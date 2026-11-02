@@ -123,6 +123,31 @@ export function buildingSprite(b) {
     bmp.rect(sx + 4, sy + 3, 3, 1, hex('#8a5a32'));
   }
 
+  if (b.sign === 'bow') {
+    // A hanging board with a bow and arrow: "free bows here"
+    const sx = Math.round(dc + 9);
+    const sy = wallTop + 5;
+    bmp.rect(sx + 2, sy - 2, 1, 3, hex('#3d2412'));
+    bmp.rect(sx + 10, sy - 2, 1, 3, hex('#3d2412'));
+    bmp.rect(sx, sy, 13, 12, hex('#c99a5b'));
+    bmp.rect(sx, sy, 13, 1, hex('#e3c08a'));
+    bmp.rect(sx, sy + 11, 13, 1, hex('#8a5a32'));
+    // the bow: a curved limb on the left, a string on the right
+    const wood = hex('#6a3a1a');
+    for (let k = 0; k < 9; k++) {
+      const off = [3, 2, 1, 1, 1, 1, 1, 2, 3][k];
+      bmp.set(sx + 2 + off, sy + 1 + k, wood);
+      bmp.set(sx + 3 + off, sy + 1 + k, wood);
+    }
+    for (let k = 1; k < 10; k++) bmp.set(sx + 6, sy + k, hex('#f1e6c8'));
+    // the arrow across it
+    bmp.rect(sx + 3, sy + 5, 8, 1, hex('#8a5a32'));
+    bmp.rect(sx + 10, sy + 4, 2, 3, hex('#b0b4b8'));
+    bmp.set(sx + 12, sy + 5, hex('#b0b4b8'));
+    bmp.set(sx + 3, sy + 4, hex('#c4402f'));
+    bmp.set(sx + 3, sy + 6, hex('#c4402f'));
+  }
+
   // ---- Roof ----------------------------------------------------------------------
   for (let y = TOP; y < roofBottom; y++) {
     for (let x = 0; x < W; x++) {
