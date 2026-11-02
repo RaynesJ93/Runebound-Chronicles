@@ -15,6 +15,7 @@
 //   range: ranged/magic weapons — how many tiles away you can attack from
 // food: { heal } — eat to restore hitpoints (takes 3 ticks, delays your next attack)
 // potion: { boost, doses, next } — drink a dose to boost a combat skill; next = what's left
+// tool:  { skill: level } — a tool for a gathering skill (works from the bag or worn)
 
 export const ITEMS = {
   coins: { name: 'Coins', stackable: true, value: 1, examine: 'Lovely money!' },
@@ -50,6 +51,34 @@ export const ITEMS = {
     name: 'Apprentice staff', value: 40, examine: 'A plain wooden staff. It hums faintly with magic.',
     equip: { slot: 'weapon', req: { magic: 1 }, style: 'magic', range: 8, type: 'crush', speed: 5, att: { magic: 6, crush: 3 }, def: { magic: 4, crush: 2 }, str: 2, look: { weaponKind: 'staff' } },
   },
+  longbow: {
+    name: 'Longbow', value: 80, examine: 'A tall bow. Slow to draw, but it shoots a long way.',
+    equip: { slot: 'weapon', req: { ranged: 1 }, style: 'ranged', ammo: 'arrow', range: 9, type: 'ranged', speed: 6, att: { ranged: 8 }, look: { weaponKind: 'bow' } },
+  },
+  oakShortbow: {
+    name: 'Oak shortbow', value: 100, examine: 'A short bow made from oak. Quick and strong.',
+    equip: { slot: 'weapon', req: { ranged: 5 }, style: 'ranged', ammo: 'arrow', range: 7, type: 'ranged', speed: 4, att: { ranged: 14 }, look: { weaponKind: 'bow' } },
+  },
+  oakLongbow: {
+    name: 'Oak longbow', value: 160, examine: 'A tall oak bow with a long reach.',
+    equip: { slot: 'weapon', req: { ranged: 5 }, style: 'ranged', ammo: 'arrow', range: 9, type: 'ranged', speed: 6, att: { ranged: 14 }, look: { weaponKind: 'bow' } },
+  },
+  // ---- Woodcutting and Fletching -------------------------------------------------------
+  bronzeAxe: {
+    name: 'Bronze axe', value: 16, tool: { woodcutting: 1 }, examine: 'A woodcutter\'s axe. Works from your bag or in your hand.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 5, att: { stab: -2, slash: 4, crush: 2 }, str: 3, look: { weapon: 'bronze', blade: 5 } },
+  },
+  ironAxe: {
+    name: 'Iron axe', value: 56, tool: { woodcutting: 5 }, examine: 'A sharper axe. Chops faster. Needs Woodcutting 5.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 5, att: { stab: -2, slash: 6, crush: 3 }, str: 5, look: { weapon: 'iron', blade: 5 } },
+  },
+  knife: { name: 'Knife', value: 6, examine: 'Sharp enough to carve wood. Tap your logs to fletch them.' },
+  logs: { name: 'Logs', value: 4, examine: 'Freshly cut pine logs.' },
+  oakLogs: { name: 'Oak logs', value: 20, examine: 'Heavy logs from an oak tree.' },
+  arrowShaft: { name: 'Arrow shaft', stackable: true, value: 1, examine: 'A wooden shaft. Add feathers to make headless arrows.' },
+  feather: { name: 'Feather', stackable: true, value: 2, examine: 'Used to fletch arrows.' },
+  headlessArrow: { name: 'Headless arrow', stackable: true, value: 1, examine: 'Needs some arrowtips to be useful.' },
+  bronzeArrowtips: { name: 'Bronze arrowtips', stackable: true, value: 1, examine: 'Fix these onto headless arrows.' },
   wolfPelt: { name: 'Wolf pelt', value: 15, examine: 'Thick grey fur. Crafters will want this one day.' },
   wolfCloak: {
     name: 'Wolf-pelt cloak', value: 400, rare: true, examine: "A cloak of alpha wolf fur. Its old owner won't be needing it.",

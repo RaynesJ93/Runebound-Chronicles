@@ -27,6 +27,8 @@ import { Bank } from './items/bank.js';
 import { Shop } from './items/shop.js';
 import { SHOPS } from '../data/shops.js';
 import { splitOnDeath, graveFee, reclaim, GRAVE_SECONDS, FREE_SECONDS } from './items/death.js';
+import { TREES, AXES, SWING_TICKS, chopChance } from '../data/woodcutting.js';
+import { RECIPES, GROUP_OF } from '../data/fletching.js';
 
 const AUTOSAVE_TICKS = 50; // 30 seconds
 
@@ -59,6 +61,14 @@ function boot() {
     // tile of a building (which shows its door text).
     const look = new Map();
     for (const p of a.props) if (p.interact) for (const t of p.tiles) look.set(a.idx(t.x, t.y), p);
+    // Trees can be chopped: their trunk, and the canopy just above it.
+    for (const p of a.props) {
+      if (p.type !== 'tree' || !TREES[p.variant]) continue;
+      for (const t of p.tiles) {
+        look.set(a.idx(t.x, t.y), p);
+        if (a.inBounds(t.x, t.y - 1) && !look.has(a.idx(t.x, t.y - 1)) && !a.isWalkable(t.x, t.y - 1)) look.set(a.idx(t.x, t.y - 1), p);
+      }
+    }
     for (const b of a.buildings) {
       // Tapping a building you can enter walks you in through its door.
       const door = b.enter ? { type: 'enter', tiles: b.doorTiles } : a.props.find((p) => p.type === 'door' && p.building === b.id);
@@ -285,15 +295,18 @@ function boot() {
   hud.onSlotSwap = (a, b) => { inventory.swap(a, b); refreshInventory(); save(); };
   // Tapping an item does its main thing (eat, drink, wield, wear), like OSRS
   // mobile. Items without one — or everything, if you prefer menus — show the menu.
-  const quickUse = (i) => {
-    const def = ITEMS[inventory.slots[i]?.id];
+  const quickUse = (i, x, y) => {
+    const id = inventory.slots[i]?.id;
+    const def = ITEMS[id];
     if (!def) return null;
+    if (GROUP_OF[id]) return () => fletchMenu(GROUP_OF[id], x, y);
+    if (id === 'knife') return () => fletchMenu(inventory.count('logs') ? 'logs' : inventory.count('oakLogs') ? 'oakLogs' : null, x, y);
     if (def.food || def.potion) return () => eat(i);
     if (def.equip) return () => wear(i);
     return null;
   };
   hud.onSlotTap = (i, x, y) => {
-    const use = state.settings.itemTap === 'menu' ? null : quickUse(i);
+    const use = state.settings.itemTap === 'menu' ? null : quickUse(i, x, y);
     if (use) use(); else hud.onSlotMenu(i, x, y);
   };
   hud.onSlotMenu = (i, x, y) => {
@@ -301,6 +314,7 @@ function boot() {
     if (!s) return;
     const def = ITEMS[s.id];
     const options = [];
+    if (GROUP_OF[s.id]) options.push({ label: 'Fletch', fn: () => fletchMenu(GROUP_OF[s.id], x, y) });
     if (def.food) options.push({ label: 'Eat', fn: () => eat(i) });
     if (def.potion) options.push({ label: 'Drink', fn: () => eat(i) });
     if (def.equip) {
@@ -389,6 +403,11 @@ function boot() {
   });
 
   // ---- Movement and interaction -------------------------------------------
+  // What you're busy doing: chopping a tree or fletching. Moving, fighting
+  // or tapping somewhere else stops it.
+  let activity = null;
+  let skillLungeAt = -99;
+  const stopActivity = () => { if (activity) { activity = null; save(); } };
   let marker = null;
   let goal = null; // what we're walking towards, so we can re-plan if blocked
   let talkTarget = null; // villager waiting for us to arrive
@@ -400,6 +419,7 @@ function boot() {
   };
 
   const walkTo = (tx, ty) => {
+    stopActivity();
     goal = { walk: { x: tx, y: ty } };
     const s = player.pathStart;
     const path = findPath(area, s.x, s.y, (x, y) => x === tx && y === ty, { x: tx, y: ty });
@@ -408,6 +428,7 @@ function boot() {
   };
 
   const interactWith = (prop) => {
+    stopActivity();
     goal = { prop };
     const s = player.pathStart;
     const isGoal = prop.goal || adjacentTo(prop.tiles);
@@ -487,6 +508,7 @@ function boot() {
   const die = () => {
     if (dying) return;
     dying = true;
+    stopActivity();
     player.frozen = true;
     player.stop();
     combat.stop();
@@ -527,6 +549,7 @@ function boot() {
 
   // Walk into another area: fade out, swap the map, fade in.
   const travel = (exit) => {
+    stopActivity();
     transitioning = true;
     player.frozen = true;
     player.stop();
@@ -569,6 +592,7 @@ function boot() {
   });
 
   const attackFoe = (foe) => {
+    stopActivity();
     pickup = null;
     releaseTalkTarget();
     goal = null;
@@ -645,7 +669,12 @@ function boot() {
     }
     if (at.prop && !at.foe && !at.npc) {
       const p = at.prop;
-      if (p.type === 'enter') {
+      const tree = p.type === 'tree' ? TREES[p.variant] : null;
+      if (tree) {
+        title ||= p.depleted ? 'Tree stump' : tree.name;
+        if (!p.depleted) opts.push({ label: `Chop down ${tree.name}`, fn: () => { combat.stop(); useProp(p); } });
+        opts.push({ label: 'Examine', fn: () => hud.message(p.depleted ? 'A stump. The tree will grow back soon.' : `${tree.examine} (Woodcutting ${tree.level})`) });
+      } else if (p.type === 'enter') {
         const b = area.buildings.find((x) => x.doorTiles === p.tiles);
         opts.push({ label: `Enter ${b?.label || 'building'}`, fn: () => { combat.stop(); useProp(p); } });
       } else if (p.action) {
@@ -804,6 +833,7 @@ function boot() {
       return;
     }
     if (prop.grave) { graveMenu(); return; }
+    if (prop.type === 'tree') { startChop(prop); return; }
     if (prop.action) { runAction(prop.action); return; }
     if (prop.interact) hud.showDialog(prop.interact);
   };
@@ -840,6 +870,129 @@ function boot() {
     if (n % AUTOSAVE_TICKS === 0) save();
   });
 
+  // ---- Woodcutting -------------------------------------------------------------
+  const wcLevel = () => book.level('woodcutting');
+  const hasItem = (id) => inventory.count(id) > 0 || state.equipment.weapon?.id === id;
+  const bestAxe = () => AXES.find((a) => hasItem(a.id) && wcLevel() >= a.level);
+  const trunk = (prop) => prop.tiles[0];
+  const fallen = new Set(); // trees that are stumps right now (any area)
+
+  const startChop = (prop) => {
+    const tree = TREES[prop.variant];
+    if (!tree) return;
+    if (prop.depleted) { hud.message('This tree has been chopped down. It will grow back soon.'); return; }
+    if (wcLevel() < tree.level) { hud.message(`You need a Woodcutting level of ${tree.level} to chop down this tree.`); return; }
+    const axe = bestAxe();
+    if (!axe) {
+      hud.message(AXES.some((a) => hasItem(a.id)) ? 'You need a higher Woodcutting level to use your axe.' : 'You need an axe to chop down this tree. Bram might lend you one.');
+      return;
+    }
+    if (!inventory.room(tree.log, 1)) { hud.message('Your inventory is too full to hold any more logs.'); return; }
+    combat.stop();
+    player.faceTowards(trunk(prop).x, trunk(prop).y);
+    activity = { kind: 'chop', prop, tree, next: ticker.count + 2 };
+    hud.message('You swing your axe at the tree.');
+  };
+
+  const chopStep = (a) => {
+    a.next = ticker.count + SWING_TICKS;
+    const axe = bestAxe();
+    if (!axe || a.prop.depleted) { activity = null; return; }
+    skillLungeAt = time;
+    player.faceTowards(trunk(a.prop).x, trunk(a.prop).y);
+    if (rng() >= chopChance(a.tree, wcLevel(), axe)) return;
+    if (!inventory.add(a.tree.log, 1)) { hud.message('Your inventory is too full to hold any more logs.'); stopActivity(); return; }
+    hud.message(`You get some ${itemName(a.tree.log).toLowerCase()}.`);
+    book.add('woodcutting', a.tree.xp);
+    refreshInventory();
+    if (rng() < a.tree.deplete) {
+      a.prop.depleted = true;
+      const [lo, hi] = a.tree.respawn;
+      a.prop.growsAt = ticker.count + lo + Math.floor(rng() * (hi - lo + 1));
+      fallen.add(a.prop);
+      hud.message(a.tree.deplete >= 1 ? 'The tree falls. It will grow back in a little while.' : 'The oak has no more good wood for now.');
+      stopActivity();
+    } else if (!inventory.room(a.tree.log, 1)) {
+      hud.message('Your inventory is too full to hold any more logs.');
+      stopActivity();
+    }
+  };
+
+  // ---- Fletching -----------------------------------------------------------------
+  const flLevel = () => book.level('fletching');
+  const amountLabel = (r) => {
+    const [id, q] = Object.entries(r.gives)[0];
+    return r.batch ? `${r.name} (up to ${r.batch})` : q > 1 ? `${r.name} × ${q}` : r.name;
+  };
+  // How many makes your bag allows (arrow steps join up to `batch` at once).
+  const makeCount = (r) => {
+    const k = Math.min(...Object.entries(r.uses).map(([id, q]) => Math.floor(inventory.count(id) / q)));
+    return r.batch ? Math.min(r.batch, k) : Math.min(1, k);
+  };
+
+  const fletchMenu = (group, x, y) => {
+    if (!group) { hud.message('Tap some logs to carve them with your knife.'); return; }
+    const list = RECIPES.filter((r) => r.group === group);
+    if (list.some((r) => r.tool) && !inventory.count('knife')) { hud.message('You need a knife to carve logs. Pell sells them.'); return; }
+    hud.showMenu(x, y, 'Fletching', [
+      ...list.map((r) => {
+        const out = Object.keys(r.gives)[0];
+        const locked = flLevel() < r.level;
+        return { label: `${amountLabel(r)}${locked ? ` — needs level ${r.level}` : ''}`, icon: itemIcon(out).url, fn: () => startMake(r) };
+      }),
+      { label: 'Cancel', fn: () => {} },
+    ]);
+  };
+
+  const startMake = (r) => {
+    if (flLevel() < r.level) { hud.message(`You need a Fletching level of ${r.level} to make that.`); return; }
+    if (r.tool && !inventory.count(r.tool)) { hud.message(`You need a ${itemName(r.tool).toLowerCase()} to do that.`); return; }
+    if (makeCount(r) <= 0) {
+      const need = Object.keys(r.uses).filter((id) => !inventory.count(id)).map((id) => itemName(id).toLowerCase());
+      hud.message(`You need ${need.join(' and ') || 'more materials'} to make that.`);
+      return;
+    }
+    combat.stop();
+    player.stop();
+    activity = { kind: 'make', recipe: r, next: ticker.count + 1, made: 0 };
+  };
+
+  const makeStep = (a) => {
+    const r = a.recipe;
+    const k = makeCount(r);
+    if (k <= 0 || (r.tool && !inventory.count(r.tool))) { stopActivity(); return; }
+    // Room for what we make, counting the slots the materials will free up.
+    let free = inventory.freeSlots;
+    for (const [id, q] of Object.entries(r.uses)) {
+      if (!ITEMS[id].stackable) free += q * k;
+      else if (inventory.count(id) === q * k) free += 1;
+    }
+    let need = 0;
+    for (const [id, q] of Object.entries(r.gives)) need += ITEMS[id].stackable ? (inventory.count(id) ? 0 : 1) : q * k;
+    if (need > free) { hud.message("You don't have enough inventory space."); stopActivity(); return; }
+    for (const [id, q] of Object.entries(r.uses)) inventory.remove(id, q * k);
+    for (const [id, q] of Object.entries(r.gives)) inventory.add(id, q * k);
+    const [outId, outQ] = Object.entries(r.gives)[0];
+    const n = outQ * k;
+    hud.message(n > 1 ? `You make ${n} ${itemName(outId).toLowerCase()}${n > 1 && !/s$/.test(itemName(outId)) ? 's' : ''}.` : `You carve the logs into ${/^[aeiou]/i.test(itemName(outId)) ? 'an' : 'a'} ${itemName(outId).toLowerCase()}.`);
+    book.add('fletching', r.xp * k);
+    skillLungeAt = time;
+    a.made++;
+    a.next = ticker.count + r.ticks;
+    refreshInventory();
+  };
+
+  ticker.on((n) => {
+    // Stumps grow back into trees.
+    for (const p of fallen) if (n >= p.growsAt) { p.depleted = false; fallen.delete(p); }
+    const a = activity;
+    if (!a) return;
+    if (dying || transitioning || combat.target || player.moving) { activity = null; return; }
+    if (n < a.next) return;
+    if (a.kind === 'chop') chopStep(a);
+    else makeStep(a);
+  });
+
   // ---- Frame loop -------------------------------------------------------------
   let zoomAcc = 0;
   let last = performance.now();
@@ -869,7 +1022,7 @@ function boot() {
 
     const blocked = hud.dialogOpen || hud.settingsOpen || transitioning || dying;
     const dir = blocked ? null : input.heldDir();
-    if (dir) { marker = null; goal = null; releaseTalkTarget(); combat.stop(); firstMove(); }
+    if (dir) { marker = null; goal = null; releaseTalkTarget(); combat.stop(); stopActivity(); firstMove(); }
     ticker.update(dt);
     if (dir) pickup = null;
     if (!transitioning) player.update(dt, dir);
@@ -877,7 +1030,7 @@ function boot() {
     for (const npc of npcs) npc.update(dt);
     for (const e of enemies) e.update(dt);
 
-    view.render(player, { time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list, playerLook: playerLook || currentLook(),
+    view.render(player, { skillLungeAt, time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list, playerLook: playerLook || currentLook(),
       grave: state.grave && state.grave.area === area.id ? state.grave : null });
     if (state.grave) {
       const left = Math.max(0, GRAVE_SECONDS - (state.stats.playTimeSec - state.grave.createdAt));
@@ -909,7 +1062,7 @@ function boot() {
   window.RBC = {
     state, player, save, hud, version: GAME_VERSION,
     get area() { return area; }, get view() { return view; }, get npcs() { return npcs; },
-    get enemies() { return enemies; }, get ground() { return ground; }, combat, book, inventory, equipment, bank, shop, eat, ticker,
+    get enemies() { return enemies; }, get ground() { return ground; }, get activity() { return activity; }, combat, book, inventory, equipment, bank, shop, eat, ticker,
   };
 }
 

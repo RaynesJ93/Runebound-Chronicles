@@ -25,13 +25,14 @@ There are no turn-based battles, no battle screens and no creature catching. You
 - Tap loot on the ground to walk over and pick it up (a pile gives you a choice). Open your **Inventory** (bag button, or I) and tap an item to examine or drop it; drag items to rearrange them. Tap a weapon or armour piece and choose **Wield** or **Wear**; the **Equipment** tab shows what you're wearing and your total bonuses.
 - Ask **Bram** (the woodcutter) for a bow and **Wren** (on the north road) about her staff. Put arrows in your ammo slot to shoot; with the staff, pick a spell in the **Combat** tab. Watch out for the wolf den to the north-east.
 - Walk into the **General Store** and **Bank** in Brambleford. Talk to Pell to trade, and Edda or any booth to bank. Pick 1 / 5 / 10 / All, then tap items to move them. Tap food to eat it, potions to drink them, and weapons or armour to put them on (Settings can make taps open the menu instead).
+- Ask **Bram** to teach you woodcutting: he'll give you an axe and a knife. Tap a pine tree to chop it (oaks need Woodcutting 15), then tap your logs to carve arrow shafts and bows. Add feathers and bronze arrowtips (from Pell) to make arrows.
 - If you die you keep your 3 most valuable items; the rest wait in a gravestone where you fell for 15 minutes (free to reclaim for the first 5).
 
 ## Status
 
-**v0.10.0 — the first playable version (Phase 1 complete).** The village of Brambleford and Route 1 (Thornwood Forest), 8 villagers with branching conversations, real-time overworld combat against goblins and wolves with melee, bows and magic, six combat skills to 99 on the OSRS XP curve, loot with rare drops, a 28-slot inventory, 11 equipment slots, a walk-in bank and General Store, food, potions and gravestones. Built for iPhone as much as desktop: long-press menus, large tap targets, a battery saver, and saves that survive every update.
+**v0.11.0 — Phase 2 has begun.** The first playable version (Brambleford, Thornwood, real-time combat with melee, bows and magic, six combat skills to 99, loot, inventory, equipment, bank, shop, food, potions and gravestones) plus the first skilling: **Woodcutting** and **Fletching**.
 
-Next: **Phase 2 — Skilling**, starting with Woodcutting and Fletching (see the [roadmap](docs/ROADMAP.md)).
+Next: Mining and Smithing (see the [roadmap](docs/ROADMAP.md)).
 
 ## Running it locally
 
@@ -58,7 +59,7 @@ node tests/save.test.mjs
 | `src/render` | Pixel-art sprites drawn in code, ground, buildings, camera and depth sorting |
 | `src/entities` | The player's movement, villagers (NPCs) and enemies |
 | `src/combat` | Combat formulas and the tick-based fighting system |
-| `src/skills` | XP curve, levels, attack styles |
+| `src/skills` | XP curve, levels, attack styles, skill list |
 | `src/items` | Inventory, equipment, bank, shop, loot rolls, ground items, death and gravestones |
 | `src/input` | Keyboard, mouse, touch, pinch and D-pad |
 | `src/ui` | On-screen interface: banner, messages, run orb, dialogue, settings |
@@ -68,6 +69,8 @@ node tests/save.test.mjs
 | `data/items.js` | Every item: name, stacking, value, examine text, equipment stats |
 | `data/spells.js` | Combat spells: level, max hit, runes, XP |
 | `data/shops.js` | Shop stock lists |
+| `data/woodcutting.js` | Trees and axes |
+| `data/fletching.js` | Fletching recipes |
 | `tests` | Save-loading tests (run with Node) |
 
 ## Stack

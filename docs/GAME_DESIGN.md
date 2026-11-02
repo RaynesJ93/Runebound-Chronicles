@@ -331,17 +331,43 @@ Dying in tutorial or story-critical fights never costs items.
 
 ## 9. Skilling, crafting, quests and long-term progression
 
-These come after the first playable version. They are listed so the systems built now leave room for them.
+Woodcutting and Fletching are in the game (v0.11.0). The rest are planned, and listed so the systems built now leave room for them.
+
+### Woodcutting and Fletching (shipped in v0.11.0)
+
+**Woodcutting.** Tap a tree to walk up and chop it. You swing every 4 ticks (2.4 s); each swing has a chance to give a log, which rises with your level and a better axe. An axe works from your bag or in your hand.
+
+| Tree | Level | XP per log | Base chance per swing | Falls |
+| --- | --- | --- | --- | --- |
+| Pine tree | 1 | 25 | 34% | After 1 log; grows back in 15–27 s |
+| Oak tree | 15 | 37.5 | 20% | 1 in 8 chance per log; grows back in 24–42 s |
+
+Each level above the tree adds 1.2% to the chance per swing. Axes: bronze (Woodcutting 1) and iron (Woodcutting 5, +10%). Bram gives you a bronze axe and a knife when you ask him to teach you; Pell sells both axes. A fallen tree shows as a stump until it grows back. Moving, fighting or tapping elsewhere stops you chopping; a full bag stops you too.
+
+**Fletching.** Tap logs (or the knife) to open the fletching menu, then pick what to make. It keeps going until you run out of materials.
+
+| Make | Level | From | XP |
+| --- | --- | --- | --- |
+| 15 arrow shafts | 1 | Logs + knife | 5 |
+| Shortbow | 5 | Logs + knife | 10 |
+| Longbow | 10 | Logs + knife | 20 |
+| 30 arrow shafts | 15 | Oak logs + knife | 10 |
+| Oak shortbow | 20 | Oak logs + knife | 33 |
+| Oak longbow | 25 | Oak logs + knife | 50 |
+| Headless arrows (up to 15 at a time) | 1 | Arrow shafts + feathers | 1 each |
+| Bronze arrows (up to 15 at a time) | 1 | Headless arrows + bronze arrowtips | 1.3 each |
+
+Feathers and bronze arrowtips come from Pell; goblins also drop feathers. Longbows shoot 9 tiles but take 6 ticks per shot; oak bows need Ranged 5 and have +14 ranged attack (normal bows +8). Bows are ready to use straight away (bowstrings arrive with Crafting).
 
 ### Gathering skills
-- **Woodcutting** — trees on routes and in forests
+- **Woodcutting** — trees on routes and in forests (see above)
 - **Mining** — ore rocks in mines and caves
 - **Fishing** — spots on rivers, lakes and the coast
 
 ### Production skills
 - **Cooking** — raw fish and meat into food (can burn)
 - **Smithing** — ore into bars, bars into weapons and armour
-- **Fletching** — logs into bows and arrows
+- **Fletching** — logs into bows and arrows (see above)
 - **Crafting** — leather, jewellery, robes
 - **Runecrafting** — rune essence into magic runes
 

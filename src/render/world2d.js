@@ -88,8 +88,8 @@ export function createWorldView(canvasEl, area) {
     switch (p.type) {
       case 'tree': {
         const spr = pick(p.variant === 'oak' ? lib.oak : lib.pine, p);
-        shadows.push({ spr: lib.treeShadow, x: f.x, y: f.y });
-        place(spr, f.x, f.y, { fade: true });
+        shadows.push({ spr: lib.treeShadow, x: f.x, y: f.y, prop: p });
+        place(spr, f.x, f.y, { fade: true, prop: p, fx: f.x, fy: f.y });
         break;
       }
       case 'bush': place(pick(lib.bush, p), f.x, f.y); break;
@@ -226,7 +226,7 @@ export function createWorldView(canvasEl, area) {
     // Your character, dressed in whatever you're wearing.
     if (playerLook !== lastLook) { lastLook = playerLook; lastLookKey = playerLook ? `player:${JSON.stringify(playerLook)}` : null; }
     const pFrames = lastLookKey ? framesFor(lib, playerLook, lastLookKey) : lib.player;
-    const pObj = personObj(pFrames, player, steps, { player: true }, time, combat?.playerLungeAt);
+    const pObj = personObj(pFrames, player, steps, { player: true }, time, Math.max(combat?.playerLungeAt ?? -99, opts.skillLungeAt ?? -99));
     const footX = pObj.fx;
     const footY = pObj.fy;
     follow(footX, footY - 8);
@@ -275,7 +275,7 @@ export function createWorldView(canvasEl, area) {
       ctx.globalAlpha = 1;
     }
 
-    for (const s of shadows) ctx.drawImage(s.spr.img, Math.round(s.x - s.spr.ax), Math.round(s.y - s.spr.ay));
+    for (const s of shadows) if (!s.prop?.depleted) ctx.drawImage(s.spr.img, Math.round(s.x - s.spr.ax), Math.round(s.y - s.spr.ay));
     const people = [pObj];
     for (const c of characters) people.push(personObj(framesFor(lib, c.def.look, c.id), c, c.steps, { person: true }));
     const foes = [];
@@ -300,6 +300,12 @@ export function createWorldView(canvasEl, area) {
 
     const flicker = Math.floor(time * 6) % 2;
     for (const o of list) {
+      if (o.prop?.depleted) {
+        // A chopped-down tree: just its stump until it grows back.
+        const st = lib.stump[(o.prop.x + o.prop.y) % lib.stump.length];
+        ctx.drawImage(st.img, Math.round(o.fx - st.ax), Math.round(o.fy - st.ay));
+        continue;
+      }
       if (o.frames) o.img = o.frames[flicker].img;
       const behind = o.fade && o.sortY > pObj.sortY &&
         pObj.x + 12 > o.x + 6 && pObj.x + 4 < o.x + o.w - 6 && pObj.y + 4 < o.y + o.h - 10 && pObj.y + pObj.h > o.y;
