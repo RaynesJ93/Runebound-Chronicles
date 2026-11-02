@@ -177,17 +177,34 @@ export function createWorldView(canvasEl, area) {
   }
 
   // A drawable for anyone walking around: the player or a villager.
-  function personObj(frames, who, steps, extra) {
+  function personObj(frames, who, steps, extra, time = 0, lungeAt = -99) {
     const wp = who.worldPosition();
-    const fx = Math.round(wp.x * TILE);
-    const fy = Math.round(wp.z * TILE + 6);
+    let fx = Math.round(wp.x * TILE);
+    let fy = Math.round(wp.z * TILE + 6);
+    const sortY = fy;
+    // A quick lunge towards whatever they're hitting.
+    if (time - lungeAt < 0.18) {
+      fx += Math.round(Math.sin(who.facing) * 3);
+      fy += Math.round(Math.cos(who.facing) * 3);
+    }
     const spr = frameOf(frames, who, steps);
-    return { img: spr.img, x: fx - spr.ax, y: fy - spr.ay, w: spr.w, h: spr.h, sortY: fy, fx, fy, ...extra };
+    return { img: spr.img, x: fx - spr.ax, y: fy - spr.ay, w: spr.w, h: spr.h, sortY, fx, fy, ...extra };
+  }
+
+  function healthBar(fx, fy, hp, max) {
+    const x = fx - 9;
+    const y = fy - 29;
+    ctx.fillStyle = '#2b1d16';
+    ctx.fillRect(x, y, 18, 5);
+    ctx.fillStyle = '#c4281d';
+    ctx.fillRect(x + 1, y + 1, 16, 3);
+    ctx.fillStyle = '#4fd04a';
+    ctx.fillRect(x + 1, y + 1, Math.round((16 * Math.max(0, hp)) / max), 3);
   }
 
   function render(player, opts) {
-    const { time, steps, marker, characters = [] } = opts;
-    const pObj = personObj(lib.player, player, steps, { player: true });
+    const { time, steps, marker, characters = [], enemies = [], combat = null } = opts;
+    const pObj = personObj(lib.player, player, steps, { player: true }, time, combat?.playerLungeAt);
     const footX = pObj.fx;
     const footY = pObj.fy;
     follow(footX, footY - 8);
@@ -225,7 +242,16 @@ export function createWorldView(canvasEl, area) {
     for (const s of shadows) ctx.drawImage(s.spr.img, Math.round(s.x - s.spr.ax), Math.round(s.y - s.spr.ay));
     const people = [pObj];
     for (const c of characters) people.push(personObj(framesFor(lib, c.def.look, c.id), c, c.steps, { person: true }));
-    for (const p of people) ctx.drawImage(lib.smallShadow.img, p.fx - lib.smallShadow.ax, p.fy - lib.smallShadow.ay);
+    const foes = [];
+    for (const e of enemies) {
+      const since = time - e.diedAt;
+      if (e.dead && since > 0.9) continue;
+      const o = personObj(framesFor(lib, e.def.look, `enemy:${e.def.id}`), e, e.steps, { person: true, enemy: e }, time, e.lungeAt);
+      if (e.dead) o.alpha = Math.max(0, 1 - since / 0.9);
+      people.push(o);
+      foes.push(o);
+    }
+    for (const p of people) if (!(p.alpha < 1)) ctx.drawImage(lib.smallShadow.img, p.fx - lib.smallShadow.ax, p.fy - lib.smallShadow.ay);
 
     const list = objects.filter((o) => inView(o.x, o.y, o.w, o.h));
     for (const p of people) if (inView(p.x, p.y, p.w, p.h)) list.push(p);
@@ -237,8 +263,24 @@ export function createWorldView(canvasEl, area) {
       const behind = o.fade && o.sortY > pObj.sortY &&
         pObj.x + 12 > o.x + 6 && pObj.x + 4 < o.x + o.w - 6 && pObj.y + 4 < o.y + o.h - 10 && pObj.y + pObj.h > o.y;
       if (behind) ctx.globalAlpha = 0.5;
+      if (o.alpha !== undefined) ctx.globalAlpha = o.alpha;
       ctx.drawImage(o.img, o.x, o.y);
-      if (behind) ctx.globalAlpha = 1;
+      ctx.globalAlpha = 1;
+    }
+
+    // Health bars (for a few seconds after being hit) and damage splats, on top.
+    if (combat) {
+      if (time - combat.playerLastHit < 6) healthBar(pObj.fx, pObj.fy, combat.hp, combat.maxHp);
+      for (const o of foes) if (!o.enemy.dead && (time - o.enemy.lastHit < 6 || o.enemy.state === 'fight')) healthBar(o.fx, o.fy, o.enemy.hp, o.enemy.maxHp);
+      const stack = new Map();
+      for (const sp of combat.splats) {
+        const o = sp.who === 'player' ? pObj : foes.find((f) => f.enemy === sp.who);
+        if (!o) continue;
+        const k = stack.get(o) || 0;
+        stack.set(o, k + 1);
+        const img = S.splat(Math.min(99, sp.dmg));
+        ctx.drawImage(img.img, o.fx - img.ax + (k % 2 ? 7 : 0), o.fy - 16 - img.ay - Math.floor(k / 2) * 9 - (k % 2 ? 4 : 0));
+      }
     }
   }
 

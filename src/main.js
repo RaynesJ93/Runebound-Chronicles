@@ -11,6 +11,9 @@ import { createWorldView } from './render/world2d.js';
 import { PlayerController } from './entities/player.js';
 import { Input } from './input/input.js';
 import { Hud } from './ui/hud.js';
+import { Enemy } from './entities/enemy.js';
+import { ENEMIES } from '../data/enemies.js';
+import { Combat } from './combat/combat.js';
 
 const AUTOSAVE_TICKS = 50; // 30 seconds
 
@@ -37,7 +40,8 @@ function boot() {
     const a = new Area(AREAS[id]());
     const v = createWorldView(canvas, a);
     const people = NPCS.filter((n) => n.area === id).map((d) => new Npc(d, a));
-    a.dynamicBlock = (x, y) => people.some((n) => n.occupies(x, y));
+    const foes = a.spawns.filter((sp) => ENEMIES[sp.enemy]).map((sp) => new Enemy(ENEMIES[sp.enemy], sp, a));
+    a.dynamicBlock = (x, y) => people.some((n) => n.occupies(x, y)) || foes.some((e) => e.occupies(x, y));
     // Tiles you can tap to look at something: props with text, and every
     // tile of a building (which shows its door text).
     const look = new Map();
@@ -46,16 +50,31 @@ function boot() {
       const door = a.props.find((p) => p.type === 'door' && p.building === b.id);
       for (let y = b.y; y < b.y + b.h; y++) for (let x = b.x; x < b.x + b.w; x++) look.set(a.idx(x, y), door);
     }
-    const w = { id, area: a, view: v, npcs: people, lookup: look };
+    const w = { id, area: a, view: v, npcs: people, enemies: foes, lookup: look };
     worlds.set(id, w);
     return w;
   }
 
   let world = loadWorld(AREAS[state.player.area] ? state.player.area : START_AREA);
-  let { area, view, npcs, lookup } = world;
+  let { area, view, npcs, enemies, lookup } = world;
   if (!area.isWalkable(state.player.x, state.player.y)) Object.assign(state.player, area.spawn);
   state.player.area = area.id;
   const player = new PlayerController(area, state);
+  let time = 0;
+  let dying = false;
+
+  // ---- Combat ----------------------------------------------------------------
+  const combat = new Combat({
+    state, player, rng,
+    on: {
+      message: (t) => hud.message(t),
+      cantReach: () => hud.message("I can't reach that."),
+      enemyDied: (e) => hud.message(`You defeated the ${e.name}!`),
+      playerDied: () => die(),
+    },
+  });
+  combat.setWorld(area, enemies);
+  if (!(state.player.hp > 0) || state.player.hp > combat.maxHp) state.player.hp = combat.maxHp;
 
   // ---- Saving --------------------------------------------------------------
   let lastSaved = loaded ? Date.now() : 0;
@@ -81,6 +100,7 @@ function boot() {
     const s = state.settings;
     hud.setDpadVisible(s.dpad === 'on' || (s.dpad === 'auto' && coarse));
     hud.el.setDpad.textContent = DPAD_LABEL[s.dpad] || 'Auto';
+    hud.el.setRetaliate.textContent = s.autoRetaliate === false ? 'Off' : 'On';
     s.zoomStep = view.setZoomStep(s.zoomStep || 0);
     hud.el.zoomVal.textContent = s.zoomStep > 0 ? `+${s.zoomStep}` : String(s.zoomStep);
   };
@@ -90,6 +110,10 @@ function boot() {
   hud.el.setDpad.addEventListener('click', () => {
     const order = ['auto', 'on', 'off'];
     state.settings.dpad = order[(order.indexOf(state.settings.dpad) + 1) % order.length];
+    applySettings();
+  });
+  hud.el.setRetaliate.addEventListener('click', () => {
+    state.settings.autoRetaliate = state.settings.autoRetaliate === false;
     applySettings();
   });
   const zoomBy = (d) => { state.settings.zoomStep = (state.settings.zoomStep || 0) + d; applySettings(); };
@@ -186,6 +210,7 @@ function boot() {
 
   // Someone stepped into our path: plan again around them.
   player.onBlocked = () => {
+    if (combat.target) { combat.approach(); return; }
     if (!goal) return;
     if (goal.prop) interactWith(goal.prop.npc ? { npc: goal.prop.npc, tiles: [goal.prop.npc.standTile] } : goal.prop);
     else walkTo(goal.walk.x, goal.walk.y);
@@ -197,7 +222,39 @@ function boot() {
     if (player.tile.x === x && player.tile.y === y) return false;
     if (player.moving && player.to.x === x && player.to.y === y) return false;
     if (area.exitAt.has(area.idx(x, y))) return false;
-    return !npcs.some((n) => n !== self && n.occupies(x, y));
+    return !npcs.some((n) => n !== self && n.occupies(x, y)) && !enemies.some((e) => e.occupies(x, y));
+  };
+
+  // You died: fade out, wake up in Brambleford at full health.
+  // (Item loss and the gravestone arrive with the bank in Batch 8.)
+  const die = () => {
+    if (dying) return;
+    dying = true;
+    player.frozen = true;
+    player.stop();
+    combat.stop();
+    releaseTalkTarget();
+    marker = null;
+    goal = null;
+    hud.message('Oh dear, you are dead!');
+    setTimeout(() => hud.setFade(true), 900);
+    setTimeout(() => {
+      world = loadWorld(START_AREA);
+      ({ area, view, npcs, enemies, lookup } = world);
+      combat.setWorld(area, enemies);
+      view.resize();
+      applySettings();
+      const s = area.spawn;
+      player.teleport(area, s.x, s.y, s.facing ?? 0);
+      state.player.hp = combat.maxHp;
+      state.stats.deaths = (state.stats.deaths || 0) + 1;
+      player.frozen = false;
+      dying = false;
+      save();
+      hud.setFade(false);
+      hud.showArea(area.name);
+      hud.message('You wake up at home, feeling a little dizzy.');
+    }, 1300);
   };
 
   // Walk into another area: fade out, swap the map, fade in.
@@ -206,12 +263,14 @@ function boot() {
     player.frozen = true;
     player.stop();
     releaseTalkTarget();
+    combat.stop();
     marker = null;
     goal = null;
     hud.setFade(true);
     setTimeout(() => {
       world = loadWorld(exit.to);
-      ({ area, view, npcs, lookup } = world);
+      ({ area, view, npcs, enemies, lookup } = world);
+      combat.setWorld(area, enemies);
       view.resize();
       applySettings();
       player.teleport(area, exit.at.x + exit.offset, exit.at.y, exit.facing ?? player.facing);
@@ -233,9 +292,20 @@ function boot() {
 
   input.onTap = (sx, sy) => {
     if (hud.dialogOpen) { hud.advanceDialog(); return; }
-    if (hud.settingsOpen || transitioning) return;
+    if (hud.settingsOpen || transitioning || dying) return;
     const t = view.screenToTile(sx, sy);
     if (!area.inBounds(t.x, t.y)) return;
+    // Monsters: tap to attack (their head, one tile up, counts too).
+    const foe = enemies.find((e) => e.occupies(t.x, t.y)) || enemies.find((e) => e.occupies(t.x, t.y + 1));
+    if (foe) {
+      releaseTalkTarget();
+      goal = null;
+      marker = null;
+      combat.attack(foe);
+      firstMove();
+      return;
+    }
+    combat.stop();
     // Villagers are tall, so a tap on their head (the tile above) counts too.
     const npc = npcs.find((n) => n.occupies(t.x, t.y)) || npcs.find((n) => n.occupies(t.x, t.y + 1));
     if (npc) { talkTo(npc); firstMove(); return; }
@@ -288,6 +358,7 @@ function boot() {
   // ---- Ticks ----------------------------------------------------------------
   const ticker = new Ticker();
   ticker.on((n) => {
+    if (!dying) combat.tick(time);
     player.onTick();
     for (const npc of npcs) npc.onTick(rng, tileFreeForNpc);
     state.stats.playTimeSec += 0.6;
@@ -297,7 +368,6 @@ function boot() {
   // ---- Frame loop -------------------------------------------------------------
   let zoomAcc = 0;
   let last = performance.now();
-  let time = 0;
   const frame = (now) => {
     const dt = Math.max(0, Math.min(0.25, (now - last) / 1000));
     last = now;
@@ -310,14 +380,17 @@ function boot() {
       zoomAcc = 0;
     }
 
-    const blocked = hud.dialogOpen || hud.settingsOpen || transitioning;
+    const blocked = hud.dialogOpen || hud.settingsOpen || transitioning || dying;
     const dir = blocked ? null : input.heldDir();
-    if (dir) { marker = null; goal = null; releaseTalkTarget(); firstMove(); }
+    if (dir) { marker = null; goal = null; releaseTalkTarget(); combat.stop(); firstMove(); }
     ticker.update(dt);
     if (!transitioning) player.update(dt, dir);
     for (const npc of npcs) npc.update(dt);
+    for (const e of enemies) e.update(dt);
 
-    view.render(player, { time, steps: state.stats.tilesWalked, marker, characters: npcs });
+    view.render(player, { time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat });
+    hud.setHp(state.player.hp, combat.maxHp);
+    hud.setTarget(combat.target || enemies.find((e) => !e.dead && e.state === 'fight') || null);
     hud.setRun(state.run.on, state.run.energy);
     requestAnimationFrame(frame);
   };
@@ -340,6 +413,7 @@ function boot() {
   window.RBC = {
     state, player, save, hud, version: GAME_VERSION,
     get area() { return area; }, get view() { return view; }, get npcs() { return npcs; },
+    get enemies() { return enemies; }, combat,
   };
 }
 

@@ -19,12 +19,13 @@ There are no turn-based battles, no battle screens and no creature catching. You
 - **iPhone:** tap to walk, or use the on-screen joystick. Pinch to zoom. For full-screen play, open the link in Safari, tap Share, then **Add to Home Screen**.
 - Tap or click people to talk to them, and signs, doors and other objects to look at them. Number keys pick answers on desktop.
 - Head north out of the village to reach Route 1 — Thornwood Forest.
+- Tap or click a goblin to attack it. Your character walks up and fights automatically. Tap the ground or move to stop. Beware the Goblin Brute by the tents: it attacks on sight.
 
 ## Status
 
-**v0.3.0 — Batches 0–2 done:** the village of Brambleford and Route 1 (Thornwood Forest), 8 villagers to talk to with branching conversations, Emerald-style top-down movement, tap-to-move pathfinding, run energy, and local saving with backup codes.
+**v0.4.0 — Batches 0–3 done:** the village of Brambleford and Route 1 (Thornwood Forest), 8 villagers with branching conversations, and real-time overworld combat against goblins — damage splats, health bars, chasing, retreating and respawning. Plus Emerald-style movement, run energy, and local saving with backup codes.
 
-Next: **Batch 3** — real-time overworld combat with roaming goblins (see the [roadmap](docs/ROADMAP.md)).
+Next: **Batch 4** — combat skills and XP, levelling to 99 (see the [roadmap](docs/ROADMAP.md)).
 
 ## Running it locally
 
@@ -43,11 +44,13 @@ then visit http://localhost:8000.
 | `src/core` | Game tick (0.6 s), game state, saving with versions and migrations |
 | `src/world` | Tile grid, collision and pathfinding |
 | `src/render` | Pixel-art sprites drawn in code, ground, buildings, camera and depth sorting |
-| `src/entities` | The player's movement and villagers (NPCs) |
+| `src/entities` | The player's movement, villagers (NPCs) and enemies |
+| `src/combat` | Combat formulas and the tick-based fighting system |
 | `src/input` | Keyboard, mouse, touch, pinch and D-pad |
 | `src/ui` | On-screen interface: banner, messages, run orb, dialogue, settings |
 | `data/areas` | Map data for each area |
 | `data/npcs.js` | Villagers: where they live, how they look, what they say |
+| `data/enemies.js` | Monster stats: levels, hitpoints, accuracy, attack speed, aggression |
 
 ## Stack
 

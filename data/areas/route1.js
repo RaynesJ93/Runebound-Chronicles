@@ -142,5 +142,14 @@ export function buildRoute1() {
     exits: [
       { tiles: [{ x: 16, y: 59 }, { x: 17, y: 59 }], to: 'brambleford', at: { x: 21, y: 1 }, facing: 0 },
     ],
+    // Monsters and where they live (see data/enemies.js).
+    spawns: [
+      { enemy: 'goblin', x: 6, y: 44 },
+      { enemy: 'goblin', x: 9, y: 46 },
+      { enemy: 'goblin', x: 4, y: 49 },
+      { enemy: 'goblin', x: 10, y: 49 },
+      { enemy: 'goblin', x: 13, y: 47 },
+      { enemy: 'goblinBrute', x: 6, y: 42 },
+    ],
   };
 }

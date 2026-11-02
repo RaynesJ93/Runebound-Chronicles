@@ -4,9 +4,9 @@
 
 export function defaultState() {
   return {
-    player: { area: 'brambleford', x: 16, y: 24, facing: 0 },
+    player: { area: 'brambleford', x: 16, y: 24, facing: 0, hp: 10 },
     run: { on: true, energy: 100 },
-    settings: { dpad: 'auto', zoomStep: 0 },
+    settings: { dpad: 'auto', zoomStep: 0, autoRetaliate: true },
     stats: { playTimeSec: 0, tilesWalked: 0 },
     flags: { seenMoveHint: false },
     createdAt: Date.now(),

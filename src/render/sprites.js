@@ -400,7 +400,8 @@ function palette(look) {
     tunic, tunicS: shade(tunic, 0.72), tunicHi: shade(tunic, 1.25),
     belt: hex(L.belt), gold: hex('#e8c040'),
     pants, pantsS: shade(pants, 0.78),
-    boots: hex(L.boots), eye: hex('#2b1d16'),
+    boots: hex(L.boots), eye: hex(L.eyes || '#2b1d16'),
+    ears: !!L.ears,
     beard: L.beard ? hex(L.beard) : null,
     hat: L.hat || null, robe: !!L.robe,
     hatCol: L.hatColor ? hex(L.hatColor) : null,
@@ -478,6 +479,14 @@ function drawFront(L, back, frame) {
       b.set(10, 8 + bob, L.blush);
     }
   }
+  if (L.ears) {
+    // pointy goblin ears sticking out either side of the head
+    for (const [x, dir] of [[2, -1], [13, 1]]) {
+      b.rect(x, 4 + bob, 1, 3, L.skin);
+      b.set(x + dir, 3 + bob, L.skin);
+      b.set(x + dir, 4 + bob, L.skinS);
+    }
+  }
   drawHat(b, L, bob, back ? 'back' : 'front');
   b.outline();
   return b;
@@ -512,6 +521,7 @@ function drawSide(L, frame) {
   b.rect(5, 5 + bob, 1, 2, L.eye);
   if (L.beard) { b.rect(4, 8 + bob, 5, 2, L.beard); b.rect(5, 10 + bob, 3, 1, L.beard); }
   else b.set(5, 8 + bob, L.blush);
+  if (L.ears) { b.rect(12, 4 + bob, 1, 3, L.skin); b.set(13, 3 + bob, L.skin); b.set(13, 4 + bob, L.skinS); }
   drawHat(b, L, bob, 'side');
   b.outline();
   return b;
@@ -540,4 +550,37 @@ function mirror(b) {
     for (let c = 0; c < 4; c++) m.data[k + c] = b.data[i + c];
   }
   return m;
+}
+
+// ---- Damage splats ---------------------------------------------------------------
+// A tiny 3x5 pixel font for the numbers.
+const DIGITS = {
+  0: ['111', '101', '101', '101', '111'], 1: ['010', '110', '010', '010', '111'],
+  2: ['111', '001', '111', '100', '111'], 3: ['111', '001', '011', '001', '111'],
+  4: ['101', '101', '111', '001', '001'], 5: ['111', '100', '111', '001', '111'],
+  6: ['111', '100', '111', '101', '111'], 7: ['111', '001', '010', '010', '010'],
+  8: ['111', '101', '111', '101', '111'], 9: ['111', '101', '111', '001', '111'],
+};
+
+const splatCache = new Map();
+
+// Red splat for damage, blue for a miss (0).
+export function splat(n) {
+  if (splatCache.has(n)) return splatCache.get(n);
+  const b = new Bitmap(15, 13);
+  const miss = n === 0;
+  const tones = miss ? [hex('#1f4f9a'), hex('#2f6fd0'), hex('#4f8fe8'), hex('#8fbdf5')] : [hex('#8a1a14'), hex('#c4281d'), hex('#e3412f'), hex('#f47a5a')];
+  shadedBlobs(b, [[7.5, 6.5, 6], [4, 4, 3], [11, 4, 3], [4, 9.5, 3], [11, 9.5, 3]], tones, n + 3);
+  b.outline();
+  const str = String(n);
+  const w = str.length * 4 - 1;
+  let x = Math.round((15 - w) / 2);
+  for (const ch of str) {
+    const g = DIGITS[ch];
+    for (let r = 0; r < 5; r++) for (let c = 0; c < 3; c++) if (g[r][c] === '1') b.set(x + c, 4 + r, [255, 255, 255]);
+    x += 4;
+  }
+  const spr = sprite(b, 7, 6);
+  splatCache.set(n, spr);
+  return spr;
 }
