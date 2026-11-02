@@ -1,6 +1,6 @@
 # RuneBound Chronicles — Game Design Document
 
-*Version 2.2 · Updated 2 November 2026 · 2D pixel art; supersedes the original creature-battler concept*
+*Version 2.3 · Updated 2 November 2026 · 2D pixel art; supersedes the original creature-battler concept*
 
 ## 1. Vision
 
@@ -72,7 +72,7 @@ The world is a graph of connected areas, each a hand-built tile map.
 | Mine | Ore rocks, dwarves, low light | Copperdeep Mine |
 | Cave | Linked tunnels, darkness, stronger enemies | — |
 | Dungeon | Multi-floor, bosses, rare drops, quest-locked | — |
-| Wilderness | High-risk area with harsher death rules and best rewards | The Ashlands (endgame) |
+| Danger zone | High-risk area with harsher death rules and best rewards | The Ashlands (endgame) |
 
 Regions unlock through quests, skill or combat level requirements, or key items (Emerald-style "HM" gates are replaced by quest and skill requirements, e.g. "Woodcutting 15 to clear the fallen log").
 
@@ -117,14 +117,15 @@ The player switches between **melee, ranged and magic** by equipping the right w
 
 | Style | XP goes to | Effect |
 | --- | --- | --- |
-| Accurate | Attack (melee) / Ranged / Magic | +3 effective attack level |
-| Aggressive | Strength (melee) | +3 effective strength level |
-| Defensive | Defence | +3 effective defence level |
-| Controlled | Attack, Strength, Defence split | +1 to each |
-| Rapid (ranged) | Ranged | Attack speed −1 tick |
-| Longrange (ranged/magic) | Ranged or Magic + Defence | +2 range |
+| Precise | Attack | +3 effective attack level |
+| Forceful | Strength | +3 effective strength level |
+| Guarded | Defence | +3 effective defence level |
+| Balanced | Attack, Strength, Defence split | +1 to each |
+| Steady (bows) | Ranged | +3 effective ranged level |
+| Quickshot (bows) | Ranged | Attack speed −1 tick |
+| Farshot (bows) | Ranged + Defence | +2 range |
 
-Every damaging hit also gives Hitpoints XP.
+Every damaging hit also gives Vitality XP. *(Until the names batch ships, the game still shows the older names Accurate, Aggressive, Defensive, Controlled, Rapid, Longrange and Hitpoints.)*
 
 ### Ranged and magic (first release)
 
@@ -133,8 +134,10 @@ Every damaging hit also gives Hitpoints XP.
 
 | Spell | Magic level | Max hit | Runes | Base XP |
 | --- | --- | --- | --- | --- |
-| Wind Strike | 1 | 2 | 1 air, 1 mind | 5.5 |
-| Water Strike | 5 | 4 | 1 water, 1 air, 1 mind | 7.5 |
+| Gale Dart | 1 | 2 | 1 Gale, 1 Focus | 5.5 |
+| Tide Dart | 5 | 4 | 1 Tide, 1 Gale, 1 Focus | 7.5 |
+
+The full spell list (Darts, Lances, Surges and Cataclysms) is in section 7, *Runes and spells*.
 
 Magic gives the base XP per cast plus 2 per damage. Arrows and spells take a moment to fly; damage lands when they arrive.
 
@@ -187,7 +190,7 @@ Enemies use the same formulas, with their own stats defined in data.
 | Attack | Melee accuracy; unlocks weapons | Melee on Accurate or Controlled |
 | Strength | Melee max hit | Melee on Aggressive or Controlled |
 | Defence | Reduces chance to be hit; unlocks armour | Defensive style |
-| Hitpoints | Health pool (1 HP per level) | Any damage dealt; starts at level 10 |
+| Vitality | Health pool (1 hitpoint per level) | Any damage dealt; starts at level 10 |
 | Ranged | Ranged accuracy and damage; unlocks bows and ranged armour | Ranged weapons |
 | Magic | Magic accuracy; unlocks spells and staves | Casting combat spells |
 
@@ -206,21 +209,21 @@ This is the OSRS curve: level 2 needs 83 XP, level 50 needs about 101,000, level
 ### Combat XP rates
 
 - Melee, ranged and magic: **4 XP per damage dealt** to the chosen skill(s).
-- Hitpoints: **1.33 XP per damage dealt**.
+- Vitality: **1.33 XP per damage dealt**.
 - Magic also gives a small base XP per cast, even on a miss.
 - Defensive/longrange styles split XP as shown in the styles table.
 
 ### Combat level
 
 ```
-base   = 0.25 × (Defence + Hitpoints)
+base   = 0.25 × (Defence + Vitality)
 melee  = 0.325 × (Attack + Strength)
 ranged = 0.325 × floor(1.5 × Ranged)
 magic  = 0.325 × floor(1.5 × Magic)
 combat level = floor( base + max(melee, ranged, magic) )
 ```
 
-A new character (all 1s, Hitpoints 10) is combat level 3. A maxed character is level 113 (there is no Prayer skill yet, so it tops out lower than OSRS's 126).
+A new character (all 1s, Vitality 10) is combat level 3. A maxed character is level 113 (there is no Devotion skill yet, so it tops out lower than OSRS's 126).
 
 Enemy names show their combat level, coloured green (weaker), yellow (similar) or red (stronger) relative to the player.
 
@@ -242,7 +245,7 @@ Each enemy has its own loot table, defined in data files:
 - **Always:** guaranteed drops (e.g. bones on every kill).
 - **Main table:** one roll per kill, weighted (coins, low-tier weapons, runes, arrows, food, crafting materials).
 - **Rare table:** separate small chance (e.g. 1/128), rare items and higher-tier gear.
-- **Unique rares:** per-enemy signature drops (e.g. Wolf Pelt Cloak from Alpha Wolf at 1/64).
+- **Trophies:** per-enemy signature rare drops (e.g. the Wolf-pelt cloak from the Alpha Wolf at 1/32), recorded in the Trophy ledger.
 
 Example — Goblin:
 
@@ -250,10 +253,10 @@ Example — Goblin:
 | --- | --- | --- |
 | Bones | 1 | Always |
 | Coins | 1–15 | 1/3 |
-| Bronze dagger | 1 | 1/16 |
+| Copper dagger | 1 | 1/16 |
 | Goblin mail | 1 | 1/32 |
-| Air runes | 4–8 | 1/12 |
-| Bronze arrows | 3–10 | 1/10 |
+| Gale runes | 4–8 | 1/12 |
+| Copper arrows | 3–10 | 1/10 |
 | Goblin war-charm (rare) | 1 | 1/256 |
 
 ### Ground items
@@ -279,17 +282,188 @@ Head, Cape, Neck, Ammo, Weapon, Body, Shield, Legs, Hands, Feet, Ring.
 
 Each item has stats in data: attack bonuses (stab, slash, crush, ranged, magic), defence bonuses for each, melee strength, ranged strength, magic damage, attack speed, and level requirements. The equipment screen shows totals.
 
-### Gear tiers (combat)
+### Gear and progression
 
-| Tier | Requirement | First source |
+*Added 2 Nov 2026 (design v2.3). The structure follows OSRS — tiers unlocked by level, three combat styles that counter each other, gear that comes from drops, shops and your own crafting — but every name, material and tier is RuneBound's own. See section 14 for the full list of names.*
+
+#### The three gear families
+
+Each combat style has its own gear family, and they counter each other in a triangle:
+
+| Family | For | Made from | Strong against | Weak against |
+| --- | --- | --- | --- | --- |
+| **Metal** (weapons and plate) | Melee | Ore smelted into bars (Smithing) | Arrows | Spells |
+| **Hide** (bows, arrows, hide armour) | Ranged | Wood (Fletching) and animal hides (Crafting) | Spells | Metal |
+| **Cloth** (staves, robes) | Magic | Wood, gems and woven cloth (Crafting) | Metal | Arrows |
+
+Metal armour has big defences against stab, slash, crush and arrows but negative magic defence. Hide armour defends well against magic and arrows but poorly against melee. Robes give magic accuracy and magic defence but almost nothing against arrows. Picking the right style for a monster (and the right armour for what it hits with) is the core of gear choice.
+
+#### Metal tiers (melee)
+
+Nine metals, each tied to a place in the world. You need **Attack** to wield a weapon and **Defence** to wear armour at the tier's level. Making it needs the same level in **Smithing**.
+
+| Tier | Level | Colour | Ore and where it's found | Arrives |
+| --- | --- | --- | --- | --- |
+| **Copper** | 1 | Warm orange | Copper ore — Copperdeep Mine, north of Thornwood | Now (shop and drops); smithing in Phase 2 |
+| **Greyiron** | 5 | Dull grey | Greyiron ore — Copperdeep Mine | Now (rare drops); smithing in Phase 2 |
+| **Hearthsteel** | 10 | Bright steel with a red sheen | Greyiron ore + cinderstone (coal) | Phase 2–3 |
+| **Dusksteel** | 20 | Blue-black | Duskite ore — caves under the second town | Phase 3 |
+| **Moonsilver** | 30 | Pale silver-blue | Moonsilver ore — moonlit caverns | Phase 3 |
+| **Verdite** | 40 | Deep green | Verdite ore — the Fen marshes | Phase 4 |
+| **Emberite** | 50 | Red-gold, glowing seams | Emberite ore — volcanic mountain | Phase 4 |
+| **Stormsteel** | 60 | Violet, crackling | Stormsteel ore — high peaks | Phase 5 |
+| **Starmetal** | 70 | Near-white with sparkles | Fallen-star rocks (random events) | Phase 5 |
+
+Beyond the metals there are **boss-only tiers** that can't be smithed: **Wyrmscale** (level 75, from wyrm bosses) and **Ashforged** (level 80, very rare, from the Ashlands).
+
+**Melee weapons** — every metal comes in these shapes:
+
+| Weapon | Hits with | Speed | Character |
+| --- | --- | --- | --- |
+| Dagger | Stab | 4 ticks (2.4 s) | Very accurate, low damage |
+| Sabre | Slash | 4 ticks | Best all-round training weapon |
+| Longsword | Slash/stab | 5 ticks | Hits harder than a sabre, slower |
+| Mace | Crush | 5 ticks | For armoured enemies (skeletons, golems) |
+| Spear | Stab | 5 ticks | Balanced stats; also boosts Defence slightly |
+| War axe | Slash | 6 ticks | Big hits, low accuracy |
+| Maul | Crush | 6 ticks | Big crush hits |
+| Greatsword | Slash | 7 ticks, two-handed | The biggest hits; no shield |
+
+**Metal armour**:
+
+| Piece | Slot | Notes |
 | --- | --- | --- |
-| Bronze | 1 | Shop, goblin drops |
-| Iron | 5 | Shop, drops |
-| Steel | 10 | Later shops, smithing |
-| Mithril → Adamant → Rune | 20 / 30 / 40 | Later regions |
-| Endgame tiers | 60+ | Bosses, rare drops |
+| Helm | Head | Light, cheap |
+| Greathelm | Head | Full face; more defence |
+| Mail shirt | Body | Light |
+| Cuirass | Body | Heaviest defence; the most expensive piece |
+| Greaves | Legs | |
+| Buckler | Shield | Light shield |
+| Heater shield | Shield | Big defence |
+| Gauntlets | Hands | |
+| Sabatons | Feet | |
 
-Ranged gear follows the same idea (leather → hide armour, shortbow → oak → willow …). Magic uses staves and robes.
+Example stats (Sabre and Cuirass at each tier) — the full tables live in `data/items.js`:
+
+| Tier | Sabre slash attack | Sabre strength | Cuirass slash defence | Cuirass magic defence |
+| --- | --- | --- | --- | --- |
+| Copper | +8 | +7 | +16 | −15 |
+| Greyiron | +11 | +10 | +22 | −15 |
+| Hearthsteel | +16 | +15 | +32 | −16 |
+| Dusksteel | +22 | +21 | +45 | −17 |
+| Moonsilver | +30 | +28 | +58 | −18 |
+| Verdite | +38 | +36 | +70 | −19 |
+| Emberite | +46 | +44 | +82 | −20 |
+| Stormsteel | +56 | +54 | +94 | −22 |
+| Starmetal | +67 | +65 | +106 | −24 |
+
+Each tier is a clear step up: at low levels a new tier is worth roughly one extra damage per hit, so upgrades are noticeable from the very first one.
+
+#### Wood tiers (bows and staves)
+
+| Wood | Level | Where it grows |
+| --- | --- | --- |
+| **Pine** | 1 | Everywhere in Thornwood |
+| **Ashwood** | 10 | Thornwood clearings |
+| **Thornwood** | 20 | Deep in the old forest |
+| **Elderwood** | 30 | Around the second town |
+| **Ironbark** | 40 | Fen islands |
+| **Duskwood** | 50 | Shadow valleys |
+| **Moonbark** | 60 | Moonlit groves |
+| **Starwood** | 70 | Where stars have fallen |
+
+- **Shortbow** — fast (4 ticks), range 7. **Warbow** — slower (5 ticks), range 9, stronger. Both need **Ranged** at the wood's level; making them needs **Fletching**.
+- A bow can fire arrows up to its own tier: a Pine bow fires Copper arrows; an Elderwood bow fires up to Moonsilver arrows (the metal of the same tier number).
+- **Arrows** are tipped with metal: Copper arrows, Greyiron arrows … Starmetal arrows. They need Ranged at the metal's level.
+- **Staves** are wood plus a gem focus (see Jewellery). They need **Magic** at the wood's level. **Attuned staves** (e.g. a Gale-attuned staff) save one elemental rune of their element on every cast.
+
+#### Hide armour (ranged)
+
+Needs **Ranged** and **Defence** at the hide's level. Pieces: Hood, Vest, Leggings, Bracers, Boots.
+
+| Hide | Level | From |
+| --- | --- | --- |
+| Rawhide | 1 | Shop; cows and deer |
+| Wolfhide | 10 | Wolf pelts (Thornwood) |
+| Boarhide | 20 | Bristleboars |
+| Fenhide | 30 | Fen lizards |
+| Cinderhide | 40 | Salamanders on the volcano |
+| Frosthide | 50 | Ice drakes |
+| Stormhide | 60 | Thunder drakes |
+| Wyrmhide | 70 | Wyrm bosses |
+
+#### Cloth (magic)
+
+Needs **Magic** (and Defence from Mooncloth up). Pieces: Hat, Robe top, Robe skirt, Gloves, Boots.
+
+| Cloth | Level |
+| --- | --- |
+| Linen | 1 |
+| Woolweave | 10 |
+| Silkweave | 20 |
+| Mooncloth | 30 |
+| Emberweave | 40 |
+| Stormweave | 50 |
+| Starcloth | 60 |
+| Voidsilk | 70 |
+
+#### Runes and spells
+
+Runes come in four **elements** and four **power runes**:
+
+- Elements: **Gale** (wind), **Tide** (water), **Stone** (earth), **Ember** (fire)
+- Power: **Focus** (Dart spells), **Fury** (Lance), **Ruin** (Surge), **Doom** (Cataclysm)
+
+Each spell family has one spell per element, getting stronger from Gale to Ember:
+
+| Family | Power rune | Gale | Tide | Stone | Ember | Max hits |
+| --- | --- | --- | --- | --- | --- | --- |
+| **Dart** | Focus | 1 | 5 | 9 | 13 | 2 / 4 / 6 / 8 |
+| **Lance** | Fury | 18 | 24 | 30 | 36 | 9 / 10 / 11 / 12 |
+| **Surge** | Ruin | 42 | 48 | 54 | 60 | 13 / 14 / 15 / 16 |
+| **Cataclysm** | Doom | 63 | 67 | 71 | 75 | 17 / 18 / 19 / 20 |
+
+A spell costs its power rune plus elemental runes (e.g. Tide Dart: 1 Focus, 1 Tide, 1 Gale). Runes are made with **Runebinding** (Phase 2) from **blank runestones**, at elemental altars.
+
+#### Jewellery (neck and ring)
+
+Gems, cut with Crafting and set into silver or gold: **Amber** (5), **Jade** (20), **Garnet** (35), **Moonstone** (50), **Starstone** (70). Each gem gives an amulet and a ring with a small bonus (accuracy, strength, magic damage or defence), and enchanted versions with special effects later. Gems are also the focus in staves.
+
+#### RuneBound's own systems
+
+These are what make our gear different from OSRS:
+
+1. **Craft quality.** Items you make yourself can come out **Standard**, **Fine** (+10% to every bonus) or **Masterwork** (+20%), with better odds the higher your skill is above the item's level. Drops and shop items are always Standard, so crafting skills give the best gear at every tier. Fine and Masterwork items show a small silver or gold star on their icon and sell for more.
+2. **Matched sets.** Wearing 4 or more pieces of the same tier (helm, body, legs, shield, gauntlets, sabatons — or the hide/cloth equivalents) gives a **set bonus**: +5% accuracy with that family's style. The Equipment tab shows "Matched set (4/6)".
+3. **Trophies.** Rare monster drops are wearable **trophies** with their own small bonus or effect (the Goblin war-charm, the Wolf-pelt cloak). Every trophy you've ever found is recorded in the **Trophy ledger**.
+4. **Fervour.** Rare and boss weapons have a **Fervour strike**: a special attack powered by a Fervour bar that fills as you fight. (Later phase.)
+5. **Gear guide.** The Equipment tab suggests your next upgrade for each slot and where it comes from, so progression is always clear.
+
+#### Progression at a glance
+
+| Combat level | Where | Melee | Ranged | Magic |
+| --- | --- | --- | --- | --- |
+| 3–15 | Brambleford, Thornwood | Copper → Greyiron | Pine bow, Rawhide → Wolfhide | Pine staff, Linen, Darts |
+| 15–35 | Copperdeep Mine, second town | Hearthsteel → Dusksteel | Ashwood → Thornwood bows, Boarhide | Woolweave, Silkweave, Lances |
+| 35–60 | Moon caverns, the Fen | Moonsilver → Verdite | Elderwood → Ironbark, Fenhide | Mooncloth, Emberweave |
+| 60–85 | Volcano, high peaks | Emberite → Stormsteel | Duskwood → Moonbark, Cinderhide → Stormhide | Stormweave, Starcloth, Surges |
+| 85+ | Fallen stars, wyrm lairs, the Ashlands | Starmetal, Wyrmscale, Ashforged | Starwood, Wyrmhide | Voidsilk, Cataclysms |
+
+#### Renaming the items already in the game
+
+When this ships, existing items are renamed and old saves are upgraded automatically (save version 3):
+
+| Now | Becomes |
+| --- | --- |
+| Bronze dagger / sword / med helm / arrows | Copper dagger / sabre / helm / arrows |
+| Iron dagger | Greyiron dagger |
+| Shortbow | Pine shortbow |
+| Apprentice staff | Pine staff |
+| Leather body / gloves / boots | Rawhide vest / bracers / boots |
+| Air / Water / Mind runes | Gale / Tide / Focus runes |
+| Wind Strike / Water Strike | Gale Dart / Tide Dart |
+
+Wooden shield, Goblin mail, the Goblin war-charm and the Wolf-pelt cloak keep their names; they are already our own.
 
 ### Food and potions
 
@@ -325,7 +499,7 @@ Death should sting without ruining a session.
 5. If the timer runs out, the items are lost.
 6. XP and levels are never lost.
 
-**Wilderness (endgame):** you keep only 3 items, and there is no gravestone. The risk is shown clearly before you enter, with a warning screen.
+**The Ashlands (endgame):** you keep only 3 items, and there is no gravestone. The risk is shown clearly before you enter, with a warning screen.
 
 Dying in tutorial or story-critical fights never costs items.
 
@@ -340,28 +514,28 @@ These come after the first playable version. They are listed so the systems buil
 
 ### Production skills
 - **Cooking** — raw fish and meat into food (can burn)
-- **Smithing** — ore into bars, bars into weapons and armour
-- **Fletching** — logs into bows and arrows
-- **Crafting** — leather, jewellery, robes
-- **Runecrafting** — rune essence into magic runes
+- **Smithing** — ore into bars, bars into metal weapons and armour (Copper to Starmetal)
+- **Fletching** — logs into bows, staves and arrows (Pine to Starwood)
+- **Crafting** — hide armour, woven robes, cut gems and jewellery
+- **Runebinding** — blank runestones into runes at elemental altars
 
 ### Support skills (later)
-- **Prayer** — bury bones for XP, temporary combat boosts
-- **Agility** — shortcuts and faster run-energy regen
+- **Devotion** — offer bones at shrines for XP; temporary blessings in combat
+- **Athletics** — shortcuts and faster run-energy regen
 
-Every skill uses the same XP curve and goes to 99. Resources respawn after a timer, with chances to succeed improving with level and tools.
+Every skill uses the same XP curve and goes to 99. Resources respawn after a timer, with chances to succeed improving with level and tools. Crafted gear can come out Fine or Masterwork (section 7).
 
 ### Quests
 - A quest journal lists quests as not started / in progress / complete.
 - Quests use NPC dialogue, item delivery, kill tasks, simple puzzles and story bosses.
 - Rewards: XP lamps, items, coins, and **new region access**.
-- Quest points unlock late-game content.
+- Quests earn **Renown**, which unlocks late-game content.
 
 ### Endgame goals
-- Level 99 in every skill (skill capes)
-- Rare boss drops and endgame equipment tiers
+- Level 99 in every skill (**Mastery mantles**)
+- Rare boss drops and the boss-only tiers (Wyrmscale, Ashforged)
 - Dungeon bosses with mechanics (telegraphed attacks, phases)
-- Collection log of rare drops
+- The **Trophy ledger** of every rare drop you've found
 
 ## 10. Art direction and controls
 
@@ -457,3 +631,38 @@ See [ROADMAP.md](ROADMAP.md).
 - Should Prayer arrive early (it changes the combat level formula and death rules)?
 - Multiplayer: single-player only for now — confirm this is the long-term plan.
 - Is the proposed death rule (3 items kept + 15-minute gravestone) the right level of risk?
+
+## 14. Our names
+
+RuneBound borrows the *shape* of Old School RuneScape's progression, never its names. When a new system arrives, it gets a name from this list (or a new one added here).
+
+| Idea | RuneBound name |
+| --- | --- |
+| Metal tiers | Copper, Greyiron, Hearthsteel, Dusksteel, Moonsilver, Verdite, Emberite, Stormsteel, Starmetal; boss tiers Wyrmscale and Ashforged |
+| Wood tiers | Pine, Ashwood, Thornwood, Elderwood, Ironbark, Duskwood, Moonbark, Starwood |
+| Hides | Rawhide, Wolfhide, Boarhide, Fenhide, Cinderhide, Frosthide, Stormhide, Wyrmhide |
+| Cloth | Linen, Woolweave, Silkweave, Mooncloth, Emberweave, Stormweave, Starcloth, Voidsilk |
+| Gems | Amber, Jade, Garnet, Moonstone, Starstone |
+| Melee weapons | Dagger, Sabre, Longsword, Mace, Spear, War axe, Maul, Greatsword |
+| Metal armour | Helm, Greathelm, Mail shirt, Cuirass, Greaves, Buckler, Heater shield, Gauntlets, Sabatons |
+| Bows | Shortbow, Warbow |
+| Elemental runes | Gale, Tide, Stone, Ember |
+| Power runes | Focus, Fury, Ruin, Doom |
+| Spell families | Dart, Lance, Surge, Cataclysm |
+| Rune blanks / making runes | Blank runestone / Runebinding |
+| Coal | Cinderstone |
+| Melee styles | Precise (Attack), Forceful (Strength), Guarded (Defence), Balanced (all three) |
+| Bow styles | Steady, Quickshot, Farshot |
+| Health skill | Vitality |
+| Prayer-like skill | Devotion (offer bones at shrines; blessings) |
+| Agility-like skill | Athletics |
+| Special attack | Fervour strike (Fervour bar) |
+| Rare monster drops | Trophies; the Trophy ledger |
+| Level-99 cape | Mastery mantle |
+| Quest points | Renown |
+| XP reward item | Tome of insight |
+| High-risk endgame zone | The Ashlands |
+| Craft quality | Standard, Fine, Masterwork |
+| Set bonus | Matched set |
+
+Words that are just ordinary English (coins, bones, bread, dagger, helm, Attack, Strength, Defence, Ranged, Magic, Mining, Smithing, Woodcutting, Fishing, Cooking, Fletching, Crafting) stay as they are.
