@@ -38,6 +38,12 @@ function getLib() {
     logPile: S.logPile(),
     crate: S.crate(),
     bones: S.bones(),
+    shelf: [S.shelf(1), S.shelf(2), S.shelf(3)],
+    barrel: S.barrel(),
+    chest: S.chest(),
+    rug: S.rug(),
+    plant: S.plant(),
+    gravestone: S.gravestone(),
     treeShadow: S.shadow(15, 4),
     smallShadow: S.shadow(6, 2),
     player: S.playerFrames(),
@@ -108,6 +114,13 @@ export function createWorldView(canvasEl, area) {
       case 'campfire': place(lib.campfire[0], f.x, f.y, { frames: lib.campfire }); break;
       // Tall grass is drawn just in front of anyone standing in it, hiding their feet.
       case 'tallGrass': place(pick(lib.tallGrass, p), f.x, f.y, { sortY: (p.y + 1) * TILE + 1 }); break;
+      case 'counter': place(S.counter(p.tiles.length), f.x, f.y); break;
+      case 'bankBooth': place(S.counter(p.tiles.length, true), f.x, f.y); break;
+      case 'shelf': place(pick(lib.shelf, p), f.x, f.y + 2); break;
+      case 'barrel': place(lib.barrel, f.x, f.y); break;
+      case 'chest': place(lib.chest, f.x, f.y); break;
+      case 'plant': place(lib.plant, f.x, f.y); break;
+      case 'rug': decals.push({ img: lib.rug.img, x: (p.x + 0.5) * TILE - lib.rug.ax, y: (p.y + 0.5) * TILE - lib.rug.ay }); break;
       case 'bones': decals.push({ img: lib.bones.img, x: p.x * TILE, y: p.y * TILE + 4 }); break;
       case 'mushrooms': { const spr = pick(lib.mushrooms, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
       default: break; // doors are drawn as part of their building
@@ -216,7 +229,7 @@ export function createWorldView(canvasEl, area) {
     const vh = canvasEl.height / scale;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = '#2c5a2a';
+    ctx.fillStyle = area.indoors ? '#120c08' : '#2c5a2a';
     ctx.fillRect(0, 0, canvasEl.width, canvasEl.height);
     ctx.setTransform(scale, 0, 0, scale, -cam.x * scale, -cam.y * scale);
 
@@ -229,7 +242,7 @@ export function createWorldView(canvasEl, area) {
     if (sw > 0 && sh > 0) ctx.drawImage(ground, sx, sy, sw, sh, sx, sy, sw, sh);
 
     const inView = (x, y, w, h) => x + w >= cam.x && y + h >= cam.y && x <= cam.x + vw && y <= cam.y + vh;
-    for (const d of decals) if (inView(d.x, d.y, 16, 16)) ctx.drawImage(d.img, d.x, d.y);
+    for (const d of decals) if (inView(d.x, d.y, d.img.width, d.img.height)) ctx.drawImage(d.img, d.x, d.y);
 
     // Items on the ground: up to three per tile, fanned out a little.
     const perTile = new Map();
@@ -271,6 +284,11 @@ export function createWorldView(canvasEl, area) {
     for (const p of people) if (!(p.alpha < 1)) ctx.drawImage(lib.smallShadow.img, p.fx - lib.smallShadow.ax, p.fy - lib.smallShadow.ay);
 
     const list = objects.filter((o) => inView(o.x, o.y, o.w, o.h));
+    if (opts.grave) {
+      const g = lib.gravestone;
+      const fx = (opts.grave.x + 0.5) * TILE, fy = (opts.grave.y + 1) * TILE - 2;
+      list.push({ img: g.img, x: fx - g.ax, y: fy - g.ay, w: g.w, h: g.h, sortY: fy });
+    }
     for (const p of people) if (inView(p.x, p.y, p.w, p.h)) list.push(p);
     list.sort((a, b) => a.sortY - b.sortY || ((a.player || a.person) ? 1 : -1));
 

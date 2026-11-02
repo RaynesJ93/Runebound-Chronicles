@@ -155,6 +155,63 @@ const DRAW = {
     b.rect(5, 2, 6, 2, f[3]);
     b.set(8, 4, hex('#e8c040'));
   },
+  cookedTrout(b) {
+    const c = [hex('#7a4a26'), hex('#b06a3a'), hex('#d89a5a'), hex('#f2c48a')];
+    b.ellipse(7, 9, 5.5, 3, c[1]);
+    b.ellipse(6.5, 8.2, 4, 1.6, c[2]);
+    b.set(4, 8, c[3]);
+    for (const [x, y] of [[12, 9], [13, 7], [13, 11], [14, 6], [14, 12]]) b.set(x, y, c[0]);
+    b.rect(12, 8, 2, 3, c[1]);
+    b.set(3, 9, hex('#1d1d1d'));
+  },
+  meatPie(b) {
+    b.ellipse(8, 10, 6.5, 3.5, hex('#8a5022'));
+    b.ellipse(8, 9, 6, 3, hex('#d8a05a'));
+    b.ellipse(7, 8.4, 3.5, 1.4, hex('#f0c888'));
+    for (const x of [5, 8, 11]) b.set(x, 9, hex('#8a5022'));
+  },
+  vial(b) {
+    b.rect(6, 2, 4, 2, hex('#8a5a32'));
+    b.rect(6, 4, 4, 2, hex('#cfe6ef'));
+    b.ellipse(8, 10, 4.5, 4.5, hex('#cfe6ef'));
+    b.ellipse(8, 10, 3.5, 3.5, hex('#eef8fc'));
+    b.set(6, 8, hex('#ffffff'));
+  },
+  woodenShield(b) {
+    b.ellipse(8, 8, 6.5, 6.5, hex('#5e3b1f'));
+    b.ellipse(8, 8, 5.5, 5.5, hex('#9a6234'));
+    for (const x of [5, 8, 11]) for (let y = 3; y < 14; y++) if (((x + 0.5 - 8) / 5.5) ** 2 + ((y + 0.5 - 8) / 5.5) ** 2 < 1) b.set(x, y, hex('#7a4a26'));
+    b.ellipse(8, 8, 1.6, 1.6, hex('#a8a39a'));
+    b.set(7, 7, hex('#e8e8e4'));
+  },
+  leatherBody(b) {
+    const c = [hex('#5e3b1f'), hex('#8a5a32'), hex('#a8743f')];
+    for (let y = 3; y < 14; y++) for (let x = 2; x < 14; x++) {
+      const torso = x >= 4 && x <= 11;
+      const sleeve = y < 8 && (x < 4 || x > 11);
+      if (!torso && !sleeve) continue;
+      if (y === 3 && x > 6 && x < 9) continue;
+      b.set(x, y, x === 8 || (y === 9 && torso) ? c[0] : (x + y) % 5 === 0 ? c[2] : c[1]);
+    }
+  },
+  leatherGloves(b) {
+    const c = [hex('#5e3b1f'), hex('#8a5a32'), hex('#a8743f')];
+    for (const ox of [1, 8]) {
+      b.rect(ox + 1, 5, 5, 6, c[1]);
+      for (let k = 0; k < 4; k++) b.rect(ox + 1 + k, 3, 1, 2, c[2]);
+      b.rect(ox, 7, 1, 3, c[1]);
+      b.rect(ox + 1, 11, 5, 2, c[0]);
+    }
+  },
+  leatherBoots(b) {
+    const c = [hex('#4a2c16'), hex('#7a4a26'), hex('#9a6234')];
+    for (const ox of [1, 8]) {
+      b.rect(ox + 1, 3, 4, 7, c[1]);
+      b.rect(ox, 10, 7, 3, c[1]);
+      b.rect(ox, 12, 7, 1, c[0]);
+      b.rect(ox + 1, 3, 4, 1, c[2]);
+    }
+  },
   bag(b) {
     const c = [hex('#6e4424'), hex('#9a6234'), hex('#c08c55')];
     b.ellipse(8, 10, 6, 5, c[0]);
@@ -169,10 +226,28 @@ const DRAW = {
 const cache = new Map();
 
 // { img: canvas, url: data URL } for an item id.
+const POTION_COLOUR = { attack: ['#2f6fd0', '#7fb8f5'], strength: ['#c4281d', '#f47a5a'], defence: ['#2f9a3a', '#8fe07a'] };
+
+// A glass vial whose liquid level shows the doses left.
+function potion(b, skill, doses) {
+  const [deep, light] = POTION_COLOUR[skill].map(hex);
+  b.rect(6, 1, 4, 2, hex('#8a5a32'));
+  b.rect(6, 3, 4, 3, hex('#cfe6ef'));
+  b.ellipse(8, 10, 4.5, 4.5, hex('#cfe6ef'));
+  const top = 14 - doses * 2.2;
+  for (let y = 5; y < 15; y++) for (let x = 3; x < 13; x++) {
+    if (((x + 0.5 - 8) / 4) ** 2 + ((y + 0.5 - 10) / 4) ** 2 > 1 || y < top) continue;
+    b.set(x, y, y < top + 1.5 ? light : deep);
+  }
+  b.set(6, 8, hex('#ffffff'));
+}
+
 export function itemIcon(id) {
   if (cache.has(id)) return cache.get(id);
   const b = new Bitmap(16, 16);
-  (DRAW[id] || DRAW.bag)(b);
+  const pm = /^(attack|strength|defence)Potion(\d)$/.exec(id);
+  if (pm) potion(b, pm[1], Number(pm[2]));
+  else (DRAW[id] || DRAW.bag)(b);
   b.outline();
   const img = b.toCanvas();
   const out = { img, url: img.toDataURL('image/png') };

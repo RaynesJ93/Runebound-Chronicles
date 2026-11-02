@@ -405,6 +405,7 @@ function palette(look) {
     weapon: L.weapon ? (L.weapon === 'iron' ? [hex('#7a828b'), hex('#c0c8d0'), hex('#eef2f5')] : [hex('#a8692e'), hex('#d4934f'), hex('#f2c48a')]) : null,
     blade: L.blade || 4,
     weaponKind: L.weaponKind || (L.weapon ? 'blade' : null),
+    shield: L.shield || null,
     beard: L.beard ? hex(L.beard) : null,
     hat: L.hat || null, robe: !!L.robe,
     hatCol: L.hatColor ? hex(L.hatColor) : null,
@@ -457,6 +458,8 @@ function drawFront(L, back, frame) {
     b.rect(x, 11 + o, 2, 4, side ? L.tunicS : L.tunic);
     b.rect(x, 15 + o, 2, 1, L.skin);
   }
+  if (L.shield && !back) shieldOn(b, 2.5, 13 + bob);
+  if (L.shield && back) shieldOn(b, 13.5, 13 + bob);
   if (L.weaponKind === 'bow' || L.weaponKind === 'staff') {
     const hx = back ? 1 : 14;
     const hy = 15 + armO(back ? 0 : 1) + bob;
@@ -669,4 +672,108 @@ export function wolfFrames(look) {
     frames.right.push(right); frames.down.push(right);
   }
   return frames;
+}
+
+// ---- Interiors ---------------------------------------------------------------------
+
+const counterCache = new Map();
+// A wooden counter `tiles` wide; grille: true adds a bank booth's brass bars.
+export function counter(tiles, grille = false) {
+  const key = `${tiles}${grille}`;
+  if (counterCache.has(key)) return counterCache.get(key);
+  const W = tiles * 16;
+  const b = new Bitmap(W, grille ? 34 : 22);
+  const top = grille ? 16 : 4;
+  const [d, m, l, h] = C.wood;
+  b.rect(0, top, W, 5, l);
+  b.rect(0, top, W, 1, h);
+  b.rect(0, top + 5, W, 13, m);
+  for (let x = 4; x < W; x += 8) b.rect(x, top + 6, 1, 12, d);
+  b.rect(0, top + 17, W, 1, d);
+  if (grille) {
+    const brass = [hex('#8a6410'), hex('#d4a020'), hex('#f2c94a')];
+    b.rect(1, 2, W - 2, 2, brass[1]); b.rect(1, 2, W - 2, 1, brass[2]);
+    for (let x = 3; x < W - 2; x += 4) b.rect(x, 4, 1, top - 4, brass[x % 8 === 3 ? 1 : 0]);
+    b.rect(W / 2 - 4, top - 1, 8, 1, hex('#f4ecd6')); // paper on the ledge
+  }
+  b.outline();
+  const spr = sprite(b, W / 2, b.h - 2);
+  counterCache.set(key, spr);
+  return spr;
+}
+
+export function shelf(seed) {
+  const b = new Bitmap(16, 30);
+  const [d, m, l] = C.wood;
+  b.rect(1, 2, 14, 26, m);
+  b.rect(2, 3, 12, 24, d);
+  for (const y of [9, 17, 25]) b.rect(1, y, 14, 2, l);
+  const goods = ['#c0392b', '#2f6fd0', '#e8c040', '#4f9a35', '#f4ecd6', '#8a5a32', '#b79cf2'];
+  for (const y of [4, 12, 20]) for (let x = 3; x < 13; x += 3) {
+    const c = hex(goods[Math.floor(rnd(seed + x, y, 7) * goods.length)]);
+    const h = 3 + Math.floor(rnd(seed, x + y, 8) * 3);
+    b.rect(x, y + 5 - h, 2, h, c);
+  }
+  b.outline();
+  return sprite(b, 8, 29);
+}
+
+export function barrel() {
+  const b = new Bitmap(16, 18);
+  const [d, m, l] = C.wood;
+  b.ellipse(8, 9, 6.5, 8, m);
+  for (let y = 2; y < 17; y++) for (let x = 2; x < 15; x++) if (b.alpha(x, y) && x < 6) b.set(x, y, l);
+  for (const y of [4, 13]) b.rect(2, y, 13, 1, hex('#5a5550'));
+  b.ellipse(8, 2.5, 5, 1.6, d);
+  b.outline();
+  return sprite(b, 8, 16);
+}
+
+export function chest() {
+  const b = new Bitmap(18, 16);
+  const [d, m, l] = C.wood;
+  b.rect(1, 6, 16, 9, m);
+  b.rect(1, 2, 16, 5, l);
+  b.rect(1, 6, 16, 1, d);
+  for (const x of [1, 15]) b.rect(x, 2, 2, 13, hex('#b8901f'));
+  b.rect(8, 6, 2, 3, hex('#e8c040'));
+  b.outline();
+  return sprite(b, 9, 15);
+}
+
+export function rug() {
+  const b = new Bitmap(48, 28);
+  b.ellipse(24, 14, 23, 13, hex('#7a2f2a'));
+  b.ellipse(24, 14, 19, 10, hex('#a8432f'));
+  b.ellipse(24, 14, 13, 6.5, hex('#e8c040'));
+  b.ellipse(24, 14, 10, 4.5, hex('#a8432f'));
+  return sprite(b, 24, 14);
+}
+
+export function plant() {
+  const b = new Bitmap(16, 24);
+  shadedBlobs(b, [[5, 9, 4], [11, 9, 4], [8, 5, 4.5], [8, 11, 4]], C.bush, 9);
+  b.rect(4, 15, 8, 7, hex('#a8432f'));
+  b.rect(3, 14, 10, 2, hex('#c45a3a'));
+  b.outline();
+  return sprite(b, 8, 22);
+}
+
+export function gravestone() {
+  const b = new Bitmap(16, 20);
+  const st = C.stone;
+  b.rect(3, 6, 10, 12, st[1]);
+  b.ellipse(8, 6, 5, 5, st[1]);
+  b.rect(3, 6, 2, 12, st[2]);
+  b.rect(7, 5, 2, 8, st[0]); b.rect(5, 7, 6, 2, st[0]);
+  b.rect(1, 17, 14, 2, hex('#6e4a2c'));
+  b.outline();
+  return sprite(b, 8, 18);
+}
+
+// A round wooden shield on the arm, for the character drawing.
+export function shieldOn(b, x, y) {
+  b.ellipse(x, y, 3, 3.5, hex('#5e3b1f'));
+  b.ellipse(x, y, 2.2, 2.7, hex('#9a6234'));
+  b.set(Math.round(x), Math.round(y), hex('#a8a39a'));
 }

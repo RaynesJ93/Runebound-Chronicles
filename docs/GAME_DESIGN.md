@@ -309,7 +309,7 @@ Ranged gear follows the same idea (leather → hide armour, shortbow → oak →
 ### Shops
 
 - Each town has a general store plus specialist shops (weapons, armour, magic, food).
-- Shops buy and sell; prices shift slightly with stock levels, like OSRS.
+- Shops buy and sell; prices shift slightly with stock levels, like OSRS. At normal stock you pay the item's value and the shop pays about 35% of it; every item above or below normal stock moves the price 3%. Stock drifts back to normal every 15 seconds.
 - Coins are the currency.
 
 ## 8. Death and its consequences
@@ -320,7 +320,7 @@ Death should sting without ruining a session.
 1. You respawn at the last town you visited, at full health.
 2. You **keep your 3 most valuable items** automatically.
 3. Everything else is left at the place you died in a **gravestone** that lasts **15 minutes** of play time.
-4. Return to the gravestone to reclaim everything for free in the first 5 minutes, or for a small coin fee after that.
+4. Return to the gravestone to reclaim everything for free in the first 5 minutes, or for a small coin fee after that (10% of the items' value, at least 10 and at most 1,000 coins). Worn items go back on if the slot is empty. A new death replaces an older gravestone.
 5. If the timer runs out, the items are lost.
 6. XP and levels are never lost.
 

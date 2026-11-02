@@ -101,30 +101,43 @@ export const NPCS = [
     },
   },
   {
-    id: 'pell', name: 'Pell the Shopkeeper', area: 'brambleford', x: 14, y: 16, radius: 1, wander: 0.1,
+    id: 'pell', name: 'Pell the Shopkeeper', area: 'store', x: 5, y: 3, radius: 0, talkRange: 2,
     look: { hair: '#2a2a2a', tunic: '#e8dcc0', belt: '#7a4a26', pants: '#4a4a5a', beard: '#2a2a2a' },
     talk: {
-      start: 'hi',
+      start: (c) => (c.flags.metPell ? 'again' : 'hi'),
       nodes: {
         hi: {
-          say: ['Welcome, welcome! Well, almost welcome. The shelves are bare until the next wagon arrives.'],
-          choices: [
-            { text: 'What will you sell?', next: 'stock' },
-            { text: "I'll come back later.", next: 'bye' },
-          ],
+          say: ['Welcome, welcome! The wagon finally came in, so the shelves are full.', 'Food, potions, weapons, armour, arrows and runes. And I buy just about anything.'],
+          set: { metPell: true },
+          next: 'menu',
         },
-        stock: { say: ['Bronze swords, bows and arrows, bread, fishing nets... a bit of everything.', 'And I buy too. Bring me anything you find out there.'], next: 'bye' },
+        again: { say: 'Back again! What can I get you?', next: 'menu' },
+        menu: { say: [], choices: [
+          { text: "Let's trade.", action: 'shop' },
+          { text: 'How do prices work?', next: 'prices' },
+          { text: 'Just looking, thanks.', next: 'bye' },
+        ] },
+        prices: { say: ['The more I have of something, the cheaper it gets. Sell me ten swords and I will not pay much for the eleventh!', 'I sell to you at a fair price and buy at about a third of that.'], next: 'menu' },
         bye: { say: 'Come back soon!' },
       },
     },
   },
   {
-    id: 'edda', name: 'Edda the Banker', area: 'brambleford', x: 31, y: 16, radius: 1, wander: 0.1,
+    id: 'edda', name: 'Edda the Banker', area: 'bank', x: 5, y: 3, radius: 0, talkRange: 2,
     look: { hair: '#a8a39a', tunic: '#2f4a73', pants: '#2f4a73', robe: true, hat: 'bun' },
     talk: {
       start: 'hi',
       nodes: {
-        hi: { say: ['Good day. The vaults are being fitted with new locks, I am afraid.', "Once we open, you'll be able to keep your belongings safe here. Every last coin."] },
+        hi: {
+          say: 'Good day. Welcome to the Bank of Brambleford. How may I help?',
+          choices: [
+            { text: "I'd like to use my bank.", action: 'bank' },
+            { text: 'What is a bank for?', next: 'about' },
+            { text: 'Nothing, thank you.', next: 'bye' },
+          ],
+        },
+        about: { say: ['We keep your things safe, as many as you like. Everything stacks in the vault.', "Anything in the bank stays safe if you're unlucky out in the woods. Any booth here will do."], next: 'hi' },
+        bye: { say: 'Good day to you.' },
       },
     },
   },

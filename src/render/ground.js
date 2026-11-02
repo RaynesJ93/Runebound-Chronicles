@@ -24,6 +24,11 @@ const P = {
   plank: [hex('#9a6a3c'), hex('#a87644'), hex('#b5844f')],
   plankDark: hex('#5e3b1f'),
   rail: hex('#7a4f2a'),
+  floor: [hex('#8a5a32'), hex('#9a6a3c'), hex('#a8774a')],
+  floorLine: hex('#5e3b1f'),
+  wall: [hex('#4a3020'), hex('#5e3e28'), hex('#6e4a30')],
+  wallTop: hex('#2b1d16'),
+  skirting: hex('#3a2416'),
 };
 
 const isSoft = (g) => g === GROUND.GRASS;
@@ -55,7 +60,7 @@ export function buildGround(area) {
       let t = g(tx, ty);
 
       // Ragged edges where a path, square, sand or soil meets grass.
-      if (t !== GROUND.GRASS && t !== GROUND.WATER && t !== GROUND.BRIDGE) {
+      if (t !== GROUND.GRASS && t !== GROUND.WATER && t !== GROUND.BRIDGE && t !== GROUND.FLOOR && t !== GROUND.WALL) {
         const e = 1 + (rnd(x, y, 21) < 0.5 ? 1 : 0) + (rnd(x >> 1, y >> 1, 22) < 0.3 ? 1 : 0);
         if ((lx < e && isSoft(g(tx - 1, ty))) || (lx > 15 - e && isSoft(g(tx + 1, ty))) ||
             (ly < e && isSoft(g(tx, ty - 1))) || (ly > 15 - e && isSoft(g(tx, ty + 1)))) t = GROUND.GRASS;
@@ -98,6 +103,21 @@ export function buildGround(area) {
           if (railL || railR) c = (lx === 0 || lx === 15) ? P.plankDark : P.rail;
           else if (y % 4 === 3) c = P.plankDark;
           else c = P.plank[Math.floor(rnd(Math.floor((x + (Math.floor(y / 4) % 2) * 5) / 9), Math.floor(y / 4), 91) * 3)];
+          break;
+        }
+        case GROUND.FLOOR: {
+          // floorboards running across the room
+          const board = Math.floor(y / 5);
+          const seam = (x + board * 7) % 23 === 0;
+          c = y % 5 === 4 || seam ? P.floorLine : P.floor[Math.floor(rnd(Math.floor((x + board * 7) / 23), board, 95) * 3)];
+          break;
+        }
+        case GROUND.WALL: {
+          // wood-panelled wall; a dark cap where it meets the floor below
+          const below = g(tx, ty + 1);
+          if (below !== GROUND.WALL && ly >= 13) c = P.skirting;
+          else if (ly < 2 && g(tx, ty - 1) !== GROUND.WALL) c = P.wallTop;
+          else c = (lx % 8 === 0) ? P.wall[0] : P.wall[1 + (rnd(tx * 2 + (lx >> 3), ty, 96) < 0.5 ? 0 : 1)];
           break;
         }
         default: c = P.water[1];

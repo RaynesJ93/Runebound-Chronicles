@@ -52,7 +52,12 @@ export class Combat {
   }
 
   // ---- Player stats, from the skills you've trained -------------------------------
-  get skills() { return this.book.levels(); }
+  // Your levels including any potion boosts (state.boosts).
+  get skills() {
+    const lv = this.book.levels();
+    for (const [k, v] of Object.entries(this.state.boosts || {})) if (v > 0 && k !== 'hitpoints') lv[k] += v;
+    return lv;
+  }
   get style() { return styleById(this.state.settings.attackStyle); }
   get rangedStyle() { return rangedStyleById(this.state.settings.rangedStyle); }
   get spell() { return spellById(this.state.settings.spell); }
@@ -110,9 +115,9 @@ export class Combat {
   }
 
   // Combat level as it would be with one skill at a different level (for "your combat level is now..." messages).
-  levelFrom(skill, level) { return combatLevel({ ...this.skills, [skill]: level }); }
-  get maxHp() { return this.skills.hitpoints; }
-  get level() { return combatLevel(this.skills); }
+  levelFrom(skill, level) { return combatLevel({ ...this.book.levels(), [skill]: level }); }
+  get maxHp() { return this.book.level('hitpoints'); }
+  get level() { return combatLevel(this.book.levels()); }
   get hp() { return this.state.player.hp; }
   get inCombat() { return !!this.target || this.enemies.some((e) => !e.dead && e.state === 'fight'); }
 

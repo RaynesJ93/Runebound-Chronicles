@@ -13,12 +13,16 @@
 //   look:  how it shows on your character
 //   style: weapons only — 'melee' (default), 'ranged' (needs ammo) or 'magic' (casts spells)
 //   range: ranged/magic weapons — how many tiles away you can attack from
-// Eating arrives in Batch 8.
+// food: { heal } — eat to restore hitpoints (takes 3 ticks, delays your next attack)
+// potion: { boost, doses, next } — drink a dose to boost a combat skill; next = what's left
 
 export const ITEMS = {
   coins: { name: 'Coins', stackable: true, value: 1, examine: 'Lovely money!' },
   bones: { name: 'Bones', value: 1, examine: 'Bones are for burying. (Prayer arrives in a later update.)' },
-  bread: { name: 'Bread', value: 12, examine: 'Nice crusty bread. (Eating arrives in Batch 8.)' },
+  bread: { name: 'Bread', value: 12, examine: 'Nice crusty bread.', food: { heal: 4 } },
+  cookedTrout: { name: 'Trout', value: 30, examine: 'Some nicely cooked trout.', food: { heal: 7 } },
+  meatPie: { name: 'Meat pie', value: 22, examine: 'A hearty pie. Still warm.', food: { heal: 6 } },
+  vial: { name: 'Vial', value: 1, examine: 'An empty glass vial.' },
   airRune: { name: 'Air rune', stackable: true, value: 4, examine: 'One of the four basic elemental runes.' },
   waterRune: { name: 'Water rune', stackable: true, value: 4, examine: 'One of the four basic elemental runes.' },
   mindRune: { name: 'Mind rune', stackable: true, value: 3, examine: 'Used for basic missile spells.' },
@@ -51,6 +55,22 @@ export const ITEMS = {
     name: 'Wolf-pelt cloak', value: 400, rare: true, examine: "A cloak of alpha wolf fur. Its old owner won't be needing it.",
     equip: { slot: 'cape', req: { defence: 5 }, att: { stab: 2, slash: 2, crush: 2, ranged: 2 }, def: { stab: 3, slash: 3, crush: 3, ranged: 3, magic: 2 }, str: 2, look: {} },
   },
+  woodenShield: {
+    name: 'Wooden shield', value: 20, examine: 'A solid wooden shield.',
+    equip: { slot: 'shield', req: { defence: 1 }, def: { stab: 4, slash: 5, crush: 3, ranged: 4 }, look: { shield: 'wood' } },
+  },
+  leatherBody: {
+    name: 'Leather body', value: 21, examine: 'Better than nothing. Good for archers.',
+    equip: { slot: 'body', req: { defence: 1 }, def: { stab: 2, slash: 4, crush: 3, ranged: 3, magic: 1 }, att: { ranged: 2 }, look: { tunic: '#8a5a32' } },
+  },
+  leatherGloves: {
+    name: 'Leather gloves', value: 6, examine: 'Keeps your hands warm and your grip firm.',
+    equip: { slot: 'hands', req: {}, def: { stab: 1, slash: 1, crush: 1 }, att: { ranged: 1 } },
+  },
+  leatherBoots: {
+    name: 'Leather boots', value: 6, examine: 'Comfortable leather boots.',
+    equip: { slot: 'feet', req: {}, def: { stab: 1, slash: 1, crush: 1 } },
+  },
   bronzeMedHelm: {
     name: 'Bronze med helm', value: 24, examine: 'A medium-sized bronze helmet.',
     equip: { slot: 'head', req: { defence: 1 }, att: { magic: -1 }, def: { stab: 3, slash: 4, crush: 2, magic: -1, ranged: 3 }, look: { hat: 'helmet', hatColor: '#b07a3a' } },
@@ -64,5 +84,18 @@ export const ITEMS = {
     equip: { slot: 'neck', req: {}, att: { stab: 3, slash: 3, crush: 3 }, def: { stab: 1, slash: 1, crush: 1 }, str: 2 },
   },
 };
+
+// Potions: 4, 3, 2 and 1 dose versions. Each dose boosts one skill by
+// 3 + 10% of its level; the boost wears off by 1 level a minute.
+for (const [skill, name, value] of [['attack', 'Attack', 60], ['strength', 'Strength', 75], ['defence', 'Defence', 60]]) {
+  for (let d = 4; d >= 1; d--) {
+    ITEMS[`${skill}Potion${d}`] = {
+      name: `${name} potion (${d})`,
+      value: Math.round((value * d) / 4),
+      examine: `${d} dose${d > 1 ? 's' : ''} of ${name.toLowerCase()} potion.`,
+      potion: { boost: skill, doses: d, next: d > 1 ? `${skill}Potion${d - 1}` : 'vial' },
+    };
+  }
+}
 
 export const itemName = (id) => ITEMS[id]?.name ?? id;

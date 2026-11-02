@@ -431,3 +431,38 @@ img.px { image-rendering: pixelated; image-rendering: crisp-edges; }
 .bonus-line { margin: 8px 0 0; font-size: 15px; }
 
 .style.locked { opacity: 0.55; }
+
+/* ---- Bank and shop ---- */
+.trade-panel { width: min(520px, 100%); }
+.qty-pick { display: inline-flex; gap: 4px; margin-left: auto; margin-right: 6px; }
+.qty-pick .chip { min-width: 40px; width: auto; padding: 0 8px; height: 34px; font-size: 15px; }
+.qty-pick .chip.on { background: #ffe9a8; box-shadow: inset 0 0 0 2px var(--gold); }
+.trade-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 5px;
+  max-height: 34vh; overflow-y: auto; padding: 8px; background: #4a3020; border: 3px solid var(--wood-dark); border-radius: 6px;
+}
+.trade-grid .slot, .trade-inv .slot { border: 0; padding: 0; }
+.trade-inv { grid-template-columns: repeat(7, 1fr); }
+.slot .price {
+  position: absolute; right: 2px; bottom: 0; font-size: 12px; font-weight: 700; color: #ffe14a;
+  text-shadow: 1px 1px 0 #000, -1px 0 0 #000; pointer-events: none;
+}
+.slot .price.sell { color: #9fe28a; }
+.slot.empty-stock { opacity: 0.45; }
+.trade-actions { display: flex; gap: 8px; margin-top: 8px; }
+.trade-actions .btn { flex: 1; }
+.trade-status { min-height: 1.3em; margin: 8px 0 0; font-weight: 700; color: var(--ink); }
+.skill-lvl .boost { color: #2f7a22; }
+.grave-timer {
+  align-self: flex-start; padding: 6px 12px; font-weight: 700; font-size: 15px; color: #fff6dc;
+  background: rgba(40, 30, 24, 0.85); border: 2px solid #8b857b; border-radius: 6px;
+}
+@media (max-width: 430px) {
+  .trade-inv { grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .trade-grid { grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); }
+  .qty-pick .chip { min-width: 34px; padding: 0 5px; font-size: 13px; }
+}
+@media (max-width: 430px) {
+  .trade-panel .panel-head h2 { font-size: 17px; line-height: 1.15; }
+  .trade-panel .panel-head { padding-left: 10px; }
+}

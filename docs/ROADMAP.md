@@ -23,7 +23,7 @@ Out of scope, permanently: turn-based battles, battle screens, random encounters
 | 5 ✅ | Loot and inventory | Loot tables in data, ground items, manual pickup, 28-slot inventory, drop, examine, despawn timers | Goblins drop items you can pick up and manage |
 | 6 ✅ | Equipment | 11 equipment slots, wield/wear, stat bonuses feeding the combat formulas, level requirements, equipment panel | Equipping a bronze sword makes you visibly stronger |
 | 7 ✅ | Ranged, magic and wolves | Shortbow + arrows, staff + runes + basic strike spells, projectiles, style switching, Ranged and Magic skills, wolves (aggressive), Alpha Wolf mini-boss | You can kill wolves with melee, ranged or magic |
-| 8 | Food, potions, bank and shop | Eating (3-tick delay), potions with timed boosts, building interiors, village bank (deposit/withdraw), general store (buy/sell, coins), death gravestone rules | Full loop works: fight → loot → bank/sell → buy upgrade |
+| 8 ✅ | Food, potions, bank and shop | Eating (3-tick delay), potions with timed boosts, building interiors, village bank (deposit/withdraw), general store (buy/sell, coins), death gravestone rules | Full loop works: fight → loot → bank/sell → buy upgrade |
 | 9 | v0.1 polish | Mobile UI pass (safe areas, 44 pt targets, long-press menus), settings, performance pass on iPhone, save migration tests, bug fixes | v0.1 released on GitHub Pages |
 
 ## Phase 2 — Skilling (v0.2)
@@ -60,6 +60,7 @@ Out of scope, permanently: turn-based battles, battle screens, random encounters
 
 | Date | Change |
 | --- | --- |
+| 2 Nov 2026 | v0.9.0: Batch 8 shipped — walk-in interiors for the General Store and Bank, Pell's shop (buy/sell, prices shift with stock, restocking), the bank (unlimited stacking storage, deposit bag/worn items), food (bread, meat pie, trout), attack/strength/defence potions with 4 doses and decaying boosts, eating delays your next attack, death keeps your 3 most valuable items and leaves the rest in a 15-minute gravestone (free for 5 minutes, then a fee), new leather armour and wooden shield. |
 | 2 Nov 2026 | v0.8.0: Batch 7 shipped — shortbow (from Bram) with arrows from the ammo slot, apprentice staff (from Wren) casting Wind Strike / Water Strike with runes, projectiles with travel time and line of sight, Accurate / Rapid / Longrange bow styles, ranged and magic accuracy, max hit and XP, 60% of arrows recoverable, wolves (aggressive pack) and the Alpha Wolf mini-boss with a 1/32 wolf-pelt cloak. New runes added to goblin drops. |
 | 2 Nov 2026 | v0.7.0: Batch 6 shipped — 11 equipment slots, wield/wear/remove with swapping, level requirements, attack/defence bonuses by type (stab, slash, crush, ranged, magic), melee strength, weapon speed and attack type feeding the combat formulas, enemies' attack types, equipment tab with bonus table, gear drawn on the character. |
 | 2 Nov 2026 | v0.6.1: health now regenerates only out of combat, at 1 hitpoint every 6 seconds (was 1 per minute, even mid-fight). |
