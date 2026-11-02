@@ -94,6 +94,7 @@ function boot() {
     on: {
       message: (t) => hud.message(t),
       cantReach: () => hud.message("I can't reach that."),
+      healed: () => hud.flashHeal(),
       enemyDied: (e) => {
         hud.message(`You defeated the ${e.name}!`);
         for (const drop of rollLoot(e.def.loot, rng)) {
