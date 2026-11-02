@@ -150,6 +150,11 @@ export function buildRoute1() {
       { enemy: 'goblin', x: 10, y: 49 },
       { enemy: 'goblin', x: 13, y: 47 },
       { enemy: 'goblinBrute', x: 6, y: 42 },
+      // The wolf den (north-east)
+      { enemy: 'wolf', x: 25, y: 11 },
+      { enemy: 'wolf', x: 28, y: 14 },
+      { enemy: 'wolf', x: 30, y: 9 },
+      { enemy: 'alphaWolf', x: 28, y: 9 },
     ],
   };
 }

@@ -126,6 +126,18 @@ The player switches between **melee, ranged and magic** by equipping the right w
 
 Every damaging hit also gives Hitpoints XP.
 
+### Ranged and magic (first release)
+
+- **Bows** fire arrows from the ammo slot, up to 7 tiles (9 on Longrange), and need a clear line of sight (trees, rocks and walls block shots; water doesn't). About 60% of arrows land under the target and can be picked up again.
+- **Staves** cast the spell chosen in the Combat tab on every attack, using its runes from the bag. Range 8 tiles.
+
+| Spell | Magic level | Max hit | Runes | Base XP |
+| --- | --- | --- | --- | --- |
+| Wind Strike | 1 | 2 | 1 air, 1 mind | 5.5 |
+| Water Strike | 5 | 4 | 1 water, 1 air, 1 mind | 7.5 |
+
+Magic gives the base XP per cast plus 2 per damage. Arrows and spells take a moment to fly; damage lands when they arrive.
+
 ### Feedback
 
 - **Hitsplats:** a red splat with the number for damage, a blue splat with 0 for a miss. Up to 4 stack on one target.

@@ -39,7 +39,14 @@ export class Equipment {
   // Weapon info: attack type and speed (bare fists are crush, 4 ticks).
   get weapon() {
     const w = this.item('weapon')?.equip;
-    return { type: w?.type ?? UNARMED.type, speed: w?.speed ?? UNARMED.speed, name: this.item('weapon')?.name ?? 'Unarmed' };
+    return {
+      type: w?.type ?? UNARMED.type,
+      speed: w?.speed ?? UNARMED.speed,
+      name: this.item('weapon')?.name ?? 'Unarmed',
+      style: w?.style ?? 'melee', // melee | ranged | magic
+      range: w?.range ?? 1,
+      ammo: w?.ammo ?? null,
+    };
   }
 
   bonuses() {

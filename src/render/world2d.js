@@ -47,8 +47,8 @@ function getLib() {
 }
 
 // Walking frames for a villager, drawn the first time they're needed.
-function framesFor(lib, look, key) {
-  if (!lib.people.has(key)) lib.people.set(key, S.characterFrames(look));
+function framesFor(lib, look, key, kind = 'person') {
+  if (!lib.people.has(key)) lib.people.set(key, kind === 'wolf' ? S.wolfFrames(look) : S.characterFrames(look));
   return lib.people.get(key);
 }
 
@@ -263,7 +263,7 @@ export function createWorldView(canvasEl, area) {
     for (const e of enemies) {
       const since = time - e.diedAt;
       if (e.dead && since > 0.9) continue;
-      const o = personObj(framesFor(lib, e.def.look, `enemy:${e.def.id}`), e, e.steps, { person: true, enemy: e }, time, e.lungeAt);
+      const o = personObj(framesFor(lib, e.def.look, `enemy:${e.def.id}`, e.def.sprite), e, e.steps, { person: true, enemy: e }, time, e.lungeAt);
       if (e.dead) o.alpha = Math.max(0, 1 - since / 0.9);
       people.push(o);
       foes.push(o);
@@ -283,6 +283,39 @@ export function createWorldView(canvasEl, area) {
       if (o.alpha !== undefined) ctx.globalAlpha = o.alpha;
       ctx.drawImage(o.img, o.x, o.y);
       ctx.globalAlpha = 1;
+    }
+
+    // Arrows and spells in flight.
+    if (combat) {
+      for (const pr of combat.projectiles) {
+        const k = Math.max(0, Math.min(1, (time - pr.start) / Math.max(0.01, pr.end - pr.start)));
+        const tp = pr.to.worldPosition();
+        const sx0 = pr.from.x * TILE, sy0 = pr.from.y * TILE - 8;
+        const tx = tp.x * TILE, ty = tp.z * TILE - 6;
+        const x = sx0 + (tx - sx0) * k;
+        const y = sy0 + (ty - sy0) * k - Math.sin(k * Math.PI) * (pr.kind === 'arrow' ? 6 : 2);
+        const ang = Math.atan2(ty - sy0, tx - sx0);
+        if (pr.kind === 'arrow') {
+          const dx = Math.cos(ang), dy = Math.sin(ang);
+          ctx.fillStyle = '#8a5a32';
+          for (let i = 0; i < 5; i++) ctx.fillRect(Math.round(x - dx * i), Math.round(y - dy * i), 1, 1);
+          ctx.fillStyle = '#d4934f';
+          ctx.fillRect(Math.round(x + dx), Math.round(y + dy), 1, 1);
+          ctx.fillStyle = '#f4f2e6';
+          ctx.fillRect(Math.round(x - dx * 5), Math.round(y - dy * 5), 1, 1);
+        } else {
+          const col = pr.kind === 'water' ? ['#2f6fd0', '#8fd0ff', '#e8f8ff'] : ['#8fd06a', '#d8f5c0', '#ffffff'];
+          for (let i = 3; i >= 1; i--) {
+            ctx.globalAlpha = 0.25 * (4 - i);
+            ctx.fillStyle = col[0];
+            ctx.fillRect(Math.round(x - Math.cos(ang) * i * 3) - 1, Math.round(y - Math.sin(ang) * i * 3) - 1, 3, 3);
+          }
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = col[0]; ctx.fillRect(Math.round(x) - 2, Math.round(y) - 2, 5, 5);
+          ctx.fillStyle = col[1]; ctx.fillRect(Math.round(x) - 1, Math.round(y) - 1, 3, 3);
+          ctx.fillStyle = col[2]; ctx.fillRect(Math.round(x), Math.round(y) - 1, 1, 1);
+        }
+      }
     }
 
     // A pulsing gold beam over rare drops, so you can't miss them.

@@ -36,8 +36,8 @@ export const SKILLS = [
   { id: 'strength', name: 'Strength', about: 'Melee damage: raises your max hit.' },
   { id: 'defence', name: 'Defence', about: 'Makes you harder to hit. Higher levels let you wear better armour.' },
   { id: 'hitpoints', name: 'Hitpoints', about: 'Your health. Every point of damage you deal trains it.' },
-  { id: 'ranged', name: 'Ranged', about: 'Bows and arrows. (Arrives in Batch 7.)' },
-  { id: 'magic', name: 'Magic', about: 'Combat spells. (Arrives in Batch 7.)' },
+  { id: 'ranged', name: 'Ranged', about: 'Bows and arrows: accuracy and damage from a distance.' },
+  { id: 'magic', name: 'Magic', about: 'Combat spells. Higher levels unlock stronger spells.' },
 ];
 
 export const SKILL_NAME = Object.fromEntries(SKILLS.map((s) => [s.id, s.name]));
@@ -58,6 +58,16 @@ export const MELEE_STYLES = [
 ];
 
 export const styleById = (id) => MELEE_STYLES.find((s) => s.id === id) || MELEE_STYLES[0];
+
+// Bow styles. Rapid shoots one tick faster; Longrange reaches 2 tiles further
+// and shares XP with Defence.
+export const RANGED_STYLES = [
+  { id: 'accurate', name: 'Accurate', trains: 'Ranged', bonus: { ranged: 3 }, xp: { ranged: 1 } },
+  { id: 'rapid', name: 'Rapid', trains: 'Ranged (faster)', bonus: {}, speed: -1, xp: { ranged: 1 } },
+  { id: 'longrange', name: 'Longrange', trains: 'Ranged and Defence', bonus: { defence: 3 }, range: 2, xp: { ranged: 0.5, defence: 0.5 } },
+];
+
+export const rangedStyleById = (id) => RANGED_STYLES.find((s) => s.id === id) || RANGED_STYLES[0];
 
 // Reads and grows the player's skills (kept in state.skills).
 export class SkillBook {

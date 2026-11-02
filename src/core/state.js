@@ -9,7 +9,7 @@ export function defaultState() {
   return {
     player: { area: 'brambleford', x: 16, y: 24, facing: 0, hp: 10 },
     run: { on: true, energy: 100 },
-    settings: { dpad: 'auto', zoomStep: 0, autoRetaliate: true, attackStyle: 'accurate' },
+    settings: { dpad: 'auto', zoomStep: 0, autoRetaliate: true, attackStyle: 'accurate', rangedStyle: 'accurate', spell: 'windStrike' },
     skills: defaultSkills(),
     inventory: Array(28).fill(null),
     equipment: defaultEquipment(),
