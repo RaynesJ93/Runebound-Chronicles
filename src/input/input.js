@@ -2,6 +2,7 @@
 //
 // - WASD / arrow keys: held direction (most recent key wins)
 // - Click / tap: onTap(screenX, screenY)
+// - Long-press (touch) or right-click (mouse): onLongPress(screenX, screenY)
 // - Mouse wheel / pinch: zoom
 // - D-pad (on-screen): held direction while touched
 
@@ -14,6 +15,7 @@ const KEYMAP = {
 
 const TAP_MOVE_PX = 12;
 const TAP_MAX_MS = 650;
+const LONG_PRESS_MS = 450;
 
 export class Input {
   constructor(canvas) {
@@ -25,6 +27,8 @@ export class Input {
     this.pinchDist = 0;
     this.onTap = null;
     this.onKey = null;
+    this.onLongPress = null;
+    this.lastTouch = -Infinity;
     this.enabled = true;
 
     const isTyping = (e) => e.target instanceof HTMLElement && e.target.closest('input, textarea, select');
@@ -48,7 +52,13 @@ export class Input {
     canvas.addEventListener('pointermove', (e) => this.move(e));
     canvas.addEventListener('pointerup', (e) => this.up(e, true));
     canvas.addEventListener('pointercancel', (e) => this.up(e, false));
-    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    // Right-click opens the options menu. (Android also sends this after a
+    // long-press, which we've already handled, so touches are ignored here.)
+    canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      if (performance.now() - this.lastTouch < 1000 || !this.enabled) return;
+      this.onLongPress?.(e.clientX, e.clientY);
+    });
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
       this.zoomDelta += Math.sign(e.deltaY) * Math.min(2, Math.abs(e.deltaY) / 60);
@@ -62,9 +72,22 @@ export class Input {
   down(e) {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     try { this.canvas.setPointerCapture(e.pointerId); } catch { /* ignore */ }
-    this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, t: performance.now(), moved: false, pinch: false });
+    const p = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, t: performance.now(), moved: false, pinch: false, long: false, timer: 0 };
+    this.pointers.set(e.pointerId, p);
+    if (e.pointerType !== 'mouse') {
+      this.lastTouch = performance.now();
+      // Hold still for a moment: open the options menu instead of tapping.
+      p.timer = setTimeout(() => {
+        if (p.moved || p.pinch || this.pointers.get(e.pointerId) !== p || !this.enabled) return;
+        p.long = true;
+        navigator.vibrate?.(12);
+        this.onLongPress?.(p.sx, p.sy);
+      }, LONG_PRESS_MS);
+    }
     if (this.pointers.size === 2) {
       const [a, b] = [...this.pointers.values()];
+      clearTimeout(a.timer);
+      clearTimeout(b.timer);
       a.pinch = b.pinch = true;
       this.pinchDist = Math.hypot(a.x - b.x, a.y - b.y);
     }
@@ -75,7 +98,7 @@ export class Input {
     if (!p) return;
     p.x = e.clientX;
     p.y = e.clientY;
-    if (Math.hypot(p.x - p.sx, p.y - p.sy) > TAP_MOVE_PX) p.moved = true;
+    if (!p.moved && Math.hypot(p.x - p.sx, p.y - p.sy) > TAP_MOVE_PX) { p.moved = true; clearTimeout(p.timer); }
     if (this.pointers.size === 2) {
       const [a, b] = [...this.pointers.values()];
       const d = Math.hypot(a.x - b.x, a.y - b.y);
@@ -87,7 +110,8 @@ export class Input {
   up(e, fire) {
     const p = this.pointers.get(e.pointerId);
     this.pointers.delete(e.pointerId);
-    if (!p || !fire || !this.enabled) return;
+    if (p) clearTimeout(p.timer);
+    if (!p || p.long || !fire || !this.enabled) return;
     if (!p.moved && !p.pinch && performance.now() - p.t < TAP_MAX_MS) this.onTap?.(e.clientX, e.clientY);
   }
 

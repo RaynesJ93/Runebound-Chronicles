@@ -1,6 +1,6 @@
 # RuneBound Chronicles — Roadmap
 
-*Updated 2 November 2026 · matches [GAME_DESIGN.md](GAME_DESIGN.md) v2.0*
+*Updated 2 November 2026 · matches [GAME_DESIGN.md](GAME_DESIGN.md) v2.2*
 
 The game is built in small batches. Each batch must:
 
@@ -11,7 +11,9 @@ The game is built in small batches. Each batch must:
 
 Out of scope, permanently: turn-based battles, battle screens, random encounters, creature catching, creature parties, Runelings.
 
-## Phase 1 — First playable version (v0.1)
+## Phase 1 — First playable version (v0.1) ✅
+
+Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings counted up one per batch, so the first playable release is 0.10.0).
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
@@ -24,7 +26,7 @@ Out of scope, permanently: turn-based battles, battle screens, random encounters
 | 6 ✅ | Equipment | 11 equipment slots, wield/wear, stat bonuses feeding the combat formulas, level requirements, equipment panel | Equipping a bronze sword makes you visibly stronger |
 | 7 ✅ | Ranged, magic and wolves | Shortbow + arrows, staff + runes + basic strike spells, projectiles, style switching, Ranged and Magic skills, wolves (aggressive), Alpha Wolf mini-boss | You can kill wolves with melee, ranged or magic |
 | 8 ✅ | Food, potions, bank and shop | Eating (3-tick delay), potions with timed boosts, building interiors, village bank (deposit/withdraw), general store (buy/sell, coins), death gravestone rules | Full loop works: fight → loot → bank/sell → buy upgrade |
-| 9 | v0.1 polish | Mobile UI pass (safe areas, 44 pt targets, long-press menus), settings, performance pass on iPhone, save migration tests, bug fixes | v0.1 released on GitHub Pages |
+| 9 ✅ | v0.1 polish | Mobile UI pass (safe areas, 44 pt targets, long-press menus), settings, performance pass on iPhone, save migration tests, bug fixes | v0.1 released on GitHub Pages |
 
 ## Phase 2 — Skilling (v0.2)
 
@@ -60,6 +62,8 @@ Out of scope, permanently: turn-based battles, battle screens, random encounters
 
 | Date | Change |
 | --- | --- |
+| 2 Nov 2026 | v0.10.0 — first playable release. Batch 9: long-press (phone) or right-click (computer) anything for its options (attack, talk, examine, take, enter, walk here); tapping an item eats, drinks, wields or wears it, long-press for the full menu; every touch button at least 44 pt; shop quantity buttons on their own row on phones; new settings (what tapping an item does, text speed, XP drops, battery saver) and an "adventure" stats section; canvas capped at 2× density and the HUD only redraws what changed; saves are repaired on load (unknown items removed, broken values reset); automated tests for loading saves from every earlier version; examine text for every villager. Fixed: two saves in the same millisecond could load the older one. |
+| 2 Nov 2026 | Bram's cabin got a bow-and-arrow sign so new players know where to get a free bow. |
 | 2 Nov 2026 | v0.9.0: Batch 8 shipped — walk-in interiors for the General Store and Bank, Pell's shop (buy/sell, prices shift with stock, restocking), the bank (unlimited stacking storage, deposit bag/worn items), food (bread, meat pie, trout), attack/strength/defence potions with 4 doses and decaying boosts, eating delays your next attack, death keeps your 3 most valuable items and leaves the rest in a 15-minute gravestone (free for 5 minutes, then a fee), new leather armour and wooden shield. |
 | 2 Nov 2026 | v0.8.0: Batch 7 shipped — shortbow (from Bram) with arrows from the ammo slot, apprentice staff (from Wren) casting Wind Strike / Water Strike with runes, projectiles with travel time and line of sight, Accurate / Rapid / Longrange bow styles, ranged and magic accuracy, max hit and XP, 60% of arrows recoverable, wolves (aggressive pack) and the Alpha Wolf mini-boss with a 1/32 wolf-pelt cloak. New runes added to goblin drops. |
 | 2 Nov 2026 | v0.7.0: Batch 6 shipped — 11 equipment slots, wield/wear/remove with swapping, level requirements, attack/defence bonuses by type (stab, slash, crush, ranged, magic), melee strength, weapon speed and attack type feeding the combat formulas, enemies' attack types, equipment tab with bonus table, gear drawn on the character. |

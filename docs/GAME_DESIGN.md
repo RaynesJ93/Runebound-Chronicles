@@ -1,6 +1,6 @@
 # RuneBound Chronicles — Game Design Document
 
-*Version 2.1 · Updated 2 November 2026 · 2D pixel art; supersedes the original creature-battler concept*
+*Version 2.2 · Updated 2 November 2026 · 2D pixel art; supersedes the original creature-battler concept*
 
 ## 1. Vision
 
@@ -271,6 +271,7 @@ Example — Goblin:
 - **28 slots** in a 4 × 7 grid.
 - Stackable items (coins, runes, arrows) use one slot.
 - Actions: Use, Equip/Wield, Eat/Drink, Drop, Examine. Drag to reorder.
+- Tapping (or left-clicking) an item does its main action: eat, drink, wield or wear. Long-press (or right-click) shows every option. A setting makes every tap open the menu instead.
 
 ### Equipment slots
 
@@ -396,7 +397,11 @@ Every skill uses the same XP curve and goes to 99. Resources respawn after a tim
 | Zoom | Pinch (limited range) |
 | Panels | Bottom tab bar, panels slide up as sheets |
 
-Touch targets are at least 44 × 44 points. The layout respects the iPhone notch and home bar (safe areas) and works in landscape and portrait. The game should run as a Home Screen web app.
+Touch targets are at least 44 × 44 points. The layout respects the iPhone notch and home bar (safe areas) and works in landscape and portrait. The game should run as a Home Screen web app. The canvas is drawn at no more than 2× pixel density (iPhones are 3×), which looks identical for pixel art and halves the work per frame; a battery saver setting caps drawing at 30 fps.
+
+### Settings
+
+Controls (joystick, what tapping an item does), gameplay (auto retaliate, text speed, XP drops), display (zoom, battery saver), your adventure (play time, levels, monsters defeated, deaths, tiles walked), save backup tools and starting a new game.
 
 ## 11. Technical architecture
 
@@ -437,6 +442,7 @@ Rules:
 - Saves go to the browser's local storage (with IndexedDB as a fallback for larger saves).
 - Autosave every 30 seconds, on level-up, on bank close and when the page is hidden.
 - Every save has a **schema version number**. Loading an older save runs migration functions step by step, so updates never wipe progress.
+- After upgrading, every save is **repaired**: unknown items are removed, broken numbers and settings are reset to defaults. `tests/save.test.mjs` loads a save from every earlier version (run with `node tests/save.test.mjs`).
 - Two rotating save slots so a crash during saving cannot corrupt everything.
 - **Export / import save** as a text code or file, because iPhone Home Screen apps keep their storage separate from Safari.
 

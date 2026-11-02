@@ -51,7 +51,7 @@ export class Hud {
           <div class="panel-body">
             <div data-ipane="inv">
               <div class="inv-grid" id="inv-grid"></div>
-              <p class="muted small">Tap an item for options (wield, wear, drop…). Drag to rearrange.</p>
+              <p class="muted small" id="inv-help"></p>
             </div>
             <div data-ipane="gear" class="hidden">
               <div class="doll" id="doll"></div>
@@ -134,9 +134,19 @@ export class Hud {
         <div class="panel" role="dialog" aria-label="Settings">
           <div class="panel-head"><h2>Settings</h2><button class="close-btn" data-close aria-label="Close">✕</button></div>
           <div class="panel-body">
+            <h3 class="first">Controls</h3>
             <div class="row"><span>On-screen joystick</span><button class="chip" id="set-dpad"></button></div>
-            <div class="row"><span>Auto retaliate</span><button class="chip" id="set-retaliate"></button></div>
+            <div class="row"><span>Tapping an item<small id="item-tap-sub"></small></span><button class="chip" id="set-itemtap"></button></div>
+            <p class="muted small" id="controls-help"></p>
+            <h3>Gameplay</h3>
+            <div class="row"><span>Auto retaliate<small>Fight back when attacked</small></span><button class="chip" id="set-retaliate"></button></div>
+            <div class="row"><span>Text speed</span><button class="chip" id="set-textspeed"></button></div>
+            <div class="row"><span>XP drops</span><button class="chip" id="set-xpdrops"></button></div>
+            <h3>Display</h3>
             <div class="row"><span>Zoom</span><span class="zoom-ctl"><button class="chip sq" id="zoom-out" aria-label="Zoom out">−</button><span id="zoom-val">0</span><button class="chip sq" id="zoom-in" aria-label="Zoom in">+</button></span></div>
+            <div class="row"><span>Battery saver<small>30 frames a second</small></span><button class="chip" id="set-battery"></button></div>
+            <h3>Your adventure</h3>
+            <div class="adv-stats" id="adv-stats"></div>
             <h3>Your save</h3>
             <p class="muted" id="save-status">Your game saves automatically.</p>
             <div class="btn-grid">
@@ -166,6 +176,7 @@ export class Hud {
       settings: $('settings'), toast: $('toast'), saveStatus: $('save-status'),
       setDpad: $('set-dpad'), zoomVal: $('zoom-val'), importBox: $('import-box'), importText: $('import-text'),
       version: $('version'), setRetaliate: $('set-retaliate'),
+      setItemTap: $('set-itemtap'), setTextSpeed: $('set-textspeed'), setXpDrops: $('set-xpdrops'), setBattery: $('set-battery'),
       hpOrb: $('hp-orb'), hpFill: $('hp-fill'), hpVal: $('hp-val'),
       target: $('target'), targetName: $('target-name'), targetFill: $('target-fill'),
     };
@@ -336,20 +347,39 @@ export class Hud {
     this.$('inv-free').textContent = `${28 - free} / 28`;
   }
 
-  // Tap a slot -> onSlotTap(i, x, y). Drag a slot onto another -> onSlotSwap(a, b).
+  // Tap a slot -> onSlotTap(i, x, y). Long-press or right-click -> onSlotMenu(i, x, y).
+  // Drag a slot onto another -> onSlotSwap(a, b).
   bindInventoryDrag(grid) {
     let drag = null;
+    let lastTouch = -Infinity;
+    grid.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      if (performance.now() - lastTouch < 1000) return; // a long-press already did it
+      const slot = e.target.closest('.slot.full');
+      if (slot) this.onSlotMenu?.(Number(slot.dataset.slot), e.clientX, e.clientY);
+    });
     grid.addEventListener('pointerdown', (e) => {
       const slot = e.target.closest('.slot.full');
-      if (!slot) return;
+      if (!slot || (e.pointerType === 'mouse' && e.button !== 0)) return;
       e.preventDefault();
-      drag = { from: Number(slot.dataset.slot), x: e.clientX, y: e.clientY, moved: false, ghost: null, id: e.pointerId };
+      const d = { from: Number(slot.dataset.slot), x: e.clientX, y: e.clientY, moved: false, ghost: null, id: e.pointerId, timer: 0 };
+      drag = d;
+      if (e.pointerType !== 'mouse') {
+        lastTouch = performance.now();
+        d.timer = setTimeout(() => {
+          if (drag !== d || d.moved) return;
+          drag = null;
+          navigator.vibrate?.(12);
+          this.onSlotMenu?.(d.from, d.x, d.y);
+        }, 450);
+      }
       try { grid.setPointerCapture(e.pointerId); } catch { /* ignore */ }
     });
     grid.addEventListener('pointermove', (e) => {
       if (!drag || e.pointerId !== drag.id) return;
       if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 8) {
         drag.moved = true;
+        clearTimeout(drag.timer);
         const img = grid.querySelector(`[data-slot="${drag.from}"] img`);
         if (img) {
           drag.ghost = img.cloneNode();
@@ -363,6 +393,7 @@ export class Hud {
       if (!drag || e.pointerId !== drag.id) return;
       const d = drag;
       drag = null;
+      clearTimeout(d.timer);
       d.ghost?.remove();
       if (e.type === 'pointercancel') return;
       if (!d.moved) { this.onSlotTap?.(d.from, e.clientX, e.clientY); return; }
@@ -454,6 +485,7 @@ export class Hud {
   // Floating "+20" with the skill's icon, near the top-right. XP from the same
   // hit (e.g. Strength and Hitpoints) is gathered into one row, side by side.
   xpDrop(skill, amount) {
+    if (this.showXpDrops === false) return;
     (this.pendingDrops ||= []).push([skill, amount]);
     if (this.dropQueued) return;
     this.dropQueued = true;
@@ -524,16 +556,21 @@ export class Hud {
     this.toastTimer = setTimeout(() => t.classList.add('hidden'), 2200);
   }
 
+  // These run every frame, so they only touch the page when something changed.
   setRun(on, energy) {
+    const key = `${on}|${Math.floor(energy)}`;
+    if (key === this.runKey) return;
+    this.runKey = key;
     this.el.runOrb.classList.toggle('on', on);
     this.el.runOrb.style.setProperty('--pct', Math.floor(energy));
-    const v = String(Math.floor(energy));
-    if (this.el.runVal.textContent !== v) this.el.runVal.textContent = v;
+    this.el.runVal.textContent = String(Math.floor(energy));
   }
 
   setHp(hp, max) {
-    const v = String(hp);
-    if (this.el.hpVal.textContent !== v) this.el.hpVal.textContent = v;
+    const key = `${hp}|${max}`;
+    if (key === this.hpKey) return;
+    this.hpKey = key;
+    this.el.hpVal.textContent = String(hp);
     this.el.hpFill.style.width = `${(100 * hp) / max}%`;
     this.el.hpOrb.classList.toggle('low', hp <= max * 0.3);
   }
@@ -549,7 +586,10 @@ export class Hud {
   // playerLevel colours the name: green = weaker than you, yellow = close, red = stronger.
   setTarget(enemy, playerLevel = 3) {
     const el = this.el.target;
-    if (!enemy) { if (!el.classList.contains('hidden')) el.classList.add('hidden'); return; }
+    const key = enemy ? `${enemy.id ?? enemy.name}|${enemy.hp}|${enemy.maxHp}|${playerLevel}` : '';
+    if (key === this.targetKey) return;
+    this.targetKey = key;
+    if (!enemy) { el.classList.add('hidden'); return; }
     el.classList.remove('hidden');
     const diff = enemy.def.level - playerLevel;
     el.dataset.diff = diff <= -3 ? 'easy' : diff >= 3 ? 'hard' : 'even';
@@ -624,8 +664,10 @@ export class Hud {
     this.el.dialogText.textContent = '';
     this.el.dialogNext.classList.add('hidden');
     this.typing = true;
+    if (this.textSpeed === 'instant') { this.finishTyping(); return; }
+    const step = this.textSpeed === 'fast' ? 5 : 2;
     this.typer = setInterval(() => {
-      n += 2;
+      n += step;
       this.el.dialogText.textContent = text.slice(0, n);
       if (n >= text.length) this.finishTyping();
     }, 28);
