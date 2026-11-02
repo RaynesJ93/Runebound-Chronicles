@@ -52,6 +52,77 @@ function axe(b, metal) {
   }
 }
 
+// A pickaxe: handle from bottom-left, a curved double-pointed head across the top.
+function pickaxe(b, metal) {
+  const [d, m, l, h] = METAL[metal];
+  line(b, 3, 14, 10, 7, WOOD[1]);
+  line(b, 4, 14, 10, 8, WOOD[0]);
+  for (let t = -6; t <= 6; t++) {
+    const bend = Math.round((36 - t * t) * 0.09);
+    const x = 10 + t, y = 6 + t - bend;
+    b.set(x, y, Math.abs(t) > 4 ? h : l);
+    b.set(x, y + 1, Math.abs(t) > 4 ? l : m);
+    if (Math.abs(t) < 3) b.set(x + 1, y + 1, d);
+  }
+}
+
+// A lump of rock with coloured flecks of ore.
+function oreLump(b, fleck) {
+  const st = [hex('#5e5a54'), hex('#7d7870'), hex('#9e988e')];
+  b.ellipse(8, 9, 6, 4.6, st[0]);
+  b.ellipse(7.5, 8.4, 5.2, 3.8, st[1]);
+  b.ellipse(6.5, 7.4, 2.6, 1.8, st[2]);
+  for (const [x, y] of [[5, 8], [9, 7], [10, 10], [7, 11], [11, 8], [4, 10]]) { b.set(x, y, fleck[1]); b.set(x + 1, y, fleck[0]); }
+  b.set(9, 7, fleck[2]);
+}
+
+// A metal bar (ingot), seen from the side and a little above.
+function ingot(b, metal) {
+  const [d, m, l, h] = METAL[metal];
+  for (let y = 6; y < 12; y++) {
+    const inset = y < 8 ? 8 - y : 0;
+    for (let x = 2 + inset; x < 14 - inset; x++) b.set(x, y, y < 8 ? l : y === 11 ? d : m);
+  }
+  line(b, 5, 6, 10, 6, h);
+}
+
+// A square shield with a rim and a boss in the middle.
+function sqShield(b, metal) {
+  const [d, m, l, h] = METAL[metal];
+  for (let y = 2; y < 14; y++) for (let x = 3; x < 13; x++) {
+    const rim = x === 3 || x === 12 || y === 2 || y === 13;
+    b.set(x, y, rim ? d : (x + y) % 7 === 0 ? l : m);
+  }
+  b.ellipse(8, 8, 1.8, 1.8, l);
+  b.set(7, 7, h);
+  line(b, 4, 3, 11, 3, h);
+}
+
+// A chainmail shirt: little rings in a checker pattern.
+function chainbody(b, metal) {
+  const [d, m, l] = METAL[metal];
+  for (let y = 3; y < 14; y++) for (let x = 2; x < 14; x++) {
+    const torso = x >= 4 && x <= 11;
+    const sleeve = y < 8 && (x < 4 || x > 11);
+    if (!torso && !sleeve) continue;
+    if (y === 3 && x > 6 && x < 9) continue;
+    b.set(x, y, (x + y) % 2 === 0 ? l : y % 3 === 0 ? d : m);
+  }
+}
+
+// A metal helmet with a nose guard.
+function medHelm(b, metal) {
+  const [d, m, l, h] = METAL[metal];
+  for (let y = 3; y < 13; y++) for (let x = 2; x < 14; x++) {
+    const dx = (x + 0.5 - 8) / 6, dy = (y + 0.5 - 10) / 7;
+    if (dx * dx + dy * dy > 1 || y > 11) continue;
+    const k = -dx * 0.7 - dy * 0.7;
+    b.set(x, y, k > 0.5 ? h : k > 0 ? l : k > -0.5 ? m : d);
+  }
+  b.rect(7, 9, 2, 4, m);
+  b.set(7, 9, l);
+}
+
 // Two logs lying side by side, ends showing their rings.
 function logPair(b, bark, ring) {
   for (const [y0, x0] of [[9, 2], [5, 4]]) {
@@ -171,6 +242,43 @@ const DRAW = {
   oakShortbow(b) { bow(b, [hex('#6e4a22'), hex('#a8783e'), hex('#d0a060')], 7); },
   oakLongbow(b) { bow(b, [hex('#6e4a22'), hex('#a8783e'), hex('#d0a060')], 7.5); },
   bronzeAxe(b) { axe(b, 'bronze'); },
+  bronzePickaxe(b) { pickaxe(b, 'bronze'); },
+  ironPickaxe(b) { pickaxe(b, 'iron'); },
+  hammer(b) {
+    line(b, 3, 14, 10, 7, WOOD[1]);
+    line(b, 4, 14, 10, 8, WOOD[0]);
+    const [d, m, l, h] = METAL.iron;
+    // a solid head across the top of the handle
+    for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+      const u = x - y, v = x + y;
+      if (u >= 2 && u <= 5 && v >= 12 && v <= 22) b.set(x, y, u === 5 ? h : u === 4 ? l : u === 2 ? d : m);
+    }
+  },
+  copperOre(b) { oreLump(b, [hex('#b8642a'), hex('#e08a44'), hex('#ffc07a')]); },
+  tinOre(b) { oreLump(b, [hex('#9aa0a4'), hex('#d4dade'), hex('#ffffff')]); },
+  ironOre(b) { oreLump(b, [hex('#6e3a26'), hex('#a85a3a'), hex('#d0886a')]); },
+  bronzeBar(b) { ingot(b, 'bronze'); },
+  ironBar(b) { ingot(b, 'iron'); },
+  ironSword(b) { blade(b, 'iron', 9); },
+  ironMedHelm(b) { medHelm(b, 'iron'); },
+  bronzeSqShield(b) { sqShield(b, 'bronze'); },
+  ironSqShield(b) { sqShield(b, 'iron'); },
+  bronzeChainbody(b) { chainbody(b, 'bronze'); },
+  ironChainbody(b) { chainbody(b, 'iron'); },
+  ironArrow(b) {
+    for (const off of [0, 3]) {
+      line(b, 3 + off, 13, 11 + off, 5, WOOD[2]);
+      const [, m, l] = METAL.iron;
+      b.set(12 + off, 4, l); b.set(11 + off, 4, m); b.set(12 + off, 5, m);
+      b.set(2 + off, 13, hex('#f4f2e6')); b.set(3 + off, 14, hex('#f4f2e6')); b.set(2 + off, 12, hex('#d8d4c6'));
+    }
+  },
+  ironArrowtips(b) {
+    const [d, m, l] = METAL.iron;
+    for (const [x, y] of [[4, 10], [9, 11], [7, 6], [11, 5]]) {
+      b.set(x, y, l); b.set(x + 1, y, m); b.set(x, y + 1, m); b.set(x + 1, y + 1, d); b.set(x + 2, y - 1, l);
+    }
+  },
   ironAxe(b) { axe(b, 'iron'); },
   knife(b) {
     line(b, 4, 12, 7, 9, WOOD[1]);

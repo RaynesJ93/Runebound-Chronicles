@@ -458,8 +458,8 @@ function drawFront(L, back, frame) {
     b.rect(x, 11 + o, 2, 4, side ? L.tunicS : L.tunic);
     b.rect(x, 15 + o, 2, 1, L.skin);
   }
-  if (L.shield && !back) shieldOn(b, 2.5, 13 + bob);
-  if (L.shield && back) shieldOn(b, 13.5, 13 + bob);
+  if (L.shield && !back) shieldOn(b, 2.5, 13 + bob, L.shield);
+  if (L.shield && back) shieldOn(b, 13.5, 13 + bob, L.shield);
   if (L.weaponKind === 'bow' || L.weaponKind === 'staff') {
     const hx = back ? 1 : 14;
     const hy = 15 + armO(back ? 0 : 1) + bob;
@@ -772,8 +772,95 @@ export function gravestone() {
 }
 
 // A round wooden shield on the arm, for the character drawing.
-export function shieldOn(b, x, y) {
-  b.ellipse(x, y, 3, 3.5, hex('#5e3b1f'));
-  b.ellipse(x, y, 2.2, 2.7, hex('#9a6234'));
-  b.set(Math.round(x), Math.round(y), hex('#a8a39a'));
+const SHIELD_COLOUR = {
+  wood: ['#5e3b1f', '#9a6234', '#a8a39a'],
+  bronze: ['#6e4320', '#c07a38', '#f2c48a'],
+  iron: ['#4a4f56', '#9aa2aa', '#e2e8ec'],
+};
+export function shieldOn(b, x, y, kind = 'wood') {
+  const [rim, face, boss] = (SHIELD_COLOUR[kind] || SHIELD_COLOUR.wood).map(hex);
+  if (kind === 'wood') {
+    b.ellipse(x, y, 3, 3.5, rim);
+    b.ellipse(x, y, 2.2, 2.7, face);
+  } else {
+    b.rect(Math.round(x) - 3, Math.round(y) - 3, 6, 7, rim);
+    b.rect(Math.round(x) - 2, Math.round(y) - 2, 4, 5, face);
+  }
+  b.set(Math.round(x), Math.round(y), boss);
+}
+
+// ---- Mining and smithing ------------------------------------------------------------
+
+const ORE_COLOUR = {
+  copper: [hex('#b8642a'), hex('#e08a44'), hex('#ffc07a')],
+  tin: [hex('#9aa0a4'), hex('#c8ced2'), hex('#f2f6f8')],
+  iron: [hex('#6e3a26'), hex('#9a5236'), hex('#c87a56')],
+};
+
+// A rock with veins of ore. With no `variant` it's a mined-out rock.
+export function oreRock(variant, seed) {
+  const b = new Bitmap(20, 18);
+  shadedBlobs(b, [[8, 11, 6.5], [12, 10, 6.5], [10, 7.5, 5.5]], C.stone, seed);
+  const col = ORE_COLOUR[variant];
+  if (col) {
+    for (let k = 0; k < 7; k++) {
+      const x = 4 + Math.floor(rnd(seed, k, 5) * 12);
+      const y = 5 + Math.floor(rnd(seed, k, 6) * 9);
+      if (!b.alpha(x, y)) continue;
+      b.set(x, y, col[1]); b.set(x + 1, y, col[0]);
+      if (b.alpha(x, y - 1)) b.set(x, y - 1, col[2]);
+    }
+  } else {
+    for (const [x, y] of [[7, 9], [11, 8], [9, 12]]) b.set(x, y, C.stone[0]);
+  }
+  b.outline();
+  return sprite(b, 10, 17);
+}
+
+// The miners' furnace: a stone kiln with a glowing mouth and a chimney.
+export function furnace() {
+  const b = new Bitmap(18, 30);
+  const st = C.stone;
+  for (let y = 4; y < 30; y++) for (let x = 1; x < 17; x++) {
+    const chimney = y < 12 && (x < 6 || x > 11);
+    if (chimney) continue;
+    const brick = (y % 4 === 0) || ((x + (Math.floor(y / 4) % 2) * 3) % 6 === 0);
+    b.set(x, y, brick ? st[0] : st[(x + y) % 3 === 0 ? 2 : 1]);
+  }
+  b.rect(6, 4, 6, 2, st[3]);
+  // the fire
+  b.ellipse(9, 22, 4.5, 3.6, hex('#3a1a0c'));
+  b.ellipse(9, 23, 3.4, 2.4, hex('#e0571e'));
+  b.ellipse(9, 23.5, 2.2, 1.4, hex('#ffb347'));
+  b.set(9, 23, hex('#fff1b0'));
+  b.rect(3, 28, 12, 2, st[0]);
+  b.outline();
+  return sprite(b, 9, 29);
+}
+
+// An anvil on a wooden block.
+export function anvil() {
+  const b = new Bitmap(18, 16);
+  const ir = [hex('#2e3236'), hex('#4c5258'), hex('#6e767e'), hex('#a3acb4')];
+  b.rect(3, 3, 12, 3, ir[1]);
+  b.rect(3, 3, 12, 1, ir[3]);
+  b.rect(0, 3, 4, 2, ir[2]); // horn
+  b.rect(6, 6, 6, 3, ir[0]);
+  b.rect(5, 9, 8, 2, ir[1]);
+  b.rect(4, 11, 10, 4, C.wood[1]);
+  b.rect(4, 11, 10, 1, C.wood[2]);
+  b.rect(4, 14, 10, 1, C.wood[0]);
+  b.outline();
+  return sprite(b, 9, 15);
+}
+
+// Loose stones on the floor (flat, walk over it).
+export function rubble(seed) {
+  const b = new Bitmap(16, 16);
+  for (let k = 0; k < 5; k++) {
+    const x = 2 + Math.floor(rnd(seed, k, 7) * 11);
+    const y = 4 + Math.floor(rnd(seed, k, 8) * 9);
+    b.set(x, y, C.stone[2]); b.set(x + 1, y, C.stone[1]); b.set(x, y + 1, C.stone[0]);
+  }
+  return sprite(b, 8, 8);
 }

@@ -27,8 +27,10 @@ import { Bank } from './items/bank.js';
 import { Shop } from './items/shop.js';
 import { SHOPS } from '../data/shops.js';
 import { splitOnDeath, graveFee, reclaim, GRAVE_SECONDS, FREE_SECONDS } from './items/death.js';
-import { TREES, AXES, SWING_TICKS, chopChance } from '../data/woodcutting.js';
+import { TREES, AXES, SWING_TICKS } from '../data/woodcutting.js';
 import { RECIPES, GROUP_OF } from '../data/fletching.js';
+import { ROCKS, PICKAXES, MINE_TICKS } from '../data/mining.js';
+import { SMELTING, SMITHING } from '../data/smithing.js';
 
 const AUTOSAVE_TICKS = 50; // 30 seconds
 
@@ -63,6 +65,7 @@ function boot() {
     for (const p of a.props) if (p.interact) for (const t of p.tiles) look.set(a.idx(t.x, t.y), p);
     // Trees can be chopped: their trunk, and the canopy just above it.
     for (const p of a.props) {
+      if (p.type === 'ore' && ROCKS[p.variant]) { for (const t of p.tiles) look.set(a.idx(t.x, t.y), p); continue; }
       if (p.type !== 'tree' || !TREES[p.variant]) continue;
       for (const t of p.tiles) {
         look.set(a.idx(t.x, t.y), p);
@@ -674,11 +677,17 @@ function boot() {
         title ||= p.depleted ? 'Tree stump' : tree.name;
         if (!p.depleted) opts.push({ label: `Chop down ${tree.name}`, fn: () => { combat.stop(); useProp(p); } });
         opts.push({ label: 'Examine', fn: () => hud.message(p.depleted ? 'A stump. The tree will grow back soon.' : `${tree.examine} (Woodcutting ${tree.level})`) });
+      } else if (p.type === 'ore' && ROCKS[p.variant]) {
+        const rock = ROCKS[p.variant];
+        title ||= p.depleted ? 'Empty rock' : rock.name;
+        if (!p.depleted) opts.push({ label: `Mine ${rock.name}`, fn: () => { combat.stop(); useProp(p); } });
+        opts.push({ label: 'Examine', fn: () => hud.message(p.depleted ? 'There is no ore left in this rock right now.' : `${rock.examine} (Mining ${rock.level})`) });
       } else if (p.type === 'enter') {
         const b = area.buildings.find((x) => x.doorTiles === p.tiles);
         opts.push({ label: `Enter ${b?.label || 'building'}`, fn: () => { combat.stop(); useProp(p); } });
       } else if (p.action) {
-        opts.push({ label: p.action === 'bank' ? 'Use bank booth' : 'Trade', fn: () => { combat.stop(); useProp(p); } });
+        const ACTION_LABEL = { bank: 'Use bank booth', shop: 'Trade', smelt: 'Smelt ore', smith: 'Smith metal' };
+        opts.push({ label: ACTION_LABEL[p.action] || 'Use', fn: () => { combat.stop(); useProp(p); } });
       } else if (p.interact) {
         opts.push({ label: `Look at ${PROP_NAME[p.type] || p.type || 'this'}`, fn: () => { combat.stop(); useProp(p); } });
       }
@@ -716,6 +725,7 @@ function boot() {
   };
   const runAction = (name) => {
     combat.stop();
+    if (name === 'smelt' || name === 'smith') { stationMenu(name); return; }
     if (name === 'bank') hud.openTrade('bank', 'Bank of Brambleford');
     else if (name === 'shop') hud.openTrade('shop', shop.name);
     refreshTrade();
@@ -833,7 +843,7 @@ function boot() {
       return;
     }
     if (prop.grave) { graveMenu(); return; }
-    if (prop.type === 'tree') { startChop(prop); return; }
+    if (prop.type === 'tree' || prop.type === 'ore') { startGather(prop); return; }
     if (prop.action) { runAction(prop.action); return; }
     if (prop.interact) hud.showDialog(prop.interact);
   };
@@ -870,56 +880,76 @@ function boot() {
     if (n % AUTOSAVE_TICKS === 0) save();
   });
 
-  // ---- Woodcutting -------------------------------------------------------------
-  const wcLevel = () => book.level('woodcutting');
+  // ---- Gathering: woodcutting and mining --------------------------------------------
+  // Trees and ore rocks work the same way: tap one, walk up, and swing away with
+  // your best tool until something comes loose. Then it's a stump or an empty
+  // rock for a while.
+  const GATHER = {
+    tree: { skill: 'woodcutting', defs: TREES, tools: AXES, ticks: SWING_TICKS, tool: 'axe', item: (d) => d.log,
+      start: 'You swing your axe at the tree.', noTool: 'You need an axe to chop down this tree. Bram might lend you one.',
+      levelMsg: (d) => `You need a Woodcutting level of ${d.level} to chop down this tree.`, gone: 'This tree has been chopped down. It will grow back soon.',
+      got: (d) => `You get some ${itemName(d.log).toLowerCase()}.`,
+      fell: (d) => (d.deplete >= 1 ? 'The tree falls. It will grow back in a little while.' : 'The oak has no more good wood for now.') },
+    ore: { skill: 'mining', defs: ROCKS, tools: PICKAXES, ticks: MINE_TICKS, tool: 'pickaxe', item: (d) => d.ore,
+      start: 'You swing your pickaxe at the rock.', noTool: 'You need a pickaxe to mine this rock. Dorrin might lend you one.',
+      levelMsg: (d) => `You need a Mining level of ${d.level} to mine this rock.`, gone: 'There is no ore left in this rock right now.',
+      got: (d) => `You manage to mine some ${itemName(d.ore).toLowerCase().replace(' ore', '')}.`,
+      fell: () => null },
+  };
   const hasItem = (id) => inventory.count(id) > 0 || state.equipment.weapon?.id === id;
-  const bestAxe = () => AXES.find((a) => hasItem(a.id) && wcLevel() >= a.level);
+  const bestTool = (g) => g.tools.find((t) => hasItem(t.id) && book.level(g.skill) >= t.level);
   const trunk = (prop) => prop.tiles[0];
-  const fallen = new Set(); // trees that are stumps right now (any area)
+  const fallen = new Set(); // stumps and empty rocks right now (any area)
+  const fullBag = (g) => `Your inventory is too full to hold any more ${g.tool === 'axe' ? 'logs' : 'ore'}.`;
 
-  const startChop = (prop) => {
-    const tree = TREES[prop.variant];
-    if (!tree) return;
-    if (prop.depleted) { hud.message('This tree has been chopped down. It will grow back soon.'); return; }
-    if (wcLevel() < tree.level) { hud.message(`You need a Woodcutting level of ${tree.level} to chop down this tree.`); return; }
-    const axe = bestAxe();
-    if (!axe) {
-      hud.message(AXES.some((a) => hasItem(a.id)) ? 'You need a higher Woodcutting level to use your axe.' : 'You need an axe to chop down this tree. Bram might lend you one.');
+  const startGather = (prop) => {
+    const g = GATHER[prop.type];
+    const d = g?.defs[prop.variant];
+    if (!d) return;
+    if (prop.depleted) { hud.message(g.gone); return; }
+    if (book.level(g.skill) < d.level) { hud.message(g.levelMsg(d)); return; }
+    if (!bestTool(g)) {
+      hud.message(g.tools.some((t) => hasItem(t.id)) ? `You need a higher ${SKILL_NAME[g.skill]} level to use your ${g.tool}.` : g.noTool);
       return;
     }
-    if (!inventory.room(tree.log, 1)) { hud.message('Your inventory is too full to hold any more logs.'); return; }
+    if (!inventory.room(g.item(d), 1)) { hud.message(fullBag(g)); return; }
     combat.stop();
     player.faceTowards(trunk(prop).x, trunk(prop).y);
-    activity = { kind: 'chop', prop, tree, next: ticker.count + 2 };
-    hud.message('You swing your axe at the tree.');
+    activity = { kind: 'gather', prop, g, d, next: ticker.count + 2 };
+    hud.message(g.start);
   };
 
-  const chopStep = (a) => {
-    a.next = ticker.count + SWING_TICKS;
-    const axe = bestAxe();
-    if (!axe || a.prop.depleted) { activity = null; return; }
+  const gatherStep = (a) => {
+    const { g, d, prop } = a;
+    a.next = ticker.count + g.ticks;
+    const tool = bestTool(g);
+    if (!tool || prop.depleted) { activity = null; return; }
     skillLungeAt = time;
-    player.faceTowards(trunk(a.prop).x, trunk(a.prop).y);
-    if (rng() >= chopChance(a.tree, wcLevel(), axe)) return;
-    if (!inventory.add(a.tree.log, 1)) { hud.message('Your inventory is too full to hold any more logs.'); stopActivity(); return; }
-    hud.message(`You get some ${itemName(a.tree.log).toLowerCase()}.`);
-    book.add('woodcutting', a.tree.xp);
+    player.faceTowards(trunk(prop).x, trunk(prop).y);
+    const chance = Math.min(0.9, d.chance + (book.level(g.skill) - d.level) * 0.012 + tool.bonus);
+    if (rng() >= chance) return;
+    const item = g.item(d);
+    if (!inventory.add(item, 1)) { hud.message(fullBag(g)); stopActivity(); return; }
+    hud.message(g.got(d));
+    book.add(g.skill, d.xp);
     refreshInventory();
-    if (rng() < a.tree.deplete) {
-      a.prop.depleted = true;
-      const [lo, hi] = a.tree.respawn;
-      a.prop.growsAt = ticker.count + lo + Math.floor(rng() * (hi - lo + 1));
-      fallen.add(a.prop);
-      hud.message(a.tree.deplete >= 1 ? 'The tree falls. It will grow back in a little while.' : 'The oak has no more good wood for now.');
+    if (rng() < d.deplete) {
+      prop.depleted = true;
+      const [lo, hi] = d.respawn;
+      prop.growsAt = ticker.count + lo + Math.floor(rng() * (hi - lo + 1));
+      fallen.add(prop);
+      const msg = g.fell(d);
+      if (msg) hud.message(msg);
       stopActivity();
-    } else if (!inventory.room(a.tree.log, 1)) {
-      hud.message('Your inventory is too full to hold any more logs.');
+    } else if (!inventory.room(item, 1)) {
+      hud.message(fullBag(g));
       stopActivity();
     }
   };
 
   // ---- Fletching -----------------------------------------------------------------
   const flLevel = () => book.level('fletching');
+  const skillOf = (r) => r.skill || 'fletching';
   const amountLabel = (r) => {
     const [id, q] = Object.entries(r.gives)[0];
     return r.batch ? `${r.name} (up to ${r.batch})` : q > 1 ? `${r.name} × ${q}` : r.name;
@@ -944,8 +974,39 @@ function boot() {
     ]);
   };
 
+  // The furnace and the anvil. Tapping one opens a menu of what you can make.
+  const stationMenu = (kind) => {
+    const pos = view.tileToScreen(player.tile.x, player.tile.y);
+    const lvl = book.level('smithing');
+    const option = (r, extra = '') => ({
+      label: `${r.name}${extra}${lvl < r.level ? ` — needs level ${r.level}` : ''}`,
+      icon: itemIcon(Object.keys(r.gives)[0]).url,
+      fn: () => startMake(r),
+    });
+    if (kind === 'smelt') {
+      hud.showMenu(pos.x, pos.y, 'Furnace', [...SMELTING.map((r) => option(r, ` (${Object.keys(r.uses).map((id) => itemName(id).toLowerCase()).join(' + ')})`)), { label: 'Cancel', fn: () => {} }]);
+      return;
+    }
+    if (!inventory.count('hammer')) { hud.message('You need a hammer to work the metal. Dorrin or Pell can help.'); return; }
+    const bars = ['bronzeBar', 'ironBar'].filter((id) => inventory.count(id));
+    if (!bars.length) { hud.message('You need some metal bars. Smelt ore at the furnace first.'); return; }
+    const list = (bar) => {
+      const rs = SMITHING.filter((r) => r.bar === bar);
+      hud.showMenu(pos.x, pos.y, `Anvil — ${itemName(bar)}s`, [
+        ...rs.map((r) => {
+          const nBars = r.uses[bar];
+          const q = Object.values(r.gives)[0];
+          return option(r, `${q > 1 ? ` × ${q}` : ''} (${nBars} bar${nBars > 1 ? 's' : ''})`);
+        }),
+        { label: 'Cancel', fn: () => {} },
+      ]);
+    };
+    if (bars.length === 1) { list(bars[0]); return; }
+    hud.showMenu(pos.x, pos.y, 'Anvil', [...bars.map((bar) => ({ label: `Smith ${itemName(bar).toLowerCase()}s`, icon: itemIcon(bar).url, fn: () => setTimeout(() => list(bar), 0) })), { label: 'Cancel', fn: () => {} }]);
+  };
+
   const startMake = (r) => {
-    if (flLevel() < r.level) { hud.message(`You need a Fletching level of ${r.level} to make that.`); return; }
+    if (book.level(skillOf(r)) < r.level) { hud.message(`You need ${/^[AEIOU]/.test(SKILL_NAME[skillOf(r)]) ? 'an' : 'a'} ${SKILL_NAME[skillOf(r)]} level of ${r.level} to make that.`); return; }
     if (r.tool && !inventory.count(r.tool)) { hud.message(`You need a ${itemName(r.tool).toLowerCase()} to do that.`); return; }
     if (makeCount(r) <= 0) {
       const need = Object.keys(r.uses).filter((id) => !inventory.count(id)).map((id) => itemName(id).toLowerCase());
@@ -971,14 +1032,25 @@ function boot() {
     for (const [id, q] of Object.entries(r.gives)) need += ITEMS[id].stackable ? (inventory.count(id) ? 0 : 1) : q * k;
     if (need > free) { hud.message("You don't have enough inventory space."); stopActivity(); return; }
     for (const [id, q] of Object.entries(r.uses)) inventory.remove(id, q * k);
+    skillLungeAt = time;
+    a.next = ticker.count + r.ticks;
+    // Some makes can fail (impure iron): the materials are used up anyway.
+    if (r.success && rng() >= r.success(book.level(skillOf(r)))) {
+      hud.message(r.fail || 'You fail.');
+      refreshInventory();
+      return;
+    }
     for (const [id, q] of Object.entries(r.gives)) inventory.add(id, q * k);
     const [outId, outQ] = Object.entries(r.gives)[0];
     const n = outQ * k;
-    hud.message(n > 1 ? `You make ${n} ${itemName(outId).toLowerCase()}${n > 1 && !/s$/.test(itemName(outId)) ? 's' : ''}.` : `You carve the logs into ${/^[aeiou]/i.test(itemName(outId)) ? 'an' : 'a'} ${itemName(outId).toLowerCase()}.`);
-    book.add('fletching', r.xp * k);
-    skillLungeAt = time;
+    const name = itemName(outId).toLowerCase();
+    const an = /^[aeiou]/.test(name) ? 'an' : 'a';
+    if (n > 1) hud.message(`You make ${n} ${name}${/s$/.test(name) ? '' : 's'}.`);
+    else if (r.station === 'furnace') hud.message(`You smelt the ore into ${an} ${name}.`);
+    else if (r.station === 'anvil') hud.message(`You hammer the metal into ${an} ${name}.`);
+    else hud.message(`You carve the logs into ${an} ${name}.`);
+    book.add(skillOf(r), r.xp * k);
     a.made++;
-    a.next = ticker.count + r.ticks;
     refreshInventory();
   };
 
@@ -989,7 +1061,7 @@ function boot() {
     if (!a) return;
     if (dying || transitioning || combat.target || player.moving) { activity = null; return; }
     if (n < a.next) return;
-    if (a.kind === 'chop') chopStep(a);
+    if (a.kind === 'gather') gatherStep(a);
     else makeStep(a);
   });
 

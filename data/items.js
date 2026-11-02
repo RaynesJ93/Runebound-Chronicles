@@ -72,6 +72,50 @@ export const ITEMS = {
     name: 'Iron axe', value: 56, tool: { woodcutting: 5 }, examine: 'A sharper axe. Chops faster. Needs Woodcutting 5.',
     equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 5, att: { stab: -2, slash: 6, crush: 3 }, str: 5, look: { weapon: 'iron', blade: 5 } },
   },
+  // ---- Mining and Smithing -----------------------------------------------------------
+  bronzePickaxe: {
+    name: 'Bronze pickaxe', value: 16, tool: { mining: 1 }, examine: 'For mining ore. Works from your bag or in your hand.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'stab', speed: 5, att: { stab: 4, slash: -2, crush: 2 }, str: 3, look: { weapon: 'bronze', blade: 5 } },
+  },
+  ironPickaxe: {
+    name: 'Iron pickaxe', value: 56, tool: { mining: 5 }, examine: 'A tougher pickaxe. Mines faster. Needs Mining 5.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'stab', speed: 5, att: { stab: 6, slash: -2, crush: 3 }, str: 5, look: { weapon: 'iron', blade: 5 } },
+  },
+  hammer: { name: 'Hammer', value: 1, examine: 'For smithing at an anvil.' },
+  copperOre: { name: 'Copper ore', value: 5, examine: 'Smelt it with tin ore to make bronze.' },
+  tinOre: { name: 'Tin ore', value: 5, examine: 'Smelt it with copper ore to make bronze.' },
+  ironOre: { name: 'Iron ore', value: 17, examine: 'Smelt it into an iron bar. (Not every bit is pure enough.)' },
+  bronzeBar: { name: 'Bronze bar', value: 8, examine: 'Hammer it into shape at an anvil.' },
+  ironBar: { name: 'Iron bar', value: 28, examine: 'Hammer it into shape at an anvil.' },
+  ironArrowtips: { name: 'Iron arrowtips', stackable: true, value: 2, examine: 'Fix these onto headless arrows. Needs Fletching 15.' },
+  ironArrow: {
+    name: 'Iron arrow', stackable: true, value: 3, examine: 'Arrows with iron heads. They hit harder than bronze.',
+    equip: { slot: 'ammo', req: {}, rangedStr: 10, ammo: 'arrow' },
+  },
+  ironSword: {
+    name: 'Iron sword', value: 91, examine: 'A well-made iron sword.',
+    equip: { slot: 'weapon', req: { attack: 5 }, type: 'slash', speed: 4, att: { stab: 6, slash: 8, crush: -2 }, def: { slash: 2, stab: 1 }, str: 7, look: { weapon: 'iron', blade: 7 } },
+  },
+  ironMedHelm: {
+    name: 'Iron med helm', value: 84, examine: 'A medium-sized iron helmet.',
+    equip: { slot: 'head', req: { defence: 5 }, att: { magic: -1 }, def: { stab: 4, slash: 5, crush: 3, magic: -1, ranged: 4 }, look: { hat: 'helmet', hatColor: '#8a9098' } },
+  },
+  bronzeSqShield: {
+    name: 'Bronze sq shield', value: 48, examine: 'A square bronze shield.',
+    equip: { slot: 'shield', req: { defence: 1 }, att: { magic: -1 }, def: { stab: 5, slash: 7, crush: 6, ranged: 6, magic: -1 }, look: { shield: 'bronze' } },
+  },
+  ironSqShield: {
+    name: 'Iron sq shield', value: 168, examine: 'A square iron shield.',
+    equip: { slot: 'shield', req: { defence: 5 }, att: { magic: -1 }, def: { stab: 8, slash: 9, crush: 7, ranged: 8, magic: -1 }, look: { shield: 'iron' } },
+  },
+  bronzeChainbody: {
+    name: 'Bronze chainbody', value: 60, examine: 'A shirt of bronze rings.',
+    equip: { slot: 'body', req: { defence: 1 }, att: { magic: -3 }, def: { stab: 7, slash: 11, crush: 13, ranged: 9, magic: -1 }, look: { tunic: '#a8692e' } },
+  },
+  ironChainbody: {
+    name: 'Iron chainbody', value: 210, examine: 'A shirt of iron rings.',
+    equip: { slot: 'body', req: { defence: 5 }, att: { magic: -4 }, def: { stab: 11, slash: 16, crush: 18, ranged: 13, magic: -1 }, look: { tunic: '#7a828b' } },
+  },
   knife: { name: 'Knife', value: 6, examine: 'Sharp enough to carve wood. Tap your logs to fletch them.' },
   logs: { name: 'Logs', value: 4, examine: 'Freshly cut pine logs.' },
   oakLogs: { name: 'Oak logs', value: 20, examine: 'Heavy logs from an oak tree.' },

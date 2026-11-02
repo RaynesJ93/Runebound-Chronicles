@@ -54,6 +54,26 @@ export const ENEMIES = {
       rare: { chance: 1 / 128, table: [{ item: 'warCharm', qty: 1 }] },
     },
   },
+  tunnelGoblin: {
+    id: 'tunnelGoblin', name: 'Tunnel goblin', level: 4, hp: 8,
+    attack: 2, strength: 2, defence: 2,
+    attackBonus: -5, strengthBonus: 0, defenceBonus: -10, maxHit: 2,
+    speed: 5, attackType: 'stab', aggressive: false, wander: 3, leash: 7, respawn: 30,
+    look: { skin: '#7f9a4a', hair: '#2a1e12', tunic: '#5a4a3a', pants: '#3e3328', belt: '#2a1e12', ears: true, eyes: '#ffcf3a', hat: 'helmet', hatColor: '#c8a030' },
+    examine: 'A goblin in a miner\'s helmet. It has been "borrowing" ore.',
+    loot: {
+      always: [{ item: 'bones', qty: 1 }],
+      main: [
+        { item: 'coins', min: 3, max: 20, chance: 1 / 3 },
+        { item: 'copperOre', qty: 1, chance: 1 / 10 },
+        { item: 'tinOre', qty: 1, chance: 1 / 10 },
+        { item: 'ironOre', qty: 1, chance: 1 / 12 },
+        { item: 'bronzePickaxe', qty: 1, chance: 1 / 24 },
+        { item: 'bronzeBar', qty: 1, chance: 1 / 16 },
+      ],
+      rare: { chance: 1 / 200, table: [{ item: 'warCharm', qty: 1 }] },
+    },
+  },
   wolf: {
     id: 'wolf', name: 'Wolf', level: 7, hp: 14, sprite: 'wolf',
     attack: 5, strength: 5, defence: 4,

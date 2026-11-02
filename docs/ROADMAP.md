@@ -31,7 +31,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 ## Phase 2 — Skilling (v0.2)
 
 1. ✅ Woodcutting (trees on the forest route) and Fletching (bows, arrows) — v0.11.0
-2. Mining (a small mine area) and Smithing (bars, bronze/iron gear)
+2. ✅ Mining (a small mine area) and Smithing (bars, bronze/iron gear) — v0.12.0
 3. Fishing and Cooking (food you make yourself)
 4. Crafting and Runecrafting (leather armour, runes for magic)
 5. Bank tabs and search
@@ -62,6 +62,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Date | Change |
 | --- | --- |
+| 2 Nov 2026 | v0.12.0: Phase 2.2 shipped — Copperdeep Mine opens at the top of Route 1 (rockslide cleared): entrance hall with furnace, anvil and Dorrin the Miner, copper/tin and iron galleries, tunnel goblins. Mining (copper, tin, iron; bronze and iron pickaxes), smelting (bronze bars; iron bars that can fail), smithing 16 bronze and iron items with a hammer. New iron sword, iron med helm, sq shields, chainbodies and iron arrows; Fletching makes iron arrows at 15. |
 | 2 Nov 2026 | v0.11.1: clearer numbers — digits now use the Jersey 10 pixel font (Pixelify Sans's 5 looked like an S); letters are unchanged. The digit font is bundled with the game (3.8 KB). |
 | 2 Nov 2026 | v0.11.0: Phase 2.1 shipped — Woodcutting (pine and oak trees, bronze and iron axes, stumps that grow back) and Fletching (arrow shafts, shortbow, longbow, oak bows, headless and bronze arrows); Bram teaches you and gives you an axe and knife; Pell sells axes, knives, feathers and arrowtips; goblins drop feathers; both skills in the skills panel. |
 | 2 Nov 2026 | v0.10.0 — first playable release. Batch 9: long-press (phone) or right-click (computer) anything for its options (attack, talk, examine, take, enter, walk here); tapping an item eats, drinks, wields or wears it, long-press for the full menu; every touch button at least 44 pt; shop quantity buttons on their own row on phones; new settings (what tapping an item does, text speed, XP drops, battery saver) and an "adventure" stats section; canvas capped at 2× density and the HUD only redraws what changed; saves are repaired on load (unknown items removed, broken values reset); automated tests for loading saves from every earlier version; examine text for every villager. Fixed: two saves in the same millisecond could load the older one. |
