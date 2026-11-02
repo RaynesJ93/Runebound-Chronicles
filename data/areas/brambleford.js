@@ -1,0 +1,157 @@
+// Brambleford — the starting village.
+// Built by "painting" ground and props onto a grid, so it is easy to edit:
+// change a rect() or a prop position and reload.
+
+import { GROUND } from '../../src/world/area.js';
+import { mulberry32 } from '../../src/core/rng.js';
+
+const W = 44;
+const H = 36;
+
+export function buildBrambleford() {
+  const ground = new Uint8Array(W * H);
+  const blocked = new Uint8Array(W * H);
+  const props = [];
+  const buildings = [];
+  const rng = mulberry32(20261102);
+
+  const inB = (x, y) => x >= 0 && y >= 0 && x < W && y < H;
+  const i = (x, y) => y * W + x;
+  const rect = (x0, y0, x1, y1, g) => {
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (inB(x, y)) ground[i(x, y)] = g;
+  };
+  const block = (x, y) => { if (inB(x, y)) blocked[i(x, y)] = 1; };
+  const free = (x, y) => inB(x, y) && !blocked[i(x, y)];
+  const taken = new Uint8Array(W * H); // tiles that already hold a prop
+  const occupy = (x, y) => { if (inB(x, y)) taken[i(x, y)] = 1; };
+
+  // A prop on one or more tiles. Blocking props stop movement.
+  const prop = (type, tiles, extra = {}) => {
+    const p = { type, tiles, x: tiles[0].x, y: tiles[0].y, ...extra };
+    for (const t of tiles) { occupy(t.x, t.y); if (extra.blocks !== false) block(t.x, t.y); }
+    props.push(p);
+    return p;
+  };
+  const one = (type, x, y, extra) => prop(type, [{ x, y }], extra);
+  const placeIfFree = (type, x, y, extra) => {
+    if (free(x, y) && !taken[i(x, y)] && ground[i(x, y)] === GROUND.GRASS) one(type, x, y, extra);
+  };
+
+  // ---- Ground -------------------------------------------------------------
+  rect(0, 0, W - 1, H - 1, GROUND.GRASS);
+  rect(21, 0, 22, 25, GROUND.PATH);    // north road through the village
+  rect(5, 17, 38, 18, GROUND.PATH);    // main street
+  rect(5, 25, 38, 25, GROUND.PATH);    // lower lane
+  rect(17, 13, 26, 19, GROUND.PLAZA);  // village square
+  rect(13, 15, 13, 16, GROUND.PATH);   // to the general store
+  rect(29, 15, 30, 16, GROUND.PATH);   // to the bank
+  rect(37, 14, 37, 16, GROUND.PATH);   // to the elder's house
+  rect(8, 24, 8, 24, GROUND.PATH);     // house A
+  rect(33, 24, 33, 24, GROUND.PATH);   // house B
+  rect(16, 24, 16, 24, GROUND.PATH);   // your home
+  rect(30, 26, 30, 27, GROUND.PATH);   // to the farm gate
+
+  // Pond with a sandy shore
+  const pcx = 7.5, pcy = 30.6, prx = 4.2, pry = 2.4;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const d = ((x + 0.5 - pcx) / prx) ** 2 + ((y + 0.5 - pcy) / pry) ** 2;
+    if (d < 1) { ground[i(x, y)] = GROUND.WATER; block(x, y); occupy(x, y); }
+    else if (d < 1.7) ground[i(x, y)] = GROUND.SAND;
+  }
+
+  // Farm field
+  rect(29, 29, 37, 32, GROUND.DIRT);
+
+  // ---- Buildings (all doors face south, towards the camera) ---------------
+  const building = (b) => {
+    for (let y = b.y; y < b.y + b.h; y++) for (let x = b.x; x < b.x + b.w; x++) { block(x, y); occupy(x, y); }
+    const door = { x: b.doorX, y: b.y + b.h - 1 };
+    const doorTiles = b.doorW === 2 ? [door, { x: door.x + 1, y: door.y }] : [door];
+    buildings.push({ ...b, doorTiles });
+    // The door is an interactable prop (it doesn't add new blocking — the wall already blocks).
+    props.push({ type: 'door', tiles: doorTiles, x: door.x, y: door.y, building: b.id, interact: b.doorText });
+  };
+
+  building({
+    id: 'store', kind: 'store', label: 'General Store', x: 11, y: 10, w: 6, h: 5, doorX: 13, doorW: 1,
+    doorText: ['The General Store has a sign on the door: "Back soon — restocking!"', '(Shops arrive in a future update.)'],
+  });
+  building({
+    id: 'bank', kind: 'bank', label: 'Bank', x: 27, y: 10, w: 6, h: 5, doorX: 29, doorW: 2,
+    doorText: ['The bank clerks are busy counting coins.', '(Banking arrives in a future update.)'],
+  });
+  building({
+    id: 'elder', kind: 'house', roof: 0x4f6d3a, label: null, x: 35, y: 10, w: 5, h: 4, doorX: 37, doorW: 1,
+    doorText: ["Village Elder Maren's house. Nobody answers.", 'Maybe she is out walking the square.'],
+  });
+  building({
+    id: 'houseA', kind: 'house', roof: 0x8a4b2a, label: null, x: 6, y: 20, w: 5, h: 4, doorX: 8, doorW: 1,
+    doorText: ['The door is locked. You can hear someone snoring inside.'],
+  });
+  building({
+    id: 'houseB', kind: 'house', roof: 0x6b4e8a, label: null, x: 31, y: 20, w: 5, h: 4, doorX: 33, doorW: 1,
+    doorText: ['A note on the door reads: "Gone to the forest. Back by supper."'],
+  });
+  building({
+    id: 'home', kind: 'house', roof: 0x3d5f8c, label: null, x: 14, y: 20, w: 5, h: 4, doorX: 16, doorW: 1,
+    doorText: ["Your home. It's cosy, but adventure is calling."],
+  });
+
+  // ---- Village square -----------------------------------------------------
+  prop('well', [{ x: 21, y: 15 }, { x: 22, y: 15 }, { x: 21, y: 16 }, { x: 22, y: 16 }], {
+    interact: ['The village well. The water down there looks cold and clear.'],
+  });
+  for (const [x, y] of [[17, 13], [26, 13], [17, 19], [26, 19]]) one('lamp', x, y);
+  prop('stall', [{ x: 24, y: 15 }, { x: 25, y: 15 }], {
+    interact: ['An empty market stall. Traders will set up here soon.'],
+  });
+
+  // ---- Signs --------------------------------------------------------------
+  one('sign', 23, 12, {
+    interact: ['Welcome to Brambleford!', 'General Store: west of the square.  Bank: east of the square.'],
+  });
+  one('sign', 23, 5, {
+    interact: ['NORTH: Route 1 — Thornwood Forest.', 'Beware of goblins and wolves beyond the village.'],
+  });
+
+  // ---- North road: blocked by a fallen tree until Route 1 is built --------
+  prop('fallenTree', [19, 20, 21, 22, 23, 24].map((x) => ({ x, y: 1 })), {
+    interact: ['A huge fallen oak blocks the road north.', '(Route 1 opens in the next update.)'],
+  });
+  for (let x = 19; x <= 24; x++) block(x, 0);
+
+  // ---- Farm fence with a gate gap at (30, 28) -----------------------------
+  for (let x = 28; x <= 38; x++) for (let y = 28; y <= 33; y++) {
+    const edge = x === 28 || x === 38 || y === 28 || y === 33;
+    if (edge && !(x === 30 && y === 28)) one('fence', x, y);
+  }
+  for (let x = 29; x <= 37; x++) for (let y = 29; y <= 32; y++) if ((y - 29) % 2 === 0) one('crop', x, y, { blocks: false, ripe: x % 3 === 0 });
+  one('scarecrow', 35, 30, { interact: ['A scarecrow in a battered hat. The crows seem unimpressed.'] });
+
+  // ---- Decoration ---------------------------------------------------------
+  for (const [x, y] of [[4, 9], [8, 6], [16, 6], [27, 6], [33, 5], [38, 7], [4, 21], [13, 29], [25, 29], [20, 30], [39, 22], [25, 22], [12, 22]]) {
+    placeIfFree('tree', x, y, { variant: rng() < 0.5 ? 'oak' : 'pine' });
+  }
+  for (const [x, y] of [[10, 13], [17, 11], [26, 11], [34, 13], [5, 22], [11, 21], [30, 22], [36, 22], [13, 23], [19, 23]]) placeIfFree('bush', x, y);
+  for (const [x, y] of [[37, 4], [6, 12], [25, 32], [15, 32], [40, 27]]) placeIfFree('rock', x, y);
+
+  // Forest edge around the village (thickest at the border).
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (x >= 19 && x <= 24 && y <= 6) continue; // keep the north road clear
+    const d = Math.min(x, y, W - 1 - x, H - 1 - y);
+    const chance = d <= 1 ? 1 : d === 2 ? 0.75 : d === 3 ? 0.35 : d === 4 ? 0.08 : 0;
+    if (chance && rng() < chance) placeIfFree('tree', x, y, { variant: rng() < 0.6 ? 'pine' : 'oak' });
+  }
+
+  // Wildflowers on open grass.
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (ground[i(x, y)] === GROUND.GRASS && free(x, y) && !taken[i(x, y)] && rng() < 0.05) one('flowers', x, y, { blocks: false });
+  }
+
+  return {
+    id: 'brambleford',
+    name: 'Brambleford',
+    W, H, ground, blocked, props, buildings,
+    spawn: { x: 16, y: 24, facing: 0 },
+  };
+}

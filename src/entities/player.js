@@ -1,0 +1,151 @@
+// Player movement on the tile grid.
+//
+// Walking: one tile per 0.6 s tick.  Running: two tiles per tick (one every 0.3 s).
+// Steps chain without pauses, and a step starts immediately when you press a key
+// or tap, so movement feels responsive (Emerald) while keeping OSRS speeds.
+
+const WALK_STEP = 0.6;
+const RUN_STEP = 0.3;
+const RUN_COST_PER_TILE = 0.55; // ~180 tiles of running from full energy
+
+export class PlayerController {
+  constructor(area, state) {
+    this.area = area;
+    this.state = state;
+    const p = state.player;
+    this.tile = { x: p.x, y: p.y };
+    this.from = { ...this.tile };
+    this.to = { ...this.tile };
+    this.t = 0;
+    this.moving = false;
+    this.stepRunning = false;
+    this.stepDur = WALK_STEP;
+    this.path = [];
+    this.interact = null; // { prop, isGoal }
+    this.facing = p.facing || 0;
+    this.targetFacing = this.facing;
+    // hooks
+    this.onStep = null;
+    this.onInteract = null;
+    this.onRunEmpty = null;
+  }
+
+  get canRun() {
+    return this.state.run.on && this.state.run.energy >= 1;
+  }
+
+  // Where the next path starts: the tile we're stepping into, or where we stand.
+  get pathStart() {
+    return this.moving ? this.to : this.tile;
+  }
+
+  setPath(path, interact = null) {
+    this.path = path ? path.slice() : [];
+    this.interact = interact;
+  }
+
+  stop() {
+    this.path = [];
+    this.interact = null;
+  }
+
+  faceTowards(x, y) {
+    const dx = x - this.tile.x;
+    const dy = y - this.tile.y;
+    if (dx || dy) this.targetFacing = Math.atan2(dx, dy);
+  }
+
+  update(dt, heldDir) {
+    if (heldDir) this.stop();
+    let budget = dt;
+    for (let guard = 0; guard < 4; guard++) {
+      if (this.moving) {
+        this.t += budget / this.stepDur;
+        budget = 0;
+        if (this.t < 1) break;
+        budget = (this.t - 1) * this.stepDur;
+        this.finishStep();
+      }
+      const next = this.nextStep(heldDir);
+      if (!next) { this.checkInteract(); break; }
+      this.startStep(next);
+      if (budget <= 0) break;
+    }
+    // Smoothly turn to face the direction of travel.
+    let diff = this.targetFacing - this.facing;
+    diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+    this.facing += diff * Math.min(1, dt * 14);
+  }
+
+  nextStep(heldDir) {
+    if (this.path.length) {
+      const n = this.path[0];
+      if (this.area.canStep(this.tile.x, this.tile.y, n.x, n.y)) {
+        this.path.shift();
+        return n;
+      }
+      this.stop(); // something is in the way now
+      return null;
+    }
+    if (heldDir) {
+      const n = { x: this.tile.x + heldDir.dx, y: this.tile.y + heldDir.dy };
+      if (this.area.canStep(this.tile.x, this.tile.y, n.x, n.y)) return n;
+      this.faceTowards(n.x, n.y); // bump: turn to face the wall
+    }
+    return null;
+  }
+
+  startStep(n) {
+    this.from = { ...this.tile };
+    this.to = { x: n.x, y: n.y };
+    this.moving = true;
+    this.t = 0;
+    this.stepRunning = this.canRun;
+    this.stepDur = this.stepRunning ? RUN_STEP : WALK_STEP;
+    this.targetFacing = Math.atan2(n.x - this.tile.x, n.y - this.tile.y);
+  }
+
+  finishStep() {
+    this.tile = { ...this.to };
+    this.moving = false;
+    this.t = 0;
+    const s = this.state;
+    s.player.x = this.tile.x;
+    s.player.y = this.tile.y;
+    s.player.facing = this.targetFacing;
+    s.stats.tilesWalked++;
+    if (this.stepRunning) {
+      s.run.energy = Math.max(0, s.run.energy - RUN_COST_PER_TILE);
+      if (s.run.energy < 1 && s.run.on) {
+        s.run.on = false;
+        this.onRunEmpty?.();
+      }
+    }
+    this.onStep?.(this.tile);
+  }
+
+  checkInteract() {
+    if (!this.interact || this.path.length || this.moving) return;
+    const { prop, isGoal } = this.interact;
+    this.interact = null;
+    if (!isGoal(this.tile.x, this.tile.y)) return;
+    const tx = prop.tiles.reduce((s, t) => s + t.x, 0) / prop.tiles.length;
+    const ty = prop.tiles.reduce((s, t) => s + t.y, 0) / prop.tiles.length;
+    this.faceTowards(tx, ty);
+    this.onInteract?.(prop);
+  }
+
+  // Ticks: run energy comes back while you aren't running.
+  onTick() {
+    const r = this.state.run;
+    if (!(this.moving && this.stepRunning)) r.energy = Math.min(100, r.energy + 0.45);
+  }
+
+  // Smooth position between tiles, in world units (tile centres).
+  worldPosition() {
+    const k = this.moving ? this.t : 0;
+    const a = this.moving ? this.from : this.tile;
+    const b = this.moving ? this.to : this.tile;
+    return { x: a.x + (b.x - a.x) * k + 0.5, z: a.y + (b.y - a.y) * k + 0.5 };
+  }
+}
