@@ -391,6 +391,13 @@ export class Hud {
     this.el.hpOrb.classList.toggle('low', hp <= max * 0.3);
   }
 
+  flashHeal() {
+    const o = this.el.hpOrb;
+    o.classList.remove('heal');
+    void o.offsetWidth;
+    o.classList.add('heal');
+  }
+
   // Who you're fighting: name, level and health.
   // playerLevel colours the name: green = weaker than you, yellow = close, red = stronger.
   setTarget(enemy, playerLevel = 3) {

@@ -11,7 +11,8 @@ import { findPath } from '../world/pathfinding.js';
 import { styleById } from '../skills/skills.js';
 
 const UNARMED_SPEED = 4; // ticks between punches
-const REGEN_TICKS = 100; // 1 hitpoint every 60 seconds
+const REGEN_TICKS = 10; // out of combat: 1 hitpoint every 6 seconds
+const CALM_SECONDS = 6; // how long after the last hit before healing starts
 const SPLAT_LIFE = 1.2; // seconds a damage splat stays up
 const XP_PER_DAMAGE = 4;
 const HP_XP_PER_DAMAGE = 4 / 3;
@@ -87,8 +88,11 @@ export class Combat {
     const p = this.player;
     this.splats = this.splats.filter((s) => now - s.time < SPLAT_LIFE);
 
-    if (st.player.hp < this.maxHp) {
-      if (++this.regen >= REGEN_TICKS) { st.player.hp++; this.regen = 0; }
+    // Health comes back slowly, but only once you're out of combat.
+    const lastAction = Math.max(this.playerLastHit, this.playerLungeAt);
+    const calm = !this.inCombat && now - lastAction >= CALM_SECONDS;
+    if (st.player.hp < this.maxHp && calm) {
+      if (++this.regen >= REGEN_TICKS) { st.player.hp++; this.regen = 0; this.on.healed?.(); }
     } else this.regen = 0;
 
     if (this.cooldown > 0) this.cooldown--;

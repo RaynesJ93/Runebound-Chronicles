@@ -280,6 +280,7 @@ Ranged gear follows the same idea (leather → hide armour, shortbow → oak →
 
 ### Food and potions
 
+- **Natural healing:** out of combat (6 seconds after your last hit), you regain 1 hitpoint every 6 seconds. There is no healing during a fight, so food matters.
 - **Food** heals a set amount and takes 3 ticks to eat (it delays your next attack). Examples: Bread (3), Shrimp (3), Trout (7), Salmon (9).
 - **Potions** give temporary effects, with 4 doses per potion:
   - Attack/Strength/Defence potion: boosts the level by 3 + 10%, then wears off 1 level per minute

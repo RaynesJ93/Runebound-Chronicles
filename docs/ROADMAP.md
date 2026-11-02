@@ -60,6 +60,7 @@ Out of scope, permanently: turn-based battles, battle screens, random encounters
 
 | Date | Change |
 | --- | --- |
+| 2 Nov 2026 | v0.6.1: health now regenerates only out of combat, at 1 hitpoint every 6 seconds (was 1 per minute, even mid-fight). |
 | 2 Nov 2026 | v0.6.0: Batch 5 shipped — 11 items with code-drawn icons, goblin and Goblin Brute loot tables with a rare table, loot on the ground (2 min; 3 min for your own drops) with a gold beam for rare drops, tap-to-pick-up with a chooser for piles, 28-slot inventory with stacking, OSRS-style stack counts, examine, drop and drag-to-rearrange. Ground items are not saved. |
 | 2 Nov 2026 | v0.5.0: Batch 4 shipped — Attack, Strength, Defence, Hitpoints, Ranged and Magic on the OSRS XP curve to 99; 4 XP per damage plus 1.33 Hitpoints; Accurate, Aggressive, Defensive and Controlled styles; XP drops, level-up popup and sparkles, combat level, skills panel with pixel icons, enemy names coloured by difficulty. |
 | 2 Nov 2026 | v0.4.0: Batch 3 shipped — real-time overworld combat on the 0.6 s tick: tap to attack, auto-approach, hit chance and max hit formulas, damage splats, health bars, target panel, auto-retaliate, goblins and an aggressive Goblin Brute that chase, give up, heal and respawn, player death and respawn at home, hitpoint regeneration. Skills stay at level 1 until Batch 4. |
