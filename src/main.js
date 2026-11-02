@@ -23,6 +23,10 @@ import { GroundItems } from './items/ground.js';
 import { rollLoot } from './items/loot.js';
 import { ITEMS, itemName } from '../data/items.js';
 import { itemIcon } from './render/items.js';
+import { Bank } from './items/bank.js';
+import { Shop } from './items/shop.js';
+import { SHOPS } from '../data/shops.js';
+import { splitOnDeath, graveFee, reclaim, GRAVE_SECONDS, FREE_SECONDS } from './items/death.js';
 
 const AUTOSAVE_TICKS = 50; // 30 seconds
 
@@ -56,7 +60,8 @@ function boot() {
     const look = new Map();
     for (const p of a.props) if (p.interact) for (const t of p.tiles) look.set(a.idx(t.x, t.y), p);
     for (const b of a.buildings) {
-      const door = a.props.find((p) => p.type === 'door' && p.building === b.id);
+      // Tapping a building you can enter walks you in through its door.
+      const door = b.enter ? { type: 'enter', tiles: b.doorTiles } : a.props.find((p) => p.type === 'door' && p.building === b.id);
       for (let y = b.y; y < b.y + b.h; y++) for (let x = b.x; x < b.x + b.w; x++) look.set(a.idx(x, y), door);
     }
     const w = { id, area: a, view: v, npcs: people, enemies: foes, lookup: look, ground: new GroundItems() };
@@ -203,7 +208,7 @@ function boot() {
   // Skills panel: levels, progress, and the Combat tab with attack styles.
   refreshSkills = () => {
     if (!hud.skillsOpen) return;
-    hud.renderSkills(book, combat.level);
+    hud.renderSkills(book, combat.level, state.boosts);
     const w = equipment.weapon;
     const c = styleChoices();
     const reach = combat.mode === 'melee' ? 'melee' : `range ${combat.range} tiles`;
@@ -247,6 +252,8 @@ function boot() {
     if (!s) return;
     const def = ITEMS[s.id];
     const options = [];
+    if (def.food) options.push({ label: 'Eat', fn: () => eat(i) });
+    if (def.potion) options.push({ label: 'Drink', fn: () => eat(i) });
     if (def.equip) {
       const v = verb(s.id);
       options.push({ label: v === 'wield' ? 'Wield' : 'Wear', fn: () => wear(i) });
@@ -354,7 +361,7 @@ function boot() {
   const interactWith = (prop) => {
     goal = { prop };
     const s = player.pathStart;
-    const isGoal = adjacentTo(prop.tiles);
+    const isGoal = prop.goal || adjacentTo(prop.tiles);
     const path = isGoal(s.x, s.y) ? [] : findPath(area, s.x, s.y, isGoal);
     if (!path) {
       hud.message("I can't reach that.");
@@ -369,7 +376,11 @@ function boot() {
     releaseTalkTarget();
     talkTarget = npc;
     npc.busy = true; // stand still while we walk over
-    interactWith({ npc, tiles: [npc.standTile] });
+    // Shopkeepers and bankers can be spoken to across their counter.
+    const r = npc.def.talkRange || 1;
+    const t = npc.standTile;
+    const goal = r > 1 ? (x, y) => (x === t.x || y === t.y) && Math.abs(x - t.x) + Math.abs(y - t.y) <= r && (x !== t.x || y !== t.y) : null;
+    interactWith({ npc, tiles: [t], goal });
   };
 
   // ---- Picking things up ----------------------------------------------------
@@ -434,6 +445,14 @@ function boot() {
     marker = null;
     goal = null;
     hud.message('Oh dear, you are dead!');
+    // Keep your 3 most valuable items; the rest go into a gravestone here.
+    const { kept, lost } = splitOnDeath(inventory, equipment);
+    const hadGrave = !!state.grave;
+    if (lost.length) {
+      state.grave = { area: area.id, x: player.tile.x, y: player.tile.y, items: lost, createdAt: state.stats.playTimeSec };
+    }
+    state.boosts = {};
+    refreshInventory();
     setTimeout(() => hud.setFade(true), 900);
     setTimeout(() => {
       world = loadWorld(START_AREA);
@@ -451,6 +470,9 @@ function boot() {
       hud.setFade(false);
       hud.showArea(area.name);
       hud.message('You wake up at home, feeling a little dizzy.');
+      if (kept.length) hud.message(`You kept: ${kept.join(', ')}.`);
+      if (lost.length) hud.message('The rest of your things are in a gravestone where you fell. You have 15 minutes to get them back.');
+      if (hadGrave && lost.length) hud.message('Your older gravestone has crumbled away.');
     }, 1300);
   };
 
@@ -522,8 +544,14 @@ function boot() {
     }
     pickup = null;
     releaseTalkTarget();
+    const grave = state.grave;
+    if (grave && grave.area === area.id && grave.x === t.x && grave.y === t.y) {
+      interactWith({ tiles: [{ x: t.x, y: t.y }], grave: true, goal: (x, y) => Math.abs(x - t.x) + Math.abs(y - t.y) <= 1 });
+      return;
+    }
     const prop = lookup.get(area.idx(t.x, t.y));
-    if (prop) interactWith(prop);
+    if (prop?.type === 'enter') walkTo(prop.tiles[0].x, prop.tiles[0].y);
+    else if (prop) interactWith(prop);
     else walkTo(t.x, t.y);
     firstMove();
   };
@@ -543,6 +571,105 @@ function boot() {
     else if (e.code === 'KeyK' && !hud.dialogOpen) { if (hud.skillsOpen) hud.closeSkills(); else hud.openSkills('skills'); }
     else if ((e.code === 'Space' || e.code === 'Enter') && hud.dialogOpen) { e.preventDefault(); hud.advanceDialog(); }
     else if (hud.dialogOpen && /^(Digit|Numpad)[1-9]$/.test(e.code)) hud.pickChoice(Number(e.code.slice(-1)) - 1);
+  };
+
+  // ---- Bank and shop ------------------------------------------------------------
+  const bank = new Bank(state);
+  const shop = new Shop(SHOPS.generalStore);
+
+  const refreshTrade = () => {
+    if (!hud.tradeOpen) return;
+    if (hud.tradeMode === 'bank') hud.renderTrade(bank.items, inventory.slots);
+    else hud.renderTrade(shop.stock.filter((x) => x.base > 0 || x.qty > 0).map((x) => ({ id: x.id, qty: x.qty, price: shop.buyPrice(x.id) })), inventory.slots, (id) => shop.sellPrice(id));
+  };
+  const runAction = (name) => {
+    combat.stop();
+    if (name === 'bank') hud.openTrade('bank', 'Bank of Brambleford');
+    else if (name === 'shop') hud.openTrade('shop', shop.name);
+    refreshTrade();
+  };
+  hud.onTradeClose = () => { refreshInventory(); save(); };
+  hud.onTradeTake = (id) => {
+    const q = hud.tradeQty;
+    if (hud.tradeMode === 'bank') {
+      const n = bank.withdraw(id, q, inventory);
+      if (!n) hud.tradeStatus('Your bag is full.');
+      else hud.tradeStatus(`Withdrew ${itemName(id)} × ${n}.`);
+    } else {
+      const r = shop.buy(id, q === Infinity ? 1000 : q, inventory);
+      if (!r.n) hud.tradeStatus(r.why === 'coins' ? "You don't have enough coins." : r.why === 'space' ? 'Your bag is full.' : "That's out of stock.");
+      else hud.tradeStatus(`Bought ${itemName(id)} × ${r.n} for ${r.cost} coins.`);
+    }
+    refreshTrade();
+  };
+  hud.onTradeGive = (i) => {
+    const slot = inventory.slots[i];
+    if (!slot) return;
+    const q = hud.tradeQty;
+    if (hud.tradeMode === 'bank') {
+      const n = bank.deposit(inventory, i, q);
+      hud.tradeStatus(`Deposited ${itemName(slot.id)} × ${n}.`);
+    } else {
+      if (slot.id === 'coins') { hud.tradeStatus("You can't sell coins!"); return; }
+      const r = shop.sell(i, q, inventory);
+      hud.tradeStatus(`Sold ${itemName(slot.id)} × ${r.n} for ${r.earned} coins.`);
+    }
+    refreshTrade();
+  };
+  hud.onDepositBag = () => { bank.depositAll(inventory); hud.tradeStatus('Deposited everything in your bag.'); refreshTrade(); };
+  hud.onDepositGear = () => { bank.depositGear(equipment); hud.tradeStatus('Deposited everything you were wearing.'); refreshTrade(); };
+
+  // ---- Food and potions -------------------------------------------------------
+  let lastEatTick = -99;
+  const eat = (i) => {
+    const s = inventory.slots[i];
+    const def = s && ITEMS[s.id];
+    if (!def) return;
+    if (ticker.count - lastEatTick < 3) return; // still chewing
+    lastEatTick = ticker.count;
+    if (def.food) {
+      inventory.removeSlot(i);
+      const before = state.player.hp;
+      state.player.hp = Math.min(combat.maxHp, state.player.hp + def.food.heal);
+      hud.message(`You eat the ${def.name.toLowerCase()}.${state.player.hp > before ? ' It heals some health.' : ''}`);
+      if (state.player.hp > before) hud.flashHeal();
+    } else if (def.potion) {
+      const sk = def.potion.boost;
+      const boost = 3 + Math.floor(book.level(sk) * 0.1);
+      state.boosts[sk] = Math.max(state.boosts[sk] || 0, boost);
+      inventory.slots[i] = { id: def.potion.next, qty: 1 };
+      hud.message(`You drink some of your ${def.name.replace(/ \(\d\)$/, '').toLowerCase()}. ${SKILL_NAME[sk]} +${boost}.`);
+    }
+    combat.cooldown += 3; // eating or drinking delays your next attack
+    refreshInventory();
+    refreshSkills();
+    save();
+  };
+
+  // ---- Gravestone ------------------------------------------------------------------
+  const graveMenu = () => {
+    const g = state.grave;
+    if (!g) return;
+    const age = state.stats.playTimeSec - g.createdAt;
+    const free = age < FREE_SECONDS;
+    const fee = graveFee(g);
+    const pos = view.tileToScreen(g.x, g.y);
+    const take = () => {
+      if (!free) {
+        if (inventory.count('coins') < fee) { hud.message(`You need ${fee} coins to reclaim your items now.`); return; }
+        inventory.remove('coins', fee);
+      }
+      const all = reclaim(g, inventory, equipment);
+      if (all) { state.grave = null; hud.message('You reclaim your items. The gravestone crumbles away.'); }
+      else hud.message('Your bag is full. Some items are still in the gravestone.');
+      refreshInventory();
+      save();
+    };
+    hud.showMenu(pos.x, pos.y, `Gravestone (${g.items.length} item${g.items.length === 1 ? '' : 's'})`, [
+      { label: free ? 'Reclaim items (free)' : `Pay ${fee} coins to reclaim`, fn: take },
+      { label: 'Look', fn: () => hud.message(`Your lost items: ${g.items.slice(0, 6).map((it) => itemName(it.id)).join(', ')}${g.items.length > 6 ? '…' : ''}.`) },
+      { label: 'Cancel', fn: () => {} },
+    ]);
   };
 
   // An NPC hands you items once (remembered by a story flag).
@@ -567,12 +694,14 @@ function boot() {
       player.faceTowards(npc.standTile.x, npc.standTile.y);
       talkTarget = null;
       npc.busy = true;
-      hud.startConversation({ name: npc.name, ...npc.def.talk }, { flags: state.flags, give: giveItems(npc) }, () => {
+      hud.startConversation({ name: npc.name, ...npc.def.talk }, { flags: state.flags, give: giveItems(npc), action: runAction }, () => {
         npc.busy = false;
         save();
       });
       return;
     }
+    if (prop.grave) { graveMenu(); return; }
+    if (prop.action) { runAction(prop.action); return; }
     if (prop.interact) hud.showDialog(prop.interact);
   };
   player.onRunEmpty = () => hud.message("You're out of run energy.");
@@ -586,6 +715,21 @@ function boot() {
   const ticker = new Ticker();
   ticker.on((n) => {
     if (!dying) combat.tick(time);
+    // Potion boosts wear off by 1 level a minute.
+    if (n % 100 === 0) {
+      for (const [sk, v] of Object.entries(state.boosts)) {
+        if (v <= 0) continue;
+        state.boosts[sk] = v - 1;
+        if (v - 1 === 0) hud.message(`Your ${SKILL_NAME[sk]} boost has worn off.`);
+      }
+      refreshSkills();
+    }
+    if (n % 25 === 0) { shop.restock(); refreshTrade(); }
+    if (state.grave && state.stats.playTimeSec - state.grave.createdAt > GRAVE_SECONDS) {
+      state.grave = null;
+      hud.message('Your gravestone has crumbled. The items in it are gone.');
+      save();
+    }
     ground.prune(time);
     player.onTick();
     for (const npc of npcs) npc.onTick(rng, tileFreeForNpc);
@@ -618,7 +762,14 @@ function boot() {
     for (const npc of npcs) npc.update(dt);
     for (const e of enemies) e.update(dt);
 
-    view.render(player, { time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list, playerLook: equipment.look() });
+    view.render(player, { time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list, playerLook: equipment.look(),
+      grave: state.grave && state.grave.area === area.id ? state.grave : null });
+    if (state.grave) {
+      const left = Math.max(0, GRAVE_SECONDS - (state.stats.playTimeSec - state.grave.createdAt));
+      const freeLeft = FREE_SECONDS - (state.stats.playTimeSec - state.grave.createdAt);
+      const mm = Math.floor(left / 60), ss = String(Math.floor(left % 60)).padStart(2, '0');
+      hud.setGraveTimer(`Gravestone ${mm}:${ss}${freeLeft > 0 ? ' · free to reclaim' : ''}`);
+    } else hud.setGraveTimer(null);
     hud.setHp(state.player.hp, combat.maxHp);
     hud.setTarget(combat.target || enemies.find((e) => !e.dead && e.state === 'fight') || null, combat.level);
     hud.setRun(state.run.on, state.run.energy);
@@ -643,7 +794,7 @@ function boot() {
   window.RBC = {
     state, player, save, hud, version: GAME_VERSION,
     get area() { return area; }, get view() { return view; }, get npcs() { return npcs; },
-    get enemies() { return enemies; }, get ground() { return ground; }, combat, book, inventory, equipment,
+    get enemies() { return enemies; }, get ground() { return ground; }, combat, book, inventory, equipment, bank, shop, eat, ticker,
   };
 }
 

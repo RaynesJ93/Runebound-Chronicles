@@ -13,6 +13,7 @@ export function buildBrambleford() {
   const blocked = new Uint8Array(W * H);
   const props = [];
   const buildings = [];
+  const exits = [];
   const rng = mulberry32(20261102);
 
   const inB = (x, y) => x >= 0 && y >= 0 && x < W && y < H;
@@ -68,17 +69,23 @@ export function buildBrambleford() {
     const door = { x: b.doorX, y: b.y + b.h - 1 };
     const doorTiles = b.doorW === 2 ? [door, { x: door.x + 1, y: door.y }] : [door];
     buildings.push({ ...b, doorTiles });
+    if (b.enter) {
+      // You can walk in: the door tile becomes an exit to the interior.
+      for (const t of doorTiles) blocked[i(t.x, t.y)] = 0;
+      exits.push({ tiles: doorTiles, to: b.enter, at: b.enterAt, facing: Math.PI });
+      return;
+    }
     // The door is an interactable prop (it doesn't add new blocking — the wall already blocks).
     props.push({ type: 'door', tiles: doorTiles, x: door.x, y: door.y, building: b.id, interact: b.doorText });
   };
 
   building({
     id: 'store', kind: 'store', label: 'General Store', x: 11, y: 10, w: 6, h: 5, doorX: 13, doorW: 1,
-    doorText: ['The General Store has a sign on the door: "Back soon — restocking!"', '(Shops arrive in a future update.)'],
+    enter: 'store', enterAt: { x: 5, y: 7 },
   });
   building({
     id: 'bank', kind: 'bank', label: 'Bank', x: 27, y: 10, w: 6, h: 5, doorX: 29, doorW: 2,
-    doorText: ['The bank clerks are busy counting coins.', '(Banking arrives in a future update.)'],
+    enter: 'bank', enterAt: { x: 6, y: 7 },
   });
   building({
     id: 'elder', kind: 'house', roof: 0x4f6d3a, label: null, x: 35, y: 10, w: 5, h: 4, doorX: 37, doorW: 1,
@@ -157,6 +164,7 @@ export function buildBrambleford() {
     // Walking onto these tiles takes you to another area.
     exits: [
       { tiles: [{ x: 21, y: 0 }, { x: 22, y: 0 }], to: 'route1', at: { x: 16, y: 58 }, facing: Math.PI },
+      ...exits, // shop and bank doors
     ],
   };
 }

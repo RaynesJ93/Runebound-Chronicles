@@ -29,6 +29,7 @@ export class Hud {
     root.innerHTML = `
       <div class="hud-top-left">
         <div class="area-banner" id="area-banner"></div>
+        <div class="grave-timer hidden" id="grave-timer"></div>
         <div class="messages" id="messages" aria-live="polite"></div>
       </div>
       <div class="hud-top-right">
@@ -56,6 +57,28 @@ export class Hud {
               <div class="doll" id="doll"></div>
               <div class="bonuses" id="bonuses"></div>
             </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-backdrop ui hidden" id="trade">
+        <div class="panel trade-panel" role="dialog" aria-label="Bank or shop">
+          <div class="panel-head">
+            <h2 id="trade-title">Bank</h2>
+            <span class="qty-pick" id="qty-pick">
+              <button class="chip sq on" data-q="1">1</button><button class="chip sq" data-q="5">5</button><button class="chip sq" data-q="10">10</button><button class="chip sq" data-q="all">All</button>
+            </span>
+            <button class="close-btn" data-close aria-label="Close">✕</button>
+          </div>
+          <div class="panel-body">
+            <p class="muted small trade-help" id="trade-help"></p>
+            <div class="trade-grid" id="trade-grid"></div>
+            <div class="trade-actions" id="trade-actions">
+              <button class="btn" id="bank-dep-inv">Deposit bag</button>
+              <button class="btn" id="bank-dep-gear">Deposit worn items</button>
+            </div>
+            <h3 id="trade-bag-title">Your bag</h3>
+            <div class="inv-grid trade-inv" id="trade-inv"></div>
+            <p class="trade-status" id="trade-status"></p>
           </div>
         </div>
       </div>
@@ -165,6 +188,23 @@ export class Hud {
     this.el.menuBackdrop = $('menu-backdrop');
     this.el.menuBackdrop.addEventListener('pointerdown', (e) => { if (e.target === this.el.menuBackdrop) { e.preventDefault(); this.closeMenu(); } });
     this.bindInventoryDrag($('inv-grid'));
+    this.tradeQty = 1;
+    this.el.trade = $('trade');
+    this.el.trade.addEventListener('click', (e) => {
+      if (e.target === this.el.trade || e.target.closest('[data-close]')) { this.closeTrade(); return; }
+      const q = e.target.closest('[data-q]');
+      if (q) {
+        this.tradeQty = q.dataset.q === 'all' ? Infinity : Number(q.dataset.q);
+        for (const b of this.el.trade.querySelectorAll('[data-q]')) b.classList.toggle('on', b === q);
+        return;
+      }
+      const t = e.target.closest('[data-take]');
+      if (t) { this.onTradeTake?.(t.dataset.take); return; }
+      const g = e.target.closest('[data-give]');
+      if (g) { this.onTradeGive?.(Number(g.dataset.give)); return; }
+    });
+    $('bank-dep-inv').addEventListener('click', () => this.onDepositBag?.());
+    $('bank-dep-gear').addEventListener('click', () => this.onDepositGear?.());
     this.el.skills = $('skills');
     this.el.skills.addEventListener('click', (e) => {
       if (e.target === this.el.skills || e.target.closest('[data-close]')) this.closeSkills();
@@ -184,7 +224,56 @@ export class Hud {
   }
 
   get settingsOpen() {
-    return !this.el.settings.classList.contains('hidden') || !this.el.skills.classList.contains('hidden') || this.invOpen || this.menuOpen;
+    return !this.el.settings.classList.contains('hidden') || !this.el.skills.classList.contains('hidden') || this.invOpen || this.menuOpen || this.tradeOpen;
+  }
+
+  // ---- Bank and shop -------------------------------------------------------------
+  // mode: 'bank' or 'shop'. Tapping an item at the top takes it (withdraw/buy);
+  // tapping one in your bag gives it (deposit/sell). Quantity from the 1/5/10/All chips.
+  get tradeOpen() { return !this.el.trade.classList.contains('hidden'); }
+
+  openTrade(mode, title) {
+    this.tradeMode = mode;
+    this.$('trade-title').textContent = title;
+    this.$('trade-actions').classList.toggle('hidden', mode !== 'bank');
+    this.$('trade-help').textContent = mode === 'bank'
+      ? 'Tap an item in the bank to take it out, or in your bag to put it in. Choose how many with the buttons above.'
+      : 'Tap an item to buy it, or one of your own to sell it. Prices are in coins.';
+    this.$('trade-status').textContent = '';
+    this.el.trade.classList.remove('hidden');
+  }
+
+  closeTrade() {
+    this.el.trade.classList.add('hidden');
+    this.onTradeClose?.();
+  }
+
+  tradeStatus(text) { this.$('trade-status').textContent = text; }
+
+  // top: [{ id, qty, price? }], bag: inventory slots, sell: (id) => price (shop only)
+  renderTrade(top, bag, sell = null) {
+    const cell = (id, qty, extra) => {
+      const lab = qty > 1 || ITEMS[id]?.stackable ? stackLabel(qty) : null;
+      return `<img class="px" src="${itemIcon(id).url}" alt="${ITEMS[id]?.name ?? ''}" draggable="false">
+        ${lab ? `<span class="qty ${lab.cls}">${lab.text}</span>` : ''}${extra || ''}`;
+    };
+    this.$('trade-grid').innerHTML = top.length
+      ? top.map((t) => `<button class="slot full ${t.qty <= 0 ? 'empty-stock' : ''}" data-take="${t.id}" title="${ITEMS[t.id]?.name}${t.price ? ` — ${t.price} coins` : ''}">
+          ${cell(t.id, t.qty, t.price ? `<span class="price">${t.price}</span>` : '')}</button>`).join('')
+      : '<p class="muted">Your bank is empty. Tap items in your bag to store them.</p>';
+    this.$('trade-inv').innerHTML = bag.map((s, i) => {
+      if (!s) return '<div class="slot"></div>';
+      const p = sell ? sell(s.id) : null;
+      return `<button class="slot full" data-give="${i}" title="${ITEMS[s.id]?.name}${p != null ? ` — sells for ${p}` : ''}">
+        ${cell(s.id, ITEMS[s.id]?.stackable ? s.qty : 1, p != null && s.id !== 'coins' ? `<span class="price sell">${p}</span>` : '')}</button>`;
+    }).join('');
+  }
+
+  setGraveTimer(text) {
+    const el = this.$('grave-timer');
+    if (!text) { el.classList.add('hidden'); return; }
+    el.classList.remove('hidden');
+    if (el.textContent !== text) el.textContent = text;
   }
 
   // ---- Inventory ------------------------------------------------------------------
@@ -329,7 +418,7 @@ export class Hud {
   }
 
   // book: SkillBook. Draws every skill with its level and progress to the next.
-  renderSkills(book, combatLevel) {
+  renderSkills(book, combatLevel, boosts = {}) {
     const grid = this.$('skill-grid');
     grid.innerHTML = SKILLS.map((sk) => {
       const xp = book.xp(sk.id);
@@ -341,7 +430,7 @@ export class Hud {
       return `<div class="skill" title="${sk.about} (${fmt(xp)} XP)">
         <img class="px" src="${iconUrl(sk.id)}" alt="">
         <div class="skill-main">
-          <div class="skill-top"><span class="skill-name">${sk.name}</span><span class="skill-lvl">${lvl}</span></div>
+          <div class="skill-top"><span class="skill-name">${sk.name}</span><span class="skill-lvl">${boosts[sk.id] ? `<b class="boost">${lvl + boosts[sk.id]}</b>/` : ''}${lvl}</span></div>
           <div class="skill-bar"><span style="width:${pct}%"></span></div>
           <div class="skill-xp">${next}</div>
         </div>
@@ -595,6 +684,7 @@ export class Hud {
     if (!c) return;
     if (c.set) Object.assign(this.ctx.flags, c.set);
     this.hideChoices();
+    if (c.action) { const act = this.ctx.action; this.endConversation(); act?.(c.action); return; }
     if (c.next) this.goto(c.next);
     else this.endConversation();
   }

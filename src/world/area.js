@@ -2,7 +2,7 @@
 // props standing on it, and exits to other areas. Tile (x, y): x grows east,
 // y grows south.
 
-export const GROUND = { GRASS: 0, PATH: 1, PLAZA: 2, WATER: 3, SAND: 4, DIRT: 5, BRIDGE: 6 };
+export const GROUND = { GRASS: 0, PATH: 1, PLAZA: 2, WATER: 3, SAND: 4, DIRT: 5, BRIDGE: 6, FLOOR: 7, WALL: 8 };
 
 export class Area {
   constructor(def) {
@@ -17,6 +17,7 @@ export class Area {
     this.spawn = def.spawn;
     this.exits = def.exits || [];
     this.spawns = def.spawns || [];
+    this.indoors = !!def.indoors; // interiors: dark surroundings, no forest skirt
     // Things that move (villagers, later enemies) and block tiles while they stand on them.
     this.dynamicBlock = null;
     this.exitAt = new Map();
