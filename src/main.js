@@ -31,6 +31,8 @@ import { TREES, AXES, SWING_TICKS } from '../data/woodcutting.js';
 import { RECIPES, GROUP_OF } from '../data/fletching.js';
 import { ROCKS, PICKAXES, MINE_TICKS } from '../data/mining.js';
 import { SMELTING, SMITHING } from '../data/smithing.js';
+import { SPOTS, FISH_TICKS, spotLevel } from '../data/fishing.js';
+import { COOKING } from '../data/cooking.js';
 
 const AUTOSAVE_TICKS = 50; // 30 seconds
 
@@ -65,7 +67,7 @@ function boot() {
     for (const p of a.props) if (p.interact) for (const t of p.tiles) look.set(a.idx(t.x, t.y), p);
     // Trees can be chopped: their trunk, and the canopy just above it.
     for (const p of a.props) {
-      if (p.type === 'ore' && ROCKS[p.variant]) { for (const t of p.tiles) look.set(a.idx(t.x, t.y), p); continue; }
+      if ((p.type === 'ore' && ROCKS[p.variant]) || (p.type === 'fishingSpot' && SPOTS[p.variant])) { for (const t of p.tiles) look.set(a.idx(t.x, t.y), p); continue; }
       if (p.type !== 'tree' || !TREES[p.variant]) continue;
       for (const t of p.tiles) {
         look.set(a.idx(t.x, t.y), p);
@@ -303,6 +305,7 @@ function boot() {
     const def = ITEMS[id];
     if (!def) return null;
     if (GROUP_OF[id]) return () => fletchMenu(GROUP_OF[id], x, y);
+    if (/^raw/.test(id)) return () => hud.message('Cook this on a fire: the cooking pit by the pond, or the goblins\' campfire.');
     if (id === 'knife') return () => fletchMenu(inventory.count('logs') ? 'logs' : inventory.count('oakLogs') ? 'oakLogs' : null, x, y);
     if (def.food || def.potion) return () => eat(i);
     if (def.equip) return () => wear(i);
@@ -659,8 +662,8 @@ function boot() {
     if (at.npc) {
       const n = at.npc;
       title ||= n.name;
-      opts.push({ label: `Talk to ${n.name.split(' ')[0]}`, fn: () => { combat.stop(); pickup = null; talkTo(n); firstMove(); } });
-      opts.push({ label: `Examine ${n.name.split(' ')[0]}`, fn: () => hud.message(n.def.examine || `${n.name}.`) });
+      opts.push({ label: `Talk to ${(n.def.short || n.name.split(' ')[0])}`, fn: () => { combat.stop(); pickup = null; talkTo(n); firstMove(); } });
+      opts.push({ label: `Examine ${(n.def.short || n.name.split(' ')[0])}`, fn: () => hud.message(n.def.examine || `${n.name}.`) });
     }
     for (const g of at.pile.slice(0, 6)) {
       opts.push({ label: `Take ${describe(g)}`, icon: itemIcon(g.item).url, fn: () => { firstMove(); goPickup(t.x, t.y, g); } });
@@ -677,6 +680,11 @@ function boot() {
         title ||= p.depleted ? 'Tree stump' : tree.name;
         if (!p.depleted) opts.push({ label: `Chop down ${tree.name}`, fn: () => { combat.stop(); useProp(p); } });
         opts.push({ label: 'Examine', fn: () => hud.message(p.depleted ? 'A stump. The tree will grow back soon.' : `${tree.examine} (Woodcutting ${tree.level})`) });
+      } else if (p.type === 'fishingSpot' && SPOTS[p.variant]) {
+        const spot = SPOTS[p.variant];
+        title ||= `Fishing spot (${spot.verb.toLowerCase()})`;
+        opts.push({ label: `${spot.verb} Fishing spot`, fn: () => { combat.stop(); useProp(p); } });
+        opts.push({ label: 'Examine', fn: () => hud.message(spot.examine) });
       } else if (p.type === 'ore' && ROCKS[p.variant]) {
         const rock = ROCKS[p.variant];
         title ||= p.depleted ? 'Empty rock' : rock.name;
@@ -686,7 +694,7 @@ function boot() {
         const b = area.buildings.find((x) => x.doorTiles === p.tiles);
         opts.push({ label: `Enter ${b?.label || 'building'}`, fn: () => { combat.stop(); useProp(p); } });
       } else if (p.action) {
-        const ACTION_LABEL = { bank: 'Use bank booth', shop: 'Trade', smelt: 'Smelt ore', smith: 'Smith metal' };
+        const ACTION_LABEL = { bank: 'Use bank booth', shop: 'Trade', smelt: 'Smelt ore', smith: 'Smith metal', cook: 'Cook food' };
         opts.push({ label: ACTION_LABEL[p.action] || 'Use', fn: () => { combat.stop(); useProp(p); } });
       } else if (p.interact) {
         opts.push({ label: `Look at ${PROP_NAME[p.type] || p.type || 'this'}`, fn: () => { combat.stop(); useProp(p); } });
@@ -725,7 +733,7 @@ function boot() {
   };
   const runAction = (name) => {
     combat.stop();
-    if (name === 'smelt' || name === 'smith') { stationMenu(name); return; }
+    if (name === 'smelt' || name === 'smith' || name === 'cook') { stationMenu(name); return; }
     if (name === 'bank') hud.openTrade('bank', 'Bank of Brambleford');
     else if (name === 'shop') hud.openTrade('shop', shop.name);
     refreshTrade();
@@ -821,7 +829,7 @@ function boot() {
     if (inventory.freeSlots < needed) return false;
     for (const it of spec.items) inventory.add(it.item, it.qty);
     state.flags[spec.flag] = true;
-    hud.message(`${npc.name.split(' ')[0]} gives you: ${spec.items.map((it) => `${itemName(it.item)}${it.qty > 1 ? ` × ${it.qty}` : ''}`).join(', ')}.`);
+    hud.message(`${npc.def.short || npc.name.split(' ')[0]} gives you: ${spec.items.map((it) => `${itemName(it.item)}${it.qty > 1 ? ` × ${it.qty}` : ''}`).join(', ')}.`);
     refreshInventory();
     save();
     return true;
@@ -843,7 +851,7 @@ function boot() {
       return;
     }
     if (prop.grave) { graveMenu(); return; }
-    if (prop.type === 'tree' || prop.type === 'ore') { startGather(prop); return; }
+    if (prop.type === 'tree' || prop.type === 'ore' || prop.type === 'fishingSpot') { startGather(prop); return; }
     if (prop.action) { runAction(prop.action); return; }
     if (prop.interact) hud.showDialog(prop.interact);
   };
@@ -895,20 +903,38 @@ function boot() {
       levelMsg: (d) => `You need a Mining level of ${d.level} to mine this rock.`, gone: 'There is no ore left in this rock right now.',
       got: (d) => `You manage to mine some ${itemName(d.ore).toLowerCase().replace(' ore', '')}.`,
       fell: () => null },
+    // Fishing: each spot has its own tool (and bait), and several fish.
+    fishingSpot: { skill: 'fishing', defs: SPOTS, ticks: FISH_TICKS, tool: 'fishing gear', perSpot: true,
+      item: (d) => d.catches.at(-1).item, levelMsg: (d) => `You need a Fishing level of ${spotLevel(d)} to fish here.`,
+      gone: '', got: () => '', fell: () => null },
   };
+  // What a fishing attempt catches, if anything: the best fish you can, else lesser ones.
+  const rollCatch = (d) => {
+    const lvl = book.level('fishing');
+    for (const c of d.catches) {
+      if (lvl < c.level) continue;
+      if (rng() < Math.min(0.85, c.chance + (lvl - c.level) * 0.01)) return c;
+    }
+    return null;
+  };
+  const levelOf = (g, d) => (g.perSpot ? spotLevel(d) : d.level);
   const hasItem = (id) => inventory.count(id) > 0 || state.equipment.weapon?.id === id;
-  const bestTool = (g) => g.tools.find((t) => hasItem(t.id) && book.level(g.skill) >= t.level);
+  const bestTool = (g, d) => (g.perSpot ? (hasItem(d.tool) ? { id: d.tool, bonus: 0 } : null)
+    : g.tools.find((t) => hasItem(t.id) && book.level(g.skill) >= t.level));
   const trunk = (prop) => prop.tiles[0];
   const fallen = new Set(); // stumps and empty rocks right now (any area)
-  const fullBag = (g) => `Your inventory is too full to hold any more ${g.tool === 'axe' ? 'logs' : 'ore'}.`;
+  const fullBag = (g) => `Your inventory is too full to hold any more ${g.tool === 'axe' ? 'logs' : g.perSpot ? 'fish' : 'ore'}.`;
 
   const startGather = (prop) => {
     const g = GATHER[prop.type];
     const d = g?.defs[prop.variant];
     if (!d) return;
     if (prop.depleted) { hud.message(g.gone); return; }
-    if (book.level(g.skill) < d.level) { hud.message(g.levelMsg(d)); return; }
-    if (!bestTool(g)) {
+    if (book.level(g.skill) < levelOf(g, d)) { hud.message(g.levelMsg(d)); return; }
+    if (g.perSpot) {
+      if (!hasItem(d.tool)) { hud.message(`You need a ${d.toolName} to fish here. Old Finn or Pell can help.`); return; }
+      if (d.bait && !inventory.count(d.bait)) { hud.message(`You need ${d.bait === 'feather' ? 'feathers' : 'fishing bait'} to fish here.`); return; }
+    } else if (!bestTool(g)) {
       hud.message(g.tools.some((t) => hasItem(t.id)) ? `You need a higher ${SKILL_NAME[g.skill]} level to use your ${g.tool}.` : g.noTool);
       return;
     }
@@ -916,16 +942,17 @@ function boot() {
     combat.stop();
     player.faceTowards(trunk(prop).x, trunk(prop).y);
     activity = { kind: 'gather', prop, g, d, next: ticker.count + 2 };
-    hud.message(g.start);
+    hud.message(g.perSpot ? d.start : g.start);
   };
 
   const gatherStep = (a) => {
     const { g, d, prop } = a;
     a.next = ticker.count + g.ticks;
-    const tool = bestTool(g);
+    const tool = bestTool(g, d);
     if (!tool || prop.depleted) { activity = null; return; }
-    skillLungeAt = time;
     player.faceTowards(trunk(prop).x, trunk(prop).y);
+    if (g.perSpot) { fishStep(a); return; }
+    skillLungeAt = time;
     const chance = Math.min(0.9, d.chance + (book.level(g.skill) - d.level) * 0.012 + tool.bonus);
     if (rng() >= chance) return;
     const item = g.item(d);
@@ -945,6 +972,21 @@ function boot() {
       hud.message(fullBag(g));
       stopActivity();
     }
+  };
+
+  const fishStep = (a) => {
+    const d = a.d;
+    if (d.bait && !inventory.count(d.bait)) { hud.message(`You have run out of ${d.bait === 'feather' ? 'feathers' : 'bait'}.`); stopActivity(); return; }
+    const c = rollCatch(d);
+    if (!c) return;
+    if (!inventory.room(c.item, 1)) { hud.message(fullBag(a.g)); stopActivity(); return; }
+    if (d.bait) inventory.remove(d.bait, 1);
+    inventory.add(c.item, 1);
+    const name = itemName(c.item).toLowerCase().replace('raw ', '');
+    hud.message(/s$/.test(name) ? `You catch some ${name}.` : `You catch ${/^[aeiou]/.test(name) ? 'an' : 'a'} ${name}.`);
+    book.add('fishing', c.xp);
+    refreshInventory();
+    if (!inventory.freeSlots) { hud.message(fullBag(a.g)); stopActivity(); }
   };
 
   // ---- Fletching -----------------------------------------------------------------
@@ -983,6 +1025,20 @@ function boot() {
       icon: itemIcon(Object.keys(r.gives)[0]).url,
       fn: () => startMake(r),
     });
+    if (kind === 'cook') {
+      const have = COOKING.filter((r) => inventory.count(r.raw));
+      if (!have.length) { hud.message('You have nothing to cook. Raw fish and chicken can be cooked here.'); return; }
+      const cl = book.level('cooking');
+      hud.showMenu(pos.x, pos.y, 'Cook', [
+        ...have.map((r) => ({
+          label: `${r.name} (${inventory.count(r.raw)} raw)${cl < r.level ? ` — needs level ${r.level}` : ''}`,
+          icon: itemIcon(r.id).url,
+          fn: () => startMake(r),
+        })),
+        { label: 'Cancel', fn: () => {} },
+      ]);
+      return;
+    }
     if (kind === 'smelt') {
       hud.showMenu(pos.x, pos.y, 'Furnace', [...SMELTING.map((r) => option(r, ` (${Object.keys(r.uses).map((id) => itemName(id).toLowerCase()).join(' + ')})`)), { label: 'Cancel', fn: () => {} }]);
       return;
@@ -1036,6 +1092,7 @@ function boot() {
     a.next = ticker.count + r.ticks;
     // Some makes can fail (impure iron): the materials are used up anyway.
     if (r.success && rng() >= r.success(book.level(skillOf(r)))) {
+      for (const [id, q] of Object.entries(r.failGives || {})) inventory.add(id, q * k);
       hud.message(r.fail || 'You fail.');
       refreshInventory();
       return;
@@ -1048,6 +1105,7 @@ function boot() {
     if (n > 1) hud.message(`You make ${n} ${name}${/s$/.test(name) ? '' : 's'}.`);
     else if (r.station === 'furnace') hud.message(`You smelt the ore into ${an} ${name}.`);
     else if (r.station === 'anvil') hud.message(`You hammer the metal into ${an} ${name}.`);
+    else if (r.station === 'fire') hud.message(`You cook the ${r.name.toLowerCase()}.`);
     else hud.message(`You carve the logs into ${an} ${name}.`);
     book.add(skillOf(r), r.xp * k);
     a.made++;

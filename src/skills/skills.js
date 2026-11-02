@@ -46,6 +46,8 @@ export const SKILLS = [
   { id: 'fletching', name: 'Fletching', about: 'Carve logs into arrows and bows with a knife.' },
   { id: 'mining', name: 'Mining', about: 'Mine ore from rocks with a pickaxe. Higher levels unlock iron.' },
   { id: 'smithing', name: 'Smithing', about: 'Smelt ore into bars at a furnace, then hammer bars into gear at an anvil.' },
+  { id: 'fishing', name: 'Fishing', about: 'Catch fish with nets and rods. Higher levels catch better fish.' },
+  { id: 'cooking', name: 'Cooking', about: 'Cook raw food on a fire. Higher levels burn less and unlock better fish.' },
 ];
 
 export const SKILL_NAME = Object.fromEntries(SKILLS.map((s) => [s.id, s.name]));

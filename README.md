@@ -28,13 +28,14 @@ There are no turn-based battles, no battle screens and no creature catching. You
 - Walk into the **General Store** and **Bank** in Brambleford. Talk to Pell to trade, and Edda or any booth to bank. Pick 1 / 5 / 10 / All, then tap items to move them. Tap food to eat it, potions to drink them, and weapons or armour to put them on (Settings can make taps open the menu instead).
 - Ask **Bram** to teach you woodcutting: he'll give you an axe and a knife. Tap a pine tree to chop it (oaks need Woodcutting 15), then tap your logs to carve arrow shafts and bows. Add feathers and bronze arrowtips (from Pell) to make arrows.
 - Head to the top of Route 1 for **Copperdeep Mine**. Ask **Dorrin** to teach you: he'll give you a pickaxe and a hammer. Mine copper and tin, smelt them into bronze bars at the furnace, then hammer bars into daggers, swords, helmets, shields, chainbodies and arrowtips at the anvil. Iron needs Mining 15 and Smithing 15.
+- Ask **Old Finn** by Brambleford's pond to teach you fishing: he'll give you a net, a rod and some bait. Tap the ripples to fish, then cook your catch (and Wyn's chickens) on the cooking pit. Trout and salmon live in the Route 1 stream: you'll need a fly fishing rod and feathers.
 - If you die you keep your 3 most valuable items; the rest wait in a gravestone where you fell for 15 minutes (free to reclaim for the first 5).
 
 ## Status
 
-**v0.12.0 — Phase 2 in progress.** The first playable version (Brambleford, Thornwood, real-time combat with melee, bows and magic, six combat skills to 99, loot, inventory, equipment, bank, shop, food, potions and gravestones) plus **Woodcutting**, **Fletching**, **Mining** and **Smithing**, and Copperdeep Mine.
+**v0.13.0 — Phase 2 in progress.** The first playable version (Brambleford, Thornwood, real-time combat with melee, bows and magic, six combat skills to 99, loot, inventory, equipment, bank, shop, food, potions and gravestones) plus **Woodcutting**, **Fletching**, **Mining**, **Smithing**, **Fishing** and **Cooking**, Copperdeep Mine and Wyn's chicken pen. All XP is 5× the base rates.
 
-Next: Fishing and Cooking (see the [roadmap](docs/ROADMAP.md)).
+Next: Crafting and Runecrafting (see the [roadmap](docs/ROADMAP.md)).
 
 ## Running it locally
 
@@ -75,6 +76,8 @@ node tests/save.test.mjs
 | `data/fletching.js` | Fletching recipes |
 | `data/mining.js` | Ore rocks and pickaxes |
 | `data/smithing.js` | Smelting and smithing recipes |
+| `data/fishing.js` | Fishing spots and what they catch |
+| `data/cooking.js` | Cooking recipes and burn rates |
 | `tests` | Save-loading tests (run with Node) |
 
 ## Stack

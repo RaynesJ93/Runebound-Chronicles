@@ -905,3 +905,53 @@ export function chickenFrames(look) {
   }
   return frames;
 }
+
+// ---- Fishing and cooking ---------------------------------------------------------
+
+// Ripples on the water where fish are. Two frames, so the rings spread.
+export function fishingSpot(frame) {
+  const b = new Bitmap(16, 16);
+  const foam = hex('#e8f6ff');
+  const soft = hex('#a8d8f5');
+  const ring = (cx, cy, r, c) => {
+    for (let a = 0; a < 24; a++) {
+      const t = (a / 24) * Math.PI * 2;
+      if (a % 4 === 3) continue; // broken rings look like moving water
+      b.set(Math.round(cx + Math.cos(t) * r), Math.round(cy + Math.sin(t) * r * 0.55), c);
+    }
+  };
+  if (frame === 0) { ring(8, 8, 2, foam); ring(8, 8, 5, soft); }
+  else { ring(8, 8, 3.5, foam); ring(8, 8, 6.5, soft); b.set(8, 8, foam); }
+  // a fish tail breaking the surface
+  if (frame === 1) { b.set(11, 6, hex('#6f8fb0')); b.set(12, 5, hex('#6f8fb0')); b.set(12, 6, hex('#9ab4cc')); }
+  return sprite(b, 8, 12);
+}
+
+// A ring of stones around a low fire with a pot hanging over it.
+export function cookingPit(frame) {
+  const b = new Bitmap(20, 24);
+  // stone ring
+  for (let a = 0; a < 10; a++) {
+    const t = (a / 10) * Math.PI * 2;
+    const x = Math.round(10 + Math.cos(t) * 7), y = Math.round(19 + Math.sin(t) * 3);
+    b.rect(x - 1, y - 1, 3, 2, C.stone[1 + (a % 2)]);
+  }
+  // logs and flames
+  b.rect(6, 18, 8, 2, C.trunk[1]);
+  const flame = [hex('#c8361d'), hex('#f07a22'), hex('#f9c23c'), hex('#fff2b0')];
+  const sway = frame ? 1 : 0;
+  for (const [y, x, w] of [[17, 10, 6], [16, 10 + sway, 5], [15, 10, 4], [14, 10 - sway, 2]]) for (let k = 0; k < w; k++) {
+    const t = Math.abs(k - (w - 1) / 2) / ((w + 1) / 2);
+    b.set(Math.round(x - w / 2 + k), y, flame[t > 0.7 ? 0 : t > 0.4 ? 1 : y < 15 ? 3 : 2]);
+  }
+  // spit with a pot
+  const ir = [hex('#2e3236'), hex('#4c5258'), hex('#6e767e')];
+  b.rect(2, 4, 1, 15, C.wood[0]); b.rect(17, 4, 1, 15, C.wood[0]);
+  b.rect(2, 4, 16, 1, C.wood[1]);
+  b.rect(9, 5, 1, 3, ir[0]);
+  b.ellipse(9.5, 10.5, 3.6, 3, ir[1]);
+  b.rect(6, 8, 8, 1, ir[2]);
+  b.set(8, 10, ir[2]);
+  b.outline();
+  return sprite(b, 10, 22);
+}

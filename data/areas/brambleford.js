@@ -61,6 +61,19 @@ export function buildBrambleford() {
     else if (d < 1.7) ground[i(x, y)] = GROUND.SAND;
   }
 
+  // Fishing spots around the pond's edge: water tiles next to the shore.
+  const shoreWater = [];
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (ground[i(x, y)] !== GROUND.WATER) continue;
+    if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => inB(x + dx, y + dy) && ground[i(x + dx, y + dy)] === GROUND.SAND)) shoreWater.push({ x, y });
+  }
+  const nearest = (tx, ty) => shoreWater.slice().sort((a, b) => Math.hypot(a.x - tx, a.y - ty) - Math.hypot(b.x - tx, b.y - ty))[0];
+  for (const [tx, ty, variant] of [[12, 30, 'net'], [9, 27, 'net'], [5, 27, 'bait'], [2, 30, 'bait']]) {
+    const t = nearest(tx, ty);
+    shoreWater.splice(shoreWater.indexOf(t), 1);
+    prop('fishingSpot', [t], { variant });
+  }
+
   // Farm field
   rect(29, 29, 37, 32, GROUND.DIRT);
 
@@ -146,8 +159,12 @@ export function buildBrambleford() {
   one('crate', 25, 28, { interact: ['A chicken coop made from an old crate. There is straw and a feather inside.'] });
   one('sign', 23, 26, { interact: ["WYN'S CHICKENS", 'Too many hens! Help yourself, but mind the cabbages.'] });
 
+  // ---- Old Finn's fishing corner by the pond --------------------------------
+  one('cookingPit', 14, 30, { action: 'cook', interact: ['A stone-ringed cooking pit. The fire never quite goes out.'] });
+  one('sign', 14, 27, { interact: ['FISHING POND', 'Ask Old Finn for a net and a rod. Cook your catch on the pit.'] });
+
   // ---- Decoration ---------------------------------------------------------
-  for (const [x, y] of [[4, 9], [8, 6], [16, 6], [27, 6], [33, 5], [38, 7], [4, 21], [13, 29], [39, 22], [25, 22], [12, 22]]) {
+  for (const [x, y] of [[4, 9], [8, 6], [16, 6], [27, 6], [33, 5], [38, 7], [4, 21], [39, 22], [25, 22], [12, 22]]) {
     placeIfFree('tree', x, y, { variant: rng() < 0.5 ? 'oak' : 'pine' });
   }
   for (const [x, y] of [[10, 13], [17, 11], [26, 11], [34, 13], [5, 22], [11, 21], [30, 22], [36, 22], [13, 23], [19, 23]]) placeIfFree('bush', x, y);
