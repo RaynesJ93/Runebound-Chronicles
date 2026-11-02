@@ -25,6 +25,11 @@ export const SHOPS = {
       { id: 'airRune', base: 300 },
       { id: 'mindRune', base: 300 },
       { id: 'waterRune', base: 200 },
+      { id: 'bronzeAxe', base: 5 },
+      { id: 'ironAxe', base: 2 },
+      { id: 'knife', base: 5 },
+      { id: 'feather', base: 500 },
+      { id: 'bronzeArrowtips', base: 300 },
     ],
   },
 };

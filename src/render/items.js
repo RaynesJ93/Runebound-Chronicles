@@ -30,6 +30,37 @@ function blade(b, metal, length) {
   b.set(x0 - 4, y0 + 4, METAL[metal][1]);
 }
 
+function bow(b, w, r) {
+  for (let a = 0; a <= 24; a++) {
+    const t = -1.05 + (a / 24) * 2.1;
+    b.set(Math.round(5 + Math.cos(t) * r), Math.round(8 + Math.sin(t) * r), w[a % 3 === 0 ? 2 : 1]);
+  }
+  line(b, Math.round(5 + Math.cos(1.05) * r), 8 - Math.round(Math.sin(1.05) * r), Math.round(5 + Math.cos(1.05) * r), 8 + Math.round(Math.sin(1.05) * r), hex('#e8e0c8'));
+  b.rect(Math.round(5 + r) - 1, 7, 2, 3, w[0]);
+}
+
+// An axe: handle from bottom-left to top-right, and a wedge of metal sticking
+// out sideways (down-right) near the top, its sharp edge on the outside.
+function axe(b, metal) {
+  const [d, m, l, h] = METAL[metal];
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+    const v = x + y, u = x - y;
+    if (v === 15 && x >= 1 && x <= 13) b.set(x, y, WOOD[1]);
+    if (v === 14 && x >= 1 && x <= 12) b.set(x, y, WOOD[0]);
+    const inHead = (v >= 16 && v <= 19 && u >= 3 && u <= 7) || (v === 20 && u >= 2 && u <= 8);
+    if (inHead) b.set(x, y, v === 20 ? h : v === 19 ? l : v === 16 ? d : m);
+  }
+}
+
+// Two logs lying side by side, ends showing their rings.
+function logPair(b, bark, ring) {
+  for (const [y0, x0] of [[9, 2], [5, 4]]) {
+    for (let x = x0; x < x0 + 10; x++) for (let y = y0; y < y0 + 4; y++) b.set(x, y, y === y0 ? bark[2] : y === y0 + 3 ? bark[0] : bark[1]);
+    b.ellipse(x0 + 10, y0 + 1.5, 1.6, 2.1, ring[0]);
+    b.set(x0 + 10, y0 + 1, ring[1]);
+  }
+}
+
 const DRAW = {
   coins(b) {
     const gold = [hex('#8a6410'), hex('#d4a020'), hex('#f2c94a'), hex('#fff0a0')];
@@ -135,6 +166,45 @@ const DRAW = {
     b.ellipse(12.5, 3.5, 2.4, 2.4, hex('#2f9a92'));
     b.set(12, 3, hex('#c8fff8'));
     b.set(13, 2, hex('#7fe8e0'));
+  },
+  longbow(b) { bow(b, [hex('#5e3b1f'), hex('#8a5a32'), hex('#b07a48')], 7.5); },
+  oakShortbow(b) { bow(b, [hex('#6e4a22'), hex('#a8783e'), hex('#d0a060')], 7); },
+  oakLongbow(b) { bow(b, [hex('#6e4a22'), hex('#a8783e'), hex('#d0a060')], 7.5); },
+  bronzeAxe(b) { axe(b, 'bronze'); },
+  ironAxe(b) { axe(b, 'iron'); },
+  knife(b) {
+    line(b, 4, 12, 7, 9, WOOD[1]);
+    line(b, 5, 12, 7, 10, WOOD[0]);
+    const [d, m, l] = METAL.iron;
+    line(b, 8, 8, 12, 4, l);
+    line(b, 8, 9, 13, 4, m);
+    b.set(13, 3, l);
+    b.set(8, 10, d);
+  },
+  logs(b) { logPair(b, [hex('#5e3b1f'), hex('#8a5a32'), hex('#b07a48')], [hex('#e8c890'), hex('#c49a5c')]); },
+  oakLogs(b) { logPair(b, [hex('#4a3016'), hex('#6e4a22'), hex('#946a36')], [hex('#d8b070'), hex('#a87a3c')]); },
+  arrowShaft(b) {
+    for (const off of [0, 3, 6]) line(b, 2 + off, 13, 9 + off, 4, off === 3 ? WOOD[1] : WOOD[2]);
+  },
+  feather(b) {
+    const w = hex('#f4f2e6'), g = hex('#c9c5b6');
+    for (let k = 0; k < 9; k++) {
+      const x = 4 + k, y = 12 - k;
+      b.set(x, y, hex('#8a8578'));
+      if (k > 0 && k < 8) { b.set(x - 1, y - 1, w); b.set(x - 2, y - 1, k % 2 ? g : w); b.set(x + 1, y + 1, w); b.set(x + 1, y + 2, k % 2 ? w : g); }
+    }
+  },
+  headlessArrow(b) {
+    for (const off of [0, 3]) {
+      line(b, 3 + off, 13, 11 + off, 5, WOOD[2]);
+      b.set(2 + off, 13, hex('#f4f2e6')); b.set(3 + off, 14, hex('#f4f2e6')); b.set(2 + off, 12, hex('#d8d4c6'));
+    }
+  },
+  bronzeArrowtips(b) {
+    const [d, m, l] = METAL.bronze;
+    for (const [x, y] of [[4, 10], [9, 11], [7, 6], [11, 5]]) {
+      b.set(x, y, l); b.set(x + 1, y, m); b.set(x, y + 1, m); b.set(x + 1, y + 1, d); b.set(x + 2, y - 1, l);
+    }
   },
   wolfPelt(b) {
     const f = [hex('#5e6368'), hex('#8a8f94'), hex('#b4b8bc')];

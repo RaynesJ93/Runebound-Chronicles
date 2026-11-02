@@ -186,7 +186,8 @@ export const NPCS = [
           { text: 'Any danger in these woods?', next: 'danger' },
           { text: 'Do you have a bow I could use?', next: 'bow', if: (c) => !c.flags.gotBow },
           { text: 'Where do I get more arrows?', next: 'arrows', if: (c) => c.flags.gotBow },
-          { text: 'Can you teach me to chop trees?', next: 'teach' },
+          { text: 'Can you teach me to chop trees?', next: 'teach', if: (c) => !c.flags.gotAxe },
+          { text: 'Remind me how woodcutting works.', next: 'lesson', if: (c) => c.flags.gotAxe },
           { text: 'See you around.', next: 'bye' },
         ] },
         bow: {
@@ -204,8 +205,17 @@ export const NPCS = [
           next: 'menu',
         },
         teach: {
-          say: ['Ha! Not without an axe, you can\'t.', 'Once Pell gets some stock in, buy yourself a bronze axe and come and find me.'],
+          say: ['Ha! Course I can. First thing you need is an axe.', "Here's my old bronze one, and a knife while I'm at it."],
+          give: { flag: 'gotAxe', items: [{ item: 'bronzeAxe', qty: 1 }, { item: 'knife', qty: 1 }] },
+          giveFail: 'bowFull',
           set: { bramOffersLessons: true },
+          next: 'lesson',
+        },
+        lesson: {
+          say: ['Tap a pine tree and you\'ll chop away at it till you get a log. Pines fall after one log, but they grow back quick.',
+            'Oaks need Woodcutting 15. They give better logs and last longer.',
+            'Then tap your logs to carve them with the knife: arrow shafts first, bows once you get the hang of it.',
+            'Add feathers to the shafts, then bronze arrowtips. Pell sells both, and goblins carry feathers.'],
           next: 'menu',
         },
         bye: { say: 'Mind the roots on the path.' },

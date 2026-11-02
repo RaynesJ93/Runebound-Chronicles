@@ -27,6 +27,7 @@ export const ENEMIES = {
         { item: 'airRune', min: 4, max: 8, chance: 1 / 12 },
         { item: 'mindRune', min: 3, max: 7, chance: 1 / 12 },
         { item: 'bronzeArrow', min: 3, max: 10, chance: 1 / 10 },
+        { item: 'feather', min: 5, max: 15, chance: 1 / 10 },
         { item: 'bronzeDagger', qty: 1, chance: 1 / 16 },
         { item: 'goblinMail', qty: 1, chance: 1 / 32 },
       ],

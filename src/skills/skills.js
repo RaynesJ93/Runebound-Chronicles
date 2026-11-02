@@ -38,6 +38,8 @@ export const SKILLS = [
   { id: 'hitpoints', name: 'Hitpoints', about: 'Your health. Every point of damage you deal trains it.' },
   { id: 'ranged', name: 'Ranged', about: 'Bows and arrows: accuracy and damage from a distance.' },
   { id: 'magic', name: 'Magic', about: 'Combat spells. Higher levels unlock stronger spells.' },
+  { id: 'woodcutting', name: 'Woodcutting', about: 'Chop trees for logs. Higher levels chop faster and unlock oaks.' },
+  { id: 'fletching', name: 'Fletching', about: 'Carve logs into arrows and bows with a knife.' },
 ];
 
 export const SKILL_NAME = Object.fromEntries(SKILLS.map((s) => [s.id, s.name]));
