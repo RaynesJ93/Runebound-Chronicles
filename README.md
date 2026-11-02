@@ -17,13 +17,14 @@ There are no turn-based battles, no battle screens and no creature catching. You
 
 - **Desktop:** click to walk, or use WASD / arrow keys. R toggles run. Mouse wheel or + / − zooms.
 - **iPhone:** tap to walk, or use the on-screen joystick. Pinch to zoom. For full-screen play, open the link in Safari, tap Share, then **Add to Home Screen**.
-- Tap or click signs, doors, the well and the market stall to look at them.
+- Tap or click people to talk to them, and signs, doors and other objects to look at them. Number keys pick answers on desktop.
+- Head north out of the village to reach Route 1 — Thornwood Forest.
 
 ## Status
 
-**v0.2.0 — Batches 0 and 1 done, now in 2D pixel art:** the starting village of Brambleford, Emerald-style top-down movement, tap-to-move pathfinding, run energy, and local saving with backup codes.
+**v0.3.0 — Batches 0–2 done:** the village of Brambleford and Route 1 (Thornwood Forest), 8 villagers to talk to with branching conversations, Emerald-style top-down movement, tap-to-move pathfinding, run energy, and local saving with backup codes.
 
-Next: **Batch 2** — NPCs, dialogue and the first forest route (see the [roadmap](docs/ROADMAP.md)).
+Next: **Batch 3** — real-time overworld combat with roaming goblins (see the [roadmap](docs/ROADMAP.md)).
 
 ## Running it locally
 
@@ -42,10 +43,11 @@ then visit http://localhost:8000.
 | `src/core` | Game tick (0.6 s), game state, saving with versions and migrations |
 | `src/world` | Tile grid, collision and pathfinding |
 | `src/render` | Pixel-art sprites drawn in code, ground, buildings, camera and depth sorting |
-| `src/entities` | The player's movement |
+| `src/entities` | The player's movement and villagers (NPCs) |
 | `src/input` | Keyboard, mouse, touch, pinch and D-pad |
 | `src/ui` | On-screen interface: banner, messages, run orb, dialogue, settings |
 | `data/areas` | Map data for each area |
+| `data/npcs.js` | Villagers: where they live, how they look, what they say |
 
 ## Stack
 

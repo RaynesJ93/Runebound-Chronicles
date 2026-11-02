@@ -232,3 +232,29 @@ body.has-dpad .hint { bottom: calc(184px + var(--safe-b)); }
   .dialog { font-size: 18px; }
   .area-banner { font-size: 20px; }
 }
+
+/* ---- Conversations: speaker name and choices ---- */
+.dialog { overflow: visible; }
+.dialog-name {
+  position: absolute; left: 18px; top: -22px;
+  padding: 4px 14px 3px; font-size: 17px; font-weight: 700; color: #fff6dc;
+  background: var(--wood); border: 3px solid var(--wood-dark); border-radius: 6px;
+  box-shadow: inset 0 -3px 0 var(--wood-dark);
+  text-shadow: 1px 1px 0 var(--wood-dark);
+}
+.dialog-choices { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.choice {
+  text-align: left; min-height: 44px; padding: 8px 14px; border-radius: 6px;
+  background: var(--parch-dark); border: 3px solid var(--wood); color: var(--ink);
+  font-size: 17px; font-weight: 600;
+}
+.choice::before { content: "▸ "; color: #c0392b; }
+.choice:hover, .choice:focus-visible { background: #fff6dc; border-color: var(--wood-dark); outline: none; }
+.choice:active { transform: translateY(1px); }
+
+/* ---- Screen fade between areas ---- */
+.fade {
+  position: absolute; inset: 0; z-index: 8; background: #0d0a06;
+  opacity: 0; pointer-events: none; transition: opacity 0.28s ease;
+}
+.fade.on { opacity: 1; }

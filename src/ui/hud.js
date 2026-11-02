@@ -26,10 +26,13 @@ export class Hud {
         <span class="joy-knob"></span>
       </div>
       <div class="hint hidden" id="hint"></div>
-      <div class="dialog ui hidden" id="dialog" role="dialog">
+      <div class="dialog ui hidden" id="dialog" role="dialog" aria-live="polite">
+        <div class="dialog-name hidden" id="dialog-name"></div>
         <div class="dialog-text" id="dialog-text"></div>
-        <div class="dialog-next">▼</div>
+        <div class="dialog-choices hidden" id="dialog-choices"></div>
+        <div class="dialog-next" id="dialog-next">▼</div>
       </div>
+      <div class="fade" id="fade"></div>
       <div class="panel-backdrop ui hidden" id="settings">
         <div class="panel" role="dialog" aria-label="Settings">
           <div class="panel-head"><h2>Settings</h2><button class="close-btn" data-close aria-label="Close">✕</button></div>
@@ -61,6 +64,7 @@ export class Hud {
     this.el = {
       banner: $('area-banner'), messages: $('messages'), runOrb: $('run-orb'), runVal: $('run-val'),
       dpad: $('dpad'), hint: $('hint'), dialog: $('dialog'), dialogText: $('dialog-text'),
+      dialogName: $('dialog-name'), dialogChoices: $('dialog-choices'), dialogNext: $('dialog-next'), fade: $('fade'),
       settings: $('settings'), toast: $('toast'), saveStatus: $('save-status'),
       setDpad: $('set-dpad'), zoomVal: $('zoom-val'), importBox: $('import-box'), importText: $('import-text'),
       version: $('version'),
@@ -74,7 +78,7 @@ export class Hud {
     this.el.settings.addEventListener('click', (e) => {
       if (e.target === this.el.settings || e.target.closest('[data-close]')) this.closeSettings();
     });
-    this.el.dialog.addEventListener('click', () => this.advanceDialog());
+    this.el.dialog.addEventListener('click', (e) => { if (!e.target.closest('.choice')) this.advanceDialog(); });
     $('save-load-toggle').addEventListener('click', () => {
       this.el.importBox.classList.toggle('hidden');
       if (!this.el.importBox.classList.contains('hidden')) this.el.importText.focus();
@@ -145,24 +149,130 @@ export class Hud {
     this.el.hint.classList.add('hidden');
   }
 
-  showDialog(lines, onClose) {
-    this.dialogLines = lines.slice();
-    this.dialogOpen = true;
+  // Fade the screen to black and back, for moving between areas.
+  setFade(on) {
+    this.el.fade.classList.toggle('on', on);
+  }
+
+  // ---- Conversations ---------------------------------------------------------
+  //
+  // A conversation is { name, start, nodes }. Each node has:
+  //   say:     lines of text (strings, or functions of ctx returning a string)
+  //   choices: [{ text, next, set }]   — buttons shown after the last line
+  //   next:    node to go to automatically after the last line
+  //   set:     { flagName: value }     — stored in the save when the node opens
+  // `start` may be a node id or a function of ctx returning one.
+  // ctx = { flags } (the saved story flags), passed through to functions.
+
+  showDialog(lines, onClose, name = null) {
+    this.startConversation({ name, start: 'a', nodes: { a: { say: lines } } }, { flags: {} }, onClose);
+  }
+
+  startConversation(conv, ctx, onClose) {
+    this.conv = conv;
+    this.ctx = ctx;
     this.onDialogClose = onClose || null;
+    this.dialogOpen = true;
     this.el.dialog.classList.remove('hidden');
-    this.el.dialogText.textContent = this.dialogLines.shift();
+    this.el.dialogName.textContent = conv.name || '';
+    this.el.dialogName.classList.toggle('hidden', !conv.name);
+    this.goto(typeof conv.start === 'function' ? conv.start(ctx) : conv.start);
+  }
+
+  goto(id) {
+    const node = this.conv.nodes[id];
+    if (!node) { this.endConversation(); return; }
+    this.node = node;
+    if (node.set) Object.assign(this.ctx.flags, node.set);
+    const say = Array.isArray(node.say) ? node.say : node.say ? [node.say] : [];
+    this.dialogLines = say.map((l) => (typeof l === 'function' ? l(this.ctx) : l));
+    this.hideChoices();
+    if (this.dialogLines.length) this.typeLine(this.dialogLines.shift());
+    else this.afterLines();
+  }
+
+  // Reveal text a few letters at a time, like Emerald. A tap finishes the line.
+  typeLine(text) {
+    clearInterval(this.typer);
+    this.fullLine = text;
+    let n = 0;
+    this.el.dialogText.textContent = '';
+    this.el.dialogNext.classList.add('hidden');
+    this.typing = true;
+    this.typer = setInterval(() => {
+      n += 2;
+      this.el.dialogText.textContent = text.slice(0, n);
+      if (n >= text.length) this.finishTyping();
+    }, 28);
+  }
+
+  finishTyping() {
+    clearInterval(this.typer);
+    this.typing = false;
+    this.el.dialogText.textContent = this.fullLine;
+    const more = this.dialogLines.length || (this.node && (this.node.next || !this.node.choices));
+    if (!this.dialogLines.length && this.node?.choices) this.showChoices(this.node.choices);
+    else this.el.dialogNext.classList.toggle('hidden', !more);
   }
 
   advanceDialog() {
     if (!this.dialogOpen) return;
-    if (this.dialogLines.length) {
-      this.el.dialogText.textContent = this.dialogLines.shift();
-      return;
-    }
+    if (this.typing) { this.finishTyping(); return; }
+    if (this.choicesShown) return; // pick an answer
+    if (this.dialogLines.length) { this.typeLine(this.dialogLines.shift()); return; }
+    this.afterLines();
+  }
+
+  afterLines() {
+    const node = this.node;
+    if (node?.choices) this.showChoices(node.choices);
+    else if (node?.next) this.goto(node.next);
+    else this.endConversation();
+  }
+
+  showChoices(choices) {
+    const box = this.el.dialogChoices;
+    box.innerHTML = '';
+    this.visibleChoices = choices.filter((c) => !c.if || c.if(this.ctx));
+    this.visibleChoices.forEach((c, i) => {
+      const b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = c.text;
+      b.dataset.key = String(i + 1);
+      b.addEventListener('click', (e) => { e.stopPropagation(); this.pickChoice(i); });
+      box.appendChild(b);
+    });
+    box.classList.remove('hidden');
+    this.el.dialogNext.classList.add('hidden');
+    this.choicesShown = true;
+  }
+
+  hideChoices() {
+    this.el.dialogChoices.classList.add('hidden');
+    this.el.dialogChoices.innerHTML = '';
+    this.choicesShown = false;
+  }
+
+  pickChoice(i) {
+    if (!this.choicesShown) return;
+    const c = this.visibleChoices[i];
+    if (!c) return;
+    if (c.set) Object.assign(this.ctx.flags, c.set);
+    this.hideChoices();
+    if (c.next) this.goto(c.next);
+    else this.endConversation();
+  }
+
+  endConversation() {
+    clearInterval(this.typer);
+    this.typing = false;
+    this.hideChoices();
     this.dialogOpen = false;
     this.el.dialog.classList.add('hidden');
     const cb = this.onDialogClose;
     this.onDialogClose = null;
+    this.conv = null;
+    this.node = null;
     cb?.();
   }
 }
