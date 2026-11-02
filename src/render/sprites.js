@@ -402,6 +402,8 @@ function palette(look) {
     pants, pantsS: shade(pants, 0.78),
     boots: hex(L.boots), eye: hex(L.eyes || '#2b1d16'),
     ears: !!L.ears,
+    weapon: L.weapon ? (L.weapon === 'iron' ? [hex('#7a828b'), hex('#c0c8d0'), hex('#eef2f5')] : [hex('#a8692e'), hex('#d4934f'), hex('#f2c48a')]) : null,
+    blade: L.blade || 4,
     beard: L.beard ? hex(L.beard) : null,
     hat: L.hat || null, robe: !!L.robe,
     hatCol: L.hatColor ? hex(L.hatColor) : null,
@@ -453,6 +455,16 @@ function drawFront(L, back, frame) {
     const o = armO(side) + bob;
     b.rect(x, 11 + o, 2, 4, side ? L.tunicS : L.tunic);
     b.rect(x, 15 + o, 2, 1, L.skin);
+  }
+  if (L.weapon) {
+    // held upright in the right hand (your right = picture left when seen from behind)
+    const hx = back ? 1 : 14;
+    const hy = 15 + armO(back ? 0 : 1) + bob;
+    const [d, m, l] = L.weapon;
+    for (let k = 1; k <= L.blade; k++) b.set(hx, hy - k, k === L.blade ? l : m);
+    b.set(hx + (back ? -1 : 1), hy - 1, d);
+    b.rect(hx - 1, hy, 3, 1, hex('#e8c040'));
+    b.set(hx, hy + 1, hex('#5e3b1f'));
   }
   b.rect(7, 9 + bob, 2, 1, L.skinS);
   b.rect(3, 1 + bob, 10, 8, L.skin);
@@ -511,6 +523,14 @@ function drawSide(L, frame) {
   const armX = frame === 1 ? 8 : frame === 2 ? 6 : 7;
   b.rect(armX, 11 + bob, 2, 4, L.tunicS);
   b.rect(armX, 15 + bob, 2, 1, L.skin);
+  if (L.weapon) {
+    // pointing forward (left) from the hand
+    const [d, m, l] = L.weapon;
+    const y = 15 + bob;
+    for (let k = 1; k <= L.blade; k++) b.set(armX - k, y, k === L.blade ? l : m);
+    b.set(armX - 1, y + 1, d);
+    b.rect(armX - 1, y - 1, 1, 3, hex('#e8c040'));
+  }
   b.rect(7, 9 + bob, 2, 1, L.skinS);
   b.rect(4, 1 + bob, 8, 8, L.skin);
   b.set(3, 6 + bob, L.skin);

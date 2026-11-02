@@ -204,8 +204,10 @@ export function createWorldView(canvasEl, area) {
   }
 
   function render(player, opts) {
-    const { time, steps, marker, characters = [], enemies = [], combat = null, ground: groundItems = [] } = opts;
-    const pObj = personObj(lib.player, player, steps, { player: true }, time, combat?.playerLungeAt);
+    const { time, steps, marker, characters = [], enemies = [], combat = null, ground: groundItems = [], playerLook = null } = opts;
+    // Your character, dressed in whatever you're wearing.
+    const pFrames = playerLook ? framesFor(lib, playerLook, `player:${JSON.stringify(playerLook)}`) : lib.player;
+    const pObj = personObj(pFrames, player, steps, { player: true }, time, combat?.playerLungeAt);
     const footX = pObj.fx;
     const footY = pObj.fy;
     follow(footX, footY - 8);

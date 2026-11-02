@@ -3,6 +3,7 @@
 // When you rename or restructure a field, bump SAVE_VERSION in save.js and add a migration.
 
 import { defaultSkills } from '../skills/skills.js';
+import { defaultEquipment } from '../items/equipment.js';
 
 export function defaultState() {
   return {
@@ -11,6 +12,7 @@ export function defaultState() {
     settings: { dpad: 'auto', zoomStep: 0, autoRetaliate: true, attackStyle: 'accurate' },
     skills: defaultSkills(),
     inventory: Array(28).fill(null),
+    equipment: defaultEquipment(),
     stats: { playTimeSec: 0, tilesWalked: 0 },
     flags: { seenMoveHint: false },
     createdAt: Date.now(),

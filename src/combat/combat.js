@@ -24,7 +24,8 @@ const DIRS4 = DIRS8.slice(0, 4);
 
 export class Combat {
   // on: { message(text), playerDied(), enemyDied(enemy), cantReach() }
-  constructor({ state, player, rng, on, skills }) {
+  constructor({ state, player, rng, on, skills, equipment }) {
+    this.gear = equipment;
     this.state = state;
     this.book = skills;
     this.player = player;
@@ -44,6 +45,18 @@ export class Combat {
   // ---- Player stats, from the skills you've trained -------------------------------
   get skills() { return this.book.levels(); }
   get style() { return styleById(this.state.settings.attackStyle); }
+  // Your accuracy bonus for your weapon's attack type, and strength bonus.
+  meleeBonuses() {
+    if (!this.gear) return { attackBonus: 0, strengthBonus: 0 };
+    const b = this.gear.bonuses();
+    return { attackBonus: b.att[this.gear.weapon.type], strengthBonus: b.str };
+  }
+
+  // Your armour's defence bonus against one attack type.
+  defenceAgainst(type) {
+    return this.gear ? this.gear.bonuses().def[type] : 0;
+  }
+
   // Combat level as it would be with one skill at a different level (for "your combat level is now..." messages).
   levelFrom(skill, level) { return combatLevel({ ...this.skills, [skill]: level }); }
   get maxHp() { return this.skills.hitpoints; }
@@ -105,7 +118,7 @@ export class Combat {
         p.faceTowards(t.standTile.x, t.standTile.y);
         if (this.cooldown <= 0) {
           this.playerSwing(t);
-          this.cooldown = UNARMED_SPEED;
+          this.cooldown = this.gear ? this.gear.weapon.speed : UNARMED_SPEED;
         }
       } else this.approach();
     }
@@ -117,7 +130,7 @@ export class Combat {
     const s = this.skills;
     const style = this.style;
     const dmg = resolveAttack(this.rng,
-      { attack: s.attack, strength: s.strength, attackBonus: 0, strengthBonus: 0, attackStyle: style.bonus.attack || 0, strengthStyle: style.bonus.strength || 0 },
+      { attack: s.attack, strength: s.strength, ...this.meleeBonuses(), attackStyle: style.bonus.attack || 0, strengthStyle: style.bonus.strength || 0 },
       { defence: e.def.defence, defenceBonus: e.def.defenceBonus });
     this.playerLungeAt = this.now;
     const dealt = Math.min(dmg, e.hp); // can't do more damage than it has health
@@ -199,7 +212,7 @@ export class Combat {
         if (e.cooldown <= 0) {
           const dmg = resolveAttack(this.rng,
             { attack: def.attack, strength: def.strength, attackBonus: def.attackBonus, maxHit: def.maxHit },
-            { defence: this.skills.defence, defenceBonus: 0, defenceStyle: this.style.bonus.defence || 0 });
+            { defence: this.skills.defence, defenceBonus: this.defenceAgainst(def.attackType || 'crush'), defenceStyle: this.style.bonus.defence || 0 });
           e.lungeAt = this.now;
           e.cooldown = def.speed;
           this.hurtPlayer(e, dmg);

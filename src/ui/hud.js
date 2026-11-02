@@ -4,6 +4,17 @@
 import { iconUrl } from '../render/icons.js';
 import { itemIcon, stackLabel } from '../render/items.js';
 import { ITEMS } from '../../data/items.js';
+import { SLOT_NAME, TYPES } from '../items/equipment.js';
+
+// Where each equipment slot sits on the 3 x 5 grid (like a paper doll).
+const DOLL = [
+  [null, 'head', null],
+  ['cape', 'neck', 'ammo'],
+  ['weapon', 'body', 'shield'],
+  [null, 'legs', null],
+  ['hands', 'feet', 'ring'],
+];
+const sign = (n) => (n > 0 ? `+${n}` : String(n));
 import { SKILLS, MELEE_STYLES, xpForLevel, MAX_LEVEL } from '../skills/skills.js';
 
 const fmt = (n) => Math.floor(n).toLocaleString('en-GB');
@@ -32,10 +43,19 @@ export class Hud {
       </div>
       <div class="panel-backdrop ui hidden" id="inv">
         <div class="panel inv-panel" role="dialog" aria-label="Inventory">
-          <div class="panel-head"><h2>Inventory</h2><span class="inv-free" id="inv-free"></span><button class="close-btn" data-close aria-label="Close">✕</button></div>
+          <div class="panel-head">
+            <div class="tabs"><button class="tab on" data-itab="inv">Bag</button><button class="tab" data-itab="gear">Equipment</button></div>
+            <span class="inv-free" id="inv-free"></span><button class="close-btn" data-close aria-label="Close">✕</button>
+          </div>
           <div class="panel-body">
-            <div class="inv-grid" id="inv-grid"></div>
-            <p class="muted small">Tap an item for options. Drag to rearrange.</p>
+            <div data-ipane="inv">
+              <div class="inv-grid" id="inv-grid"></div>
+              <p class="muted small">Tap an item for options (wield, wear, drop…). Drag to rearrange.</p>
+            </div>
+            <div data-ipane="gear" class="hidden">
+              <div class="doll" id="doll"></div>
+              <div class="bonuses" id="bonuses"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -137,6 +157,10 @@ export class Hud {
     this.el.inv = $('inv');
     this.el.inv.addEventListener('click', (e) => {
       if (e.target === this.el.inv || e.target.closest('[data-close]')) this.closeInventory();
+      const tab = e.target.closest('[data-itab]');
+      if (tab) this.showInvTab(tab.dataset.itab);
+      const eq = e.target.closest('[data-eq]');
+      if (eq && eq.classList.contains('full')) this.onGearTap?.(eq.dataset.eq, e.clientX, e.clientY);
     });
     this.el.menuBackdrop = $('menu-backdrop');
     this.el.menuBackdrop.addEventListener('pointerdown', (e) => { if (e.target === this.el.menuBackdrop) { e.preventDefault(); this.closeMenu(); } });
@@ -175,6 +199,38 @@ export class Hud {
   closeInventory() {
     this.el.inv.classList.add('hidden');
     this.closeMenu();
+  }
+
+  showInvTab(name) {
+    for (const t of this.el.inv.querySelectorAll('[data-itab]')) t.classList.toggle('on', t.dataset.itab === name);
+    for (const p of this.el.inv.querySelectorAll('[data-ipane]')) p.classList.toggle('hidden', p.dataset.ipane !== name);
+    this.$('inv-free').classList.toggle('hidden', name !== 'inv');
+    this.onInventoryOpen?.();
+  }
+
+  // gear: { slot: {id, qty} | null }, b: summed bonuses, weapon: { name, type, speed }
+  renderEquipment(gear, b, weapon, maxHitNow) {
+    this.$('doll').innerHTML = DOLL.map((row) => row.map((slot) => {
+      if (!slot) return '<div class="eq-gap"></div>';
+      const s = gear[slot];
+      if (!s) return `<div class="eq-slot" data-eq="${slot}"><span class="eq-label">${SLOT_NAME[slot]}</span></div>`;
+      const lab = ITEMS[s.id]?.stackable ? stackLabel(s.qty) : null;
+      return `<div class="eq-slot full" data-eq="${slot}" title="${ITEMS[s.id]?.name}">
+        <img class="px" src="${itemIcon(s.id).url}" alt="${ITEMS[s.id]?.name}">
+        ${lab ? `<span class="qty ${lab.cls}">${lab.text}</span>` : ''}
+      </div>`;
+    }).join('')).join('');
+    const cell = (v) => `<td class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${sign(v)}</td>`;
+    this.$('bonuses').innerHTML = `
+      <table>
+        <thead><tr><th></th>${TYPES.map((t) => `<th>${t[0].toUpperCase() + t.slice(1)}</th>`).join('')}</tr></thead>
+        <tbody>
+          <tr><th>Attack</th>${TYPES.map((t) => cell(b.att[t])).join('')}</tr>
+          <tr><th>Defence</th>${TYPES.map((t) => cell(b.def[t])).join('')}</tr>
+        </tbody>
+      </table>
+      <p class="bonus-line">Melee strength <b>${sign(b.str)}</b> · Max hit <b>${maxHitNow}</b></p>
+      <p class="bonus-line">${weapon.name}: ${weapon.type}, ${(weapon.speed * 0.6).toFixed(1)} s per attack</p>`;
   }
 
   renderInventory(slots) {
