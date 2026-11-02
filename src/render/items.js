@@ -342,6 +342,15 @@ const DRAW = {
     b.rect(12, 8, 2, 3, c[1]);
     b.set(3, 9, hex('#1d1d1d'));
   },
+  rawChicken(b) {
+    // a raw drumstick: pink meat, a pale bone end
+    b.ellipse(6.5, 9.5, 4.6, 3.8, hex('#d77a7a'));
+    b.ellipse(6, 9, 3.6, 2.8, hex('#f0a0a0'));
+    b.ellipse(5, 8, 1.6, 1.1, hex('#ffd0cc'));
+    line(b, 9, 7, 12, 4, hex('#efe6cf'));
+    line(b, 10, 7, 12, 5, hex('#c9bd9c'));
+    b.set(13, 3, hex('#efe6cf')); b.set(12, 3, hex('#efe6cf')); b.set(13, 4, hex('#efe6cf'));
+  },
   meatPie(b) {
     b.ellipse(8, 10, 6.5, 3.5, hex('#8a5022'));
     b.ellipse(8, 9, 6, 3, hex('#d8a05a'));

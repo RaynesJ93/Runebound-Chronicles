@@ -864,3 +864,44 @@ export function rubble(seed) {
   }
   return sprite(b, 8, 8);
 }
+
+// ---- Chickens ----------------------------------------------------------------------
+
+// A little hen, facing left. f = walk frame (0 standing, 1 and 2 stepping).
+function drawChicken(look, f) {
+  const b = new Bitmap(16, 16);
+  const body = [hex(look.dark || '#c9bfae'), hex(look.feather || '#ece6da'), hex(look.light || '#ffffff')];
+  const bob = f === 0 ? 0 : 1;
+  // tail feathers
+  b.ellipse(12, 7 + bob, 2.4, 2.6, body[0]);
+  b.set(13, 4 + bob, body[1]); b.set(14, 5 + bob, body[1]);
+  // body
+  b.ellipse(8.5, 9 + bob, 5, 3.6, body[1]);
+  b.ellipse(8, 8 + bob, 3.6, 2.2, body[2]);
+  b.ellipse(10, 9.5 + bob, 2.2, 1.6, body[0]); // wing
+  // head
+  b.ellipse(4.5, 5 + bob, 2.2, 2.2, body[1]);
+  b.set(4, 4 + bob, body[2]);
+  b.set(3, 4 + bob, hex('#1d1410')); // eye
+  b.rect(4, 2 + bob, 2, 1, hex('#d8322a')); b.set(5, 1 + bob, hex('#d8322a')); // comb
+  b.set(3, 7 + bob, hex('#d8322a')); // wattle
+  b.set(1, 5 + bob, hex('#f2a72e')); b.set(2, 5 + bob, hex('#f2a72e')); // beak
+  // legs
+  const leg = hex('#e89a2a');
+  const [l1, l2] = f === 1 ? [6, 10] : f === 2 ? [7, 9] : [7, 10];
+  for (const x of [l1, l2]) { b.set(x, 13, leg); b.set(x, 14, leg); b.set(x - 1, 14, leg); }
+  b.outline();
+  return b;
+}
+
+export function chickenFrames(look) {
+  const frames = { down: [], up: [], left: [], right: [] };
+  for (let f = 0; f < 3; f++) {
+    const c = drawChicken(look, f);
+    const left = sprite(c, 8, 15);
+    const right = sprite(mirror(c), 8, 15);
+    frames.left.push(left); frames.up.push(left);
+    frames.right.push(right); frames.down.push(right);
+  }
+  return frames;
+}

@@ -51,6 +51,7 @@ export function buildBrambleford() {
   rect(33, 24, 33, 24, GROUND.PATH);   // house B
   rect(16, 24, 16, 24, GROUND.PATH);   // your home
   rect(30, 26, 30, 27, GROUND.PATH);   // to the farm gate
+  rect(22, 26, 22, 27, GROUND.PATH);   // to the chicken pen gate
 
   // Pond with a sandy shore
   const pcx = 7.5, pcy = 30.6, prx = 4.2, pry = 2.4;
@@ -136,8 +137,17 @@ export function buildBrambleford() {
   for (let x = 29; x <= 37; x++) for (let y = 29; y <= 32; y++) if ((y - 29) % 2 === 0) one('crop', x, y, { blocks: false, ripe: x % 3 === 0 });
   one('scarecrow', 35, 30, { interact: ['A scarecrow in a battered hat. The crows seem unimpressed.'] });
 
+  // ---- Wyn's chicken pen, west of the farm, gate at (22, 27) --------------
+  for (let x = 18; x <= 26; x++) for (let y = 27; y <= 31; y++) {
+    const edge = x === 18 || x === 26 || y === 27 || y === 31;
+    if (edge && !(x === 22 && y === 27)) one('fence', x, y);
+  }
+  rect(22, 28, 22, 28, GROUND.DIRT);
+  one('crate', 25, 28, { interact: ['A chicken coop made from an old crate. There is straw and a feather inside.'] });
+  one('sign', 23, 26, { interact: ["WYN'S CHICKENS", 'Too many hens! Help yourself, but mind the cabbages.'] });
+
   // ---- Decoration ---------------------------------------------------------
-  for (const [x, y] of [[4, 9], [8, 6], [16, 6], [27, 6], [33, 5], [38, 7], [4, 21], [13, 29], [25, 29], [20, 30], [39, 22], [25, 22], [12, 22]]) {
+  for (const [x, y] of [[4, 9], [8, 6], [16, 6], [27, 6], [33, 5], [38, 7], [4, 21], [13, 29], [39, 22], [25, 22], [12, 22]]) {
     placeIfFree('tree', x, y, { variant: rng() < 0.5 ? 'oak' : 'pine' });
   }
   for (const [x, y] of [[10, 13], [17, 11], [26, 11], [34, 13], [5, 22], [11, 21], [30, 22], [36, 22], [13, 23], [19, 23]]) placeIfFree('bush', x, y);
@@ -146,6 +156,7 @@ export function buildBrambleford() {
   // Forest edge around the village (thickest at the border).
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
     if (x >= 19 && x <= 24 && y <= 6) continue; // keep the north road clear
+    if (x >= 16 && x <= 28 && y >= 32 && y <= 33) continue; // keep the chicken pen in view
     const d = Math.min(x, y, W - 1 - x, H - 1 - y);
     const chance = d <= 1 ? 1 : d === 2 ? 0.75 : d === 3 ? 0.35 : d === 4 ? 0.08 : 0;
     if (chance && rng() < chance) placeIfFree('tree', x, y, { variant: rng() < 0.6 ? 'pine' : 'oak' });
@@ -165,6 +176,13 @@ export function buildBrambleford() {
     exits: [
       { tiles: [{ x: 21, y: 0 }, { x: 22, y: 0 }], to: 'route1', at: { x: 16, y: 58 }, facing: Math.PI },
       ...exits, // shop and bank doors
+    ],
+    spawns: [
+      { enemy: 'chicken', x: 20, y: 29 },
+      { enemy: 'chicken', x: 23, y: 29 },
+      { enemy: 'chicken', x: 24, y: 30 },
+      { enemy: 'chicken', x: 19, y: 30 },
+      { enemy: 'chicken', x: 21, y: 30 },
     ],
   };
 }

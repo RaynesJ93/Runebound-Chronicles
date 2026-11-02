@@ -22,6 +22,7 @@ export const ITEMS = {
   bones: { name: 'Bones', value: 1, examine: 'Bones are for burying. (Prayer arrives in a later update.)' },
   bread: { name: 'Bread', value: 12, examine: 'Nice crusty bread.', food: { heal: 4 } },
   cookedTrout: { name: 'Trout', value: 30, examine: 'Some nicely cooked trout.', food: { heal: 7 } },
+  rawChicken: { name: 'Raw chicken', value: 4, examine: "I'd better cook this before eating it. (Cooking arrives with the next update.)" },
   meatPie: { name: 'Meat pie', value: 22, examine: 'A hearty pie. Still warm.', food: { heal: 6 } },
   vial: { name: 'Vial', value: 1, examine: 'An empty glass vial.' },
   airRune: { name: 'Air rune', stackable: true, value: 4, examine: 'One of the four basic elemental runes.' },
