@@ -8,6 +8,10 @@
 export const MAX_LEVEL = 99;
 export const MAX_XP = 200_000_000;
 
+// Every bit of XP in the game (combat, Hitpoints and every skill) is multiplied
+// by this. The XP numbers in the data files are the base rates.
+export const XP_RATE = 5;
+
 export const XP_TABLE = (() => {
   const t = [0, 0]; // t[L] = XP needed for level L (index 0 unused)
   let points = 0;
@@ -97,8 +101,9 @@ export class SkillBook {
   }
 
   // Adds XP (kept to one decimal place). Returns levels gained.
-  add(id, amount) {
-    if (!(amount > 0)) return 0;
+  add(id, base) {
+    if (!(base > 0)) return 0;
+    const amount = base * XP_RATE;
     const rec = this.state.skills[id] || (this.state.skills[id] = { xp: 0 });
     const before = levelForXp(rec.xp);
     rec.xp = Math.min(MAX_XP, Math.round((rec.xp + amount) * 10) / 10);
