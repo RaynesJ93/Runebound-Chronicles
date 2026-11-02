@@ -103,24 +103,30 @@ export class Input {
     return z;
   }
 
-  // The D-pad is a circle: direction comes from where your thumb is relative to
-  // its centre, so you can slide between directions without lifting.
+  // Virtual joystick: drag the knob. Eight directions, so you can walk
+  // diagonally; a small dead zone in the middle means "stand still".
   bindDpad(el) {
+    const knob = el.querySelector('.joy-knob');
     let active = null;
     const update = (e) => {
       const r = el.getBoundingClientRect();
-      const dx = e.clientX - (r.left + r.width / 2);
-      const dy = e.clientY - (r.top + r.height / 2);
-      if (Math.hypot(dx, dy) < r.width * 0.12) { this.dpadDir = null; el.dataset.dir = ''; return; }
-      const horiz = Math.abs(dx) > Math.abs(dy);
-      this.dpadDir = horiz ? { dx: Math.sign(dx), dy: 0 } : { dx: 0, dy: Math.sign(dy) };
-      el.dataset.dir = horiz ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+      const max = r.width * 0.32;
+      let dx = e.clientX - (r.left + r.width / 2);
+      let dy = e.clientY - (r.top + r.height / 2);
+      const len = Math.hypot(dx, dy);
+      if (len > max) { dx *= max / len; dy *= max / len; }
+      if (knob) knob.style.transform = `translate(${dx}px, ${dy}px)`;
+      if (len < r.width * 0.12) { this.dpadDir = null; return; }
+      const sector = Math.round(Math.atan2(dy, dx) / (Math.PI / 4));
+      const dirs = { 0: [1, 0], 1: [1, 1], 2: [0, 1], 3: [-1, 1], 4: [-1, 0], '-4': [-1, 0], '-3': [-1, -1], '-2': [0, -1], '-1': [1, -1] };
+      const [x, y] = dirs[sector];
+      this.dpadDir = { dx: x, dy: y };
     };
     const end = (e) => {
       if (active !== e.pointerId) return;
       active = null;
       this.dpadDir = null;
-      el.dataset.dir = '';
+      if (knob) knob.style.transform = '';
     };
     el.addEventListener('pointerdown', (e) => {
       e.preventDefault();

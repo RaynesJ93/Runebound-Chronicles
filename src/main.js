@@ -1,15 +1,10 @@
-import * as THREE from 'three';
 import { GAME_VERSION, BUILD_NAME } from './version.js';
 import { Ticker } from './core/tick.js';
 import { loadGame, saveGame, exportSave, importSave, wipeSave } from './core/save.js';
 import { Area, adjacentTo } from './world/area.js';
 import { findPath } from './world/pathfinding.js';
 import { buildBrambleford } from '../data/areas/brambleford.js';
-import { createRenderer, ZOOM_MIN, ZOOM_MAX } from './render/renderer.js';
-import { buildTerrain } from './render/terrain.js';
-import { buildProps } from './render/props.js';
-import { createHumanoid } from './render/characters.js';
-import { createMarker } from './render/marker.js';
+import { createWorldView } from './render/world2d.js';
 import { PlayerController } from './entities/player.js';
 import { Input } from './input/input.js';
 import { Hud } from './ui/hud.js';
@@ -30,33 +25,20 @@ function boot() {
   const area = new Area(buildBrambleford());
   if (!area.isWalkable(state.player.x, state.player.y)) Object.assign(state.player, area.spawn);
 
-  let view;
-  try {
-    view = createRenderer(canvas);
-  } catch (err) {
-    console.error(err);
-    fail('Your browser could not start 3D graphics (WebGL). Try updating it, or turn off Low Power Mode.');
-    return;
-  }
-  const { scene, rig, camera } = view;
-  const terrain = buildTerrain(area);
-  const props = buildProps(area);
-  scene.add(terrain.group, props.group);
-
-  const marker = createMarker();
-  scene.add(marker.object);
-
-  const playerModel = createHumanoid();
-  scene.add(playerModel.root);
-
+  const view = createWorldView(canvas, area);
   const player = new PlayerController(area, state);
   const hud = new Hud(document.getElementById('ui'));
   const input = new Input(canvas);
   input.bindDpad(hud.el.dpad);
 
-  rig.distance = THREE.MathUtils.clamp(state.settings.zoom || 16, ZOOM_MIN, ZOOM_MAX);
-  const start = player.worldPosition();
-  rig.target.set(start.x, 0, start.z);
+  // Tiles you can tap to look at something: props with text, and every tile
+  // of a building (which opens its door text).
+  const lookup = new Map();
+  for (const p of area.props) if (p.interact) for (const t of p.tiles) lookup.set(area.idx(t.x, t.y), p);
+  for (const b of area.buildings) {
+    const door = area.props.find((p) => p.type === 'door' && p.building === b.id);
+    for (let y = b.y - 1; y < b.y + b.h; y++) for (let x = b.x; x < b.x + b.w; x++) if (area.inBounds(x, y) && (y >= b.y || !area.isWalkable(x, y))) lookup.set(area.idx(x, y), door);
+  }
 
   // ---- Saving --------------------------------------------------------------
   let lastSaved = loaded ? Date.now() : 0;
@@ -82,10 +64,9 @@ function boot() {
     const s = state.settings;
     hud.setDpadVisible(s.dpad === 'on' || (s.dpad === 'auto' && coarse));
     hud.el.setDpad.textContent = DPAD_LABEL[s.dpad] || 'Auto';
-    hud.el.setShadows.textContent = s.shadows ? 'On' : 'Off';
-    view.setShadows(s.shadows);
+    s.zoomStep = view.setZoomStep(s.zoomStep || 0);
+    hud.el.zoomVal.textContent = s.zoomStep > 0 ? `+${s.zoomStep}` : String(s.zoomStep);
   };
-  applySettings();
   hud.el.version.textContent = `RuneBound Chronicles v${GAME_VERSION} · ${BUILD_NAME}`;
   hud.onSettingsOpen = () => { hud.el.saveStatus.textContent = describeSave(); };
 
@@ -94,10 +75,10 @@ function boot() {
     state.settings.dpad = order[(order.indexOf(state.settings.dpad) + 1) % order.length];
     applySettings();
   });
-  hud.el.setShadows.addEventListener('click', () => {
-    state.settings.shadows = !state.settings.shadows;
-    applySettings();
-  });
+  const zoomBy = (d) => { state.settings.zoomStep = (state.settings.zoomStep || 0) + d; applySettings(); };
+  hud.$('zoom-in').addEventListener('click', () => zoomBy(1));
+  hud.$('zoom-out').addEventListener('click', () => zoomBy(-1));
+
   hud.$('save-now').addEventListener('click', () => {
     hud.toast(save() ? 'Game saved.' : "Couldn't save — storage may be full or blocked.");
     hud.el.saveStatus.textContent = describeSave();
@@ -147,19 +128,13 @@ function boot() {
   });
 
   // ---- Movement and interaction -------------------------------------------
-  const raycaster = new THREE.Raycaster();
-  const ndc = new THREE.Vector2();
+  let marker = null;
 
   const walkTo = (tx, ty) => {
     const s = player.pathStart;
     const path = findPath(area, s.x, s.y, (x, y) => x === tx && y === ty, { x: tx, y: ty });
     player.setPath(path);
-    if (path && path.length) {
-      const end = path.at(-1);
-      marker.show(end.x, end.y);
-    } else {
-      marker.hide();
-    }
+    marker = path && path.length ? path.at(-1) : null;
   };
 
   const interactWith = (prop) => {
@@ -168,8 +143,7 @@ function boot() {
     const path = isGoal(s.x, s.y) ? [] : findPath(area, s.x, s.y, isGoal);
     if (!path) { hud.message("I can't reach that."); return; }
     player.setPath(path, { prop, isGoal });
-    if (path.length) marker.show(path.at(-1).x, path.at(-1).y);
-    else marker.hide();
+    marker = path.length ? path.at(-1) : null;
   };
 
   const firstMove = () => {
@@ -182,24 +156,12 @@ function boot() {
   input.onTap = (sx, sy) => {
     if (hud.dialogOpen) { hud.advanceDialog(); return; }
     if (hud.settingsOpen) return;
-    const rect = canvas.getBoundingClientRect();
-    ndc.set(((sx - rect.left) / rect.width) * 2 - 1, -((sy - rect.top) / rect.height) * 2 + 1);
-    raycaster.setFromCamera(ndc, camera);
-    const hits = raycaster.intersectObjects([...props.interactables, terrain.ground], false);
-    if (!hits.length) return;
-    const hit = hits[0];
-    if (hit.object.userData.prop) { interactWith(hit.object.userData.prop); firstMove(); return; }
-    const tx = Math.floor(hit.point.x);
-    const ty = Math.floor(hit.point.z);
-    if (!area.inBounds(tx, ty)) return;
-    walkTo(tx, ty);
+    const t = view.screenToTile(sx, sy);
+    if (!area.inBounds(t.x, t.y)) return;
+    const prop = lookup.get(area.idx(t.x, t.y));
+    if (prop) interactWith(prop);
+    else walkTo(t.x, t.y);
     firstMove();
-  };
-
-  input.onKey = (e) => {
-    if (e.code === 'KeyR') toggleRun();
-    else if (e.code === 'Escape') { if (hud.dialogOpen) hud.advanceDialog(); else if (hud.settingsOpen) hud.closeSettings(); }
-    else if ((e.code === 'Space' || e.code === 'Enter') && hud.dialogOpen) { e.preventDefault(); hud.advanceDialog(); }
   };
 
   const toggleRun = () => {
@@ -208,13 +170,21 @@ function boot() {
   };
   hud.el.runOrb.addEventListener('click', toggleRun);
 
+  input.onKey = (e) => {
+    if (e.code === 'KeyR') toggleRun();
+    else if (e.code === 'Equal' || e.code === 'NumpadAdd') zoomBy(1);
+    else if (e.code === 'Minus' || e.code === 'NumpadSubtract') zoomBy(-1);
+    else if (e.code === 'Escape') { if (hud.dialogOpen) hud.advanceDialog(); else if (hud.settingsOpen) hud.closeSettings(); }
+    else if ((e.code === 'Space' || e.code === 'Enter') && hud.dialogOpen) { e.preventDefault(); hud.advanceDialog(); }
+  };
+
   player.onInteract = (prop) => {
-    marker.hide();
+    marker = null;
     if (prop.interact) hud.showDialog(prop.interact);
   };
   player.onRunEmpty = () => hud.message("You're out of run energy.");
   player.onStep = () => {
-    if (!player.path.length && !player.moving) marker.hide();
+    if (!player.path.length) marker = null;
   };
 
   // ---- Ticks ----------------------------------------------------------------
@@ -226,50 +196,41 @@ function boot() {
   });
 
   // ---- Frame loop -------------------------------------------------------------
+  let zoomAcc = 0;
   let last = performance.now();
+  let time = 0;
   const frame = (now) => {
-    const dt = Math.min(0.25, (now - last) / 1000);
+    const dt = Math.max(0, Math.min(0.25, (now - last) / 1000));
     last = now;
+    time += dt;
 
-    const zoom = input.consumeZoom();
-    if (zoom) {
-      rig.distance = THREE.MathUtils.clamp(rig.distance + zoom, ZOOM_MIN, ZOOM_MAX);
-      state.settings.zoom = Math.round(rig.distance * 10) / 10;
+    // Wheel and pinch: positive = zoom out. One whole step at a time.
+    zoomAcc += input.consumeZoom();
+    if (Math.abs(zoomAcc) >= 1) {
+      zoomBy(zoomAcc > 0 ? -1 : 1);
+      zoomAcc = 0;
     }
 
     const blocked = hud.dialogOpen || hud.settingsOpen;
     const dir = blocked ? null : input.heldDir();
-    if (dir) { marker.hide(); firstMove(); }
+    if (dir) { marker = null; firstMove(); }
     ticker.update(dt);
     player.update(dt, dir);
 
-    const wp = player.worldPosition();
-    const ground = terrain.heightAt(wp.x, wp.z);
-    playerModel.root.position.set(wp.x, Math.max(0, ground), wp.z);
-    playerModel.root.rotation.y = player.facing;
-    playerModel.animate(dt, player.moving, player.stepRunning);
-
-    const follow = 1 - Math.exp(-dt * 9);
-    rig.target.x += (wp.x - rig.target.x) * follow;
-    rig.target.z += (wp.z - rig.target.z) * follow;
-    view.updateCamera();
-
-    marker.update(dt);
+    view.render(player, { time, steps: state.stats.tilesWalked, marker });
     hud.setRun(state.run.on, state.run.energy);
-    view.render();
     requestAnimationFrame(frame);
   };
 
-  view.resize();
-  window.addEventListener('resize', view.resize);
-  window.addEventListener('orientationchange', () => setTimeout(view.resize, 200));
-  view.updateCamera();
+  const onResize = () => { view.resize(); applySettings(); };
+  onResize();
+  window.addEventListener('resize', onResize);
+  window.addEventListener('orientationchange', () => setTimeout(onResize, 200));
   requestAnimationFrame(frame);
 
   document.getElementById('loading')?.classList.add('done');
   setTimeout(() => hud.showArea(area.name), 400);
-  if (!loaded) setTimeout(() => hud.message('Welcome to RuneBound Chronicles.'), 900);
-  else setTimeout(() => hud.message('Welcome back.'), 900);
+  setTimeout(() => hud.message(loaded ? 'Welcome back.' : 'Welcome to RuneBound Chronicles.'), 900);
   if (!state.flags.seenMoveHint) {
     hud.showHint(coarse ? 'Tap the ground to walk · tap signs and doors to look' : 'Click to walk, or use WASD / arrow keys · R toggles run');
   }

@@ -9,16 +9,25 @@
 
 import { defaultState } from './state.js';
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 
 const SLOT_KEYS = ['rbc.save.0', 'rbc.save.1'];
 const LAST_KEY = 'rbc.save.last';
 const CODE_PREFIX = 'RBC1:';
 
 // migrations[n] turns a version-n save into a version-(n+1) save.
-// Example for a future change:
-//   1: (d) => { d.player.hp = 10; return d; },
-const migrations = {};
+const migrations = {
+  // v1 -> v2: the 3D camera distance and shadow toggle were replaced by
+  // pixel-art zoom steps when the game switched to 2D.
+  1: (d) => {
+    const s = d.settings || {};
+    delete s.zoom;
+    delete s.shadows;
+    s.zoomStep = 0;
+    d.settings = s;
+    return d;
+  },
+};
 
 function fnv(str) {
   let h = 0x811c9dc5;

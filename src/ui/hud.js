@@ -17,13 +17,13 @@ export class Hud {
       </div>
       <div class="hud-bottom-right">
         <button class="run-orb ui" id="run-orb" aria-label="Toggle run">
-          <span class="run-ring"></span>
-          <span class="run-inner">${BOOT_SVG}<span class="run-val" id="run-val">100</span></span>
+          <span class="run-icon">${BOOT_SVG}</span>
+          <span class="run-bar"><span class="run-fill"></span></span>
+          <span class="run-val" id="run-val">100</span>
         </button>
       </div>
-      <div class="dpad ui hidden" id="dpad" aria-label="Movement pad">
-        <span class="dp up"></span><span class="dp right"></span><span class="dp down"></span><span class="dp left"></span>
-        <span class="dp-nub"></span>
+      <div class="dpad ui hidden" id="dpad" aria-label="Movement joystick">
+        <span class="joy-knob"></span>
       </div>
       <div class="hint hidden" id="hint"></div>
       <div class="dialog ui hidden" id="dialog" role="dialog">
@@ -34,8 +34,8 @@ export class Hud {
         <div class="panel" role="dialog" aria-label="Settings">
           <div class="panel-head"><h2>Settings</h2><button class="close-btn" data-close aria-label="Close">✕</button></div>
           <div class="panel-body">
-            <div class="row"><span>On-screen D-pad</span><button class="chip" id="set-dpad"></button></div>
-            <div class="row"><span>Shadows</span><button class="chip" id="set-shadows"></button></div>
+            <div class="row"><span>On-screen joystick</span><button class="chip" id="set-dpad"></button></div>
+            <div class="row"><span>Zoom</span><span class="zoom-ctl"><button class="chip sq" id="zoom-out" aria-label="Zoom out">−</button><span id="zoom-val">0</span><button class="chip sq" id="zoom-in" aria-label="Zoom in">+</button></span></div>
             <h3>Your save</h3>
             <p class="muted" id="save-status">Your game saves automatically.</p>
             <div class="btn-grid">
@@ -62,7 +62,7 @@ export class Hud {
       banner: $('area-banner'), messages: $('messages'), runOrb: $('run-orb'), runVal: $('run-val'),
       dpad: $('dpad'), hint: $('hint'), dialog: $('dialog'), dialogText: $('dialog-text'),
       settings: $('settings'), toast: $('toast'), saveStatus: $('save-status'),
-      setDpad: $('set-dpad'), setShadows: $('set-shadows'), importBox: $('import-box'), importText: $('import-text'),
+      setDpad: $('set-dpad'), zoomVal: $('zoom-val'), importBox: $('import-box'), importText: $('import-text'),
       version: $('version'),
     };
     this.$ = $;
