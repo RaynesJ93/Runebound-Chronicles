@@ -14,6 +14,8 @@ import { Hud } from './ui/hud.js';
 import { Enemy } from './entities/enemy.js';
 import { ENEMIES } from '../data/enemies.js';
 import { Combat } from './combat/combat.js';
+import { SkillBook, SKILL_NAME } from './skills/skills.js';
+import { maxHit, effectiveLevel } from './combat/formulas.js';
 
 const AUTOSAVE_TICKS = 50; // 30 seconds
 
@@ -63,9 +65,27 @@ function boot() {
   let time = 0;
   let dying = false;
 
+  // ---- Skills ----------------------------------------------------------------
+  let levelUpAt = -99;
+  let refreshSkills = () => {};
+  const book = new SkillBook(state, {
+    xp: (id, amount) => hud.xpDrop(id, amount),
+    levelUp: (id, level, before) => {
+      const name = SKILL_NAME[id];
+      const oldCombat = combat.levelFrom(id, before);
+      hud.levelUp(id, name, level);
+      hud.message(`Congratulations, your ${name} level is now ${level}.`);
+      if (id === 'hitpoints') state.player.hp = Math.min(level, state.player.hp + (level - before));
+      if (combat.level > oldCombat) hud.message(`Your combat level is now ${combat.level}.`);
+      levelUpAt = time;
+      refreshSkills();
+      save();
+    },
+  });
+
   // ---- Combat ----------------------------------------------------------------
   const combat = new Combat({
-    state, player, rng,
+    state, player, rng, skills: book,
     on: {
       message: (t) => hud.message(t),
       cantReach: () => hud.message("I can't reach that."),
@@ -112,10 +132,29 @@ function boot() {
     state.settings.dpad = order[(order.indexOf(state.settings.dpad) + 1) % order.length];
     applySettings();
   });
-  hud.el.setRetaliate.addEventListener('click', () => {
+  const toggleRetaliate = () => {
     state.settings.autoRetaliate = state.settings.autoRetaliate === false;
     applySettings();
-  });
+    refreshSkills();
+  };
+  hud.el.setRetaliate.addEventListener('click', toggleRetaliate);
+  hud.$('set-retaliate2').addEventListener('click', toggleRetaliate);
+
+  // Skills panel: levels, progress, and the Combat tab with attack styles.
+  refreshSkills = () => {
+    if (!hud.skillsOpen) return;
+    hud.renderSkills(book, combat.level);
+    const style = combat.style;
+    const lv = combat.skills;
+    const max = maxHit(effectiveLevel(lv.strength, style.bonus.strength || 0), 0);
+    hud.renderStyles(style.id, state.settings.autoRetaliate !== false, `Max hit: ${max} · Combat level: ${combat.level} · Fighting unarmed (weapons arrive in Batch 6).`);
+  };
+  hud.onSkillsOpen = () => refreshSkills();
+  hud.onStylePick = (id) => {
+    state.settings.attackStyle = id;
+    hud.message(`Attack style: ${combat.style.name} (trains ${combat.style.trains}).`);
+    refreshSkills();
+  };
   const zoomBy = (d) => { state.settings.zoomStep = (state.settings.zoomStep || 0) + d; applySettings(); };
   hud.$('zoom-in').addEventListener('click', () => zoomBy(1));
   hud.$('zoom-out').addEventListener('click', () => zoomBy(-1));
@@ -326,7 +365,8 @@ function boot() {
     if (e.code === 'KeyR') toggleRun();
     else if (e.code === 'Equal' || e.code === 'NumpadAdd') zoomBy(1);
     else if (e.code === 'Minus' || e.code === 'NumpadSubtract') zoomBy(-1);
-    else if (e.code === 'Escape') { if (hud.dialogOpen) hud.advanceDialog(); else if (hud.settingsOpen) hud.closeSettings(); }
+    else if (e.code === 'Escape') { if (hud.dialogOpen) hud.advanceDialog(); else if (hud.settingsOpen) { hud.closeSettings(); hud.closeSkills(); } }
+    else if (e.code === 'KeyK' && !hud.dialogOpen) { if (hud.skillsOpen) hud.closeSkills(); else hud.openSkills('skills'); }
     else if ((e.code === 'Space' || e.code === 'Enter') && hud.dialogOpen) { e.preventDefault(); hud.advanceDialog(); }
     else if (hud.dialogOpen && /^(Digit|Numpad)[1-9]$/.test(e.code)) hud.pickChoice(Number(e.code.slice(-1)) - 1);
   };
@@ -388,9 +428,9 @@ function boot() {
     for (const npc of npcs) npc.update(dt);
     for (const e of enemies) e.update(dt);
 
-    view.render(player, { time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat });
+    view.render(player, { time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt });
     hud.setHp(state.player.hp, combat.maxHp);
-    hud.setTarget(combat.target || enemies.find((e) => !e.dead && e.state === 'fight') || null);
+    hud.setTarget(combat.target || enemies.find((e) => !e.dead && e.state === 'fight') || null, combat.level);
     hud.setRun(state.run.on, state.run.energy);
     requestAnimationFrame(frame);
   };
@@ -413,7 +453,7 @@ function boot() {
   window.RBC = {
     state, player, save, hud, version: GAME_VERSION,
     get area() { return area; }, get view() { return view; }, get npcs() { return npcs; },
-    get enemies() { return enemies; }, combat,
+    get enemies() { return enemies; }, combat, book,
   };
 }
 

@@ -268,6 +268,20 @@ export function createWorldView(canvasEl, area) {
       ctx.globalAlpha = 1;
     }
 
+    // Level-up sparkles spiralling out around the player.
+    const lu = opts.levelUpAt ?? -99;
+    if (time - lu < 1.5) {
+      const k = (time - lu) / 1.5;
+      ctx.globalAlpha = 1 - k;
+      for (let i = 0; i < 14; i++) {
+        const ang = (i / 14) * Math.PI * 2 + k * 3;
+        const r = 7 + k * 18;
+        ctx.fillStyle = i % 2 ? '#ffe14a' : '#fff6cf';
+        ctx.fillRect(Math.round(pObj.fx + Math.cos(ang) * r), Math.round(pObj.fy - 12 + Math.sin(ang) * r * 0.7 - k * 10), 2, 2);
+      }
+      ctx.globalAlpha = 1;
+    }
+
     // Health bars (for a few seconds after being hit) and damage splats, on top.
     if (combat) {
       if (time - combat.playerLastHit < 6) healthBar(pObj.fx, pObj.fy, combat.hp, combat.maxHp);

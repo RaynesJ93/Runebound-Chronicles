@@ -1,6 +1,11 @@
 // The on-screen interface: area name banner, game messages, run orb,
 // D-pad, dialogue box and the settings panel (with save backup tools).
 
+import { iconUrl } from '../render/icons.js';
+import { SKILLS, MELEE_STYLES, xpForLevel, MAX_LEVEL } from '../skills/skills.js';
+
+const fmt = (n) => Math.floor(n).toLocaleString('en-GB');
+
 const GEAR_SVG = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.2 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>';
 const HEART_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 21 3.5 12.6A5.2 5.2 0 0 1 12 6.2a5.2 5.2 0 0 1 8.5 6.4z"/></svg>';
 const BOOT_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M7 3h5v8l6 3c1.7.8 3 2.4 3 4.3V20H4v-3l3-1z"/></svg>';
@@ -14,7 +19,33 @@ export class Hud {
         <div class="messages" id="messages" aria-live="polite"></div>
       </div>
       <div class="hud-top-right">
+        <button class="icon-btn ui" id="btn-skills" aria-label="Skills"><img class="px" src="${iconUrl('attack')}" alt=""></button>
         <button class="icon-btn ui" id="btn-settings" aria-label="Settings">${GEAR_SVG}</button>
+        <div class="xp-drops" id="xp-drops" aria-hidden="true"></div>
+      </div>
+      <div class="levelup hidden" id="levelup" role="status">
+        <img class="px" id="levelup-icon" alt="">
+        <div><div class="levelup-title">Level up!</div><div id="levelup-text"></div></div>
+      </div>
+      <div class="panel-backdrop ui hidden" id="skills">
+        <div class="panel" role="dialog" aria-label="Skills">
+          <div class="panel-head">
+            <div class="tabs"><button class="tab on" data-tab="skills">Skills</button><button class="tab" data-tab="combat">Combat</button></div>
+            <button class="close-btn" data-close aria-label="Close">✕</button>
+          </div>
+          <div class="panel-body">
+            <div data-pane="skills">
+              <div class="skill-grid" id="skill-grid"></div>
+              <div class="skill-foot" id="skill-foot"></div>
+            </div>
+            <div data-pane="combat" class="hidden">
+              <p class="muted">Pick how you fight. Each style gives a small bonus and decides which skill your XP goes to.</p>
+              <div class="style-list" id="style-list"></div>
+              <div class="row"><span>Auto retaliate</span><button class="chip" id="set-retaliate2"></button></div>
+              <p class="muted small" id="combat-stats"></p>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="target hidden" id="target" aria-live="polite">
         <div class="target-name" id="target-name"></div>
@@ -88,6 +119,15 @@ export class Hud {
     this.onDialogClose = null;
 
     $('btn-settings').addEventListener('click', () => this.openSettings());
+    $('btn-skills').addEventListener('click', () => this.openSkills());
+    this.el.skills = $('skills');
+    this.el.skills.addEventListener('click', (e) => {
+      if (e.target === this.el.skills || e.target.closest('[data-close]')) this.closeSkills();
+      const tab = e.target.closest('[data-tab]');
+      if (tab) this.showTab(tab.dataset.tab);
+      const st = e.target.closest('[data-style]');
+      if (st) this.onStylePick?.(st.dataset.style);
+    });
     this.el.settings.addEventListener('click', (e) => {
       if (e.target === this.el.settings || e.target.closest('[data-close]')) this.closeSettings();
     });
@@ -99,7 +139,83 @@ export class Hud {
   }
 
   get settingsOpen() {
-    return !this.el.settings.classList.contains('hidden');
+    return !this.el.settings.classList.contains('hidden') || !this.el.skills.classList.contains('hidden');
+  }
+
+  get skillsOpen() {
+    return !this.el.skills.classList.contains('hidden');
+  }
+
+  // ---- Skills panel ------------------------------------------------------------
+  openSkills(tab) {
+    this.el.skills.classList.remove('hidden');
+    if (tab) this.showTab(tab);
+    this.onSkillsOpen?.();
+  }
+
+  closeSkills() {
+    this.el.skills.classList.add('hidden');
+  }
+
+  showTab(name) {
+    for (const t of this.el.skills.querySelectorAll('[data-tab]')) t.classList.toggle('on', t.dataset.tab === name);
+    for (const p of this.el.skills.querySelectorAll('[data-pane]')) p.classList.toggle('hidden', p.dataset.pane !== name);
+    this.onSkillsOpen?.();
+  }
+
+  // book: SkillBook. Draws every skill with its level and progress to the next.
+  renderSkills(book, combatLevel) {
+    const grid = this.$('skill-grid');
+    grid.innerHTML = SKILLS.map((sk) => {
+      const xp = book.xp(sk.id);
+      const lvl = book.level(sk.id);
+      const lo = xpForLevel(lvl);
+      const hi = xpForLevel(lvl + 1);
+      const pct = lvl >= MAX_LEVEL ? 100 : Math.floor((100 * (xp - lo)) / (hi - lo));
+      const next = lvl >= MAX_LEVEL ? 'Maxed!' : `${fmt(hi - xp)} XP to level ${lvl + 1}`;
+      return `<div class="skill" title="${sk.about} (${fmt(xp)} XP)">
+        <img class="px" src="${iconUrl(sk.id)}" alt="">
+        <div class="skill-main">
+          <div class="skill-top"><span class="skill-name">${sk.name}</span><span class="skill-lvl">${lvl}</span></div>
+          <div class="skill-bar"><span style="width:${pct}%"></span></div>
+          <div class="skill-xp">${next}</div>
+        </div>
+      </div>`;
+    }).join('');
+    this.$('skill-foot').innerHTML = `<span>Combat level <b>${combatLevel}</b></span><span>Total level <b>${book.total()}</b></span>`;
+  }
+
+  renderStyles(currentId, retaliate, stats) {
+    this.$('style-list').innerHTML = MELEE_STYLES.map((st) => `
+      <button class="style ${st.id === currentId ? 'on' : ''}" data-style="${st.id}" aria-pressed="${st.id === currentId}">
+        <img class="px" src="${iconUrl(st.id)}" alt="">
+        <span><b>${st.name}</b><small>Trains ${st.trains}</small></span>
+      </button>`).join('');
+    this.$('set-retaliate2').textContent = retaliate ? 'On' : 'Off';
+    this.$('combat-stats').textContent = stats;
+  }
+
+  // Floating "+20" with the skill's icon, near the top-right.
+  xpDrop(skill, amount) {
+    const box = this.$('xp-drops');
+    const d = document.createElement('div');
+    d.className = 'xp-drop';
+    const n = amount >= 10 ? Math.round(amount) : Math.round(amount * 10) / 10;
+    d.innerHTML = `<img class="px" src="${iconUrl(skill)}" alt=""><span>+${n}</span>`;
+    box.appendChild(d);
+    while (box.children.length > 6) box.firstChild.remove();
+    setTimeout(() => d.remove(), 1700);
+  }
+
+  levelUp(skillId, skillName, level) {
+    const el = this.$('levelup');
+    this.$('levelup-icon').src = iconUrl(skillId);
+    this.$('levelup-text').textContent = `Your ${skillName} level is now ${level}.`;
+    el.classList.remove('hidden', 'pop');
+    void el.offsetWidth;
+    el.classList.add('pop');
+    clearTimeout(this.levelTimer);
+    this.levelTimer = setTimeout(() => el.classList.add('hidden'), 3600);
   }
 
   openSettings() {
@@ -156,10 +272,13 @@ export class Hud {
   }
 
   // Who you're fighting: name, level and health.
-  setTarget(enemy) {
+  // playerLevel colours the name: green = weaker than you, yellow = close, red = stronger.
+  setTarget(enemy, playerLevel = 3) {
     const el = this.el.target;
     if (!enemy) { if (!el.classList.contains('hidden')) el.classList.add('hidden'); return; }
     el.classList.remove('hidden');
+    const diff = enemy.def.level - playerLevel;
+    el.dataset.diff = diff <= -3 ? 'easy' : diff >= 3 ? 'hard' : 'even';
     const name = `${enemy.name}  (level ${enemy.def.level})`;
     if (this.el.targetName.textContent !== name) this.el.targetName.textContent = name;
     this.el.targetFill.style.width = `${(100 * enemy.hp) / enemy.maxHp}%`;

@@ -19,13 +19,14 @@ There are no turn-based battles, no battle screens and no creature catching. You
 - **iPhone:** tap to walk, or use the on-screen joystick. Pinch to zoom. For full-screen play, open the link in Safari, tap Share, then **Add to Home Screen**.
 - Tap or click people to talk to them, and signs, doors and other objects to look at them. Number keys pick answers on desktop.
 - Head north out of the village to reach Route 1 — Thornwood Forest.
+- Open **Skills** (sword button, or K) to see your levels. The **Combat** tab chooses your attack style: Accurate trains Attack, Aggressive trains Strength, Defensive trains Defence, Controlled trains all three.
 - Tap or click a goblin to attack it. Your character walks up and fights automatically. Tap the ground or move to stop. Beware the Goblin Brute by the tents: it attacks on sight.
 
 ## Status
 
-**v0.4.0 — Batches 0–3 done:** the village of Brambleford and Route 1 (Thornwood Forest), 8 villagers with branching conversations, and real-time overworld combat against goblins — damage splats, health bars, chasing, retreating and respawning. Plus Emerald-style movement, run energy, and local saving with backup codes.
+**v0.5.0 — Batches 0–4 done:** the village of Brambleford and Route 1 (Thornwood Forest), 8 villagers with branching conversations, real-time overworld combat against goblins, and combat skills that level to 99 on the OSRS XP curve, with attack styles, XP drops and a skills panel. Plus Emerald-style movement, run energy, and local saving with backup codes.
 
-Next: **Batch 4** — combat skills and XP, levelling to 99 (see the [roadmap](docs/ROADMAP.md)).
+Next: **Batch 5** — loot drops, picking items up, and a 28-slot inventory (see the [roadmap](docs/ROADMAP.md)).
 
 ## Running it locally
 
@@ -46,6 +47,7 @@ then visit http://localhost:8000.
 | `src/render` | Pixel-art sprites drawn in code, ground, buildings, camera and depth sorting |
 | `src/entities` | The player's movement, villagers (NPCs) and enemies |
 | `src/combat` | Combat formulas and the tick-based fighting system |
+| `src/skills` | XP curve, levels, attack styles |
 | `src/input` | Keyboard, mouse, touch, pinch and D-pad |
 | `src/ui` | On-screen interface: banner, messages, run orb, dialogue, settings |
 | `data/areas` | Map data for each area |
