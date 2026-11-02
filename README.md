@@ -31,7 +31,7 @@ There are no turn-based battles, no battle screens and no creature catching. You
 
 **v0.10.0 — the first playable version (Phase 1 complete).** The village of Brambleford and Route 1 (Thornwood Forest), 8 villagers with branching conversations, real-time overworld combat against goblins and wolves with melee, bows and magic, six combat skills to 99 on the OSRS XP curve, loot with rare drops, a 28-slot inventory, 11 equipment slots, a walk-in bank and General Store, food, potions and gravestones. Built for iPhone as much as desktop: long-press menus, large tap targets, a battery saver, and saves that survive every update.
 
-Next: **Phase 1.5 — Gear and progression**: the full gear ladder (Copper to Starmetal, Pine to Starwood, hides, cloth, runes and spells) with RuneBound's own names, then **Phase 2 — Skilling** (see the [roadmap](docs/ROADMAP.md)).
+Next: **Phase 2 — Skilling**, starting with Woodcutting and Fletching (see the [roadmap](docs/ROADMAP.md)).
 
 ## Running it locally
 
