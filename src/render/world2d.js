@@ -47,6 +47,8 @@ function getLib() {
     ore: Object.fromEntries(['copper', 'tin', 'iron'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
     oreEmpty: [S.oreRock(null, 131), S.oreRock(null, 132)],
     furnace: S.furnace(),
+    fishingSpot: [S.fishingSpot(0), S.fishingSpot(1)],
+    cookingPit: [S.cookingPit(0), S.cookingPit(1)],
     anvil: S.anvil(),
     rubble: [S.rubble(141), S.rubble(142), S.rubble(143)],
     treeShadow: S.shadow(15, 4),
@@ -131,6 +133,9 @@ export function createWorldView(canvasEl, area) {
         break;
       }
       case 'furnace': place(lib.furnace, f.x, f.y + 1); break;
+      // Ripples sit flat on the water, under anyone standing nearby.
+      case 'fishingSpot': place(lib.fishingSpot[0], f.x, f.y - 2, { frames: lib.fishingSpot, rate: 1.6, sortY: p.y * TILE }); break;
+      case 'cookingPit': place(lib.cookingPit[0], f.x, f.y, { frames: lib.cookingPit }); break;
       case 'anvil': place(lib.anvil, f.x, f.y); break;
       case 'rubble': { const spr = pick(lib.rubble, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
       case 'rug': decals.push({ img: lib.rug.img, x: (p.x + 0.5) * TILE - lib.rug.ax, y: (p.y + 0.5) * TILE - lib.rug.ay }); break;
@@ -319,7 +324,7 @@ export function createWorldView(canvasEl, area) {
         ctx.drawImage(st.img, Math.round(o.fx - st.ax), Math.round(o.fy - st.ay));
         continue;
       }
-      if (o.frames) o.img = o.frames[flicker].img;
+      if (o.frames) o.img = o.frames[o.rate ? Math.floor(time * o.rate) % 2 : flicker].img;
       const behind = o.fade && o.sortY > pObj.sortY &&
         pObj.x + 12 > o.x + 6 && pObj.x + 4 < o.x + o.w - 6 && pObj.y + 4 < o.y + o.h - 10 && pObj.y + pObj.h > o.y;
       if (behind) ctx.globalAlpha = 0.5;

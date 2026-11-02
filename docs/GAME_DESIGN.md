@@ -337,7 +337,7 @@ Dying in tutorial or story-critical fights never costs items.
 
 ## 9. Skilling, crafting, quests and long-term progression
 
-Woodcutting, Fletching, Mining and Smithing are in the game (v0.12.0). The rest are planned, and listed so the systems built now leave room for them.
+Woodcutting, Fletching, Mining, Smithing, Fishing and Cooking are in the game (v0.13.0). The rest are planned, and listed so the systems built now leave room for them.
 
 ### Woodcutting and Fletching (shipped in v0.11.0)
 
@@ -404,13 +404,37 @@ Dorrin gives you a bronze pickaxe and a hammer when you ask him to teach you; Pe
 
 New gear: iron sword, iron med helm, bronze and iron sq shields, bronze and iron chainbodies (iron needs Attack/Defence 5), and iron arrows (ranged strength 10; Fletching 15 from iron arrowtips). Shields show their metal on your character.
 
+### Fishing and Cooking (shipped in v0.13.0)
+
+**Fishing.** Tap a fishing spot (ripples on the water) to fish from the bank until your bag is full. An attempt every 5 ticks (3 s). Each spot is fished one way:
+
+| Spot | Where | Needs | Catches |
+| --- | --- | --- | --- |
+| Net | Brambleford pond | Small fishing net | Shrimps (level 1, 10 XP), anchovies (15, 40 XP) |
+| Bait | Brambleford pond, Route 1 stream | Fishing rod + 1 fishing bait per fish | Sardines (5, 20 XP), herring (10, 30 XP) |
+| Lure | Route 1 stream (north bank) | Fly fishing rod + 1 feather per fish | Trout (20, 50 XP), salmon (30, 70 XP) |
+
+Each attempt tries the best fish you can catch first (its chance rises 1% a level above it), then the next one down. **Old Finn** by the pond gives you a net, a rod and 30 bait; Pell sells all three rods and nets, and bait. Chickens are a good source of feathers for lure fishing.
+
+**Cooking.** Tap the cooking pit by the pond, or the goblins' campfire on Route 1, and pick what to cook; it keeps going until that food runs out. At the level you can first cook something, half of it burns; that drops evenly until the "stops burning" level. Burnt food is ruined and gives no XP.
+
+| Food | Level | XP | Heals | Stops burning |
+| --- | --- | --- | --- | --- |
+| Shrimps | 1 | 30 | 3 | 34 |
+| Chicken | 1 | 30 | 3 | 34 |
+| Anchovies | 1 | 30 | 1 | 34 |
+| Sardine | 1 | 40 | 4 | 38 |
+| Herring | 5 | 50 | 5 | 41 |
+| Trout | 15 | 70 | 7 | 50 |
+| Salmon | 25 | 90 | 9 | 58 |
+
 ### Gathering skills
 - **Woodcutting** — trees on routes and in forests (see above)
 - **Mining** — ore rocks in mines and caves (see above)
-- **Fishing** — spots on rivers, lakes and the coast
+- **Fishing** — spots on rivers, lakes and the coast (see above)
 
 ### Production skills
-- **Cooking** — raw fish and meat into food (can burn)
+- **Cooking** — raw fish and meat into food (can burn) (see above)
 - **Smithing** — ore into bars, bars into weapons and armour (see above)
 - **Fletching** — logs into bows and arrows (see above)
 - **Crafting** — leather, jewellery, robes

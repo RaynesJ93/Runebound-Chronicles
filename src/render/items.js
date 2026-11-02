@@ -123,6 +123,23 @@ function medHelm(b, metal) {
   b.set(7, 9, l);
 }
 
+// A fish lying on its side, head to the left. len: 6-12. col: [dark, body, belly].
+function fish(b, col, len, cooked = false) {
+  const [d, m, l] = col.map(hex);
+  const cx = 8, cy = 8, rx = len / 2, ry = Math.max(2, len / 4.2);
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+    const dx = (x + 0.5 - cx) / rx, dy = (y + 0.5 - cy) / ry;
+    if (dx * dx + dy * dy > 1) continue;
+    b.set(x, y, dy > 0.35 ? l : dy < -0.5 ? d : m);
+  }
+  // tail
+  const tx = Math.round(cx + rx);
+  for (let k = 0; k < 3; k++) { b.set(tx + k, cy - 1 - k, d); b.set(tx + k, cy + k, d); b.set(tx + k, cy, m); }
+  // eye, or grill marks once cooked
+  b.set(Math.round(cx - rx + 2), cy - 1, cooked ? d : hex('#1d1410'));
+  if (cooked) for (const x of [cx - 1, cx + 2]) { b.set(x, cy - 1, d); b.set(x + 1, cy, d); }
+}
+
 // Two logs lying side by side, ends showing their rings.
 function logPair(b, bark, ring) {
   for (const [y0, x0] of [[9, 2], [5, 4]]) {
@@ -242,6 +259,58 @@ const DRAW = {
   oakShortbow(b) { bow(b, [hex('#6e4a22'), hex('#a8783e'), hex('#d0a060')], 7); },
   oakLongbow(b) { bow(b, [hex('#6e4a22'), hex('#a8783e'), hex('#d0a060')], 7.5); },
   bronzeAxe(b) { axe(b, 'bronze'); },
+  smallNet(b) {
+    const rope = hex('#d8c08a'), dark = hex('#a8905a');
+    for (let y = 3; y < 14; y++) for (let x = 3; x < 13; x++) if ((x + y) % 3 === 0 || (x - y + 30) % 3 === 0) b.set(x, y, (x + y) % 2 ? rope : dark);
+    line(b, 3, 3, 12, 3, WOOD[1]);
+    line(b, 12, 3, 14, 1, WOOD[0]);
+  },
+  fishingRod(b) {
+    line(b, 2, 14, 13, 2, WOOD[1]);
+    line(b, 3, 14, 13, 3, WOOD[0]);
+    line(b, 13, 2, 13, 11, hex('#e8e8e8'));
+    b.set(13, 12, hex('#c0392b')); b.set(12, 12, hex('#e8e8e8'));
+    b.rect(4, 11, 2, 2, hex('#7a828b'));
+  },
+  flyFishingRod(b) {
+    line(b, 2, 14, 13, 2, hex('#5e3b1f'));
+    line(b, 3, 14, 13, 3, hex('#8a5a32'));
+    line(b, 13, 2, 14, 10, hex('#e8e8e8'));
+    b.set(14, 11, hex('#f2c94a')); b.set(13, 11, hex('#e05a3a')); // the fly
+    b.rect(4, 11, 2, 2, hex('#c8a030'));
+  },
+  fishingBait(b) {
+    const w = [hex('#b05a5a'), hex('#d88080')];
+    b.ellipse(8, 11, 5.5, 2.8, hex('#6e4a2a'));
+    b.ellipse(8, 10.5, 4.6, 2, hex('#8a6a42'));
+    for (let k = 0; k < 7; k++) { b.set(4 + k, 9 - Math.round(Math.sin(k) * 1.5), w[k % 2]); b.set(5 + k, 7 + Math.round(Math.cos(k * 1.3)), w[(k + 1) % 2]); }
+  },
+  rawShrimps(b) { for (const [x, y] of [[4, 7], [9, 10]]) { b.ellipse(x + 2, y, 3, 1.8, hex('#d88c80')); b.ellipse(x + 2, y - 0.5, 2.4, 1.1, hex('#f2b4a8')); b.set(x - 1, y + 1, hex('#c06a5a')); } },
+  shrimps(b) { for (const [x, y] of [[4, 7], [9, 10]]) { b.ellipse(x + 2, y, 3, 1.8, hex('#d8582e')); b.ellipse(x + 2, y - 0.5, 2.4, 1.1, hex('#f2905a')); b.set(x - 1, y + 1, hex('#b0401e')); } },
+  rawAnchovies(b) { for (const y of [5, 9, 12]) { b.ellipse(8, y, 4.5, 1.2, hex('#8aa0b0')); b.set(4, y, hex('#1d1410')); b.set(13, y, hex('#5a6e7e')); } },
+  anchovies(b) { for (const y of [5, 9, 12]) { b.ellipse(8, y, 4.5, 1.2, hex('#a8844e')); b.set(13, y, hex('#6e5030')); } },
+  rawSardine(b) { fish(b, ['#4a6a8a', '#7fa0bf', '#d0dce8'], 9); },
+  sardine(b) { fish(b, ['#6e4a26', '#a8743e', '#d4a46a'], 9, true); },
+  rawHerring(b) { fish(b, ['#4e5e6e', '#8a9aaa', '#dfe5ea'], 10); },
+  herring(b) { fish(b, ['#6e4a26', '#a87a46', '#d8b07a'], 10, true); },
+  rawTrout(b) { fish(b, ['#4a6a3a', '#7f9a5a', '#e8c8b0'], 11); },
+  rawSalmon(b) { fish(b, ['#6a7a8a', '#d88a70', '#f4c8b0'], 12); },
+  salmon(b) { fish(b, ['#8a4a22', '#d0703a', '#f0a870'], 12, true); },
+  burntFish(b) { fish(b, ['#141010', '#2a2220', '#4a3e38'], 10, true); },
+  cookedChicken(b) {
+    b.ellipse(6.5, 9.5, 4.6, 3.8, hex('#8a4a1e'));
+    b.ellipse(6, 9, 3.6, 2.8, hex('#c07a3a'));
+    b.ellipse(5, 8, 1.6, 1.1, hex('#e8a860'));
+    line(b, 9, 7, 12, 4, hex('#efe6cf'));
+    line(b, 10, 7, 12, 5, hex('#c9bd9c'));
+    b.set(13, 3, hex('#efe6cf')); b.set(12, 3, hex('#efe6cf')); b.set(13, 4, hex('#efe6cf'));
+  },
+  burntChicken(b) {
+    b.ellipse(6.5, 9.5, 4.6, 3.8, hex('#141010'));
+    b.ellipse(6, 9, 3.6, 2.8, hex('#2e2420'));
+    line(b, 9, 7, 12, 4, hex('#8a8478'));
+    b.set(13, 3, hex('#8a8478')); b.set(12, 3, hex('#8a8478'));
+  },
   bronzePickaxe(b) { pickaxe(b, 'bronze'); },
   ironPickaxe(b) { pickaxe(b, 'iron'); },
   hammer(b) {

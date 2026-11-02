@@ -55,6 +55,16 @@ export function buildRoute1() {
     clear(x, cy - 2, x, cy + 2); // grassy banks
   }
 
+  // Fishing spots on the stream: fast water for lure fishing, a calmer pool for bait.
+  // The bank tile beside each is kept clear so you can always reach it.
+  const streamY = (x) => 29 + Math.round(Math.sin(x / 3.6) * 1.3);
+  for (const [x, side, variant] of [[18, -1, 'lure'], [20, -1, 'lure'], [10, -1, 'lure'], [14, -1, 'bait']]) {
+    const y = streamY(x) + side;
+    props.push({ type: 'fishingSpot', tiles: [{ x, y }], x, y, variant });
+    taken[i(x, y)] = 1;
+    taken[i(x, y + side)] = 1; // the bank
+  }
+
   // ---- Clearings ---------------------------------------------------------------------
   // Goblin camp (west), linked by a little trail
   rect(3, 40, 11, 50, GROUND.GRASS); clear(3, 40, 11, 50);
@@ -83,7 +93,7 @@ export function buildRoute1() {
   // ---- Goblin camp props ----------------------------------------------------------------
   prop('tent', [{ x: 4, y: 41 }, { x: 5, y: 41 }], { interact: ['A grubby goblin tent. It smells awful.', 'Nobody is home... for now.'] });
   prop('tent', [{ x: 8, y: 41 }, { x: 9, y: 41 }], { interact: ['Another goblin tent, patched with old sacks.'] });
-  one('campfire', 7, 45, { interact: ['A campfire, still warm. The goblins must be nearby.'] });
+  one('campfire', 7, 45, { action: 'cook', interact: ['A campfire, still warm. The goblins must be nearby.'] });
   for (const [x, y] of [[4, 47], [10, 44]]) one('crate', x, y);
   for (const [x, y] of [[6, 48], [9, 47], [3, 45]]) one('bones', x, y, { blocks: false });
 

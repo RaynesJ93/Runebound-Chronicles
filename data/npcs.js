@@ -168,6 +168,53 @@ export const NPCS = [
     },
   },
 
+  {
+    examine: 'A weathered old fisherman. He smells strongly of the pond.',
+    id: 'finn', name: 'Old Finn', short: 'Finn', area: 'brambleford', x: 12, y: 28, radius: 1, wander: 0.1,
+    look: { hair: '#d8d4cc', tunic: '#3d6a8a', pants: '#4a4a3a', beard: '#e4e0d8', hat: 'straw' },
+    talk: {
+      start: (c) => (c.flags.metFinn ? 'again' : 'intro'),
+      nodes: {
+        intro: {
+          say: ["Shh! You'll scare the fish. ...Oh, it's fine, they're not biting anyway.", "Name's Finn. Been fishing this pond since before your parents were born."],
+          set: { metFinn: true },
+          next: 'menu',
+        },
+        again: { say: 'Bite yet?', next: 'menu' },
+        menu: { say: [], choices: [
+          { text: 'Can you teach me to fish?', next: 'teach', if: (c) => !c.flags.gotNet },
+          { text: 'How does fishing work again?', next: 'lesson', if: (c) => c.flags.gotNet },
+          { text: 'How do I cook what I catch?', next: 'cook' },
+          { text: 'Where are the big fish?', next: 'big' },
+          { text: 'Tight lines, Finn.', next: 'bye' },
+        ] },
+        teach: {
+          say: ['Ha! A pupil. Here, take my spare net and an old rod, and a tin of worms for bait.'],
+          give: { flag: 'gotNet', items: [{ item: 'smallNet', qty: 1 }, { item: 'fishingRod', qty: 1 }, { item: 'fishingBait', qty: 30 }] },
+          giveFail: 'full',
+          next: 'lesson',
+        },
+        full: { say: "Your bag's full to bursting. Make some room and I'll give you something.", next: 'menu' },
+        lesson: {
+          say: ['See the ripples on the water? Those are fishing spots. Tap one and you\'ll fish until your bag\'s full.',
+            'Use the net on the ones near me for shrimps. The rod and bait spots on the far side give sardines from Fishing 5, and herring at 10.',
+            'Every cast with the rod uses one bait. Pell sells more.'],
+          next: 'menu',
+        },
+        cook: {
+          say: ['Tap the cooking pit right there, then pick what to cook.', "You'll burn a lot at first. Everyone does. You burn less as your Cooking level goes up.",
+            'Wyn\'s chickens cook up nicely too. The goblins\' campfire on Route 1 works in a pinch.'],
+          next: 'menu',
+        },
+        big: {
+          say: ['Trout and salmon swim in the fast water of the stream on Route 1.', 'You need a fly fishing rod from Pell, and feathers for lures. Trout need Fishing 20, salmon 30.'],
+          next: 'menu',
+        },
+        bye: { say: 'And may they be big ones.' },
+      },
+    },
+  },
+
   // ---- Route 1 -----------------------------------------------------------------
   {
     examine: 'A big, bearded woodcutter. He smells of pine.',
