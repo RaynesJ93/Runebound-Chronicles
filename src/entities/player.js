@@ -88,9 +88,14 @@ export class PlayerController {
       return null;
     }
     if (heldDir) {
-      const n = { x: this.tile.x + heldDir.dx, y: this.tile.y + heldDir.dy };
-      if (this.area.canStep(this.tile.x, this.tile.y, n.x, n.y)) return n;
-      this.faceTowards(n.x, n.y); // bump: turn to face the wall
+      const { x, y } = this.tile;
+      const tries = [[heldDir.dx, heldDir.dy]];
+      // Diagonal blocked? Slide along whichever straight direction is open.
+      if (heldDir.dx && heldDir.dy) tries.push([heldDir.dx, 0], [0, heldDir.dy]);
+      for (const [dx, dy] of tries) {
+        if (this.area.canStep(x, y, x + dx, y + dy)) return { x: x + dx, y: y + dy };
+      }
+      this.faceTowards(x + heldDir.dx, y + heldDir.dy); // bump: turn to face the wall
     }
     return null;
   }

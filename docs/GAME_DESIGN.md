@@ -1,10 +1,10 @@
 # RuneBound Chronicles — Game Design Document
 
-*Version 2.0 · Updated 2 November 2026 · Supersedes the original creature-battler concept*
+*Version 2.1 · Updated 2 November 2026 · 2D pixel art; supersedes the original creature-battler concept*
 
 ## 1. Vision
 
-RuneBound Chronicles is a browser-based, low-poly fantasy RPG that plays on desktop and iPhone.
+RuneBound Chronicles is a browser-based, 2D pixel-art fantasy RPG that plays on desktop and iPhone.
 
 It combines two things:
 
@@ -53,7 +53,7 @@ Long loop (weeks): quests, new regions, bosses, 99s, rare drops.
 
 ### Camera and movement (Emerald style)
 
-- **Camera:** fixed, angled top-down view (roughly 50–60° pitch), follows the player, no free rotation. A small zoom range is allowed on desktop and via pinch on iPhone.
+- **Camera:** 2D top-down view with the 3/4 perspective of Emerald (you see the tops and fronts of things), follows the player, no rotation. The world is drawn at 16 px per tile and scaled by whole numbers so pixels stay crisp; a few zoom steps are allowed (mouse wheel, pinch, or Settings).
 - **Movement:** tile grid. The player moves tile to tile with smooth interpolation, four directions with keyboard/D-pad, eight-direction pathing when clicking/tapping a destination.
 - **Click/tap to move:** A* pathfinding over the tile grid; a marker shows the destination.
 - **Run toggle:** walking is 1 tile per tick, running is 2 tiles per tick, using a run-energy bar that refills while walking or standing.
@@ -246,7 +246,7 @@ Example — Goblin:
 
 ### Ground items
 
-- Drops appear on the tile where the enemy died as small 3D models with a name label.
+- Drops appear on the tile where the enemy died as small item sprites with a name label.
 - **Players must pick loot up manually** (tap the item, or right-click > Take on desktop).
 - Several items on one tile open a small list to choose from.
 - Drops stay for 2 minutes, then disappear. Items the player drops stay for 3 minutes.
@@ -353,11 +353,14 @@ Every skill uses the same XP curve and goes to 99. Resources respawn after a tim
 
 ### Art direction
 
-- **Original** low-poly fantasy art inspired by the look of Old School RuneScape: chunky shapes, flat or simple-gradient colours, visible polygons, a slightly muted palette.
-- No assets, names or designs copied from OSRS or Pokémon.
-- Models built from simple primitives or small low-poly meshes to keep the game fast on iPhone.
-- Readable silhouettes: each enemy type is recognisable from the default camera height.
-- UI: OSRS-style stone and parchment panels, original icons drawn in one consistent style.
+*Changed 2 Nov 2026: the game moved from low-poly 3D to 2D pixel art.*
+
+- **Original 2D pixel art** in a cosy farming-RPG style: 16 × 16 px tiles, a 3/4 top-down view, warm saturated colours, and a 1 px dark outline around every sprite so things read clearly on grass.
+- Trees, bushes and rocks are built from clusters of shaded blobs lit from the top-left; ground has textured grass with tufts, ragged path edges, cobbled squares and shimmering water.
+- Characters are small chibi sprites (16 × 24 px) with 4-direction walking animations.
+- All art is drawn in code, in one consistent style. No assets, names or designs are copied from OSRS, Pokémon or any other game.
+- Readable silhouettes: each enemy type is recognisable at the default zoom.
+- UI: wood-framed parchment panels with a pixel font (Pixelify Sans), a virtual joystick on touch screens, and an Emerald-style dialogue box.
 
 ### Desktop controls
 
@@ -386,7 +389,7 @@ Touch targets are at least 44 × 44 points. The layout respects the iPhone notch
 
 ### Stack (proposed)
 
-- **Three.js** for 3D rendering, plain JavaScript ES modules, no build step needed.
+- **HTML canvas (2D)** for rendering, plain JavaScript ES modules, no build step and no libraries needed.
 - Hosted on **GitHub Pages** from this repository.
 - Target: 60 fps on recent iPhones in Safari and as a Home Screen app; 30 fps minimum on older devices.
 
@@ -400,7 +403,7 @@ Touch targets are at least 44 × 44 points. The layout respects the iPhone notch
   core/state.js      — single game-state object
   core/save.js       — save/load, versioning, migrations
   world/             — tile maps, collision, pathfinding, area transitions
-  render/            — Three.js scene, camera, models, hitsplats, health bars
+  render/            — pixel-art sprites drawn in code, ground, buildings, camera, depth sorting, hitsplats, health bars
   entities/          — player, NPCs, enemies, ground items
   combat/            — formulas, attack cycle, styles, projectiles, AI
   skills/            — XP curve, levels, combat level
@@ -412,7 +415,7 @@ Touch targets are at least 44 × 44 points. The layout respects the iPhone notch
 ```
 
 Rules:
-- **Game logic is separate from rendering.** Combat, XP and loot run on the tick and know nothing about Three.js. This keeps it testable and stops frame-rate from affecting gameplay.
+- **Game logic is separate from rendering.** Combat, XP and loot run on the tick and know nothing about drawing. This keeps it testable and stops frame-rate from affecting gameplay.
 - **Content lives in data files**, not code: adding an enemy or item should not need new code.
 - **Seeded random numbers** for combat and loot so bugs can be reproduced.
 

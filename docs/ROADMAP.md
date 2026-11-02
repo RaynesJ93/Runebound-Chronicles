@@ -15,8 +15,8 @@ Out of scope, permanently: turn-based battles, battle screens, random encounters
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
-| 0 ✅ | Project foundation | `index.html`, Three.js scene, game loop, 0.6 s tick, game-state object, save system v1 (versioned, autosave, two slots, export/import), GitHub Pages deploy | Page loads on desktop and iPhone; a save survives a reload |
-| 1 ✅ | Starting village + Emerald camera | Low-poly tile-map village, angled follow camera, grid movement (WASD/arrows), tap/click-to-move with A* pathfinding, collision, run toggle and energy | You can walk around the village on both devices |
+| 0 ✅ | Project foundation | `index.html`, renderer, game loop, 0.6 s tick, game-state object, save system v1 (versioned, autosave, two slots, export/import), GitHub Pages deploy | Page loads on desktop and iPhone; a save survives a reload |
+| 1 ✅ | Starting village + Emerald camera | Tile-map village, top-down follow camera, grid movement (WASD/arrows), tap/click-to-move with A* pathfinding, collision, run toggle and energy | You can walk around the village on both devices |
 | 2 | NPCs and the forest route | Wandering NPCs, Emerald-style dialogue box, buildings and doors, the first forest route connected to the village with area transitions | You can talk to NPCs and walk to the forest and back |
 | 3 | Overworld combat core | Roaming goblins, tap/click to attack, auto-move into range, timed attack cycles, hit chance and damage formulas, hitsplats, health bars, enemy retaliation, chasing, leashing back to spawn, enemy respawn, player death and respawn | You can fight and kill goblins without any battle screen |
 | 4 | Combat skills and XP | Attack, Strength, Defence, Hitpoints (starts at 10), XP curve to 99, combat styles, XP drops, level-up messages, combat level, skills panel | Killing goblins levels you up and your combat level changes |
@@ -60,5 +60,6 @@ Out of scope, permanently: turn-based battles, battle screens, random encounters
 
 | Date | Change |
 | --- | --- |
+| 2 Nov 2026 | v0.2.0: switched from low-poly 3D to 2D pixel art (canvas renderer, sprites drawn in code, wood-and-parchment UI, joystick). Saves upgrade automatically. |
 | 2 Nov 2026 | v0.1.0: Batches 0 and 1 shipped — Brambleford village, camera, movement, run energy, saving with backup codes. Live on GitHub Pages. |
 | 2 Nov 2026 | Design v2.0: removed Pokémon-style battles, catching, creature parties and Runelings. Game now uses OSRS-style real-time overworld combat with Emerald-style exploration. Roadmap rebuilt around this. |
