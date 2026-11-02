@@ -234,6 +234,7 @@ Enemy names show their combat level, coloured green (weaker), yellow (similar) o
 
 | Enemy | Level | HP | Behaviour | Where |
 | --- | --- | --- | --- | --- |
+| Chicken | 1 | 3 | Passive, stays in its pen; bones every kill, raw chicken 1/2 and 5–15 feathers 1/2, rolled separately | Wyn's chicken pen, Brambleford |
 | Goblin | 2 | 5 | Passive, roams in groups of 3–5 | Village outskirts, Route 1 |
 | Goblin Brute | 5 | 12 | Aggressive to low levels | Route 1 goblin camp |
 | Wolf | 7 | 14 | Aggressive, fast, chases further | Forest route |
@@ -244,6 +245,7 @@ Enemy names show their combat level, coloured green (weaker), yellow (similar) o
 Each enemy has its own loot table, defined in data files:
 
 - **Always:** guaranteed drops (e.g. bones on every kill).
+- **Each table:** every entry rolls on its own, so a kill can give several of them or none (chickens use this).
 - **Main table:** one roll per kill, weighted (coins, low-tier weapons, runes, arrows, food, crafting materials).
 - **Rare table:** separate small chance (e.g. 1/128), rare items and higher-tier gear.
 - **Unique rares:** per-enemy signature drops (e.g. Wolf Pelt Cloak from Alpha Wolf at 1/64).

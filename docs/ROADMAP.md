@@ -62,6 +62,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Date | Change |
 | --- | --- |
+| 2 Nov 2026 | v0.12.2: Wyn's chicken pen in Brambleford (south of the lower lane, west of the farm) with 5 chickens (level 1, 3 HP, respawn in 9 s). Every kill drops bones; raw chicken (1/2) and 5–15 feathers (1/2) are rolled separately. New `each` loot table type for independent drops; new raw chicken item (for Cooking). |
 | 2 Nov 2026 | v0.12.1: XP rates increased 5× for every skill (combat, Hitpoints and skilling), with one multiplier, `XP_RATE`. Existing XP is kept as it is. |
 | 2 Nov 2026 | v0.12.0: Phase 2.2 shipped — Copperdeep Mine opens at the top of Route 1 (rockslide cleared): entrance hall with furnace, anvil and Dorrin the Miner, copper/tin and iron galleries, tunnel goblins. Mining (copper, tin, iron; bronze and iron pickaxes), smelting (bronze bars; iron bars that can fail), smithing 16 bronze and iron items with a hammer. New iron sword, iron med helm, sq shields, chainbodies and iron arrows; Fletching makes iron arrows at 15. |
 | 2 Nov 2026 | v0.11.1: clearer numbers — digits now use the Jersey 10 pixel font (Pixelify Sans's 5 looked like an S); letters are unchanged. The digit font is bundled with the game (3.8 KB). |
