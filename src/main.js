@@ -113,6 +113,7 @@ function boot() {
       },
       enemyDied: (e) => {
         hud.message(`You defeated the ${e.name}!`);
+        state.stats.kills = (state.stats.kills || 0) + 1;
         for (const drop of rollLoot(e.def.loot, rng)) {
           ground.add(drop.item, drop.qty, e.tile.x, e.tile.y, time, { rare: drop.rare || !!ITEMS[drop.item]?.rare });
           if (drop.rare) hud.message(`Rare drop: ${itemName(drop.item)}!`);
@@ -154,9 +155,43 @@ function boot() {
     hud.el.setRetaliate.textContent = s.autoRetaliate === false ? 'Off' : 'On';
     s.zoomStep = view.setZoomStep(s.zoomStep || 0);
     hud.el.zoomVal.textContent = s.zoomStep > 0 ? `+${s.zoomStep}` : String(s.zoomStep);
+    hud.el.setItemTap.textContent = s.itemTap === 'menu' ? 'Menu' : 'Use';
+    hud.$('item-tap-sub').textContent = s.itemTap === 'menu' ? 'Always shows the options menu' : 'Eats, drinks, wields or wears it';
+    hud.el.setTextSpeed.textContent = TEXT_LABEL[s.textSpeed] || 'Normal';
+    hud.textSpeed = s.textSpeed;
+    hud.el.setXpDrops.textContent = s.xpDrops === false ? 'Off' : 'On';
+    hud.showXpDrops = s.xpDrops !== false;
+    hud.el.setBattery.textContent = s.batterySaver ? 'On' : 'Off';
+    const hold = coarse ? 'Long-press' : 'Right-click';
+    hud.$('controls-help').textContent = `${hold} anything in the world or in your bag to see all its options (examine, walk here, drop…).`;
+    hud.$('inv-help').textContent = s.itemTap === 'menu'
+      ? `Tap an item for its options. Drag to rearrange.`
+      : `Tap to eat, drink, wield or wear. ${hold} for more options (examine, drop…). Drag to rearrange.`;
+  };
+  const TEXT_LABEL = { normal: 'Normal', fast: 'Fast', instant: 'Instant' };
+  const cycle = (key, order) => () => {
+    state.settings[key] = order[(order.indexOf(state.settings[key]) + 1) % order.length];
+    applySettings();
+    save();
+  };
+  hud.el.setItemTap.addEventListener('click', cycle('itemTap', ['use', 'menu']));
+  hud.el.setTextSpeed.addEventListener('click', cycle('textSpeed', ['normal', 'fast', 'instant']));
+  hud.el.setXpDrops.addEventListener('click', cycle('xpDrops', [true, false]));
+  hud.el.setBattery.addEventListener('click', cycle('batterySaver', [false, true]));
+  const playTime = (secs) => {
+    const h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60);
+    return h ? `${h} h ${m} min` : `${m} min`;
   };
   hud.el.version.textContent = `RuneBound Chronicles v${GAME_VERSION} · ${BUILD_NAME}`;
-  hud.onSettingsOpen = () => { hud.el.saveStatus.textContent = describeSave(); };
+  hud.onSettingsOpen = () => {
+    hud.el.saveStatus.textContent = describeSave();
+    const st = state.stats;
+    const rows = [
+      ['Time played', playTime(st.playTimeSec)], ['Combat level', combat.level], ['Total level', book.total()],
+      ['Monsters defeated', st.kills.toLocaleString('en-GB')], ['Deaths', st.deaths], ['Tiles walked', st.tilesWalked.toLocaleString('en-GB')],
+    ];
+    hud.$('adv-stats').innerHTML = rows.map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('');
+  };
 
   hud.el.setDpad.addEventListener('click', () => {
     const order = ['auto', 'on', 'off'];
@@ -218,6 +253,7 @@ function boot() {
   hud.onSkillsOpen = () => refreshSkills();
   // Inventory panel: tap for options, drag to rearrange.
   refreshInventory = () => {
+    currentLook();
     if (!hud.invOpen) return;
     hud.renderInventory(inventory.slots);
     hud.renderEquipment(equipment.slots, equipment.bonuses(), equipment.weapon, currentMaxHit());
@@ -247,7 +283,20 @@ function boot() {
   };
   hud.onInventoryOpen = () => refreshInventory();
   hud.onSlotSwap = (a, b) => { inventory.swap(a, b); refreshInventory(); save(); };
+  // Tapping an item does its main thing (eat, drink, wield, wear), like OSRS
+  // mobile. Items without one — or everything, if you prefer menus — show the menu.
+  const quickUse = (i) => {
+    const def = ITEMS[inventory.slots[i]?.id];
+    if (!def) return null;
+    if (def.food || def.potion) return () => eat(i);
+    if (def.equip) return () => wear(i);
+    return null;
+  };
   hud.onSlotTap = (i, x, y) => {
+    const use = state.settings.itemTap === 'menu' ? null : quickUse(i);
+    if (use) use(); else hud.onSlotMenu(i, x, y);
+  };
+  hud.onSlotMenu = (i, x, y) => {
     const s = inventory.slots[i];
     if (!s) return;
     const def = ITEMS[s.id];
@@ -509,51 +558,105 @@ function boot() {
     }
   };
 
+  // What's at a tile: monsters and villagers also answer for the tile above
+  // their feet, because they're drawn tall.
+  const whatsAt = (t) => ({
+    foe: enemies.find((e) => e.occupies(t.x, t.y)) || enemies.find((e) => e.occupies(t.x, t.y + 1)),
+    npc: npcs.find((n) => n.occupies(t.x, t.y)) || npcs.find((n) => n.occupies(t.x, t.y + 1)),
+    pile: ground.at(t.x, t.y),
+    grave: state.grave && state.grave.area === area.id && state.grave.x === t.x && state.grave.y === t.y ? state.grave : null,
+    prop: lookup.get(area.idx(t.x, t.y)),
+  });
+
+  const attackFoe = (foe) => {
+    pickup = null;
+    releaseTalkTarget();
+    goal = null;
+    marker = null;
+    combat.attack(foe);
+    firstMove();
+  };
+  const goToGrave = (t) => interactWith({ tiles: [{ x: t.x, y: t.y }], grave: true, goal: (x, y) => Math.abs(x - t.x) + Math.abs(y - t.y) <= 1 });
+  const useProp = (prop) => {
+    if (prop.type === 'enter') walkTo(prop.tiles[0].x, prop.tiles[0].y);
+    else interactWith(prop);
+  };
+  const walkHere = (t) => { pickup = null; combat.stop(); releaseTalkTarget(); walkTo(t.x, t.y); firstMove(); };
+  const ready = () => !(hud.settingsOpen || transitioning || dying);
+
   input.onTap = (sx, sy) => {
     if (hud.menuOpen) { hud.closeMenu(); return; }
     if (hud.dialogOpen) { hud.advanceDialog(); return; }
-    if (hud.settingsOpen || transitioning || dying) return;
+    if (!ready()) return;
     const t = view.screenToTile(sx, sy);
     if (!area.inBounds(t.x, t.y)) return;
-    // Monsters: tap to attack (their head, one tile up, counts too).
-    const foe = enemies.find((e) => e.occupies(t.x, t.y)) || enemies.find((e) => e.occupies(t.x, t.y + 1));
-    if (foe) {
-      pickup = null;
-      releaseTalkTarget();
-      goal = null;
-      marker = null;
-      combat.attack(foe);
-      firstMove();
-      return;
-    }
+    const at = whatsAt(t);
+    // Monsters: tap to attack.
+    if (at.foe) { attackFoe(at.foe); return; }
     combat.stop();
-    // Villagers are tall, so a tap on their head (the tile above) counts too.
-    const npc = npcs.find((n) => n.occupies(t.x, t.y)) || npcs.find((n) => n.occupies(t.x, t.y + 1));
-    if (npc) { pickup = null; talkTo(npc); firstMove(); return; }
+    if (at.npc) { pickup = null; talkTo(at.npc); firstMove(); return; }
     // Loot on the ground: one item -> go and take it; a pile -> choose.
-    const pile = ground.at(t.x, t.y);
-    if (pile.length) {
+    if (at.pile.length) {
       firstMove();
-      if (pile.length === 1) { goPickup(t.x, t.y, pile[0]); return; }
+      if (at.pile.length === 1) { goPickup(t.x, t.y, at.pile[0]); return; }
       hud.showMenu(sx, sy, 'Items here', [
-        ...pile.slice(0, 8).map((g) => ({ label: `Take ${describe(g)}`, icon: itemIcon(g.item).url, fn: () => goPickup(t.x, t.y, g) })),
+        ...at.pile.slice(0, 8).map((g) => ({ label: `Take ${describe(g)}`, icon: itemIcon(g.item).url, fn: () => goPickup(t.x, t.y, g) })),
         { label: 'Take everything', fn: () => goPickup(t.x, t.y, null) },
-        { label: 'Walk here', fn: () => { pickup = null; combat.stop(); walkTo(t.x, t.y); } },
+        { label: 'Walk here', fn: () => walkHere(t) },
       ]);
       return;
     }
     pickup = null;
     releaseTalkTarget();
-    const grave = state.grave;
-    if (grave && grave.area === area.id && grave.x === t.x && grave.y === t.y) {
-      interactWith({ tiles: [{ x: t.x, y: t.y }], grave: true, goal: (x, y) => Math.abs(x - t.x) + Math.abs(y - t.y) <= 1 });
-      return;
-    }
-    const prop = lookup.get(area.idx(t.x, t.y));
-    if (prop?.type === 'enter') walkTo(prop.tiles[0].x, prop.tiles[0].y);
-    else if (prop) interactWith(prop);
+    if (at.grave) { goToGrave(t); return; }
+    if (at.prop) useProp(at.prop);
     else walkTo(t.x, t.y);
     firstMove();
+  };
+
+  // Long-press (phone) or right-click (computer): every option for what's there.
+  const PROP_NAME = { sign: 'sign', door: 'door', well: 'well', stall: 'stall', counter: 'counter', bankBooth: 'bank booth', fallenTree: 'fallen tree', logPile: 'log pile', tent: 'tent', campfire: 'campfire', scarecrow: 'scarecrow', lamp: 'lamp' };
+  input.onLongPress = (sx, sy) => {
+    if (hud.dialogOpen || !ready()) return;
+    const t = view.screenToTile(sx, sy);
+    if (!area.inBounds(t.x, t.y)) return;
+    const at = whatsAt(t);
+    const opts = [];
+    let title = null;
+    if (at.foe && !at.foe.dead) {
+      const f = at.foe;
+      title = `${f.name} (level ${f.def.level})`;
+      opts.push({ label: `Attack ${f.name}`, fn: () => attackFoe(f) });
+      opts.push({ label: `Examine ${f.name}`, fn: () => hud.message(f.def.examine) });
+    }
+    if (at.npc) {
+      const n = at.npc;
+      title ||= n.name;
+      opts.push({ label: `Talk to ${n.name.split(' ')[0]}`, fn: () => { combat.stop(); pickup = null; talkTo(n); firstMove(); } });
+      opts.push({ label: `Examine ${n.name.split(' ')[0]}`, fn: () => hud.message(n.def.examine || `${n.name}.`) });
+    }
+    for (const g of at.pile.slice(0, 6)) {
+      opts.push({ label: `Take ${describe(g)}`, icon: itemIcon(g.item).url, fn: () => { firstMove(); goPickup(t.x, t.y, g); } });
+    }
+    if (at.pile.length) opts.push({ label: `Examine ${itemName(at.pile[0].item)}`, fn: () => hud.message(ITEMS[at.pile[0].item].examine) });
+    if (at.grave) {
+      title ||= 'Your gravestone';
+      opts.push({ label: 'Reclaim items', fn: () => { combat.stop(); goToGrave(t); } });
+    }
+    if (at.prop && !at.foe && !at.npc) {
+      const p = at.prop;
+      if (p.type === 'enter') {
+        const b = area.buildings.find((x) => x.doorTiles === p.tiles);
+        opts.push({ label: `Enter ${b?.label || 'building'}`, fn: () => { combat.stop(); useProp(p); } });
+      } else if (p.action) {
+        opts.push({ label: p.action === 'bank' ? 'Use bank booth' : 'Trade', fn: () => { combat.stop(); useProp(p); } });
+      } else if (p.interact) {
+        opts.push({ label: `Look at ${PROP_NAME[p.type] || p.type || 'this'}`, fn: () => { combat.stop(); useProp(p); } });
+      }
+    }
+    if (area.isWalkable(t.x, t.y)) opts.push({ label: 'Walk here', fn: () => walkHere(t) });
+    opts.push({ label: 'Cancel', fn: () => {} });
+    hud.showMenu(sx, sy, title, opts);
   };
 
   const toggleRun = () => {
@@ -740,7 +843,19 @@ function boot() {
   // ---- Frame loop -------------------------------------------------------------
   let zoomAcc = 0;
   let last = performance.now();
+  // Your outfit only changes when your equipment does, so work it out then.
+  let lookKey = '';
+  let playerLook = null;
+  const currentLook = () => {
+    const key = JSON.stringify(equipment.slots);
+    if (key !== lookKey) { lookKey = key; playerLook = equipment.look(); }
+    return playerLook;
+  };
+  ticker.on(() => currentLook());
+
   const frame = (now) => {
+    // Battery saver: draw every other screen refresh (about 30 a second).
+    if (state.settings.batterySaver && now - last < 30) { requestAnimationFrame(frame); return; }
     const dt = Math.max(0, Math.min(0.25, (now - last) / 1000));
     last = now;
     time += dt;
@@ -762,7 +877,7 @@ function boot() {
     for (const npc of npcs) npc.update(dt);
     for (const e of enemies) e.update(dt);
 
-    view.render(player, { time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list, playerLook: equipment.look(),
+    view.render(player, { time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list, playerLook: playerLook || currentLook(),
       grave: state.grave && state.grave.area === area.id ? state.grave : null });
     if (state.grave) {
       const left = Math.max(0, GRAVE_SECONDS - (state.stats.playTimeSec - state.grave.createdAt));

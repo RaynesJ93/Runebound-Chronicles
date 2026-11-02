@@ -139,7 +139,9 @@ export function createWorldView(canvasEl, area) {
   const cam = { x: 0, y: 0 };
 
   function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 3);
+    // iPhones are 3x, but pixel art looks the same at 2x and there are
+    // less than half as many pixels to fill each frame.
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvasEl.width = Math.round(window.innerWidth * dpr);
     canvasEl.height = Math.round(window.innerHeight * dpr);
     // About 12 tiles across a phone held upright; about 20 x 12 on wide screens.
@@ -216,10 +218,14 @@ export function createWorldView(canvasEl, area) {
     ctx.fillRect(x + 1, y + 1, Math.round((16 * Math.max(0, hp)) / max), 3);
   }
 
+  let lastLook = null;
+  let lastLookKey = null;
+
   function render(player, opts) {
     const { time, steps, marker, characters = [], enemies = [], combat = null, ground: groundItems = [], playerLook = null } = opts;
     // Your character, dressed in whatever you're wearing.
-    const pFrames = playerLook ? framesFor(lib, playerLook, `player:${JSON.stringify(playerLook)}`) : lib.player;
+    if (playerLook !== lastLook) { lastLook = playerLook; lastLookKey = playerLook ? `player:${JSON.stringify(playerLook)}` : null; }
+    const pFrames = lastLookKey ? framesFor(lib, playerLook, lastLookKey) : lib.player;
     const pObj = personObj(pFrames, player, steps, { player: true }, time, combat?.playerLungeAt);
     const footX = pObj.fx;
     const footY = pObj.fy;

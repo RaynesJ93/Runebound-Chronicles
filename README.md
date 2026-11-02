@@ -18,19 +18,20 @@ There are no turn-based battles, no battle screens and no creature catching. You
 - **Desktop:** click to walk, or use WASD / arrow keys. R toggles run. Mouse wheel or + / − zooms.
 - **iPhone:** tap to walk, or use the on-screen joystick. Pinch to zoom. For full-screen play, open the link in Safari, tap Share, then **Add to Home Screen**.
 - Tap or click people to talk to them, and signs, doors and other objects to look at them. Number keys pick answers on desktop.
+- **Long-press** (iPhone) or **right-click** (desktop) anything — monsters, people, loot, doors, your items — for all its options: attack, talk, examine, take, walk here, drop.
 - Head north out of the village to reach Route 1 — Thornwood Forest.
 - Open **Skills** (sword button, or K) to see your levels. The **Combat** tab chooses your attack style: Accurate trains Attack, Aggressive trains Strength, Defensive trains Defence, Controlled trains all three.
 - Tap or click a goblin to attack it. Your character walks up and fights automatically. Tap the ground or move to stop. Beware the Goblin Brute by the tents: it attacks on sight.
 - Tap loot on the ground to walk over and pick it up (a pile gives you a choice). Open your **Inventory** (bag button, or I) and tap an item to examine or drop it; drag items to rearrange them. Tap a weapon or armour piece and choose **Wield** or **Wear**; the **Equipment** tab shows what you're wearing and your total bonuses.
 - Ask **Bram** (the woodcutter) for a bow and **Wren** (on the north road) about her staff. Put arrows in your ammo slot to shoot; with the staff, pick a spell in the **Combat** tab. Watch out for the wolf den to the north-east.
-- Walk into the **General Store** and **Bank** in Brambleford. Talk to Pell to trade, and Edda or any booth to bank. Pick 1 / 5 / 10 / All, then tap items to move them. Tap food to **Eat** and potions to **Drink**.
+- Walk into the **General Store** and **Bank** in Brambleford. Talk to Pell to trade, and Edda or any booth to bank. Pick 1 / 5 / 10 / All, then tap items to move them. Tap food to eat it, potions to drink them, and weapons or armour to put them on (Settings can make taps open the menu instead).
 - If you die you keep your 3 most valuable items; the rest wait in a gravestone where you fell for 15 minutes (free to reclaim for the first 5).
 
 ## Status
 
-**v0.9.0 — Batches 0–8 done:** the village of Brambleford and Route 1 (Thornwood Forest), 8 villagers with branching conversations, real-time overworld combat against goblins, combat skills that level to 99 on the OSRS XP curve, loot: goblins drop items (with rare drops) that you pick up into a 28-slot inventory, equipment with bonuses that feed the combat formulas, Ranged and Magic with bows, staves, spells and wolves, and the full trading loop: walk-in bank and General Store, food, potions, and gravestones when you die. Plus Emerald-style movement, run energy, and local saving with backup codes.
+**v0.10.0 — the first playable version (Phase 1 complete).** The village of Brambleford and Route 1 (Thornwood Forest), 8 villagers with branching conversations, real-time overworld combat against goblins and wolves with melee, bows and magic, six combat skills to 99 on the OSRS XP curve, loot with rare drops, a 28-slot inventory, 11 equipment slots, a walk-in bank and General Store, food, potions and gravestones. Built for iPhone as much as desktop: long-press menus, large tap targets, a battery saver, and saves that survive every update.
 
-Next: **Batch 9** — the v0.1 polish pass that completes the first playable version (see the [roadmap](docs/ROADMAP.md)).
+Next: **Phase 2 — Skilling**, starting with Woodcutting and Fletching (see the [roadmap](docs/ROADMAP.md)).
 
 ## Running it locally
 
@@ -42,11 +43,17 @@ python3 -m http.server 8000
 
 then visit http://localhost:8000.
 
+To check that saves from every earlier version still load:
+
+```
+node tests/save.test.mjs
+```
+
 ## Code layout
 
 | Folder | What's in it |
 | --- | --- |
-| `src/core` | Game tick (0.6 s), game state, saving with versions and migrations |
+| `src/core` | Game tick (0.6 s), game state, saving with versions, migrations and repair |
 | `src/world` | Tile grid, collision and pathfinding |
 | `src/render` | Pixel-art sprites drawn in code, ground, buildings, camera and depth sorting |
 | `src/entities` | The player's movement, villagers (NPCs) and enemies |
@@ -61,6 +68,7 @@ then visit http://localhost:8000.
 | `data/items.js` | Every item: name, stacking, value, examine text, equipment stats |
 | `data/spells.js` | Combat spells: level, max hit, runes, XP |
 | `data/shops.js` | Shop stock lists |
+| `tests` | Save-loading tests (run with Node) |
 
 ## Stack
 

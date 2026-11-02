@@ -12,6 +12,7 @@ const pickLine = (lines) => () => lines[Math.floor(Math.random() * lines.length)
 export const NPCS = [
   // ---- Brambleford -------------------------------------------------------------
   {
+    examine: "The village elder. She seems to know everyone's business.",
     id: 'maren', name: 'Elder Maren', area: 'brambleford', x: 23, y: 18, radius: 3, wander: 0.15,
     look: { hair: '#e8e4dc', tunic: '#6b4a8a', pants: '#6b4a8a', robe: true, hat: 'bun' },
     talk: {
@@ -57,6 +58,7 @@ export const NPCS = [
     },
   },
   {
+    examine: 'He takes guarding the north gate very seriously.',
     id: 'tomas', name: 'Guard Tomas', area: 'brambleford', x: 20, y: 5, radius: 1, wander: 0.12,
     look: { hair: '#4a3220', tunic: '#8c2f2f', pants: '#5a5f66', hat: 'helmet', beard: '#4a3220' },
     talk: {
@@ -86,6 +88,7 @@ export const NPCS = [
     },
   },
   {
+    examine: 'A small, fast child. Probably up to something.',
     id: 'pip', name: 'Pip', area: 'brambleford', x: 19, y: 14, radius: 4, wander: 0.55, fast: true,
     look: { hair: '#d9772b', tunic: '#4f9a35', pants: '#6b5137' },
     talk: {
@@ -101,6 +104,7 @@ export const NPCS = [
     },
   },
   {
+    examine: 'He runs the General Store. His apron has seen better days.',
     id: 'pell', name: 'Pell the Shopkeeper', area: 'store', x: 5, y: 3, radius: 0, talkRange: 2,
     look: { hair: '#2a2a2a', tunic: '#e8dcc0', belt: '#7a4a26', pants: '#4a4a5a', beard: '#2a2a2a' },
     talk: {
@@ -123,6 +127,7 @@ export const NPCS = [
     },
   },
   {
+    examine: 'She keeps the village savings safe. Nothing gets past her.',
     id: 'edda', name: 'Edda the Banker', area: 'bank', x: 5, y: 3, radius: 0, talkRange: 2,
     look: { hair: '#a8a39a', tunic: '#2f4a73', pants: '#2f4a73', robe: true, hat: 'bun' },
     talk: {
@@ -142,6 +147,7 @@ export const NPCS = [
     },
   },
   {
+    examine: 'A farmer with soil under every fingernail.',
     id: 'wyn', name: 'Farmer Wyn', area: 'brambleford', x: 33, y: 30, radius: 3, wander: 0.2,
     look: { hair: '#8a5a2e', tunic: '#6f8f3a', pants: '#3f5f8a', hat: 'straw' },
     talk: {
@@ -164,6 +170,7 @@ export const NPCS = [
 
   // ---- Route 1 -----------------------------------------------------------------
   {
+    examine: 'A big, bearded woodcutter. He smells of pine.',
     id: 'bram', name: 'Bram the Woodcutter', area: 'route1', x: 27, y: 38, radius: 2, wander: 0.18,
     look: { hair: '#a8462a', tunic: '#b0302a', pants: '#4a3a2a', beard: '#a8462a' },
     talk: {
@@ -206,6 +213,7 @@ export const NPCS = [
     },
   },
   {
+    examine: 'A traveller with a staff and a lot of stories.',
     id: 'wren', name: 'Wren the Traveller', area: 'route1', x: 13, y: 5, radius: 1, wander: 0.15,
     look: { hair: '#3a2a1a', tunic: '#4a6b3a', pants: '#5a4a3a', hat: 'hood', hatColor: '#3d5a30' },
     talk: {

@@ -9,14 +9,15 @@ export function defaultState() {
   return {
     player: { area: 'brambleford', x: 16, y: 24, facing: 0, hp: 10 },
     run: { on: true, energy: 100 },
-    settings: { dpad: 'auto', zoomStep: 0, autoRetaliate: true, attackStyle: 'accurate', rangedStyle: 'accurate', spell: 'windStrike' },
+    settings: { dpad: 'auto', zoomStep: 0, autoRetaliate: true, attackStyle: 'accurate', rangedStyle: 'accurate', spell: 'windStrike',
+      itemTap: 'use', textSpeed: 'normal', xpDrops: true, batterySaver: false },
     skills: defaultSkills(),
     inventory: Array(28).fill(null),
     equipment: defaultEquipment(),
     bank: [],
     boosts: {},
     grave: null,
-    stats: { playTimeSec: 0, tilesWalked: 0 },
+    stats: { playTimeSec: 0, tilesWalked: 0, deaths: 0, kills: 0 },
     flags: { seenMoveHint: false },
     createdAt: Date.now(),
   };

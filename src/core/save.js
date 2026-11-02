@@ -8,6 +8,7 @@
 //   storage separate from Safari.
 
 import { defaultState } from './state.js';
+import { sanitize } from './sanitize.js';
 
 export const SAVE_VERSION = 2;
 
@@ -62,9 +63,14 @@ export function deepMerge(base, over) {
   return over === undefined || (over !== null && typeof over !== typeof base && base !== null) ? base : over;
 }
 
+// Save times always go up, even for two saves in the same millisecond, so
+// loading can always tell which slot is newer.
+let lastSavedAt = 0;
+
 function makeEnvelope(state) {
   const data = JSON.stringify(state);
-  return { version: SAVE_VERSION, savedAt: Date.now(), sum: fnv(data), data };
+  lastSavedAt = Math.max(Date.now(), lastSavedAt + 1);
+  return { version: SAVE_VERSION, savedAt: lastSavedAt, sum: fnv(data), data };
 }
 
 function parseEnvelope(raw) {
@@ -88,7 +94,7 @@ export function migrate(version, data) {
     d = step(d);
     v++;
   }
-  return deepMerge(defaultState(), d);
+  return sanitize(deepMerge(defaultState(), d));
 }
 
 export function loadGame() {
@@ -96,6 +102,7 @@ export function loadGame() {
     .map((k) => parseEnvelope(safeGet(k)))
     .filter(Boolean)
     .sort((a, b) => b.savedAt - a.savedAt);
+  if (candidates.length) lastSavedAt = Math.max(lastSavedAt, candidates[0].savedAt);
   for (const c of candidates) {
     try {
       return { state: migrate(c.version, c.data), loaded: true };
