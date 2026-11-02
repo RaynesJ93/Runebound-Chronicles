@@ -10,6 +10,7 @@ export function defaultState() {
     run: { on: true, energy: 100 },
     settings: { dpad: 'auto', zoomStep: 0, autoRetaliate: true, attackStyle: 'accurate' },
     skills: defaultSkills(),
+    inventory: Array(28).fill(null),
     stats: { playTimeSec: 0, tilesWalked: 0 },
     flags: { seenMoveHint: false },
     createdAt: Date.now(),
