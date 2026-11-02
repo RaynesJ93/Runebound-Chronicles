@@ -1,6 +1,6 @@
 # RuneBound Chronicles — Roadmap
 
-*Updated 2 November 2026 · matches [GAME_DESIGN.md](GAME_DESIGN.md) v2.2*
+*Updated 2 November 2026 · matches [GAME_DESIGN.md](GAME_DESIGN.md) v2.3*
 
 The game is built in small batches. Each batch must:
 
@@ -28,12 +28,22 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 | 8 ✅ | Food, potions, bank and shop | Eating (3-tick delay), potions with timed boosts, building interiors, village bank (deposit/withdraw), general store (buy/sell, coins), death gravestone rules | Full loop works: fight → loot → bank/sell → buy upgrade |
 | 9 ✅ | v0.1 polish | Mobile UI pass (safe areas, 44 pt targets, long-press menus), settings, performance pass on iPhone, save migration tests, bug fixes | v0.1 released on GitHub Pages |
 
+## Phase 1.5 — Gear and progression (v0.11)
+
+The full gear ladder from [design section 7](GAME_DESIGN.md#gear-and-progression), with RuneBound's own names ([section 14](GAME_DESIGN.md#14-our-names)). Done before skilling, because skilling makes this gear.
+
+| Batch | Name | What's in it | Done when |
+| --- | --- | --- | --- |
+| G1 | Our names | Rename existing items (Copper, Greyiron, Pine, Rawhide, Gale/Tide/Focus runes), spells (Gale Dart, Tide Dart), styles (Precise, Forceful, Guarded, Balanced; Steady, Quickshot, Farshot) and Hitpoints → Vitality. Save version 3 with a migration, and new save tests | Every name in the game is our own and old saves load with items renamed |
+| G2 | The gear ladder | Every tier generated from data: 9 metals × 8 weapons and 9 armour pieces, arrows, 8 woods × shortbow/warbow/staff, 8 hides and 8 cloths × 5 pieces, gem jewellery. Icons and character sprites tinted per tier. Copper and Greyiron available now from Brambleford's new smith and Thornwood drops; Stone and Ember Darts unlocked; early gear rebalanced so each upgrade is felt | You can wear a full Copper or Greyiron set and see it on your character; higher tiers exist in data for later regions |
+| G3 | Sets, triangle and guide | Matched-set bonus, combat triangle tuning (monsters with weaknesses shown on examine), Gear guide in the Equipment tab, Trophy ledger | Choosing gear for a monster matters and the next upgrade is always clear |
+
 ## Phase 2 — Skilling (v0.2)
 
-1. Woodcutting (trees on the forest route) and Fletching (bows, arrows)
-2. Mining (a small mine area) and Smithing (bars, bronze/iron gear)
+1. Woodcutting (Pine and Ashwood in Thornwood) and Fletching (shortbows, warbows, staves, arrows)
+2. Mining (Copperdeep Mine: copper, greyiron, cinderstone) and Smithing (bars, then every Copper–Hearthsteel item), with Fine and Masterwork quality
 3. Fishing and Cooking (food you make yourself)
-4. Crafting and Runecrafting (leather armour, runes for magic)
+4. Crafting (Rawhide/Wolfhide armour, Linen/Woolweave robes, Amber jewellery) and Runebinding (Gale, Tide, Stone, Ember and Focus runes)
 5. Bank tabs and search
 
 ## Phase 3 — Quests and new regions (v0.3)
@@ -41,27 +51,28 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 1. Quest journal and quest system (stages, flags, rewards)
 2. First main-story quest that unlocks the second town
 3. Second town, two more routes, a cave
-4. New enemy families and gear tiers (steel, mithril)
+4. New enemy families and the Hearthsteel, Dusksteel and Moonsilver tiers; Lance spells
 5. Specialist shops in the new town
 
 ## Phase 4 — Dungeons and bosses (v0.4)
 
 1. First multi-floor dungeon
 2. Boss fight with telegraphed attacks and phases
-3. Rare-drop table expansion and collection log
-4. Prayer and Agility skills
+3. Rare-drop table expansion and the Trophy ledger
+4. Devotion and Athletics skills; Fervour strikes on rare weapons
 
 ## Phase 5 — Endgame (v1.0)
 
 1. Wilderness area with harsher death rules
-2. Endgame gear tiers and bosses
-3. Skill capes at 99
+2. Endgame tiers (Emberite to Starmetal, Wyrmscale, Ashforged), Surge and Cataclysm spells, and bosses
+3. Mastery mantles at 99
 4. Balance pass across all skills, XP rates and drop rates
 
 ## Changelog
 
 | Date | Change |
 | --- | --- |
+| 2 Nov 2026 | Design v2.3: gear and progression system — three gear families with a combat triangle, 9 metal tiers (Copper to Starmetal) plus boss tiers, 8 woods, hides and cloths, our own runes and spells (Dart, Lance, Surge, Cataclysm), craft quality, matched sets, trophies, and a names list (section 14). New Phase 1.5 with batches G1–G3. |
 | 2 Nov 2026 | v0.10.0 — first playable release. Batch 9: long-press (phone) or right-click (computer) anything for its options (attack, talk, examine, take, enter, walk here); tapping an item eats, drinks, wields or wears it, long-press for the full menu; every touch button at least 44 pt; shop quantity buttons on their own row on phones; new settings (what tapping an item does, text speed, XP drops, battery saver) and an "adventure" stats section; canvas capped at 2× density and the HUD only redraws what changed; saves are repaired on load (unknown items removed, broken values reset); automated tests for loading saves from every earlier version; examine text for every villager. Fixed: two saves in the same millisecond could load the older one. |
 | 2 Nov 2026 | Bram's cabin got a bow-and-arrow sign so new players know where to get a free bow. |
 | 2 Nov 2026 | v0.9.0: Batch 8 shipped — walk-in interiors for the General Store and Bank, Pell's shop (buy/sell, prices shift with stock, restocking), the bank (unlimited stacking storage, deposit bag/worn items), food (bread, meat pie, trout), attack/strength/defence potions with 4 doses and decaying boosts, eating delays your next attack, death keeps your 3 most valuable items and leaves the rest in a 15-minute gravestone (free for 5 minutes, then a fee), new leather armour and wooden shield. |
