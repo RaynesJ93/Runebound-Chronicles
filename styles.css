@@ -1,3 +1,14 @@
+/* Numbers use Jersey 10 (a pixel font with very clear digits; SIL Open Font
+   Licence, see fonts/Jersey10-OFL.txt). Only the digits 0-9 come from it; letters
+   stay in Pixelify Sans, whose 5 looks too much like an S. */
+@font-face {
+  font-family: "RB Digits";
+  src: url("fonts/jersey10-digits.woff") format("woff");
+  unicode-range: U+0030-0039;
+  size-adjust: 122%;
+  font-display: swap;
+}
+
 /* RuneBound Chronicles — interface styles.
    Wood-framed parchment panels and a pixel font, to match the pixel-art
    world. Sized for thumbs (44 pt targets) and the iPhone notch. */
@@ -16,7 +27,7 @@
   --safe-r: env(safe-area-inset-right, 0px);
   --safe-b: env(safe-area-inset-bottom, 0px);
   --safe-l: env(safe-area-inset-left, 0px);
-  --pixel: "Pixelify Sans", "Trebuchet MS", system-ui, sans-serif;
+  --pixel: "RB Digits", "Pixelify Sans", "Trebuchet MS", system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -28,6 +39,7 @@ html, body {
   background: #2c5a2a;
   color: var(--ink);
   font-family: var(--pixel);
+  font-synthesis-weight: none; /* never smear the pixel digits with fake bold */
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
