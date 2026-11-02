@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="RuneBound">
+  <meta name="theme-color" content="#2b241b">
+  <meta name="description" content="RuneBound Chronicles — a low-poly fantasy RPG for desktop and iPhone.">
+  <title>RuneBound Chronicles</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three/three.module.min.js" } }
+  </script>
+</head>
+<body>
+  <canvas id="game" aria-label="Game world"></canvas>
+  <div id="ui"></div>
+  <div id="loading">
+    <div class="title">RuneBound<span>Chronicles</span></div>
+    <div class="sub" id="loading-text">Loading…</div>
+  </div>
+  <noscript><p style="color:#fff;padding:24px">RuneBound Chronicles needs JavaScript turned on.</p></noscript>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
