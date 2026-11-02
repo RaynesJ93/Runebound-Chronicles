@@ -164,9 +164,20 @@ export const NPCS = [
         again: { say: 'Still in one piece? Good.', next: 'menu' },
         menu: { say: [], choices: [
           { text: 'Any danger in these woods?', next: 'danger' },
+          { text: 'Do you have a bow I could use?', next: 'bow', if: (c) => !c.flags.gotBow },
+          { text: 'Where do I get more arrows?', next: 'arrows', if: (c) => c.flags.gotBow },
           { text: 'Can you teach me to chop trees?', next: 'teach' },
           { text: 'See you around.', next: 'bye' },
         ] },
+        bow: {
+          say: ["A bow? I've a spare shortbow I made last winter. Take it, and a quiver of arrows.",
+            'Put the arrows in your ammo slot and the bow in your hand. Then you can shoot from a safe distance.'],
+          give: { flag: 'gotBow', items: [{ item: 'shortbow', qty: 1 }, { item: 'bronzeArrow', qty: 50 }] },
+          giveFail: 'bowFull',
+          next: 'menu',
+        },
+        bowFull: { say: 'Your bag is stuffed full! Make some room, then ask me again.', next: 'menu' },
+        arrows: { say: ['Goblins carry a few. And most arrows you shoot land under your target, so pick them back up.'], next: 'menu' },
         danger: {
           say: ["Goblins, west of the road past the tall grass. They've pitched tents and everything.", "Wolves keep to the rocks up north-east. Don't go poking round there without a weapon."],
           set: { heardOfGoblins: true },
@@ -189,12 +200,25 @@ export const NPCS = [
       nodes: {
         hi: {
           say: ["The mine road's blocked by a rockslide. I've been waiting two days for someone to clear it.", "If you're heading north, you'll have to wait too."],
-          choices: [
-            { text: "What's at the mine?", next: 'mine' },
-            { text: 'Good luck.', next: 'bye' },
-          ],
+          next: 'menu',
         },
-        mine: { say: ['Copper, tin, and dwarves who don\'t much like visitors.', "Best place around to learn mining, once you can get there."] },
+        menu: { say: [], choices: [
+          { text: "What's at the mine?", next: 'mine' },
+          { text: 'Is that a magic staff?', next: 'staff', if: (c) => !c.flags.gotStaff },
+          { text: 'How does magic work?', next: 'magic', if: (c) => c.flags.gotStaff },
+          { text: 'Good luck.', next: 'bye' },
+        ] },
+        staff: {
+          say: ["This old thing? I'm an apprentice of the Tower, or I was. I've a spare one, actually.",
+            "Here, take it, and some runes. Wield the staff, pick Wind Strike in your Combat tab, and every attack casts it.",
+            'Each cast uses an air rune and a mind rune. Water Strike needs Magic level 5 and a water rune too.'],
+          give: { flag: 'gotStaff', items: [{ item: 'apprenticeStaff', qty: 1 }, { item: 'airRune', qty: 60 }, { item: 'mindRune', qty: 50 }, { item: 'waterRune', qty: 20 }] },
+          giveFail: 'staffFull',
+          next: 'menu',
+        },
+        staffFull: { say: 'You have no room for it! Free up some space in your bag first.', next: 'menu' },
+        magic: { say: ['Runes hold the power. The staff just points it.', 'Goblins carry air and mind runes; the brute by the tents often has water runes.'], next: 'menu' },
+        mine: { say: ['Copper, tin, and dwarves who don\'t much like visitors.', "Best place around to learn mining, once you can get there."], next: 'menu' },
         bye: { say: 'And to you.' },
       },
     },

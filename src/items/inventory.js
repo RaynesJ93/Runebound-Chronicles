@@ -54,6 +54,21 @@ export class Inventory {
     return s;
   }
 
+  // Removes qty of an item (from stacks or single slots). Returns true if it had enough.
+  remove(id, qty = 1) {
+    if (this.count(id) < qty) return false;
+    let left = qty;
+    for (let i = 0; i < this.slots.length && left > 0; i++) {
+      const s = this.slots[i];
+      if (!s || s.id !== id) continue;
+      const take = Math.min(left, s.qty);
+      s.qty -= take;
+      left -= take;
+      if (s.qty <= 0) this.slots[i] = null;
+    }
+    return true;
+  }
+
   swap(a, b) {
     const s = this.slots;
     if (a === b || a < 0 || b < 0 || a >= s.length || b >= s.length) return;

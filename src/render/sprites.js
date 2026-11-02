@@ -404,6 +404,7 @@ function palette(look) {
     ears: !!L.ears,
     weapon: L.weapon ? (L.weapon === 'iron' ? [hex('#7a828b'), hex('#c0c8d0'), hex('#eef2f5')] : [hex('#a8692e'), hex('#d4934f'), hex('#f2c48a')]) : null,
     blade: L.blade || 4,
+    weaponKind: L.weaponKind || (L.weapon ? 'blade' : null),
     beard: L.beard ? hex(L.beard) : null,
     hat: L.hat || null, robe: !!L.robe,
     hatCol: L.hatColor ? hex(L.hatColor) : null,
@@ -456,7 +457,20 @@ function drawFront(L, back, frame) {
     b.rect(x, 11 + o, 2, 4, side ? L.tunicS : L.tunic);
     b.rect(x, 15 + o, 2, 1, L.skin);
   }
-  if (L.weapon) {
+  if (L.weaponKind === 'bow' || L.weaponKind === 'staff') {
+    const hx = back ? 1 : 14;
+    const hy = 15 + armO(back ? 0 : 1) + bob;
+    const wood = [hex('#5e3b1f'), hex('#8a5a32'), hex('#b07a48')];
+    if (L.weaponKind === 'bow') {
+      for (let k = -6; k <= 4; k++) b.set(hx + (Math.abs(k) < 4 ? (back ? -1 : 1) : 0), hy + k, wood[Math.abs(k) < 2 ? 2 : 1]);
+      for (let k = -5; k <= 3; k++) b.set(hx, hy + k, hex('#e8e0c8'));
+    } else {
+      for (let y = hy - 12; y <= hy + 5; y++) b.set(hx, y, y < hy - 9 ? wood[2] : wood[1]);
+      b.rect(hx - 1, hy - 14, 3, 2, hex('#5fd0c8'));
+      b.set(hx, hy - 15, hex('#c8fff8'));
+    }
+  }
+  if (L.weaponKind === 'blade') {
     // held upright in the right hand (your right = picture left when seen from behind)
     const hx = back ? 1 : 14;
     const hy = 15 + armO(back ? 0 : 1) + bob;
@@ -523,7 +537,16 @@ function drawSide(L, frame) {
   const armX = frame === 1 ? 8 : frame === 2 ? 6 : 7;
   b.rect(armX, 11 + bob, 2, 4, L.tunicS);
   b.rect(armX, 15 + bob, 2, 1, L.skin);
-  if (L.weapon) {
+  if (L.weaponKind === 'bow') {
+    const wood = [hex('#8a5a32'), hex('#b07a48')];
+    const y = 15 + bob;
+    for (let k = -6; k <= 5; k++) b.set(armX - 2 - (Math.abs(k) < 4 ? 1 : 0), y + k, wood[Math.abs(k) < 2 ? 1 : 0]);
+    for (let k = -5; k <= 4; k++) b.set(armX - 1, y + k, hex('#e8e0c8'));
+  } else if (L.weaponKind === 'staff') {
+    const y = 15 + bob;
+    for (let k = -12; k <= 5; k++) b.set(armX - 1, y + k, hex(k < -9 ? '#b07a48' : '#8a5a32'));
+    b.rect(armX - 2, y - 14, 3, 2, hex('#5fd0c8'));
+  } else if (L.weaponKind === 'blade') {
     // pointing forward (left) from the hand
     const [d, m, l] = L.weapon;
     const y = 15 + bob;
@@ -603,4 +626,47 @@ export function splat(n) {
   const spr = sprite(b, 7, 6);
   splatCache.set(n, spr);
   return spr;
+}
+
+// ---- Wolves ---------------------------------------------------------------------
+// A four-legged side view, facing left. frame 0 stands, 1 and 2 are strides.
+// big: the Alpha is drawn about a third larger.
+function drawWolf(look, frame) {
+  const k = look.big ? 1.35 : 1;
+  const W = Math.round(26 * k), H = Math.round(20 * k);
+  const b = new Bitmap(W, H);
+  const fur = hex(look.fur), dark = hex(look.dark), light = hex(look.light), eye = hex(look.eyes || '#f2c23a');
+  const R = (x, y, w, h, c) => b.rect(Math.round(x * k), Math.round(y * k), Math.max(1, Math.round(w * k)), Math.max(1, Math.round(h * k)), c);
+  const bob = frame ? -1 : 0;
+  // legs: front pair and back pair, swapping on strides
+  const legs = frame === 0 ? [[6, 0], [9, 0], [17, 0], [20, 0]] : frame === 1 ? [[4, 0], [10, -1], [16, -1], [21, 0]] : [[7, -1], [8, 0], [18, 0], [19, -1]];
+  legs.forEach(([x, lift], i) => { R(x, 12 + lift, 2, 6 - lift, i % 2 ? dark : fur); R(x - (i < 2 ? 1 : 0), 17 + lift, 3, 1, dark); });
+  // body
+  b.ellipse(14 * k, (9 + bob) * k, 9 * k, 4.6 * k, fur);
+  b.ellipse(14 * k, (11 + bob) * k, 7 * k, 2.2 * k, light);
+  b.ellipse(15 * k, (7 + bob) * k, 7 * k, 2 * k, dark);
+  // tail, curving up behind
+  R(22, 6 + bob, 2, 2, fur); R(23, 4 + bob, 2, 3, fur); R(24, 3 + bob, 2, 2, light);
+  // head, snout and ears
+  R(2, 4 + bob, 7, 6, fur);
+  R(0, 7 + bob, 3, 3, fur);
+  R(0, 9 + bob, 3, 1, light);
+  b.set(0, Math.round((7 + bob) * k), hex('#1d1d1d'));
+  R(4, 1 + bob, 2, 3, dark); R(7, 2 + bob, 2, 2, dark);
+  R(3, 6 + bob, 1, 1, eye);
+  if (look.big) { R(8, 4 + bob, 3, 5, light); R(6, 9 + bob, 2, 1, hex('#b0302a')); } // white mane, scar
+  b.outline();
+  return b;
+}
+
+export function wolfFrames(look) {
+  const frames = { down: [], up: [], left: [], right: [] };
+  for (let f = 0; f < 3; f++) {
+    const w = drawWolf(look, f);
+    const left = sprite(w, Math.floor(w.w / 2), w.h - 2);
+    const right = sprite(mirror(w), Math.floor(w.w / 2), w.h - 2);
+    frames.left.push(left); frames.up.push(left);
+    frames.right.push(right); frames.down.push(right);
+  }
+  return frames;
 }

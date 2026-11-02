@@ -14,7 +14,8 @@ import { Hud } from './ui/hud.js';
 import { Enemy } from './entities/enemy.js';
 import { ENEMIES } from '../data/enemies.js';
 import { Combat } from './combat/combat.js';
-import { SkillBook, SKILL_NAME } from './skills/skills.js';
+import { SkillBook, SKILL_NAME, MELEE_STYLES, RANGED_STYLES } from './skills/skills.js';
+import { SPELLS } from '../data/spells.js';
 import { maxHit, effectiveLevel } from './combat/formulas.js';
 import { Inventory } from './items/inventory.js';
 import { Equipment, verb } from './items/equipment.js';
@@ -94,11 +95,17 @@ function boot() {
 
   // ---- Combat ----------------------------------------------------------------
   const combat = new Combat({
-    state, player, rng, skills: book, equipment,
+    state, player, rng, skills: book, equipment, inventory,
     on: {
       message: (t) => hud.message(t),
       cantReach: () => hud.message("I can't reach that."),
       healed: () => hud.flashHeal(),
+      inventoryChanged: () => refreshInventory(),
+      // Arrows that didn't break land under the target, stacked per tile.
+      arrowLanded: (id, x, y) => {
+        const here = ground.at(x, y).find((g) => g.item === id && !g.rare);
+        if (here) { here.qty++; here.expires = time + 120; } else ground.add(id, 1, x, y, time);
+      },
       enemyDied: (e) => {
         hud.message(`You defeated the ${e.name}!`);
         for (const drop of rollLoot(e.def.loot, rng)) {
@@ -159,19 +166,49 @@ function boot() {
   hud.el.setRetaliate.addEventListener('click', toggleRetaliate);
   hud.$('set-retaliate2').addEventListener('click', toggleRetaliate);
 
+  // Max hit for whatever you're fighting with right now.
   const currentMaxHit = () => {
     const lv = combat.skills;
-    return maxHit(effectiveLevel(lv.strength, combat.style.bonus.strength || 0), equipment.bonuses().str);
+    const b = equipment.bonuses();
+    if (combat.mode === 'magic') return combat.spell.maxHit;
+    if (combat.mode === 'ranged') return maxHit(effectiveLevel(lv.ranged, combat.rangedStyle.bonus.ranged || 0), b.rangedStr);
+    return maxHit(effectiveLevel(lv.strength, combat.style.bonus.strength || 0), b.str);
+  };
+
+  // The choices in the Combat tab depend on your weapon: melee styles, bow styles or spells.
+  const styleChoices = () => {
+    const lv = combat.skills;
+    if (combat.mode === 'magic') {
+      const runes = (sp) => Object.entries(sp.runes).map(([id, n]) => `${n} ${ITEMS[id].name.replace(' rune', '')}`).join(', ');
+      return {
+        intro: 'Choose a spell. Every attack casts it, using its runes from your bag.',
+        current: combat.spell.id,
+        list: SPELLS.map((sp) => ({ id: sp.id, name: sp.name, icon: sp.id, locked: lv.magic < sp.level, sub: `Magic ${sp.level} · max hit ${sp.maxHit} · ${runes(sp)}` })),
+      };
+    }
+    if (combat.mode === 'ranged') {
+      return {
+        intro: 'Pick how you shoot. Arrows come from your ammo slot.',
+        current: combat.rangedStyle.id,
+        list: RANGED_STYLES.map((st) => ({ id: st.id, name: st.name, icon: st.id === 'accurate' ? 'ranged' : st.id, sub: `Trains ${st.trains}` })),
+      };
+    }
+    return {
+      intro: 'Pick how you fight. Each style gives a small bonus and decides which skill your XP goes to.',
+      current: combat.style.id,
+      list: MELEE_STYLES.map((st) => ({ id: st.id, name: st.name, icon: st.id, sub: `Trains ${st.trains}` })),
+    };
   };
 
   // Skills panel: levels, progress, and the Combat tab with attack styles.
   refreshSkills = () => {
     if (!hud.skillsOpen) return;
     hud.renderSkills(book, combat.level);
-    const style = combat.style;
-    const lv = combat.skills;
     const w = equipment.weapon;
-    hud.renderStyles(style.id, state.settings.autoRetaliate !== false, `Max hit: ${currentMaxHit()} · Combat level: ${combat.level} · ${w.name} (${w.type}, ${(w.speed * 0.6).toFixed(1)} s per attack).`);
+    const c = styleChoices();
+    const reach = combat.mode === 'melee' ? 'melee' : `range ${combat.range} tiles`;
+    hud.renderStyles(c.list, c.current, state.settings.autoRetaliate !== false,
+      `Max hit: ${currentMaxHit()} · Combat level: ${combat.level} · ${w.name} (${reach}, ${(combat.speed * 0.6).toFixed(1)} s per attack).`, c.intro);
   };
   hud.onSkillsOpen = () => refreshSkills();
   // Inventory panel: tap for options, drag to rearrange.
@@ -228,9 +265,20 @@ function boot() {
     ]);
   };
   hud.onStylePick = (id) => {
-    state.settings.attackStyle = id;
-    hud.message(`Attack style: ${combat.style.name} (trains ${combat.style.trains}).`);
+    if (combat.mode === 'magic') {
+      const sp = SPELLS.find((x) => x.id === id);
+      if (combat.skills.magic < sp.level) { hud.message(`You need a Magic level of ${sp.level} to cast ${sp.name}.`); return; }
+      state.settings.spell = id;
+      hud.message(`Spell: ${sp.name}.`);
+    } else if (combat.mode === 'ranged') {
+      state.settings.rangedStyle = id;
+      hud.message(`Ranged style: ${combat.rangedStyle.name} (trains ${combat.rangedStyle.trains}).`);
+    } else {
+      state.settings.attackStyle = id;
+      hud.message(`Attack style: ${combat.style.name} (trains ${combat.style.trains}).`);
+    }
     refreshSkills();
+    refreshInventory();
   };
   const zoomBy = (d) => { state.settings.zoomStep = (state.settings.zoomStep || 0) + d; applySettings(); };
   hud.$('zoom-in').addEventListener('click', () => zoomBy(1));
@@ -497,6 +545,19 @@ function boot() {
     else if (hud.dialogOpen && /^(Digit|Numpad)[1-9]$/.test(e.code)) hud.pickChoice(Number(e.code.slice(-1)) - 1);
   };
 
+  // An NPC hands you items once (remembered by a story flag).
+  const giveItems = (npc) => (spec) => {
+    if (state.flags[spec.flag]) return true;
+    const needed = spec.items.filter((it) => !ITEMS[it.item].stackable || !inventory.count(it.item)).length;
+    if (inventory.freeSlots < needed) return false;
+    for (const it of spec.items) inventory.add(it.item, it.qty);
+    state.flags[spec.flag] = true;
+    hud.message(`${npc.name.split(' ')[0]} gives you: ${spec.items.map((it) => `${itemName(it.item)}${it.qty > 1 ? ` × ${it.qty}` : ''}`).join(', ')}.`);
+    refreshInventory();
+    save();
+    return true;
+  };
+
   player.onInteract = (prop) => {
     marker = null;
     goal = null;
@@ -506,7 +567,7 @@ function boot() {
       player.faceTowards(npc.standTile.x, npc.standTile.y);
       talkTarget = null;
       npc.busy = true;
-      hud.startConversation({ name: npc.name, ...npc.def.talk }, { flags: state.flags }, () => {
+      hud.startConversation({ name: npc.name, ...npc.def.talk }, { flags: state.flags, give: giveItems(npc) }, () => {
         npc.busy = false;
         save();
       });

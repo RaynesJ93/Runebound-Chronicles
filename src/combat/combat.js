@@ -1,14 +1,19 @@
 // Real-time overworld combat, run on the 0.6 s game tick.
 //
-// Player: tap an enemy -> walk until standing next to it (not diagonally),
-// then attack every `speed` ticks until it dies or you do something else.
+// Player: tap an enemy -> walk until in range (next to it for melee; within
+// the weapon's range with a clear line of sight for bows and spells), then
+// attack every `speed` ticks until it dies or you do something else.
+// Arrows and spells fly as projectiles and land a moment later.
 // Enemies: wander near their spawn; when attacked (or, if aggressive, when you
 // come close) they fight back and chase you; if you lead them too far from
 // home they give up, walk back and heal.
 
 import { resolveAttack, combatLevel } from './formulas.js';
 import { findPath } from '../world/pathfinding.js';
-import { styleById } from '../skills/skills.js';
+import { styleById, rangedStyleById } from '../skills/skills.js';
+import { spellById } from '../../data/spells.js';
+import { ITEMS } from '../../data/items.js';
+import { GROUND } from '../world/area.js';
 
 const UNARMED_SPEED = 4; // ticks between punches
 const REGEN_TICKS = 10; // out of combat: 1 hitpoint every 6 seconds
@@ -24,8 +29,12 @@ const DIRS4 = DIRS8.slice(0, 4);
 
 export class Combat {
   // on: { message(text), playerDied(), enemyDied(enemy), cantReach() }
-  constructor({ state, player, rng, on, skills, equipment }) {
+  constructor({ state, player, rng, on, skills, equipment, inventory }) {
     this.gear = equipment;
+    this.inv = inventory;
+    this.projectiles = []; // { kind, from: {x, y} world tiles, to: enemy, start, end }
+    this.pending = []; // hits in flight: { target, dmg, at (tick), mode, spell }
+    this.ticks = 0;
     this.state = state;
     this.book = skills;
     this.player = player;
@@ -45,11 +54,54 @@ export class Combat {
   // ---- Player stats, from the skills you've trained -------------------------------
   get skills() { return this.book.levels(); }
   get style() { return styleById(this.state.settings.attackStyle); }
+  get rangedStyle() { return rangedStyleById(this.state.settings.rangedStyle); }
+  get spell() { return spellById(this.state.settings.spell); }
+  get weapon() { return this.gear ? this.gear.weapon : { style: 'melee', range: 1, speed: UNARMED_SPEED, type: 'crush' }; }
+  get mode() { return this.weapon.style; }
+
+  // How far away you can attack from.
+  get range() {
+    const w = this.weapon;
+    if (w.style === 'melee') return 1;
+    return w.range + (w.style === 'ranged' ? this.rangedStyle.range || 0 : 0);
+  }
+
+  get speed() {
+    const w = this.weapon;
+    return Math.max(2, w.speed + (w.style === 'ranged' ? this.rangedStyle.speed || 0 : 0));
+  }
+
+  // Projectiles fly over water, but not through trees, rocks or walls.
+  lineOfSight(a, b) {
+    const n = Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y));
+    for (let i = 1; i < n; i++) {
+      const x = Math.round(a.x + ((b.x - a.x) * i) / n);
+      const y = Math.round(a.y + ((b.y - a.y) * i) / n);
+      if (!this.area.isWalkable(x, y)) {
+        const g = this.area.groundAt(x, y);
+        if (g !== GROUND.WATER && g !== GROUND.BRIDGE) return false;
+      }
+    }
+    return true;
+  }
+
+  inRange(from, to) {
+    if (this.mode === 'melee') return adjacent(from, to);
+    const d = cheb(from, to);
+    return d >= 1 && d <= this.range && this.lineOfSight(from, to);
+  }
   // Your accuracy bonus for your weapon's attack type, and strength bonus.
   meleeBonuses() {
     if (!this.gear) return { attackBonus: 0, strengthBonus: 0 };
     const b = this.gear.bonuses();
     return { attackBonus: b.att[this.gear.weapon.type], strengthBonus: b.str };
+  }
+
+  // Defensive / Longrange styles make you a little harder to hit.
+  defenceStyleBonus() {
+    if (this.mode === 'melee') return this.style.bonus.defence || 0;
+    if (this.mode === 'ranged') return this.rangedStyle.bonus.defence || 0;
+    return 0;
   }
 
   // Your armour's defence bonus against one attack type.
@@ -69,6 +121,8 @@ export class Combat {
     this.area = area;
     this.enemies = enemies;
     this.target = null;
+    this.pending = [];
+    this.projectiles = [];
   }
 
   attack(enemy) {
@@ -88,8 +142,8 @@ export class Combat {
     const p = this.player;
     const s = p.pathStart;
     const g = t.standTile;
-    if (adjacent(s, g)) { p.setPath([]); return; }
-    const path = findPath(this.area, s.x, s.y, (x, y) => Math.abs(x - g.x) + Math.abs(y - g.y) === 1);
+    if (this.inRange(s, g)) { p.setPath([]); return; }
+    const path = findPath(this.area, s.x, s.y, (x, y) => this.inRange({ x, y }, g));
     if (path) p.setPath(path);
     else if (first) { this.target = null; this.on.cantReach?.(); }
   }
@@ -113,17 +167,105 @@ export class Combat {
     const t = this.target;
     if (t) {
       if (t.dead) this.target = null;
-      else if (!p.moving && adjacent(p.tile, t.standTile)) {
+      else if (!p.moving && this.inRange(p.tile, t.standTile)) {
         p.setPath([]);
         p.faceTowards(t.standTile.x, t.standTile.y);
         if (this.cooldown <= 0) {
-          this.playerSwing(t);
-          this.cooldown = this.gear ? this.gear.weapon.speed : UNARMED_SPEED;
+          const fired = this.mode === 'ranged' ? this.shoot(t) : this.mode === 'magic' ? this.cast(t) : (this.playerSwing(t), true);
+          if (fired) this.cooldown = this.speed;
         }
       } else this.approach();
     }
 
+    // Arrows and spells landing this tick.
+    this.ticks++;
+    this.projectiles = this.projectiles.filter((pr) => now < pr.end + 0.05);
+    const landing = this.pending.filter((h) => h.at <= this.ticks);
+    this.pending = this.pending.filter((h) => h.at > this.ticks);
+    for (const h of landing) this.land(h);
+
     for (const e of this.enemies) this.enemyTick(e);
+  }
+
+  // ---- Ranged and magic --------------------------------------------------------------
+  flightTicks(e, magic) {
+    const d = cheb(this.player.tile, e.standTile);
+    return magic ? 1 + Math.floor((1 + d) / 3) : 1 + Math.floor((3 + d) / 6);
+  }
+
+  launch(e, kind, ticks) {
+    const p = this.player.tile;
+    this.projectiles.push({ kind, from: { x: p.x + 0.5, y: p.y + 0.5 }, to: e, start: this.now, end: this.now + ticks * 0.6 });
+  }
+
+  // Fire one arrow from the ammo slot. Returns false if you can't.
+  shoot(e) {
+    const ammo = this.gear.slots.ammo;
+    const def = ammo && ITEMS[ammo.id]?.equip;
+    if (!ammo || def?.ammo !== this.weapon.ammo) {
+      this.on.message?.('You have no arrows in your ammo slot.');
+      this.target = null;
+      return false;
+    }
+    ammo.qty--;
+    if (ammo.qty <= 0) { this.gear.slots.ammo = null; this.on.message?.("That was your last arrow!"); }
+    const s = this.skills;
+    const st = this.rangedStyle;
+    const b = this.gear.bonuses();
+    const dmg = resolveAttack(this.rng,
+      { attack: s.ranged, strength: s.ranged, attackBonus: b.att.ranged, strengthBonus: b.rangedStr, attackStyle: st.bonus.ranged || 0, strengthStyle: st.bonus.ranged || 0 },
+      { defence: e.def.defence, defenceBonus: e.def.defenceBonus });
+    const ticks = this.flightTicks(e, false);
+    this.launch(e, 'arrow', ticks);
+    this.playerLungeAt = this.now;
+    // Like OSRS, most arrows can be picked up again where they land.
+    this.pending.push({ target: e, dmg, at: this.ticks + ticks, mode: 'ranged', arrow: ammo.id, keepArrow: this.rng() < 0.6 });
+    this.on.inventoryChanged?.();
+    return true;
+  }
+
+  // Cast the chosen spell, using its runes. Returns false if you can't.
+  cast(e) {
+    const spell = this.spell;
+    const s = this.skills;
+    if (s.magic < spell.level) {
+      this.on.message?.(`You need a Magic level of ${spell.level} to cast ${spell.name}.`);
+      this.target = null;
+      return false;
+    }
+    const missing = Object.entries(spell.runes).find(([id, n]) => this.inv.count(id) < n);
+    if (missing) {
+      this.on.message?.(`You don't have enough ${ITEMS[missing[0]].name.toLowerCase()}s to cast ${spell.name}.`);
+      this.target = null;
+      return false;
+    }
+    for (const [id, n] of Object.entries(spell.runes)) this.inv.remove(id, n);
+    const b = this.gear.bonuses();
+    const dmg = resolveAttack(this.rng,
+      { attack: s.magic, attackBonus: b.att.magic, maxHit: spell.maxHit },
+      { defence: e.def.defence, defenceBonus: e.def.defenceBonus });
+    const ticks = this.flightTicks(e, true);
+    this.launch(e, spell.colour, ticks);
+    this.playerLungeAt = this.now;
+    this.book.add('magic', spell.xp); // every cast gives some Magic XP
+    this.pending.push({ target: e, dmg, at: this.ticks + ticks, mode: 'magic', spell });
+    this.on.inventoryChanged?.();
+    return true;
+  }
+
+  // An arrow or spell arrives.
+  land(h) {
+    const e = h.target;
+    if (h.mode === 'ranged' && h.keepArrow && !e.dead) this.on.arrowLanded?.(h.arrow, e.standTile.x, e.standTile.y);
+    if (e.dead) return;
+    const dealt = Math.min(h.dmg, e.hp);
+    this.hurtEnemy(e, dealt);
+    if (dealt > 0) {
+      if (h.mode === 'ranged') for (const [skill, share] of Object.entries(this.rangedStyle.xp)) this.book.add(skill, dealt * XP_PER_DAMAGE * share);
+      else this.book.add('magic', dealt * 2);
+      this.book.add('hitpoints', dealt * HP_XP_PER_DAMAGE);
+    }
+    if (!e.dead && e.state !== 'fight') { e.state = 'fight'; e.cooldown = Math.max(e.cooldown, 1); }
   }
 
   playerSwing(e) {
@@ -212,7 +354,7 @@ export class Combat {
         if (e.cooldown <= 0) {
           const dmg = resolveAttack(this.rng,
             { attack: def.attack, strength: def.strength, attackBonus: def.attackBonus, maxHit: def.maxHit },
-            { defence: this.skills.defence, defenceBonus: this.defenceAgainst(def.attackType || 'crush'), defenceStyle: this.style.bonus.defence || 0 });
+            { defence: this.skills.defence, defenceBonus: this.defenceAgainst(def.attackType || 'crush'), defenceStyle: this.defenceStyleBonus() });
           e.lungeAt = this.now;
           e.cooldown = def.speed;
           this.hurtPlayer(e, dmg);

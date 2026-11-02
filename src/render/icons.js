@@ -128,6 +128,10 @@ ART.accurate = ART.attack;
 ART.aggressive = ART.strength;
 ART.defensive = ART.defence;
 ART.combat = ART.attack;
+ART.rapid = ART.ranged;
+ART.longrange = ART.ranged;
+ART.windStrike = ART.magic;
+ART.waterStrike = ART.magic;
 
 const cache = new Map();
 

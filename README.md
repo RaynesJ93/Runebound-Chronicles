@@ -22,12 +22,13 @@ There are no turn-based battles, no battle screens and no creature catching. You
 - Open **Skills** (sword button, or K) to see your levels. The **Combat** tab chooses your attack style: Accurate trains Attack, Aggressive trains Strength, Defensive trains Defence, Controlled trains all three.
 - Tap or click a goblin to attack it. Your character walks up and fights automatically. Tap the ground or move to stop. Beware the Goblin Brute by the tents: it attacks on sight.
 - Tap loot on the ground to walk over and pick it up (a pile gives you a choice). Open your **Inventory** (bag button, or I) and tap an item to examine or drop it; drag items to rearrange them. Tap a weapon or armour piece and choose **Wield** or **Wear**; the **Equipment** tab shows what you're wearing and your total bonuses.
+- Ask **Bram** (the woodcutter) for a bow and **Wren** (on the north road) about her staff. Put arrows in your ammo slot to shoot; with the staff, pick a spell in the **Combat** tab. Watch out for the wolf den to the north-east.
 
 ## Status
 
-**v0.7.0 — Batches 0–6 done:** the village of Brambleford and Route 1 (Thornwood Forest), 8 villagers with branching conversations, real-time overworld combat against goblins, combat skills that level to 99 on the OSRS XP curve, loot: goblins drop items (with rare drops) that you pick up into a 28-slot inventory, and equipment: wield weapons and wear armour, with bonuses that feed the combat formulas. Plus Emerald-style movement, run energy, and local saving with backup codes.
+**v0.8.0 — Batches 0–7 done:** the village of Brambleford and Route 1 (Thornwood Forest), 8 villagers with branching conversations, real-time overworld combat against goblins, combat skills that level to 99 on the OSRS XP curve, loot: goblins drop items (with rare drops) that you pick up into a 28-slot inventory, equipment with bonuses that feed the combat formulas, and Ranged and Magic: bows, staves, spells and projectiles, plus wolves and an Alpha Wolf mini-boss. Plus Emerald-style movement, run energy, and local saving with backup codes.
 
-Next: **Batch 7** — Ranged and Magic, bows and arrows, spells, and wolves (see the [roadmap](docs/ROADMAP.md)).
+Next: **Batch 8** — food, potions, the bank, the shop and building interiors (see the [roadmap](docs/ROADMAP.md)).
 
 ## Running it locally
 
@@ -56,6 +57,7 @@ then visit http://localhost:8000.
 | `data/npcs.js` | Villagers: where they live, how they look, what they say |
 | `data/enemies.js` | Monster stats and loot tables |
 | `data/items.js` | Every item: name, stacking, value, examine text, equipment stats |
+| `data/spells.js` | Combat spells: level, max hit, runes, XP |
 
 ## Stack
 

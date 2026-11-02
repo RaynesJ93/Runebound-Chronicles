@@ -106,6 +106,55 @@ const DRAW = {
     b.rect(7, 10, 3, 2, tooth); b.rect(7, 12, 2, 2, tooth); b.set(7, 14, tooth);
     b.set(9, 10, hex('#c9bd9c'));
   },
+  waterRune(b) {
+    b.ellipse(8, 8, 6, 6, hex('#7d7d78'));
+    b.ellipse(8, 7.5, 5.2, 5.2, hex('#a9a79f'));
+    const w = hex('#3f8fe0');
+    for (const [x, y] of [[8, 4], [7, 5], [9, 5], [6, 6], [10, 6], [6, 7], [10, 7], [6, 8], [10, 8], [7, 9], [9, 9], [8, 10], [8, 6], [8, 7], [7, 7], [9, 7], [7, 8], [9, 8], [8, 8], [8, 9]]) b.set(x, y, w);
+    b.set(7, 6, hex('#bfe3ff'));
+  },
+  mindRune(b) {
+    b.ellipse(8, 8, 6, 6, hex('#7d7d78'));
+    b.ellipse(8, 7.5, 5.2, 5.2, hex('#a9a79f'));
+    const o = hex('#f07a22');
+    for (const [x, y] of [[6, 5], [7, 5], [8, 5], [9, 5], [10, 6], [10, 7], [9, 8], [8, 8], [7, 9], [7, 10], [7, 7], [6, 6]]) b.set(x, y, o);
+    b.set(8, 6, hex('#ffd0a0'));
+  },
+  shortbow(b) {
+    const w = [hex('#5e3b1f'), hex('#8a5a32'), hex('#b07a48')];
+    for (let a = 0; a <= 20; a++) {
+      const t = -0.95 + (a / 20) * 1.9;
+      b.set(Math.round(5 + Math.cos(t) * 7), Math.round(8 + Math.sin(t) * 7), w[a % 3 === 0 ? 2 : 1]);
+    }
+    line(b, 9, 1, 9, 14, hex('#e8e0c8'));
+    b.rect(11, 7, 2, 3, w[0]);
+  },
+  apprenticeStaff(b) {
+    line(b, 3, 14, 11, 4, hex('#8a5a32'));
+    line(b, 4, 14, 12, 4, hex('#5e3b1f'));
+    b.ellipse(12.5, 3.5, 2.4, 2.4, hex('#2f9a92'));
+    b.set(12, 3, hex('#c8fff8'));
+    b.set(13, 2, hex('#7fe8e0'));
+  },
+  wolfPelt(b) {
+    const f = [hex('#5e6368'), hex('#8a8f94'), hex('#b4b8bc')];
+    for (let y = 3; y < 14; y++) for (let x = 2; x < 14; x++) {
+      const dx = (x + 0.5 - 8) / 6, dy = (y + 0.5 - 8.5) / 5;
+      const legs = (y > 11 && (x < 4 || x > 11)) || (y < 5 && (x < 4 || x > 11));
+      if (dx * dx + dy * dy > 1 && !legs) continue;
+      b.set(x, y, f[(x * 3 + y * 5) % 7 < 2 ? 0 : (x + y) % 3 === 0 ? 2 : 1]);
+    }
+    b.rect(6, 2, 4, 2, f[1]);
+  },
+  wolfCloak(b) {
+    const f = [hex('#3a3e42'), hex('#5e6368'), hex('#8a8f94'), hex('#e8e8e4')];
+    for (let y = 2; y < 15; y++) {
+      const half = 2 + (y - 2) * 0.45;
+      for (let x = 0; x < 16; x++) if (Math.abs(x + 0.5 - 8) <= half) b.set(x, y, f[y === 14 ? 0 : (x + y) % 4 === 0 ? 2 : 1]);
+    }
+    b.rect(5, 2, 6, 2, f[3]);
+    b.set(8, 4, hex('#e8c040'));
+  },
   bag(b) {
     const c = [hex('#6e4424'), hex('#9a6234'), hex('#c08c55')];
     b.ellipse(8, 10, 6, 5, c[0]);

@@ -15,7 +15,7 @@ const DOLL = [
   ['hands', 'feet', 'ring'],
 ];
 const sign = (n) => (n > 0 ? `+${n}` : String(n));
-import { SKILLS, MELEE_STYLES, xpForLevel, MAX_LEVEL } from '../skills/skills.js';
+import { SKILLS, xpForLevel, MAX_LEVEL } from '../skills/skills.js';
 
 const fmt = (n) => Math.floor(n).toLocaleString('en-GB');
 
@@ -72,7 +72,7 @@ export class Hud {
               <div class="skill-foot" id="skill-foot"></div>
             </div>
             <div data-pane="combat" class="hidden">
-              <p class="muted">Pick how you fight. Each style gives a small bonus and decides which skill your XP goes to.</p>
+              <p class="muted" id="style-intro"></p>
               <div class="style-list" id="style-list"></div>
               <div class="row"><span>Auto retaliate</span><button class="chip" id="set-retaliate2"></button></div>
               <p class="muted small" id="combat-stats"></p>
@@ -350,11 +350,13 @@ export class Hud {
     this.$('skill-foot').innerHTML = `<span>Combat level <b>${combatLevel}</b></span><span>Total level <b>${book.total()}</b></span>`;
   }
 
-  renderStyles(currentId, retaliate, stats) {
-    this.$('style-list').innerHTML = MELEE_STYLES.map((st) => `
-      <button class="style ${st.id === currentId ? 'on' : ''}" data-style="${st.id}" aria-pressed="${st.id === currentId}">
-        <img class="px" src="${iconUrl(st.id)}" alt="">
-        <span><b>${st.name}</b><small>Trains ${st.trains}</small></span>
+  // list: [{ id, name, sub, icon, locked }] — melee styles, bow styles or spells.
+  renderStyles(list, currentId, retaliate, stats, intro) {
+    this.$('style-intro').textContent = intro;
+    this.$('style-list').innerHTML = list.map((st) => `
+      <button class="style ${st.id === currentId ? 'on' : ''} ${st.locked ? 'locked' : ''}" data-style="${st.id}" aria-pressed="${st.id === currentId}">
+        <img class="px" src="${iconUrl(st.icon || st.id)}" alt="">
+        <span><b>${st.name}</b><small>${st.sub}</small></span>
       </button>`).join('');
     this.$('set-retaliate2').textContent = retaliate ? 'On' : 'Off';
     this.$('combat-stats').textContent = stats;
@@ -514,6 +516,8 @@ export class Hud {
   goto(id) {
     const node = this.conv.nodes[id];
     if (!node) { this.endConversation(); return; }
+    // give: { flag, items: [{ item, qty }], say } — an NPC hands you things once.
+    if (node.give && this.ctx.give && !this.ctx.give(node.give) && node.giveFail) { this.goto(node.giveFail); return; }
     this.node = node;
     if (node.set) Object.assign(this.ctx.flags, node.set);
     const say = Array.isArray(node.say) ? node.say : node.say ? [node.say] : [];
