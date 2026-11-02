@@ -21,6 +21,9 @@ const P = {
   waterHi: hex('#9fd3f5'),
   foam: hex('#d9f0ff'),
   shore: hex('#c7b278'),
+  plank: [hex('#9a6a3c'), hex('#a87644'), hex('#b5844f')],
+  plankDark: hex('#5e3b1f'),
+  rail: hex('#7a4f2a'),
 };
 
 const isSoft = (g) => g === GROUND.GRASS;
@@ -52,7 +55,7 @@ export function buildGround(area) {
       let t = g(tx, ty);
 
       // Ragged edges where a path, square, sand or soil meets grass.
-      if (t !== GROUND.GRASS && t !== GROUND.WATER) {
+      if (t !== GROUND.GRASS && t !== GROUND.WATER && t !== GROUND.BRIDGE) {
         const e = 1 + (rnd(x, y, 21) < 0.5 ? 1 : 0) + (rnd(x >> 1, y >> 1, 22) < 0.3 ? 1 : 0);
         if ((lx < e && isSoft(g(tx - 1, ty))) || (lx > 15 - e && isSoft(g(tx + 1, ty))) ||
             (ly < e && isSoft(g(tx, ty - 1))) || (ly > 15 - e && isSoft(g(tx, ty + 1)))) t = GROUND.GRASS;
@@ -86,6 +89,15 @@ export function buildGround(area) {
         }
         case GROUND.DIRT: {
           c = (y % 4 === 3) ? P.furrow : P.dirt[Math.floor(rnd(x, y, 61) * 2.2 + (y % 4 === 0 ? 0.9 : 0)) % 3];
+          break;
+        }
+        case GROUND.BRIDGE: {
+          // planks across the bridge, rails along the sides that face water
+          const railL = g(tx - 1, ty) === GROUND.WATER && lx < 2;
+          const railR = g(tx + 1, ty) === GROUND.WATER && lx > 13;
+          if (railL || railR) c = (lx === 0 || lx === 15) ? P.plankDark : P.rail;
+          else if (y % 4 === 3) c = P.plankDark;
+          else c = P.plank[Math.floor(rnd(Math.floor((x + (Math.floor(y / 4) % 2) * 5) / 9), Math.floor(y / 4), 91) * 3)];
           break;
         }
         default: c = P.water[1];

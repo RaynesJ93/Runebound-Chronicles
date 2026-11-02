@@ -28,6 +28,22 @@ export class PlayerController {
     this.onStep = null;
     this.onInteract = null;
     this.onRunEmpty = null;
+    this.onBlocked = null; // a villager is standing in the way of our path
+    this.waited = 0;
+    this.dt = 0;
+  }
+
+  // Jump straight to a tile (used when entering a new area).
+  teleport(area, x, y, facing = this.facing) {
+    this.area = area;
+    this.tile = { x, y };
+    this.from = { x, y };
+    this.to = { x, y };
+    this.moving = false;
+    this.t = 0;
+    this.stop();
+    this.facing = this.targetFacing = facing;
+    Object.assign(this.state.player, { area: area.id, x, y, facing });
   }
 
   get canRun() {
@@ -56,6 +72,7 @@ export class PlayerController {
   }
 
   update(dt, heldDir) {
+    this.dt = dt;
     if (heldDir) this.stop();
     let budget = dt;
     for (let guard = 0; guard < 4; guard++) {
@@ -78,13 +95,21 @@ export class PlayerController {
   }
 
   nextStep(heldDir) {
+    if (this.frozen) return null; // e.g. while the screen fades to a new area
     if (this.path.length) {
       const n = this.path[0];
       if (this.area.canStep(this.tile.x, this.tile.y, n.x, n.y)) {
         this.path.shift();
+        this.waited = 0;
         return n;
       }
-      this.stop(); // something is in the way now
+      if (this.area.canStep(this.tile.x, this.tile.y, n.x, n.y, true)) {
+        // Only a villager is in the way: wait a moment, then find a way round.
+        this.waited += this.dt;
+        if (this.waited > 0.7) { this.waited = 0; this.onBlocked?.(); }
+        return null;
+      }
+      this.stop(); // a wall is in the way now
       return null;
     }
     if (heldDir) {

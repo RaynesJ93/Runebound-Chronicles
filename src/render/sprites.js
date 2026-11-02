@@ -264,53 +264,195 @@ export function shadow(rx, ry) {
   return sprite(b, rx, ry);
 }
 
-// ---- The player ------------------------------------------------------------------
+// ---- Forest and camp props --------------------------------------------------------
 
-const LOOK = {
-  skin: hex('#f2c393'), skinS: hex('#d99c6c'), blush: hex('#ef9a8c'),
-  hair: hex('#6b3f1f'), hairHi: hex('#93602f'),
-  tunic: hex('#3f6fb0'), tunicS: hex('#2d5089'), tunicHi: hex('#5d8fd0'),
-  belt: hex('#5a3a1e'), gold: hex('#e8c040'),
-  pants: hex('#6b5137'), pantsS: hex('#523d29'),
-  boots: hex('#3a2a1c'), eye: hex('#2b1d16'),
+export function tallGrass(seed) {
+  const b = new Bitmap(16, 14);
+  const cols = [hex('#3c8a2c'), hex('#4fa338'), hex('#6cbf48'), hex('#8fd662')];
+  for (let k = 0; k < 9; k++) {
+    const x = 1 + Math.floor(rnd(seed, k, 1) * 14);
+    const h = 5 + Math.floor(rnd(seed, k, 2) * 6);
+    const lean = rnd(seed, k, 3) < 0.5 ? -1 : 1;
+    for (let j = 0; j < h; j++) {
+      const c = cols[Math.min(3, Math.floor((j / h) * 3 + rnd(seed, k, 4)))];
+      b.set(x + (j > h * 0.6 ? lean : 0), 13 - j, c);
+      if (j < h * 0.5) b.set(x + 1, 13 - j, cols[0]);
+    }
+  }
+  return sprite(b, 8, 14);
+}
+
+export function tent(seed) {
+  const b = new Bitmap(36, 30);
+  const cloth = rnd(seed, 1, 1) < 0.5 ? [hex('#6d5a3a'), hex('#8a744b'), hex('#a68e5e')] : [hex('#5d6b3a'), hex('#77874a'), hex('#93a35d')];
+  for (let y = 4; y < 28; y++) {
+    const half = ((y - 4) / 24) * 17;
+    for (let x = 0; x < 36; x++) {
+      const d = x + 0.5 - 18;
+      if (Math.abs(d) > half) continue;
+      let c = d < -half * 0.35 ? cloth[2] : d < half * 0.35 ? cloth[1] : cloth[0];
+      if ((y + Math.floor(x / 6)) % 7 === 0) c = cloth[0];
+      b.set(x, y, c);
+    }
+  }
+  // dark doorway
+  for (let y = 14; y < 28; y++) {
+    const half = ((y - 14) / 14) * 5;
+    for (let x = 0; x < 36; x++) if (Math.abs(x + 0.5 - 18) <= half) b.set(x, y, hex('#2a2016'));
+  }
+  b.rect(17, 0, 2, 6, hex('#5a3a20'));
+  b.rect(19, 0, 5, 3, hex('#b0302a'));
+  b.outline();
+  return sprite(b, 18, 28);
+}
+
+export function campfire(frame) {
+  const b = new Bitmap(18, 20);
+  for (const [x, y] of [[2, 15], [5, 16], [9, 16], [13, 15], [3, 17], [12, 17]]) b.rect(x, y, 3, 2, C.stone[1 + (x % 2)]);
+  b.rect(4, 14, 10, 2, C.trunk[1]);
+  b.rect(6, 13, 6, 1, C.trunk[0]);
+  const flame = [hex('#c8361d'), hex('#f07a22'), hex('#f9c23c'), hex('#fff2b0')];
+  const sway = frame ? 1 : 0;
+  const rows = [[6, 12, 6], [5, 11, 8], [4, 10, 8], [4, 9, 7], [3, 9, 5], [2, 8 + sway, 3], [1, 9 - sway, 2]];
+  for (const [y, x, w] of rows) for (let k = 0; k < w; k++) {
+    const t = Math.abs(k - (w - 1) / 2) / ((w + 1) / 2);
+    b.set(x - w / 2 + k + 0.5, y + 4, flame[t > 0.7 ? 0 : t > 0.4 ? 1 : y < 4 ? 3 : 2]);
+  }
+  return sprite(b, 9, 18);
+}
+
+export function logPile() {
+  const b = new Bitmap(34, 22);
+  const end = [hex('#d8b07a'), hex('#c4955c')];
+  for (const [cx, cy] of [[7, 16], [17, 16], [27, 16], [12, 8], [22, 8]]) {
+    b.ellipse(cx, cy, 5.5, 5.5, C.trunk[0]);
+    b.ellipse(cx, cy, 4.5, 4.5, end[0]);
+    b.ellipse(cx, cy, 2.4, 2.4, end[1]);
+    b.set(Math.floor(cx), Math.floor(cy), C.trunk[1]);
+  }
+  b.outline();
+  return sprite(b, 17, 21);
+}
+
+export function stump(seed) {
+  const b = new Bitmap(18, 16);
+  trunk(b, 4, 6, 10, 8);
+  b.rect(2, 12, 3, 2, C.trunk[1]); b.rect(13, 12, 3, 2, C.trunk[1]);
+  b.ellipse(9, 6, 5, 2.6, hex('#d8b07a'));
+  b.ellipse(9, 6, 2.6, 1.3, hex('#c4955c'));
+  if (rnd(seed, 1, 1) < 0.5) { b.rect(14, 9, 2, 1, hex('#e04a3a')); b.set(14, 10, hex('#f3e6d0')); }
+  b.outline();
+  return sprite(b, 9, 14);
+}
+
+export function crate() {
+  const b = new Bitmap(16, 16);
+  const [d, m, l, h] = C.wood;
+  b.rect(1, 3, 14, 12, m);
+  b.rect(1, 3, 14, 2, h);
+  for (const y of [8, 12]) b.rect(1, y, 14, 1, d);
+  b.rect(1, 5, 2, 10, l); b.rect(13, 5, 2, 10, d);
+  b.outline();
+  return sprite(b, 8, 15);
+}
+
+export function bones() {
+  const b = new Bitmap(16, 10);
+  const bone = hex('#efe6cf');
+  b.rect(3, 4, 9, 2, bone);
+  for (const [x, y] of [[2, 3], [2, 6], [12, 3], [12, 6]]) b.rect(x, y, 2, 2, bone);
+  b.rect(9, 7, 5, 1, bone);
+  b.outline();
+  return sprite(b, 8, 9);
+}
+
+export function mushrooms(seed) {
+  const b = new Bitmap(16, 16);
+  for (let k = 0; k < 3; k++) {
+    const x = 3 + Math.floor(rnd(seed, k, 5) * 9);
+    const y = 7 + Math.floor(rnd(seed, k, 6) * 6);
+    b.rect(x, y, 1, 2, hex('#efe2c4'));
+    b.rect(x - 1, y - 1, 3, 1, hex('#c8452f'));
+    b.set(x, y - 2, hex('#c8452f'));
+    b.set(x - 1, y - 1, hex('#f3e6d0'));
+  }
+  return sprite(b, 8, 14);
+}
+
+// ---- Characters --------------------------------------------------------------------
+//
+// One drawing routine for everyone. A look sets colours plus optional extras:
+//   hat: 'straw' | 'helmet' | 'hood' | 'bun'   beard: colour   robe: true (long tunic)
+
+const BASE_LOOK = {
+  skin: '#f2c393', hair: '#6b3f1f', tunic: '#3f6fb0', pants: '#6b5137', boots: '#3a2a1c', belt: '#5a3a1e',
 };
 
-function mirror(b) {
-  const m = new Bitmap(b.w, b.h);
-  for (let y = 0; y < b.h; y++) for (let x = 0; x < b.w; x++) {
-    const i = (y * b.w + x) * 4;
-    const k = (y * b.w + (b.w - 1 - x)) * 4;
-    for (let c = 0; c < 4; c++) m.data[k + c] = b.data[i + c];
+function palette(look) {
+  const L = { ...BASE_LOOK, ...look };
+  const skin = hex(L.skin);
+  const hair = hex(L.hair);
+  const tunic = hex(L.tunic);
+  const pants = hex(L.pants);
+  return {
+    skin, skinS: shade(skin, 0.86), blush: hex('#ef9a8c'),
+    hair, hairHi: shade(hair, 1.35),
+    tunic, tunicS: shade(tunic, 0.72), tunicHi: shade(tunic, 1.25),
+    belt: hex(L.belt), gold: hex('#e8c040'),
+    pants, pantsS: shade(pants, 0.78),
+    boots: hex(L.boots), eye: hex('#2b1d16'),
+    beard: L.beard ? hex(L.beard) : null,
+    hat: L.hat || null, robe: !!L.robe,
+    hatCol: L.hatColor ? hex(L.hatColor) : null,
+  };
+}
+
+function drawHat(b, L, bob, view) {
+  if (L.hat === 'straw') {
+    const straw = L.hatCol || hex('#e6c35a');
+    b.rect(1, 3 + bob, 14, 2, straw);
+    b.rect(4, 0 + bob, 8, 3, straw);
+    b.rect(4, 2 + bob, 8, 1, view === 'back' ? straw : hex('#b0302a'));
+    b.rect(2, 4 + bob, 12, 1, shade(straw, 0.8));
+  } else if (L.hat === 'helmet') {
+    const steel = L.hatCol || hex('#9aa3ab');
+    b.rect(3, 0 + bob, 10, 5, steel);
+    b.rect(4, 0 + bob, 3, 1, shade(steel, 1.25));
+    b.rect(2, 4 + bob, 12, 1, shade(steel, 0.75));
+    if (view === 'front') b.rect(7, 5 + bob, 2, 2, shade(steel, 0.85));
+  } else if (L.hat === 'hood') {
+    const cloth = L.hatCol || hex('#4a6b3a');
+    b.rect(2, 0 + bob, 12, 4, cloth);
+    b.rect(2, 4 + bob, 2, 5, cloth);
+    b.rect(12, 4 + bob, 2, 5, cloth);
+    if (view === 'back') b.rect(3, 0 + bob, 10, 9, cloth);
+  } else if (L.hat === 'bun') {
+    b.rect(6, -1 + bob + 1, 4, 2, L.hair);
   }
-  return m;
 }
 
 // frame: 0 standing, 1 left foot forward, 2 right foot forward
-function drawFront(back, frame) {
-  const L = LOOK;
+function drawFront(L, back, frame) {
   const b = new Bitmap(16, 24);
   const bob = frame ? -1 : 0;
-  // legs
   const legY = (side) => (frame === 1 && side === 0) || (frame === 2 && side === 1) ? -1 : 0;
   for (const [side, x] of [[0, 5], [1, 8]]) {
     const o = legY(side);
     b.rect(x, 17 + o, 3, 3, side ? L.pantsS : L.pants);
     b.rect(x, 20 + o, 3, 2, L.boots);
   }
-  // torso
   b.rect(4, 10 + bob, 8, 7 - bob, L.tunic);
-  b.rect(11, 10 + bob, 1, 7 - bob, L.tunicS);
+  if (L.robe) b.rect(4, 16, 8, 4, L.tunic), b.rect(4, 19, 8, 1, L.tunicS);
+  b.rect(11, 10 + bob, 1, L.robe ? 10 - bob : 7 - bob, L.tunicS);
   b.rect(5, 10 + bob, 1, 5, L.tunicHi);
   b.rect(4, 15 + bob, 8, 1, L.belt);
   if (!back) b.rect(7, 15 + bob, 2, 1, L.gold);
-  // arms swing opposite to legs
   const armO = (side) => (frame === 1 && side === 1) || (frame === 2 && side === 0) ? 1 : 0;
   for (const [side, x] of [[0, 2], [1, 12]]) {
     const o = armO(side) + bob;
     b.rect(x, 11 + o, 2, 4, side ? L.tunicS : L.tunic);
     b.rect(x, 15 + o, 2, 1, L.skin);
   }
-  // head
   b.rect(7, 9 + bob, 2, 1, L.skinS);
   b.rect(3, 1 + bob, 10, 8, L.skin);
   if (back) {
@@ -327,18 +469,23 @@ function drawFront(back, frame) {
     b.rect(5, 1 + bob, 3, 1, L.hairHi);
     b.rect(6, 6 + bob, 1, 2, L.eye);
     b.rect(9, 6 + bob, 1, 2, L.eye);
-    b.set(5, 8 + bob, L.blush);
-    b.set(10, 8 + bob, L.blush);
+    if (L.beard) {
+      b.rect(4, 8 + bob, 8, 2, L.beard);
+      b.rect(5, 10 + bob, 6, 1, L.beard);
+      b.rect(6, 11 + bob, 4, 1, L.beard);
+    } else {
+      b.set(5, 8 + bob, L.blush);
+      b.set(10, 8 + bob, L.blush);
+    }
   }
+  drawHat(b, L, bob, back ? 'back' : 'front');
   b.outline();
   return b;
 }
 
-function drawSide(frame) {
-  const L = LOOK;
+function drawSide(L, frame) {
   const b = new Bitmap(16, 24);
   const bob = frame ? -1 : 0;
-  // legs: apart when walking
   if (frame === 0) {
     b.rect(6, 17, 4, 3, L.pants); b.rect(9, 17, 1, 3, L.pantsS);
     b.rect(6, 20, 4, 2, L.boots); b.set(5, 21, L.boots);
@@ -349,12 +496,12 @@ function drawSide(frame) {
     b.rect(front, 17, 3, 3, L.pants); b.rect(front - 1, 20, 4, 2, L.boots);
   }
   b.rect(5, 10 + bob, 6, 7 - bob, L.tunic);
+  if (L.robe) b.rect(5, 16, 6, 4, L.tunic);
   b.rect(10, 10 + bob, 1, 7 - bob, L.tunicS);
   b.rect(5, 15 + bob, 6, 1, L.belt);
   const armX = frame === 1 ? 8 : frame === 2 ? 6 : 7;
   b.rect(armX, 11 + bob, 2, 4, L.tunicS);
   b.rect(armX, 15 + bob, 2, 1, L.skin);
-  // head facing left
   b.rect(7, 9 + bob, 2, 1, L.skinS);
   b.rect(4, 1 + bob, 8, 8, L.skin);
   b.set(3, 6 + bob, L.skin);
@@ -363,19 +510,34 @@ function drawSide(frame) {
   b.rect(5, 3 + bob, 3, 1, L.hair);
   b.rect(6, 1 + bob, 3, 1, L.hairHi);
   b.rect(5, 5 + bob, 1, 2, L.eye);
-  b.set(5, 8 + bob, L.blush);
+  if (L.beard) { b.rect(4, 8 + bob, 5, 2, L.beard); b.rect(5, 10 + bob, 3, 1, L.beard); }
+  else b.set(5, 8 + bob, L.blush);
+  drawHat(b, L, bob, 'side');
   b.outline();
   return b;
 }
 
-export function playerFrames() {
+export function characterFrames(look = {}) {
+  const L = palette(look);
   const frames = { down: [], up: [], left: [], right: [] };
   for (let f = 0; f < 3; f++) {
-    frames.down.push(sprite(drawFront(false, f), 8, 22));
-    frames.up.push(sprite(drawFront(true, f), 8, 22));
-    const side = drawSide(f);
+    frames.down.push(sprite(drawFront(L, false, f), 8, 22));
+    frames.up.push(sprite(drawFront(L, true, f), 8, 22));
+    const side = drawSide(L, f);
     frames.left.push(sprite(side, 8, 22));
     frames.right.push(sprite(mirror(side), 8, 22));
   }
   return frames;
+}
+
+export const playerFrames = () => characterFrames({});
+
+function mirror(b) {
+  const m = new Bitmap(b.w, b.h);
+  for (let y = 0; y < b.h; y++) for (let x = 0; x < b.w; x++) {
+    const i = (y * b.w + x) * 4;
+    const k = (y * b.w + (b.w - 1 - x)) * 4;
+    for (let c = 0; c < 4; c++) m.data[k + c] = b.data[i + c];
+  }
+  return m;
 }

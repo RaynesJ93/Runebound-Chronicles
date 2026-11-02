@@ -12,19 +12,21 @@ import * as S from './sprites.js';
 
 const VARIANTS = 4;
 
-export function createWorldView(canvasEl, area) {
-  const ctx = canvasEl.getContext('2d', { alpha: false });
-  const grounds = buildGround(area);
-  const mapW = area.W * TILE;
-  const mapH = area.H * TILE;
-
-  // ---- Sprite library ------------------------------------------------------------
-  const lib = {
+// Sprites are shared by every area, so they're only drawn once.
+let LIB = null;
+function getLib() {
+  if (LIB) return LIB;
+  LIB = {
     oak: Array.from({ length: VARIANTS }, (_, i) => S.oakTree(i + 1)),
     pine: Array.from({ length: VARIANTS }, (_, i) => S.pineTree(i + 11)),
     bush: Array.from({ length: VARIANTS }, (_, i) => S.bush(i + 21)),
     rock: Array.from({ length: VARIANTS }, (_, i) => S.rock(i + 31)),
     flowers: Array.from({ length: 8 }, (_, i) => S.flowers(i + 41)),
+    tallGrass: Array.from({ length: VARIANTS }, (_, i) => S.tallGrass(i + 61)),
+    stump: Array.from({ length: 2 }, (_, i) => S.stump(i + 71)),
+    mushrooms: Array.from({ length: 3 }, (_, i) => S.mushrooms(i + 81)),
+    tent: [S.tent(1), S.tent(2)],
+    campfire: [S.campfire(0), S.campfire(1)],
     crop: [S.crop(false, 51), S.crop(true, 52)],
     lamp: S.lamp(),
     sign: S.sign(),
@@ -32,10 +34,30 @@ export function createWorldView(canvasEl, area) {
     stall: S.stall(),
     fallenTree: S.fallenTree(),
     scarecrow: S.scarecrow(),
+    logPile: S.logPile(),
+    crate: S.crate(),
+    bones: S.bones(),
     treeShadow: S.shadow(15, 4),
     smallShadow: S.shadow(6, 2),
     player: S.playerFrames(),
+    people: new Map(),
   };
+  return LIB;
+}
+
+// Walking frames for a villager, drawn the first time they're needed.
+function framesFor(lib, look, key) {
+  if (!lib.people.has(key)) lib.people.set(key, S.characterFrames(look));
+  return lib.people.get(key);
+}
+
+export function createWorldView(canvasEl, area) {
+  const ctx = canvasEl.getContext('2d', { alpha: false });
+  const grounds = buildGround(area);
+  const mapW = area.W * TILE;
+  const mapH = area.H * TILE;
+
+  const lib = getLib();
   const fences = {};
   const fenceSprite = (e, s) => (fences[`${e}${s}`] ||= S.fence(e, s));
 
@@ -78,6 +100,15 @@ export function createWorldView(canvasEl, area) {
       case 'stall': place(lib.stall, f.x, f.y); break;
       case 'fallenTree': place(lib.fallenTree, f.x, f.y); break;
       case 'scarecrow': place(lib.scarecrow, f.x, f.y); break;
+      case 'logPile': place(lib.logPile, f.x, f.y); break;
+      case 'stump': place(pick(lib.stump, p), f.x, f.y); break;
+      case 'crate': place(lib.crate, f.x, f.y); break;
+      case 'tent': place(pick(lib.tent, p), f.x, f.y); break;
+      case 'campfire': place(lib.campfire[0], f.x, f.y, { frames: lib.campfire }); break;
+      // Tall grass is drawn just in front of anyone standing in it, hiding their feet.
+      case 'tallGrass': place(pick(lib.tallGrass, p), f.x, f.y, { sortY: (p.y + 1) * TILE + 1 }); break;
+      case 'bones': decals.push({ img: lib.bones.img, x: p.x * TILE, y: p.y * TILE + 4 }); break;
+      case 'mushrooms': { const spr = pick(lib.mushrooms, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
       default: break; // doors are drawn as part of their building
     }
   }
@@ -135,21 +166,30 @@ export function createWorldView(canvasEl, area) {
   // ---- Drawing ---------------------------------------------------------------------
   const DIRS = ['down', 'right', 'up', 'left'];
 
-  function playerSprite(player, steps) {
-    const a = player.facing;
+  function frameOf(frames, who, steps) {
+    const a = who.facing;
     const dx = Math.sin(a);
     const dy = Math.cos(a);
     const dir = Math.abs(dx) > Math.abs(dy) + 0.01 ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
     let frame = 0;
-    if (player.moving) frame = player.t < 0.5 ? (steps % 2 ? 1 : 2) : 0;
-    return lib.player[dir][frame] || lib.player[DIRS[0]][0];
+    if (who.moving) frame = who.t < 0.5 ? (steps % 2 ? 1 : 2) : 0;
+    return frames[dir][frame] || frames.down[0];
+  }
+
+  // A drawable for anyone walking around: the player or a villager.
+  function personObj(frames, who, steps, extra) {
+    const wp = who.worldPosition();
+    const fx = Math.round(wp.x * TILE);
+    const fy = Math.round(wp.z * TILE + 6);
+    const spr = frameOf(frames, who, steps);
+    return { img: spr.img, x: fx - spr.ax, y: fy - spr.ay, w: spr.w, h: spr.h, sortY: fy, fx, fy, ...extra };
   }
 
   function render(player, opts) {
-    const { time, steps, marker } = opts;
-    const wp = player.worldPosition();
-    const footX = Math.round(wp.x * TILE);
-    const footY = Math.round(wp.z * TILE + 6);
+    const { time, steps, marker, characters = [] } = opts;
+    const pObj = personObj(lib.player, player, steps, { player: true });
+    const footX = pObj.fx;
+    const footY = pObj.fy;
     follow(footX, footY - 8);
 
     const vw = canvasEl.width / scale;
@@ -183,15 +223,17 @@ export function createWorldView(canvasEl, area) {
     }
 
     for (const s of shadows) ctx.drawImage(s.spr.img, Math.round(s.x - s.spr.ax), Math.round(s.y - s.spr.ay));
-    ctx.drawImage(lib.smallShadow.img, footX - lib.smallShadow.ax, footY - lib.smallShadow.ay);
+    const people = [pObj];
+    for (const c of characters) people.push(personObj(framesFor(lib, c.def.look, c.id), c, c.steps, { person: true }));
+    for (const p of people) ctx.drawImage(lib.smallShadow.img, p.fx - lib.smallShadow.ax, p.fy - lib.smallShadow.ay);
 
-    const ps = playerSprite(player, steps);
-    const pObj = { img: ps.img, x: footX - ps.ax, y: footY - ps.ay, w: ps.w, h: ps.h, sortY: footY, player: true };
     const list = objects.filter((o) => inView(o.x, o.y, o.w, o.h));
-    list.push(pObj);
-    list.sort((a, b) => a.sortY - b.sortY || (a.player ? 1 : -1));
+    for (const p of people) if (inView(p.x, p.y, p.w, p.h)) list.push(p);
+    list.sort((a, b) => a.sortY - b.sortY || ((a.player || a.person) ? 1 : -1));
 
+    const flicker = Math.floor(time * 6) % 2;
     for (const o of list) {
+      if (o.frames) o.img = o.frames[flicker].img;
       const behind = o.fade && o.sortY > pObj.sortY &&
         pObj.x + 12 > o.x + 6 && pObj.x + 4 < o.x + o.w - 6 && pObj.y + 4 < o.y + o.h - 10 && pObj.y + pObj.h > o.y;
       if (behind) ctx.globalAlpha = 0.5;

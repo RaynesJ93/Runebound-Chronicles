@@ -111,14 +111,15 @@ export function buildBrambleford() {
     interact: ['Welcome to Brambleford!', 'General Store: west of the square.  Bank: east of the square.'],
   });
   one('sign', 23, 5, {
-    interact: ['NORTH: Route 1 — Thornwood Forest.', 'Beware of goblins and wolves beyond the village.'],
+    interact: ['NORTH: Route 1 — Thornwood Forest.', 'Travellers beware: goblins and wolves roam the woods.'],
   });
 
-  // ---- North road: blocked by a fallen tree until Route 1 is built --------
-  prop('fallenTree', [19, 20, 21, 22, 23, 24].map((x) => ({ x, y: 1 })), {
-    interact: ['A huge fallen oak blocks the road north.', '(Route 1 opens in the next update.)'],
+  // ---- North road: the fallen oak has been cleared and cut into logs ------
+  prop('logPile', [{ x: 19, y: 3 }, { x: 20, y: 3 }], {
+    interact: ["The fallen oak, neatly cut and stacked. Bram's woodcutters worked fast."],
   });
-  for (let x = 19; x <= 24; x++) block(x, 0);
+  one('stump', 23, 2, { interact: ['A fresh stump. It still smells of sap.'] });
+  for (const [x, y] of [[19, 0], [20, 0], [23, 0], [24, 0], [19, 1], [24, 1]]) placeIfFree('tree', x, y, { variant: 'pine' });
 
   // ---- Farm fence with a gate gap at (30, 28) -----------------------------
   for (let x = 28; x <= 38; x++) for (let y = 28; y <= 33; y++) {
@@ -153,5 +154,9 @@ export function buildBrambleford() {
     name: 'Brambleford',
     W, H, ground, blocked, props, buildings,
     spawn: { x: 16, y: 24, facing: 0 },
+    // Walking onto these tiles takes you to another area.
+    exits: [
+      { tiles: [{ x: 21, y: 0 }, { x: 22, y: 0 }], to: 'route1', at: { x: 16, y: 58 }, facing: Math.PI },
+    ],
   };
 }

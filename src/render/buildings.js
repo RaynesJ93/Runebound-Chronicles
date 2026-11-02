@@ -9,6 +9,7 @@ const STYLES = {
   bank: { roof: '#34507a', wall: 'stone', wallH: 34 },
   store: { roof: '#a8432f', wall: 'plaster', wallH: 32, awning: true },
   house: { roof: '#8a4b2a', wall: 'timber', wallH: 30 },
+  cabin: { roof: '#5d6b3a', wall: 'logs', wallH: 30 },
 };
 
 const OVER = 3; // roof overhang in pixels on each side
@@ -37,6 +38,11 @@ export function buildingSprite(b) {
         const bx = (x - x0 + (row % 2) * 5) % 10;
         const tone = rnd(Math.floor((x - x0 + (row % 2) * 5) / 10), row, 3);
         c = (bx === 0 || (y - wallTop) % 5 === 0) ? hex('#7d776d') : tone < 0.33 ? hex('#a9a297') : tone < 0.66 ? hex('#b8b1a5') : hex('#c4bdb0');
+      } else if (style.wall === 'logs') {
+        // stacked round logs
+        const ly = (y - wallTop) % 6;
+        c = ly === 0 ? hex('#4a2c16') : ly === 1 ? hex('#a0703f') : ly < 4 ? hex('#8a5a32') : hex('#6e4424');
+        if (rnd(x >> 2, Math.floor((y - wallTop) / 6), 6) < 0.08 && ly > 1) c = hex('#5e3b1f');
       } else if (style.wall === 'plaster') {
         c = rnd(x, y, 4) < 0.06 ? hex('#e0d2ad') : hex('#efe2bd');
       } else {
@@ -47,10 +53,10 @@ export function buildingSprite(b) {
     }
   }
   // timber frame (corners and a top beam) for plaster and timber walls
-  if (style.wall !== 'stone') {
+  if (style.wall === 'plaster' || style.wall === 'timber') {
     for (const x of [x0, x0 + 1, x1 - 2, x1 - 1]) for (let y = wallTop; y < H - 3; y++) bmp.set(x, y, x === x0 || x === x1 - 2 ? timberHi : timber);
     bmp.rect(x0, wallTop + 2, b.w * TILE, 2, timber);
-  } else {
+  } else if (style.wall === 'stone') {
     // pillars either side of the bank door
     const dc = doorCenter(b);
     for (const px of [dc - 17, dc + 13]) {
@@ -148,7 +154,7 @@ export function buildingSprite(b) {
   }
 
   // Chimney on houses
-  if (b.kind === 'house') {
+  if (b.kind === 'house' || b.kind === 'cabin') {
     const cx = W - 22;
     for (let y = 1; y < TOP + 12; y++) for (let x = cx; x < cx + 8; x++) {
       const brick = ((y + (Math.floor(x / 4) % 2) * 2) % 4 === 0) || x === cx + 7;
