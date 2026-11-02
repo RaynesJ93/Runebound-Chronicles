@@ -2,6 +2,7 @@ import { TILE } from './pixel.js';
 import { buildGround } from './ground.js';
 import { buildingSprite } from './buildings.js';
 import * as S from './sprites.js';
+import { itemIcon } from './items.js';
 
 // Draws an area in 2D pixel art.
 //
@@ -203,7 +204,7 @@ export function createWorldView(canvasEl, area) {
   }
 
   function render(player, opts) {
-    const { time, steps, marker, characters = [], enemies = [], combat = null } = opts;
+    const { time, steps, marker, characters = [], enemies = [], combat = null, ground: groundItems = [] } = opts;
     const pObj = personObj(lib.player, player, steps, { player: true }, time, combat?.playerLungeAt);
     const footX = pObj.fx;
     const footY = pObj.fy;
@@ -227,6 +228,20 @@ export function createWorldView(canvasEl, area) {
 
     const inView = (x, y, w, h) => x + w >= cam.x && y + h >= cam.y && x <= cam.x + vw && y <= cam.y + vh;
     for (const d of decals) if (inView(d.x, d.y, 16, 16)) ctx.drawImage(d.img, d.x, d.y);
+
+    // Items on the ground: up to three per tile, fanned out a little.
+    const perTile = new Map();
+    const beams = [];
+    for (const g of groundItems) {
+      if (!inView(g.x * TILE, g.y * TILE, TILE, TILE)) continue;
+      const key = g.y * 10000 + g.x;
+      const k = perTile.get(key) || 0;
+      perTile.set(key, k + 1);
+      if (k > 2) continue;
+      const ic = itemIcon(g.item);
+      ctx.drawImage(ic.img, g.x * TILE + [0, 3, -3][k], g.y * TILE - 2 + [0, -2, 2][k]);
+      if (g.rare) beams.push(g);
+    }
 
     // walk-target marker: a blinking tile outline
     if (marker) {
@@ -265,6 +280,18 @@ export function createWorldView(canvasEl, area) {
       if (behind) ctx.globalAlpha = 0.5;
       if (o.alpha !== undefined) ctx.globalAlpha = o.alpha;
       ctx.drawImage(o.img, o.x, o.y);
+      ctx.globalAlpha = 1;
+    }
+
+    // A pulsing gold beam over rare drops, so you can't miss them.
+    for (const g of beams) {
+      const pulse = 0.28 + Math.sin(time * 4) * 0.12;
+      ctx.globalAlpha = pulse;
+      ctx.fillStyle = '#ffd84a';
+      ctx.fillRect(g.x * TILE + 4, g.y * TILE - 56, 8, 66);
+      ctx.globalAlpha = pulse * 1.6;
+      ctx.fillStyle = '#fff6cf';
+      ctx.fillRect(g.x * TILE + 7, g.y * TILE - 56, 2, 66);
       ctx.globalAlpha = 1;
     }
 

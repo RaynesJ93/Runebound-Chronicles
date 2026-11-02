@@ -16,6 +16,11 @@ import { ENEMIES } from '../data/enemies.js';
 import { Combat } from './combat/combat.js';
 import { SkillBook, SKILL_NAME } from './skills/skills.js';
 import { maxHit, effectiveLevel } from './combat/formulas.js';
+import { Inventory } from './items/inventory.js';
+import { GroundItems } from './items/ground.js';
+import { rollLoot } from './items/loot.js';
+import { ITEMS, itemName } from '../data/items.js';
+import { itemIcon } from './render/items.js';
 
 const AUTOSAVE_TICKS = 50; // 30 seconds
 
@@ -52,13 +57,13 @@ function boot() {
       const door = a.props.find((p) => p.type === 'door' && p.building === b.id);
       for (let y = b.y; y < b.y + b.h; y++) for (let x = b.x; x < b.x + b.w; x++) look.set(a.idx(x, y), door);
     }
-    const w = { id, area: a, view: v, npcs: people, enemies: foes, lookup: look };
+    const w = { id, area: a, view: v, npcs: people, enemies: foes, lookup: look, ground: new GroundItems() };
     worlds.set(id, w);
     return w;
   }
 
   let world = loadWorld(AREAS[state.player.area] ? state.player.area : START_AREA);
-  let { area, view, npcs, enemies, lookup } = world;
+  let { area, view, npcs, enemies, lookup, ground } = world;
   if (!area.isWalkable(state.player.x, state.player.y)) Object.assign(state.player, area.spawn);
   state.player.area = area.id;
   const player = new PlayerController(area, state);
@@ -89,12 +94,22 @@ function boot() {
     on: {
       message: (t) => hud.message(t),
       cantReach: () => hud.message("I can't reach that."),
-      enemyDied: (e) => hud.message(`You defeated the ${e.name}!`),
+      enemyDied: (e) => {
+        hud.message(`You defeated the ${e.name}!`);
+        for (const drop of rollLoot(e.def.loot, rng)) {
+          ground.add(drop.item, drop.qty, e.tile.x, e.tile.y, time, { rare: drop.rare || !!ITEMS[drop.item]?.rare });
+          if (drop.rare) hud.message(`Rare drop: ${itemName(drop.item)}!`);
+        }
+      },
       playerDied: () => die(),
     },
   });
   combat.setWorld(area, enemies);
   if (!(state.player.hp > 0) || state.player.hp > combat.maxHp) state.player.hp = combat.maxHp;
+
+  // ---- Inventory -----------------------------------------------------------
+  const inventory = new Inventory(state);
+  let refreshInventory = () => {};
 
   // ---- Saving --------------------------------------------------------------
   let lastSaved = loaded ? Date.now() : 0;
@@ -150,6 +165,26 @@ function boot() {
     hud.renderStyles(style.id, state.settings.autoRetaliate !== false, `Max hit: ${max} · Combat level: ${combat.level} · Fighting unarmed (weapons arrive in Batch 6).`);
   };
   hud.onSkillsOpen = () => refreshSkills();
+  // Inventory panel: tap for options, drag to rearrange.
+  refreshInventory = () => { if (hud.invOpen) hud.renderInventory(inventory.slots); };
+  hud.onInventoryOpen = () => refreshInventory();
+  hud.onSlotSwap = (a, b) => { inventory.swap(a, b); refreshInventory(); save(); };
+  hud.onSlotTap = (i, x, y) => {
+    const s = inventory.slots[i];
+    if (!s) return;
+    const def = ITEMS[s.id];
+    hud.showMenu(x, y, describe({ item: s.id, qty: s.qty }), [
+      { label: 'Examine', fn: () => hud.message(`${def.examine}${def.stackable && s.qty > 1 ? ` (${s.qty.toLocaleString('en-GB')})` : ''}`) },
+      { label: 'Drop', fn: () => {
+        const it = inventory.removeSlot(i);
+        if (!it) return;
+        ground.add(it.id, it.qty, player.tile.x, player.tile.y, time, { mine: true });
+        refreshInventory();
+        save();
+      } },
+      { label: 'Cancel', fn: () => {} },
+    ]);
+  };
   hud.onStylePick = (id) => {
     state.settings.attackStyle = id;
     hud.message(`Attack style: ${combat.style.name} (trains ${combat.style.trains}).`);
@@ -247,6 +282,39 @@ function boot() {
     interactWith({ npc, tiles: [npc.standTile] });
   };
 
+  // ---- Picking things up ----------------------------------------------------
+  let pickup = null; // { x, y, entry } — entry null means "take everything here"
+
+  const describe = (g) => `${itemName(g.item)}${g.qty > 1 ? ` × ${g.qty.toLocaleString('en-GB')}` : ''}`;
+
+  const tryPickup = () => {
+    if (!pickup || player.moving) return;
+    const { x, y, entry } = pickup;
+    if (player.tile.x !== x || player.tile.y !== y) {
+      if (!player.path.length) pickup = null; // couldn't get there
+      return;
+    }
+    pickup = null;
+    const pile = entry ? (ground.has(entry) ? [entry] : []) : ground.at(x, y);
+    if (!pile.length) { hud.message("Too late, it's gone!"); return; }
+    for (const g of pile) {
+      const got = inventory.add(g.item, g.qty);
+      if (got > 0) hud.message(`You pick up: ${itemName(g.item)}${got > 1 ? ` × ${got.toLocaleString('en-GB')}` : ''}.`);
+      if (got === g.qty) ground.remove(g);
+      else { g.qty -= got; hud.message("You don't have enough inventory space."); break; }
+    }
+    refreshInventory();
+    save();
+  };
+
+  const goPickup = (x, y, entry) => {
+    combat.stop();
+    releaseTalkTarget();
+    pickup = { x, y, entry };
+    if (!player.moving && player.tile.x === x && player.tile.y === y) { tryPickup(); return; }
+    walkTo(x, y);
+  };
+
   // Someone stepped into our path: plan again around them.
   player.onBlocked = () => {
     if (combat.target) { combat.approach(); return; }
@@ -279,7 +347,7 @@ function boot() {
     setTimeout(() => hud.setFade(true), 900);
     setTimeout(() => {
       world = loadWorld(START_AREA);
-      ({ area, view, npcs, enemies, lookup } = world);
+      ({ area, view, npcs, enemies, lookup, ground } = world);
       combat.setWorld(area, enemies);
       view.resize();
       applySettings();
@@ -308,7 +376,7 @@ function boot() {
     hud.setFade(true);
     setTimeout(() => {
       world = loadWorld(exit.to);
-      ({ area, view, npcs, enemies, lookup } = world);
+      ({ area, view, npcs, enemies, lookup, ground } = world);
       combat.setWorld(area, enemies);
       view.resize();
       applySettings();
@@ -330,6 +398,7 @@ function boot() {
   };
 
   input.onTap = (sx, sy) => {
+    if (hud.menuOpen) { hud.closeMenu(); return; }
     if (hud.dialogOpen) { hud.advanceDialog(); return; }
     if (hud.settingsOpen || transitioning || dying) return;
     const t = view.screenToTile(sx, sy);
@@ -337,6 +406,7 @@ function boot() {
     // Monsters: tap to attack (their head, one tile up, counts too).
     const foe = enemies.find((e) => e.occupies(t.x, t.y)) || enemies.find((e) => e.occupies(t.x, t.y + 1));
     if (foe) {
+      pickup = null;
       releaseTalkTarget();
       goal = null;
       marker = null;
@@ -347,7 +417,20 @@ function boot() {
     combat.stop();
     // Villagers are tall, so a tap on their head (the tile above) counts too.
     const npc = npcs.find((n) => n.occupies(t.x, t.y)) || npcs.find((n) => n.occupies(t.x, t.y + 1));
-    if (npc) { talkTo(npc); firstMove(); return; }
+    if (npc) { pickup = null; talkTo(npc); firstMove(); return; }
+    // Loot on the ground: one item -> go and take it; a pile -> choose.
+    const pile = ground.at(t.x, t.y);
+    if (pile.length) {
+      firstMove();
+      if (pile.length === 1) { goPickup(t.x, t.y, pile[0]); return; }
+      hud.showMenu(sx, sy, 'Items here', [
+        ...pile.slice(0, 8).map((g) => ({ label: `Take ${describe(g)}`, icon: itemIcon(g.item).url, fn: () => goPickup(t.x, t.y, g) })),
+        { label: 'Take everything', fn: () => goPickup(t.x, t.y, null) },
+        { label: 'Walk here', fn: () => { pickup = null; combat.stop(); walkTo(t.x, t.y); } },
+      ]);
+      return;
+    }
+    pickup = null;
     releaseTalkTarget();
     const prop = lookup.get(area.idx(t.x, t.y));
     if (prop) interactWith(prop);
@@ -365,7 +448,8 @@ function boot() {
     if (e.code === 'KeyR') toggleRun();
     else if (e.code === 'Equal' || e.code === 'NumpadAdd') zoomBy(1);
     else if (e.code === 'Minus' || e.code === 'NumpadSubtract') zoomBy(-1);
-    else if (e.code === 'Escape') { if (hud.dialogOpen) hud.advanceDialog(); else if (hud.settingsOpen) { hud.closeSettings(); hud.closeSkills(); } }
+    else if (e.code === 'Escape') { if (hud.menuOpen) hud.closeMenu(); else if (hud.dialogOpen) hud.advanceDialog(); else if (hud.settingsOpen) { hud.closeSettings(); hud.closeSkills(); hud.closeInventory(); } }
+    else if ((e.code === 'KeyI' || e.code === 'KeyB') && !hud.dialogOpen) { if (hud.invOpen) hud.closeInventory(); else hud.openInventory(); }
     else if (e.code === 'KeyK' && !hud.dialogOpen) { if (hud.skillsOpen) hud.closeSkills(); else hud.openSkills('skills'); }
     else if ((e.code === 'Space' || e.code === 'Enter') && hud.dialogOpen) { e.preventDefault(); hud.advanceDialog(); }
     else if (hud.dialogOpen && /^(Digit|Numpad)[1-9]$/.test(e.code)) hud.pickChoice(Number(e.code.slice(-1)) - 1);
@@ -399,6 +483,7 @@ function boot() {
   const ticker = new Ticker();
   ticker.on((n) => {
     if (!dying) combat.tick(time);
+    ground.prune(time);
     player.onTick();
     for (const npc of npcs) npc.onTick(rng, tileFreeForNpc);
     state.stats.playTimeSec += 0.6;
@@ -424,11 +509,13 @@ function boot() {
     const dir = blocked ? null : input.heldDir();
     if (dir) { marker = null; goal = null; releaseTalkTarget(); combat.stop(); firstMove(); }
     ticker.update(dt);
+    if (dir) pickup = null;
     if (!transitioning) player.update(dt, dir);
+    if (pickup) tryPickup();
     for (const npc of npcs) npc.update(dt);
     for (const e of enemies) e.update(dt);
 
-    view.render(player, { time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt });
+    view.render(player, { time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list });
     hud.setHp(state.player.hp, combat.maxHp);
     hud.setTarget(combat.target || enemies.find((e) => !e.dead && e.state === 'fight') || null, combat.level);
     hud.setRun(state.run.on, state.run.energy);
@@ -453,7 +540,7 @@ function boot() {
   window.RBC = {
     state, player, save, hud, version: GAME_VERSION,
     get area() { return area; }, get view() { return view; }, get npcs() { return npcs; },
-    get enemies() { return enemies; }, combat, book,
+    get enemies() { return enemies; }, get ground() { return ground; }, combat, book, inventory,
   };
 }
 

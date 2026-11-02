@@ -363,3 +363,44 @@ img.px { image-rendering: pixelated; image-rendering: crisp-edges; }
 
 .xp-drop { gap: 12px; white-space: nowrap; }
 .xp-part { display: inline-flex; align-items: center; gap: 4px; }
+
+/* ---- Inventory ---- */
+.inv-panel { width: min(340px, 100%); }
+.inv-free { margin-left: auto; margin-right: 6px; font-weight: 700; color: var(--ink-soft); }
+.inv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 8px; background: #6e4424; border: 3px solid var(--wood-dark); border-radius: 6px; touch-action: none; }
+.slot {
+  position: relative; aspect-ratio: 1; border-radius: 4px;
+  background: #5e3b1f; box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.35), inset 0 -1px 0 rgba(255, 220, 160, 0.15);
+  display: grid; place-items: center;
+}
+.slot.full { cursor: pointer; }
+.slot img.px { width: 80%; height: 80%; pointer-events: none; }
+.slot .qty {
+  position: absolute; left: 3px; top: 1px; font-size: 13px; font-weight: 700; color: #ffff3a;
+  text-shadow: 1px 1px 0 #000, -1px 0 0 #000, 0 -1px 0 #000;
+  pointer-events: none;
+}
+.slot .qty.k { color: #ffffff; }
+.slot .qty.m { color: #4fff6a; }
+.drag-ghost { position: fixed; width: 44px; height: 44px; pointer-events: none; z-index: 20; opacity: 0.85; }
+
+/* ---- Pop-up menu (item options, piles on the ground) ---- */
+.menu-backdrop { position: absolute; inset: 0; z-index: 12; }
+.menu {
+  position: absolute; min-width: 180px; max-width: 80vw; padding: 6px;
+  background: var(--parch); border: 3px solid var(--wood-dark); border-radius: 7px;
+  box-shadow: inset 0 0 0 2px var(--wood-light), 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+.menu-title { padding: 4px 8px 6px; font-weight: 700; color: var(--ink-soft); font-size: 14px; }
+.menu-item {
+  display: flex; align-items: center; gap: 8px; width: 100%; min-height: 42px; padding: 6px 10px;
+  background: transparent; border: 0; border-radius: 5px; text-align: left; font-size: 17px; font-weight: 600; color: var(--ink);
+}
+.menu-item:hover, .menu-item:focus-visible { background: #ffe9a8; outline: none; }
+.menu-item img.px { width: 24px; height: 24px; }
+@media (max-width: 430px) {
+  .icon-btn { width: 48px; height: 48px; }
+  .icon-btn img.px { width: 28px; height: 28px; }
+  .hud-top-right { gap: 6px; }
+  .area-banner { font-size: 18px; padding: 8px 14px 7px; }
+}

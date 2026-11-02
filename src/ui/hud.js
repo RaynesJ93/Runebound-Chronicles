@@ -2,6 +2,8 @@
 // D-pad, dialogue box and the settings panel (with save backup tools).
 
 import { iconUrl } from '../render/icons.js';
+import { itemIcon, stackLabel } from '../render/items.js';
+import { ITEMS } from '../../data/items.js';
 import { SKILLS, MELEE_STYLES, xpForLevel, MAX_LEVEL } from '../skills/skills.js';
 
 const fmt = (n) => Math.floor(n).toLocaleString('en-GB');
@@ -19,6 +21,7 @@ export class Hud {
         <div class="messages" id="messages" aria-live="polite"></div>
       </div>
       <div class="hud-top-right">
+        <button class="icon-btn ui" id="btn-inv" aria-label="Inventory"><img class="px" src="${itemIcon('bag').url}" alt=""></button>
         <button class="icon-btn ui" id="btn-skills" aria-label="Skills"><img class="px" src="${iconUrl('attack')}" alt=""></button>
         <button class="icon-btn ui" id="btn-settings" aria-label="Settings">${GEAR_SVG}</button>
         <div class="xp-drops" id="xp-drops" aria-hidden="true"></div>
@@ -27,6 +30,16 @@ export class Hud {
         <img class="px" id="levelup-icon" alt="">
         <div><div class="levelup-title">Level up!</div><div id="levelup-text"></div></div>
       </div>
+      <div class="panel-backdrop ui hidden" id="inv">
+        <div class="panel inv-panel" role="dialog" aria-label="Inventory">
+          <div class="panel-head"><h2>Inventory</h2><span class="inv-free" id="inv-free"></span><button class="close-btn" data-close aria-label="Close">✕</button></div>
+          <div class="panel-body">
+            <div class="inv-grid" id="inv-grid"></div>
+            <p class="muted small">Tap an item for options. Drag to rearrange.</p>
+          </div>
+        </div>
+      </div>
+      <div class="menu-backdrop ui hidden" id="menu-backdrop"><div class="menu" id="menu" role="menu"></div></div>
       <div class="panel-backdrop ui hidden" id="skills">
         <div class="panel" role="dialog" aria-label="Skills">
           <div class="panel-head">
@@ -120,6 +133,14 @@ export class Hud {
 
     $('btn-settings').addEventListener('click', () => this.openSettings());
     $('btn-skills').addEventListener('click', () => this.openSkills());
+    $('btn-inv').addEventListener('click', () => this.openInventory());
+    this.el.inv = $('inv');
+    this.el.inv.addEventListener('click', (e) => {
+      if (e.target === this.el.inv || e.target.closest('[data-close]')) this.closeInventory();
+    });
+    this.el.menuBackdrop = $('menu-backdrop');
+    this.el.menuBackdrop.addEventListener('pointerdown', (e) => { if (e.target === this.el.menuBackdrop) { e.preventDefault(); this.closeMenu(); } });
+    this.bindInventoryDrag($('inv-grid'));
     this.el.skills = $('skills');
     this.el.skills.addEventListener('click', (e) => {
       if (e.target === this.el.skills || e.target.closest('[data-close]')) this.closeSkills();
@@ -139,7 +160,95 @@ export class Hud {
   }
 
   get settingsOpen() {
-    return !this.el.settings.classList.contains('hidden') || !this.el.skills.classList.contains('hidden');
+    return !this.el.settings.classList.contains('hidden') || !this.el.skills.classList.contains('hidden') || this.invOpen || this.menuOpen;
+  }
+
+  // ---- Inventory ------------------------------------------------------------------
+  get invOpen() { return !this.el.inv.classList.contains('hidden'); }
+  get menuOpen() { return !this.el.menuBackdrop.classList.contains('hidden'); }
+
+  openInventory() {
+    this.el.inv.classList.remove('hidden');
+    this.onInventoryOpen?.();
+  }
+
+  closeInventory() {
+    this.el.inv.classList.add('hidden');
+    this.closeMenu();
+  }
+
+  renderInventory(slots) {
+    const grid = this.$('inv-grid');
+    grid.innerHTML = slots.map((s, i) => {
+      if (!s) return `<div class="slot" data-slot="${i}"></div>`;
+      const lab = ITEMS[s.id]?.stackable ? stackLabel(s.qty) : null;
+      return `<div class="slot full" data-slot="${i}" title="${ITEMS[s.id]?.name ?? s.id}">
+        <img class="px" src="${itemIcon(s.id).url}" alt="${ITEMS[s.id]?.name ?? ''}" draggable="false">
+        ${lab ? `<span class="qty ${lab.cls}">${lab.text}</span>` : ''}
+      </div>`;
+    }).join('');
+    const free = slots.filter((s) => !s).length;
+    this.$('inv-free').textContent = `${28 - free} / 28`;
+  }
+
+  // Tap a slot -> onSlotTap(i, x, y). Drag a slot onto another -> onSlotSwap(a, b).
+  bindInventoryDrag(grid) {
+    let drag = null;
+    grid.addEventListener('pointerdown', (e) => {
+      const slot = e.target.closest('.slot.full');
+      if (!slot) return;
+      e.preventDefault();
+      drag = { from: Number(slot.dataset.slot), x: e.clientX, y: e.clientY, moved: false, ghost: null, id: e.pointerId };
+      try { grid.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+    });
+    grid.addEventListener('pointermove', (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 8) {
+        drag.moved = true;
+        const img = grid.querySelector(`[data-slot="${drag.from}"] img`);
+        if (img) {
+          drag.ghost = img.cloneNode();
+          drag.ghost.className = 'px drag-ghost';
+          document.body.appendChild(drag.ghost);
+        }
+      }
+      if (drag.ghost) Object.assign(drag.ghost.style, { left: `${e.clientX - 22}px`, top: `${e.clientY - 22}px` });
+    });
+    const end = (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const d = drag;
+      drag = null;
+      d.ghost?.remove();
+      if (e.type === 'pointercancel') return;
+      if (!d.moved) { this.onSlotTap?.(d.from, e.clientX, e.clientY); return; }
+      const under = document.elementFromPoint(e.clientX, e.clientY)?.closest('.slot');
+      if (under) this.onSlotSwap?.(d.from, Number(under.dataset.slot));
+    };
+    grid.addEventListener('pointerup', end);
+    grid.addEventListener('pointercancel', end);
+  }
+
+  // A small pop-up list of choices near (x, y): [{ label, fn, icon? }].
+  showMenu(x, y, title, options) {
+    const m = this.$('menu');
+    m.innerHTML = `${title ? `<div class="menu-title">${title}</div>` : ''}` + options.map((o, i) =>
+      `<button class="menu-item" data-i="${i}">${o.icon ? `<img class="px" src="${o.icon}" alt="">` : ''}<span>${o.label}</span></button>`).join('');
+    this.el.menuBackdrop.classList.remove('hidden');
+    m.querySelectorAll('.menu-item').forEach((b) => b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const o = options[Number(b.dataset.i)];
+      this.closeMenu();
+      o.fn?.();
+    }));
+    // keep it on screen
+    const r = m.getBoundingClientRect();
+    const left = Math.max(8, Math.min(window.innerWidth - r.width - 8, x - r.width / 2));
+    const top = Math.max(8, Math.min(window.innerHeight - r.height - 8, y + 12));
+    Object.assign(m.style, { left: `${left}px`, top: `${top}px` });
+  }
+
+  closeMenu() {
+    this.el.menuBackdrop.classList.add('hidden');
   }
 
   get skillsOpen() {
