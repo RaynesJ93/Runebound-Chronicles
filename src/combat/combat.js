@@ -8,10 +8,13 @@
 
 import { resolveAttack, combatLevel } from './formulas.js';
 import { findPath } from '../world/pathfinding.js';
+import { styleById } from '../skills/skills.js';
 
 const UNARMED_SPEED = 4; // ticks between punches
 const REGEN_TICKS = 100; // 1 hitpoint every 60 seconds
 const SPLAT_LIFE = 1.2; // seconds a damage splat stays up
+const XP_PER_DAMAGE = 4;
+const HP_XP_PER_DAMAGE = 4 / 3;
 
 const adjacent = (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y) === 1;
 const cheb = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
@@ -20,8 +23,9 @@ const DIRS4 = DIRS8.slice(0, 4);
 
 export class Combat {
   // on: { message(text), playerDied(), enemyDied(enemy), cantReach() }
-  constructor({ state, player, rng, on }) {
+  constructor({ state, player, rng, on, skills }) {
     this.state = state;
+    this.book = skills;
     this.player = player;
     this.rng = rng;
     this.on = on;
@@ -36,8 +40,11 @@ export class Combat {
     this.now = 0;
   }
 
-  // ---- Player stats (fixed at the starting levels until Batch 4 adds XP) ------
-  get skills() { return { attack: 1, strength: 1, defence: 1, hitpoints: 10, ranged: 1, magic: 1 }; }
+  // ---- Player stats, from the skills you've trained -------------------------------
+  get skills() { return this.book.levels(); }
+  get style() { return styleById(this.state.settings.attackStyle); }
+  // Combat level as it would be with one skill at a different level (for "your combat level is now..." messages).
+  levelFrom(skill, level) { return combatLevel({ ...this.skills, [skill]: level }); }
   get maxHp() { return this.skills.hitpoints; }
   get level() { return combatLevel(this.skills); }
   get hp() { return this.state.player.hp; }
@@ -104,11 +111,18 @@ export class Combat {
 
   playerSwing(e) {
     const s = this.skills;
+    const style = this.style;
     const dmg = resolveAttack(this.rng,
-      { attack: s.attack, strength: s.strength, attackBonus: 0, strengthBonus: 0 },
+      { attack: s.attack, strength: s.strength, attackBonus: 0, strengthBonus: 0, attackStyle: style.bonus.attack || 0, strengthStyle: style.bonus.strength || 0 },
       { defence: e.def.defence, defenceBonus: e.def.defenceBonus });
     this.playerLungeAt = this.now;
-    this.hurtEnemy(e, dmg);
+    const dealt = Math.min(dmg, e.hp); // can't do more damage than it has health
+    this.hurtEnemy(e, dealt);
+    // XP: 4 per damage shared by the style's skills, plus 1.33 Hitpoints.
+    if (dealt > 0) {
+      for (const [skill, share] of Object.entries(style.xp)) this.book.add(skill, dealt * XP_PER_DAMAGE * share);
+      this.book.add('hitpoints', dealt * HP_XP_PER_DAMAGE);
+    }
     // Being hit makes it fight back after a short pause.
     if (!e.dead && e.state !== 'fight') {
       e.state = 'fight';
@@ -181,7 +195,7 @@ export class Combat {
         if (e.cooldown <= 0) {
           const dmg = resolveAttack(this.rng,
             { attack: def.attack, strength: def.strength, attackBonus: def.attackBonus, maxHit: def.maxHit },
-            { defence: this.skills.defence, defenceBonus: 0 });
+            { defence: this.skills.defence, defenceBonus: 0, defenceStyle: this.style.bonus.defence || 0 });
           e.lungeAt = this.now;
           e.cooldown = def.speed;
           this.hurtPlayer(e, dmg);

@@ -284,3 +284,79 @@ body.has-dpad .hint { bottom: calc(184px + var(--safe-b)); }
 .target-bar { height: 9px; background: #8a1a14; border: 2px solid var(--wood-dark); border-radius: 3px; overflow: hidden; }
 .target-bar span { display: block; height: 100%; background: #4fd04a; transition: width 0.2s; }
 @media (max-width: 420px) { .target { top: calc(76px + var(--safe-t)); } }
+
+/* ---- Skills: buttons, panel, XP drops, level-up ---- */
+img.px { image-rendering: pixelated; image-rendering: crisp-edges; }
+.hud-top-right { display: flex; gap: 8px; align-items: flex-start; }
+.icon-btn img.px { width: 32px; height: 32px; }
+
+.tabs { display: flex; gap: 6px; }
+.tab {
+  height: 40px; padding: 0 16px; border-radius: 6px 6px 0 0;
+  background: var(--parch-dark); border: 3px solid var(--wood); border-bottom-width: 0;
+  color: var(--ink-soft); font-size: 18px; font-weight: 700;
+}
+.tab.on { background: #fff6dc; border-color: var(--wood-dark); color: var(--ink); }
+
+.skill-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.skill {
+  display: flex; gap: 8px; align-items: center; padding: 8px;
+  background: #fff6dc; border: 3px solid var(--wood); border-radius: 6px;
+}
+.skill img.px { width: 32px; height: 32px; flex: none; }
+.skill-main { flex: 1; min-width: 0; }
+.skill-top { display: flex; justify-content: space-between; align-items: baseline; }
+.skill-name { font-weight: 700; font-size: 16px; }
+.skill-lvl { font-weight: 700; font-size: 22px; color: var(--ink); line-height: 1; }
+.skill-bar { height: 7px; margin: 4px 0 3px; background: #c9b48a; border: 1px solid var(--wood-dark); border-radius: 2px; overflow: hidden; }
+.skill-bar span { display: block; height: 100%; background: var(--green); }
+.skill-xp { font-size: 12px; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.skill-foot { display: flex; justify-content: space-between; margin-top: 12px; padding: 10px 4px 0; border-top: 2px dashed rgba(122, 90, 58, 0.3); font-size: 17px; }
+@media (max-width: 430px) {
+  .skill { padding: 6px; gap: 6px; }
+  .skill img.px { width: 24px; height: 24px; }
+  .skill-name { font-size: 14px; }
+  .skill-lvl { font-size: 19px; }
+  .skill-xp { font-size: 11px; }
+  .panel-body { padding: 4px 10px 14px; }
+}
+
+.style-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 8px; }
+.style {
+  display: flex; gap: 8px; align-items: center; text-align: left; padding: 8px; min-height: 60px;
+  background: var(--parch-dark); border: 3px solid var(--wood); border-radius: 6px; color: var(--ink);
+}
+.style img.px { width: 32px; height: 32px; flex: none; }
+.style b { display: block; font-size: 16px; }
+.style small { display: block; font-size: 12px; color: var(--ink-soft); }
+.style.on { background: #ffe9a8; border-color: var(--wood-dark); box-shadow: inset 0 0 0 2px var(--gold); }
+
+.xp-drops {
+  position: absolute; top: 64px; right: 0; width: 140px; height: 160px;
+  pointer-events: none; overflow: visible;
+}
+.xp-drop {
+  position: absolute; right: 4px; top: 90px;
+  display: flex; align-items: center; gap: 4px;
+  font-size: 18px; font-weight: 700; color: #fff6d8;
+  text-shadow: 2px 2px 0 var(--wood-dark), -1px -1px 0 var(--wood-dark), 1px -1px 0 var(--wood-dark), -1px 1px 0 var(--wood-dark);
+  animation: xpfloat 1.6s ease-out forwards;
+}
+.xp-drop img.px { width: 20px; height: 20px; }
+@keyframes xpfloat { 0% { opacity: 0; transform: translateY(10px); } 12% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-90px); } }
+
+.levelup {
+  position: absolute; left: 50%; top: calc(90px + var(--safe-t)); transform: translateX(-50%);
+  display: flex; gap: 12px; align-items: center; padding: 12px 20px; z-index: 4;
+  background: #fff6dc; border: 3px solid var(--wood-dark); border-radius: 7px;
+  box-shadow: inset 0 0 0 3px var(--gold), inset 0 0 0 5px var(--wood), inset 0 0 0 6px var(--wood-dark), 0 3px 0 rgba(30, 18, 8, 0.55), 0 0 24px rgba(255, 210, 80, 0.6);
+  font-size: 17px;
+}
+.levelup img.px { width: 40px; height: 40px; }
+.levelup-title { font-size: 22px; font-weight: 700; color: #b8860b; }
+.levelup.pop { animation: pop 0.45s ease-out; }
+@keyframes pop { 0% { transform: translateX(-50%) scale(0.6); opacity: 0; } 60% { transform: translateX(-50%) scale(1.08); opacity: 1; } 100% { transform: translateX(-50%) scale(1); } }
+
+.target[data-diff="easy"] .target-name { color: #2f7a22; }
+.target[data-diff="even"] .target-name { color: #9a6a00; }
+.target[data-diff="hard"] .target-name { color: #b0201a; }
