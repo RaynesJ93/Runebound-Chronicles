@@ -71,8 +71,8 @@ export function buildRoute1() {
   clear(9, 52, 15, 57);
 
   // ---- Bram's cabin -------------------------------------------------------------------
-  const cabin = { id: 'cabin', kind: 'cabin', label: null, x: 26, y: 33, w: 5, h: 4, doorX: 28, doorW: 1,
-    doorText: ["Bram's cabin. It smells of pine sap and woodsmoke."] };
+  const cabin = { id: 'cabin', kind: 'cabin', label: null, sign: 'bow', x: 26, y: 33, w: 5, h: 4, doorX: 28, doorW: 1,
+    doorText: ["Bram's cabin. It smells of pine sap and woodsmoke.", 'A board by the door shows a bow and arrow: "New adventurers — ask Bram for a free bow!"'] };
   for (let y = cabin.y; y < cabin.y + cabin.h; y++) for (let x = cabin.x; x < cabin.x + cabin.w; x++) { block(x, y); taken[i(x, y)] = 1; }
   buildings.push({ ...cabin, doorTiles: [{ x: cabin.doorX, y: cabin.y + cabin.h - 1 }] });
   props.push({ type: 'door', tiles: [{ x: cabin.doorX, y: cabin.y + cabin.h - 1 }], x: cabin.doorX, y: cabin.y + cabin.h - 1, building: 'cabin', interact: cabin.doorText });
@@ -99,7 +99,7 @@ export function buildRoute1() {
   one('sign', 19, 56, { interact: ['ROUTE 1 — Thornwood Forest.', 'North: Copperdeep Mine.  South: Brambleford.'] });
   one('sign', 14, 45, { interact: ['DANGER! Goblin camp to the west.', 'Signed, the Brambleford Watch.'] });
   one('sign', 14, 16, { interact: ['Wolf den to the east. Travel in daylight.'] });
-  one('sign', 24, 42, { interact: ["Bram's Woodcutting — logs, kindling and advice."] });
+  one('sign', 24, 42, { interact: ["Bram's Woodcutting — logs, kindling and advice.", 'New to adventuring? Ask Bram for a FREE bow and arrows!'] });
   one('sign', 14, 9, { interact: ['Copperdeep Mine road. CLOSED after the rockslide.'] });
 
   // ---- Forest: thickest far from the road and clearings ------------------------------------
