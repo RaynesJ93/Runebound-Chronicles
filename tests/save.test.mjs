@@ -155,7 +155,7 @@ test('broken numbers and settings are repaired', () => {
   d.settings.zoomStep = 99;
   d.skills.attack = { xp: -5 };
   d.inventory = d.inventory.slice(0, 10);
-  d.boosts = { cooking: 4, attack: 0 };
+  d.boosts = { juggling: 4, attack: 0 }; // not a real skill, and a used-up boost
   const s = migrate(2, d);
   assert.equal(s.player.area, 'brambleford');
   assert.equal(s.player.hp, 10);
