@@ -16,6 +16,7 @@ export class Area {
     this.buildings = def.buildings || [];
     this.spawn = def.spawn;
     this.exits = def.exits || [];
+    this.spawns = def.spawns || [];
     // Things that move (villagers, later enemies) and block tiles while they stand on them.
     this.dynamicBlock = null;
     this.exitAt = new Map();

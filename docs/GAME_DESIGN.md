@@ -162,7 +162,7 @@ These keep combat consistent and let equipment matter. All values are rounded do
 
 **Max hit (ranged)** uses Ranged level and ranged strength bonus the same way. **Magic** max hits are set per spell, boosted by magic damage bonus on gear.
 
-On a successful hit, damage is a uniform random number from 0 to max hit.
+A failed roll is a miss (blue 0 splat). A successful hit does a random 1 to max hit damage, so every hit that lands counts.
 
 Enemies use the same formulas, with their own stats defined in data.
 

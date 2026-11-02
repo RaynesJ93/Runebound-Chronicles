@@ -2,6 +2,7 @@
 // D-pad, dialogue box and the settings panel (with save backup tools).
 
 const GEAR_SVG = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.2 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>';
+const HEART_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 21 3.5 12.6A5.2 5.2 0 0 1 12 6.2a5.2 5.2 0 0 1 8.5 6.4z"/></svg>';
 const BOOT_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M7 3h5v8l6 3c1.7.8 3 2.4 3 4.3V20H4v-3l3-1z"/></svg>';
 
 export class Hud {
@@ -15,7 +16,16 @@ export class Hud {
       <div class="hud-top-right">
         <button class="icon-btn ui" id="btn-settings" aria-label="Settings">${GEAR_SVG}</button>
       </div>
+      <div class="target hidden" id="target" aria-live="polite">
+        <div class="target-name" id="target-name"></div>
+        <div class="target-bar"><span id="target-fill"></span></div>
+      </div>
       <div class="hud-bottom-right">
+        <div class="hp-orb" id="hp-orb" aria-label="Hitpoints">
+          <span class="hp-icon">${HEART_SVG}</span>
+          <span class="run-bar"><span class="hp-fill" id="hp-fill"></span></span>
+          <span class="run-val" id="hp-val">10</span>
+        </div>
         <button class="run-orb ui" id="run-orb" aria-label="Toggle run">
           <span class="run-icon">${BOOT_SVG}</span>
           <span class="run-bar"><span class="run-fill"></span></span>
@@ -38,6 +48,7 @@ export class Hud {
           <div class="panel-head"><h2>Settings</h2><button class="close-btn" data-close aria-label="Close">✕</button></div>
           <div class="panel-body">
             <div class="row"><span>On-screen joystick</span><button class="chip" id="set-dpad"></button></div>
+            <div class="row"><span>Auto retaliate</span><button class="chip" id="set-retaliate"></button></div>
             <div class="row"><span>Zoom</span><span class="zoom-ctl"><button class="chip sq" id="zoom-out" aria-label="Zoom out">−</button><span id="zoom-val">0</span><button class="chip sq" id="zoom-in" aria-label="Zoom in">+</button></span></div>
             <h3>Your save</h3>
             <p class="muted" id="save-status">Your game saves automatically.</p>
@@ -67,7 +78,9 @@ export class Hud {
       dialogName: $('dialog-name'), dialogChoices: $('dialog-choices'), dialogNext: $('dialog-next'), fade: $('fade'),
       settings: $('settings'), toast: $('toast'), saveStatus: $('save-status'),
       setDpad: $('set-dpad'), zoomVal: $('zoom-val'), importBox: $('import-box'), importText: $('import-text'),
-      version: $('version'),
+      version: $('version'), setRetaliate: $('set-retaliate'),
+      hpOrb: $('hp-orb'), hpFill: $('hp-fill'), hpVal: $('hp-val'),
+      target: $('target'), targetName: $('target-name'), targetFill: $('target-fill'),
     };
     this.$ = $;
     this.dialogLines = [];
@@ -133,6 +146,23 @@ export class Hud {
     this.el.runOrb.style.setProperty('--pct', Math.floor(energy));
     const v = String(Math.floor(energy));
     if (this.el.runVal.textContent !== v) this.el.runVal.textContent = v;
+  }
+
+  setHp(hp, max) {
+    const v = String(hp);
+    if (this.el.hpVal.textContent !== v) this.el.hpVal.textContent = v;
+    this.el.hpFill.style.width = `${(100 * hp) / max}%`;
+    this.el.hpOrb.classList.toggle('low', hp <= max * 0.3);
+  }
+
+  // Who you're fighting: name, level and health.
+  setTarget(enemy) {
+    const el = this.el.target;
+    if (!enemy) { if (!el.classList.contains('hidden')) el.classList.add('hidden'); return; }
+    el.classList.remove('hidden');
+    const name = `${enemy.name}  (level ${enemy.def.level})`;
+    if (this.el.targetName.textContent !== name) this.el.targetName.textContent = name;
+    this.el.targetFill.style.width = `${(100 * enemy.hp) / enemy.maxHp}%`;
   }
 
   setDpadVisible(v) {
