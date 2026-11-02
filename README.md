@@ -21,13 +21,13 @@ There are no turn-based battles, no battle screens and no creature catching. You
 - Head north out of the village to reach Route 1 — Thornwood Forest.
 - Open **Skills** (sword button, or K) to see your levels. The **Combat** tab chooses your attack style: Accurate trains Attack, Aggressive trains Strength, Defensive trains Defence, Controlled trains all three.
 - Tap or click a goblin to attack it. Your character walks up and fights automatically. Tap the ground or move to stop. Beware the Goblin Brute by the tents: it attacks on sight.
-- Tap loot on the ground to walk over and pick it up (a pile gives you a choice). Open your **Inventory** (bag button, or I) and tap an item to examine or drop it; drag items to rearrange them.
+- Tap loot on the ground to walk over and pick it up (a pile gives you a choice). Open your **Inventory** (bag button, or I) and tap an item to examine or drop it; drag items to rearrange them. Tap a weapon or armour piece and choose **Wield** or **Wear**; the **Equipment** tab shows what you're wearing and your total bonuses.
 
 ## Status
 
-**v0.6.0 — Batches 0–5 done:** the village of Brambleford and Route 1 (Thornwood Forest), 8 villagers with branching conversations, real-time overworld combat against goblins, combat skills that level to 99 on the OSRS XP curve, and loot: goblins drop items (with rare drops) that you pick up into a 28-slot inventory. Plus Emerald-style movement, run energy, and local saving with backup codes.
+**v0.7.0 — Batches 0–6 done:** the village of Brambleford and Route 1 (Thornwood Forest), 8 villagers with branching conversations, real-time overworld combat against goblins, combat skills that level to 99 on the OSRS XP curve, loot: goblins drop items (with rare drops) that you pick up into a 28-slot inventory, and equipment: wield weapons and wear armour, with bonuses that feed the combat formulas. Plus Emerald-style movement, run energy, and local saving with backup codes.
 
-Next: **Batch 6** — equipment: wield weapons and wear armour, with bonuses feeding the combat formulas (see the [roadmap](docs/ROADMAP.md)).
+Next: **Batch 7** — Ranged and Magic, bows and arrows, spells, and wolves (see the [roadmap](docs/ROADMAP.md)).
 
 ## Running it locally
 
@@ -49,13 +49,13 @@ then visit http://localhost:8000.
 | `src/entities` | The player's movement, villagers (NPCs) and enemies |
 | `src/combat` | Combat formulas and the tick-based fighting system |
 | `src/skills` | XP curve, levels, attack styles |
-| `src/items` | Inventory, loot rolls, items on the ground |
+| `src/items` | Inventory, equipment, loot rolls, items on the ground |
 | `src/input` | Keyboard, mouse, touch, pinch and D-pad |
 | `src/ui` | On-screen interface: banner, messages, run orb, dialogue, settings |
 | `data/areas` | Map data for each area |
 | `data/npcs.js` | Villagers: where they live, how they look, what they say |
 | `data/enemies.js` | Monster stats and loot tables |
-| `data/items.js` | Every item: name, stacking, value, examine text |
+| `data/items.js` | Every item: name, stacking, value, examine text, equipment stats |
 
 ## Stack
 

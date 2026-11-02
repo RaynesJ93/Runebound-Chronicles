@@ -17,6 +17,7 @@ import { Combat } from './combat/combat.js';
 import { SkillBook, SKILL_NAME } from './skills/skills.js';
 import { maxHit, effectiveLevel } from './combat/formulas.js';
 import { Inventory } from './items/inventory.js';
+import { Equipment, verb } from './items/equipment.js';
 import { GroundItems } from './items/ground.js';
 import { rollLoot } from './items/loot.js';
 import { ITEMS, itemName } from '../data/items.js';
@@ -88,9 +89,12 @@ function boot() {
     },
   });
 
+  const inventory = new Inventory(state);
+  const equipment = new Equipment(state, book, inventory);
+
   // ---- Combat ----------------------------------------------------------------
   const combat = new Combat({
-    state, player, rng, skills: book,
+    state, player, rng, skills: book, equipment,
     on: {
       message: (t) => hud.message(t),
       cantReach: () => hud.message("I can't reach that."),
@@ -109,7 +113,6 @@ function boot() {
   if (!(state.player.hp > 0) || state.player.hp > combat.maxHp) state.player.hp = combat.maxHp;
 
   // ---- Inventory -----------------------------------------------------------
-  const inventory = new Inventory(state);
   let refreshInventory = () => {};
 
   // ---- Saving --------------------------------------------------------------
@@ -156,25 +159,63 @@ function boot() {
   hud.el.setRetaliate.addEventListener('click', toggleRetaliate);
   hud.$('set-retaliate2').addEventListener('click', toggleRetaliate);
 
+  const currentMaxHit = () => {
+    const lv = combat.skills;
+    return maxHit(effectiveLevel(lv.strength, combat.style.bonus.strength || 0), equipment.bonuses().str);
+  };
+
   // Skills panel: levels, progress, and the Combat tab with attack styles.
   refreshSkills = () => {
     if (!hud.skillsOpen) return;
     hud.renderSkills(book, combat.level);
     const style = combat.style;
     const lv = combat.skills;
-    const max = maxHit(effectiveLevel(lv.strength, style.bonus.strength || 0), 0);
-    hud.renderStyles(style.id, state.settings.autoRetaliate !== false, `Max hit: ${max} · Combat level: ${combat.level} · Fighting unarmed (weapons arrive in Batch 6).`);
+    const w = equipment.weapon;
+    hud.renderStyles(style.id, state.settings.autoRetaliate !== false, `Max hit: ${currentMaxHit()} · Combat level: ${combat.level} · ${w.name} (${w.type}, ${(w.speed * 0.6).toFixed(1)} s per attack).`);
   };
   hud.onSkillsOpen = () => refreshSkills();
   // Inventory panel: tap for options, drag to rearrange.
-  refreshInventory = () => { if (hud.invOpen) hud.renderInventory(inventory.slots); };
+  refreshInventory = () => {
+    if (!hud.invOpen) return;
+    hud.renderInventory(inventory.slots);
+    hud.renderEquipment(equipment.slots, equipment.bonuses(), equipment.weapon, currentMaxHit());
+  };
+  const wear = (i) => {
+    const r = equipment.equipFromInventory(i);
+    if (!r.ok) { hud.message(r.msg); return; }
+    refreshInventory();
+    refreshSkills();
+    save();
+  };
+  hud.onGearTap = (slot, x, y) => {
+    const s = equipment.slots[slot];
+    if (!s) return;
+    const def = ITEMS[s.id];
+    hud.showMenu(x, y, describe({ item: s.id, qty: s.qty }), [
+      { label: 'Remove', fn: () => {
+        const r = equipment.unequip(slot);
+        if (!r.ok && r.msg) hud.message(r.msg);
+        refreshInventory();
+        refreshSkills();
+        save();
+      } },
+      { label: 'Examine', fn: () => hud.message(def.examine) },
+      { label: 'Cancel', fn: () => {} },
+    ]);
+  };
   hud.onInventoryOpen = () => refreshInventory();
   hud.onSlotSwap = (a, b) => { inventory.swap(a, b); refreshInventory(); save(); };
   hud.onSlotTap = (i, x, y) => {
     const s = inventory.slots[i];
     if (!s) return;
     const def = ITEMS[s.id];
+    const options = [];
+    if (def.equip) {
+      const v = verb(s.id);
+      options.push({ label: v === 'wield' ? 'Wield' : 'Wear', fn: () => wear(i) });
+    }
     hud.showMenu(x, y, describe({ item: s.id, qty: s.qty }), [
+      ...options,
       { label: 'Examine', fn: () => hud.message(`${def.examine}${def.stackable && s.qty > 1 ? ` (${s.qty.toLocaleString('en-GB')})` : ''}`) },
       { label: 'Drop', fn: () => {
         const it = inventory.removeSlot(i);
@@ -516,7 +557,7 @@ function boot() {
     for (const npc of npcs) npc.update(dt);
     for (const e of enemies) e.update(dt);
 
-    view.render(player, { time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list });
+    view.render(player, { time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list, playerLook: equipment.look() });
     hud.setHp(state.player.hp, combat.maxHp);
     hud.setTarget(combat.target || enemies.find((e) => !e.dead && e.state === 'fight') || null, combat.level);
     hud.setRun(state.run.on, state.run.energy);
@@ -541,7 +582,7 @@ function boot() {
   window.RBC = {
     state, player, save, hud, version: GAME_VERSION,
     get area() { return area; }, get view() { return view; }, get npcs() { return npcs; },
-    get enemies() { return enemies; }, get ground() { return ground; }, combat, book, inventory,
+    get enemies() { return enemies; }, get ground() { return ground; }, combat, book, inventory, equipment,
   };
 }
 
