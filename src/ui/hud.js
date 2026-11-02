@@ -195,16 +195,27 @@ export class Hud {
     this.$('combat-stats').textContent = stats;
   }
 
-  // Floating "+20" with the skill's icon, near the top-right.
+  // Floating "+20" with the skill's icon, near the top-right. XP from the same
+  // hit (e.g. Strength and Hitpoints) is gathered into one row, side by side.
   xpDrop(skill, amount) {
-    const box = this.$('xp-drops');
-    const d = document.createElement('div');
-    d.className = 'xp-drop';
-    const n = amount >= 10 ? Math.round(amount) : Math.round(amount * 10) / 10;
-    d.innerHTML = `<img class="px" src="${iconUrl(skill)}" alt=""><span>+${n}</span>`;
-    box.appendChild(d);
-    while (box.children.length > 6) box.firstChild.remove();
-    setTimeout(() => d.remove(), 1700);
+    (this.pendingDrops ||= []).push([skill, amount]);
+    if (this.dropQueued) return;
+    this.dropQueued = true;
+    queueMicrotask(() => {
+      this.dropQueued = false;
+      const parts = this.pendingDrops;
+      this.pendingDrops = [];
+      const box = this.$('xp-drops');
+      const d = document.createElement('div');
+      d.className = 'xp-drop';
+      d.innerHTML = parts.map(([sk, amt]) => {
+        const n = amt >= 10 ? Math.round(amt) : Math.round(amt * 10) / 10;
+        return `<span class="xp-part"><img class="px" src="${iconUrl(sk)}" alt=""><span>+${n}</span></span>`;
+      }).join('');
+      box.appendChild(d);
+      while (box.children.length > 4) box.firstChild.remove();
+      setTimeout(() => d.remove(), 1700);
+    });
   }
 
   levelUp(skillId, skillName, level) {
