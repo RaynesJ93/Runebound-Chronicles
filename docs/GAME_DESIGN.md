@@ -331,7 +331,7 @@ Dying in tutorial or story-critical fights never costs items.
 
 ## 9. Skilling, crafting, quests and long-term progression
 
-Woodcutting and Fletching are in the game (v0.11.0). The rest are planned, and listed so the systems built now leave room for them.
+Woodcutting, Fletching, Mining and Smithing are in the game (v0.12.0). The rest are planned, and listed so the systems built now leave room for them.
 
 ### Woodcutting and Fletching (shipped in v0.11.0)
 
@@ -359,14 +359,53 @@ Each level above the tree adds 1.2% to the chance per swing. Axes: bronze (Woodc
 
 Feathers and bronze arrowtips come from Pell; goblins also drop feathers. Longbows shoot 9 tiles but take 6 ticks per shot; oak bows need Ranged 5 and have +14 ranged attack (normal bows +8). Bows are ready to use straight away (bowstrings arrive with Crafting).
 
+### Mining and Smithing (shipped in v0.12.0)
+
+**Copperdeep Mine** opens at the top of Route 1 now the rockslide is cleared. It has three parts:
+- an entrance hall with the miners' furnace and anvil, and Dorrin the Miner
+- a west gallery of copper and tin
+- an east gallery of iron, where tunnel goblins (level 4) have moved in
+
+Dorrin gives you a bronze pickaxe and a hammer when you ask him to teach you; Pell sells both, plus an iron pickaxe.
+
+**Mining** works like woodcutting: tap a rock, swing every 4 ticks, and the chance per swing rises with level (+1.2% a level) and pickaxe (iron +10%, needs Mining 5). A rock empties after every ore and refills shortly after.
+
+| Rock | Level | XP | Base chance | Refills in |
+| --- | --- | --- | --- | --- |
+| Copper | 1 | 17.5 | 38% | 2.4–4.2 s |
+| Tin | 1 | 17.5 | 38% | 2.4–4.2 s |
+| Iron | 15 | 35 | 30% | 5.4–9 s |
+
+**Smelting** at the furnace (4 ticks each, keeps going until you run out):
+
+| Bar | Level | Ore | XP |
+| --- | --- | --- | --- |
+| Bronze | 1 | 1 copper + 1 tin | 6.2 |
+| Iron | 15 | 1 iron | 12.5 — succeeds 50% of the time at level 15, +1% a level, up to 80%; the ore is lost on a failure |
+
+**Smithing** at the anvil needs a hammer. With both kinds of bar, the anvil asks which metal first.
+
+| Item | Bronze level | Iron level | Bars | XP (bronze / iron) |
+| --- | --- | --- | --- | --- |
+| Dagger | 1 | 15 | 1 | 12.5 / 25 |
+| Axe | 1 | 16 | 1 | 12.5 / 25 |
+| Pickaxe | 2 | 17 | 1 | 12.5 / 25 |
+| Med helm | 3 | 18 | 1 | 12.5 / 25 |
+| Sword | 4 | 19 | 1 | 12.5 / 25 |
+| 15 arrowtips | 5 | 20 | 1 | 12.5 / 25 |
+| Sq shield | 8 | 23 | 2 | 25 / 50 |
+| Chainbody | 11 | 26 | 3 | 37.5 / 75 |
+
+New gear: iron sword, iron med helm, bronze and iron sq shields, bronze and iron chainbodies (iron needs Attack/Defence 5), and iron arrows (ranged strength 10; Fletching 15 from iron arrowtips). Shields show their metal on your character.
+
 ### Gathering skills
 - **Woodcutting** — trees on routes and in forests (see above)
-- **Mining** — ore rocks in mines and caves
+- **Mining** — ore rocks in mines and caves (see above)
 - **Fishing** — spots on rivers, lakes and the coast
 
 ### Production skills
 - **Cooking** — raw fish and meat into food (can burn)
-- **Smithing** — ore into bars, bars into weapons and armour
+- **Smithing** — ore into bars, bars into weapons and armour (see above)
 - **Fletching** — logs into bows and arrows (see above)
 - **Crafting** — leather, jewellery, robes
 - **Runecrafting** — rune essence into magic runes

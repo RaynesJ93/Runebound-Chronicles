@@ -29,6 +29,12 @@ const P = {
   wall: [hex('#4a3020'), hex('#5e3e28'), hex('#6e4a30')],
   wallTop: hex('#2b1d16'),
   skirting: hex('#3a2416'),
+  cave: [hex('#4a423a'), hex('#544b42'), hex('#5f554a')],
+  caveDark: hex('#3a332d'),
+  caveHi: hex('#76695b'),
+  rockwall: [hex('#2e2925'), hex('#3a342e'), hex('#463f37')],
+  rockwallHi: hex('#5c5349'),
+  rockwallTop: hex('#1c1815'),
 };
 
 const isSoft = (g) => g === GROUND.GRASS;
@@ -60,7 +66,7 @@ export function buildGround(area) {
       let t = g(tx, ty);
 
       // Ragged edges where a path, square, sand or soil meets grass.
-      if (t !== GROUND.GRASS && t !== GROUND.WATER && t !== GROUND.BRIDGE && t !== GROUND.FLOOR && t !== GROUND.WALL) {
+      if (t !== GROUND.GRASS && t !== GROUND.WATER && t !== GROUND.BRIDGE && t !== GROUND.FLOOR && t !== GROUND.WALL && t !== GROUND.CAVE && t !== GROUND.ROCKWALL) {
         const e = 1 + (rnd(x, y, 21) < 0.5 ? 1 : 0) + (rnd(x >> 1, y >> 1, 22) < 0.3 ? 1 : 0);
         if ((lx < e && isSoft(g(tx - 1, ty))) || (lx > 15 - e && isSoft(g(tx + 1, ty))) ||
             (ly < e && isSoft(g(tx, ty - 1))) || (ly > 15 - e && isSoft(g(tx, ty + 1)))) t = GROUND.GRASS;
@@ -118,6 +124,23 @@ export function buildGround(area) {
           if (below !== GROUND.WALL && ly >= 13) c = P.skirting;
           else if (ly < 2 && g(tx, ty - 1) !== GROUND.WALL) c = P.wallTop;
           else c = (lx % 8 === 0) ? P.wall[0] : P.wall[1 + (rnd(tx * 2 + (lx >> 3), ty, 96) < 0.5 ? 0 : 1)];
+          break;
+        }
+        case GROUND.CAVE: {
+          // packed earth and grit on the mine floor
+          const r = rnd(x, y, 97);
+          c = r < 0.05 ? P.caveDark : r > 0.97 ? P.caveHi : P.cave[Math.floor(rnd(x >> 2, y >> 2, 98) * 3)];
+          break;
+        }
+        case GROUND.ROCKWALL: {
+          // rough rock: chunky facets, a lit lip where it meets the floor below
+          const below = g(tx, ty + 1);
+          // chunky facets in staggered blocks, with the odd dark crack
+          const row = Math.floor(y / 4);
+          const facet = rnd(Math.floor((x + (row % 2) * 3) / 6), row, 99);
+          if (below !== GROUND.ROCKWALL && ly >= 12) c = ly >= 14 ? P.rockwallTop : P.rockwallHi;
+          else if (rnd(x, y, 100) < 0.035 || y % 4 === 3 && rnd(x >> 1, row, 101) < 0.5) c = P.rockwallTop;
+          else c = P.rockwall[Math.floor(facet * 3)];
           break;
         }
         default: c = P.water[1];

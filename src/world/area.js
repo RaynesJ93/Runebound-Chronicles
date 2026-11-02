@@ -2,7 +2,7 @@
 // props standing on it, and exits to other areas. Tile (x, y): x grows east,
 // y grows south.
 
-export const GROUND = { GRASS: 0, PATH: 1, PLAZA: 2, WATER: 3, SAND: 4, DIRT: 5, BRIDGE: 6, FLOOR: 7, WALL: 8 };
+export const GROUND = { GRASS: 0, PATH: 1, PLAZA: 2, WATER: 3, SAND: 4, DIRT: 5, BRIDGE: 6, FLOOR: 7, WALL: 8, CAVE: 9, ROCKWALL: 10 };
 
 export class Area {
   constructor(def) {

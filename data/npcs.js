@@ -230,7 +230,7 @@ export const NPCS = [
       start: 'hi',
       nodes: {
         hi: {
-          say: ["The mine road's blocked by a rockslide. I've been waiting two days for someone to clear it.", "If you're heading north, you'll have to wait too."],
+          say: ["They've finally cleared the rockslide! The mine's just up the road.", "I'm resting my feet before I go in."],
           next: 'menu',
         },
         menu: { say: [], choices: [
@@ -249,8 +249,57 @@ export const NPCS = [
         },
         staffFull: { say: 'You have no room for it! Free up some space in your bag first.', next: 'menu' },
         magic: { say: ['Runes hold the power. The staff just points it.', 'Goblins carry air and mind runes; the brute by the tents often has water runes.'], next: 'menu' },
-        mine: { say: ['Copper, tin, and dwarves who don\'t much like visitors.', "Best place around to learn mining, once you can get there."], next: 'menu' },
+        mine: { say: ['Copper and tin near the entrance, iron deeper in.', "Dorrin runs the place. Ask him and he'll teach you to mine and smith."], next: 'menu' },
         bye: { say: 'And to you.' },
+      },
+    },
+  },
+
+  // ---- Copperdeep Mine -----------------------------------------------------------
+  {
+    examine: 'A stocky old miner with a lamp on his helmet and dust in his beard.',
+    id: 'dorrin', name: 'Dorrin the Miner', area: 'mine', x: 16, y: 21, radius: 2, wander: 0.12,
+    look: { hair: '#8a8580', tunic: '#6a4a2a', pants: '#4a3a2a', beard: '#b8b2a8', hat: 'helmet', hatColor: '#c8a030' },
+    talk: {
+      start: (c) => (c.flags.metDorrin ? 'again' : 'intro'),
+      nodes: {
+        intro: {
+          say: ["Mind your head! Welcome to Copperdeep. I'm Dorrin.", 'Bram\'s lot helped us shift the rockslide, so we\'re digging again at last.'],
+          set: { metDorrin: true },
+          next: 'menu',
+        },
+        again: { say: 'Back for more ore?', next: 'menu' },
+        menu: { say: [], choices: [
+          { text: 'Can you teach me to mine?', next: 'teach', if: (c) => !c.flags.gotPickaxe },
+          { text: 'How does mining work again?', next: 'lesson', if: (c) => c.flags.gotPickaxe },
+          { text: 'How do I make things from ore?', next: 'smith' },
+          { text: "What's deeper in?", next: 'deeper' },
+          { text: 'See you, Dorrin.', next: 'bye' },
+        ] },
+        teach: {
+          say: ['Course! Every miner starts with a pickaxe. Take this old bronze one.', 'And a hammer, for the anvil. You\'ll want that soon enough.'],
+          give: { flag: 'gotPickaxe', items: [{ item: 'bronzePickaxe', qty: 1 }, { item: 'hammer', qty: 1 }] },
+          giveFail: 'full',
+          next: 'lesson',
+        },
+        full: { say: "You've no room in that bag! Clear a couple of spaces and come back.", next: 'menu' },
+        lesson: {
+          say: ['Tap a rock and you\'ll chip away at it until some ore comes loose. Then the rock\'s empty for a few seconds.',
+            'Copper and tin are in the west gallery. Iron\'s to the east, but you\'ll need Mining 15 for it.'],
+          next: 'menu',
+        },
+        smith: {
+          say: ['Take one copper ore and one tin ore to the furnace there, and out comes a bronze bar.',
+            'Iron bars need Smithing 15, and half the time the ore\'s too impure. Gets better as you learn.',
+            'Then take your bars to the anvil with a hammer. Daggers, swords, helmets, shields, even arrowtips.'],
+          next: 'menu',
+        },
+        deeper: {
+          say: ['Tunnel goblins. They crept in while the road was blocked, and they keep "borrowing" our ore.',
+            'Not too tough on their own. Teach them some manners if you like.'],
+          next: 'menu',
+        },
+        bye: { say: 'Watch for falling rocks!' },
       },
     },
   },

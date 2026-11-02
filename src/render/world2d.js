@@ -44,6 +44,11 @@ function getLib() {
     rug: S.rug(),
     plant: S.plant(),
     gravestone: S.gravestone(),
+    ore: Object.fromEntries(['copper', 'tin', 'iron'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
+    oreEmpty: [S.oreRock(null, 131), S.oreRock(null, 132)],
+    furnace: S.furnace(),
+    anvil: S.anvil(),
+    rubble: [S.rubble(141), S.rubble(142), S.rubble(143)],
     treeShadow: S.shadow(15, 4),
     smallShadow: S.shadow(6, 2),
     player: S.playerFrames(),
@@ -120,6 +125,14 @@ export function createWorldView(canvasEl, area) {
       case 'barrel': place(lib.barrel, f.x, f.y); break;
       case 'chest': place(lib.chest, f.x, f.y); break;
       case 'plant': place(lib.plant, f.x, f.y); break;
+      case 'ore': {
+        const k = (p.x + p.y) % 2;
+        place(lib.ore[p.variant][k], f.x, f.y + 1, { prop: p, fx: f.x, fy: f.y + 1, alt: lib.oreEmpty[k] });
+        break;
+      }
+      case 'furnace': place(lib.furnace, f.x, f.y + 1); break;
+      case 'anvil': place(lib.anvil, f.x, f.y); break;
+      case 'rubble': { const spr = pick(lib.rubble, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
       case 'rug': decals.push({ img: lib.rug.img, x: (p.x + 0.5) * TILE - lib.rug.ax, y: (p.y + 0.5) * TILE - lib.rug.ay }); break;
       case 'bones': decals.push({ img: lib.bones.img, x: p.x * TILE, y: p.y * TILE + 4 }); break;
       case 'mushrooms': { const spr = pick(lib.mushrooms, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
@@ -302,7 +315,7 @@ export function createWorldView(canvasEl, area) {
     for (const o of list) {
       if (o.prop?.depleted) {
         // A chopped-down tree: just its stump until it grows back.
-        const st = lib.stump[(o.prop.x + o.prop.y) % lib.stump.length];
+        const st = o.alt || lib.stump[(o.prop.x + o.prop.y) % lib.stump.length];
         ctx.drawImage(st.img, Math.round(o.fx - st.ax), Math.round(o.fy - st.ay));
         continue;
       }

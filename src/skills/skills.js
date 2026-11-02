@@ -40,6 +40,8 @@ export const SKILLS = [
   { id: 'magic', name: 'Magic', about: 'Combat spells. Higher levels unlock stronger spells.' },
   { id: 'woodcutting', name: 'Woodcutting', about: 'Chop trees for logs. Higher levels chop faster and unlock oaks.' },
   { id: 'fletching', name: 'Fletching', about: 'Carve logs into arrows and bows with a knife.' },
+  { id: 'mining', name: 'Mining', about: 'Mine ore from rocks with a pickaxe. Higher levels unlock iron.' },
+  { id: 'smithing', name: 'Smithing', about: 'Smelt ore into bars at a furnace, then hammer bars into gear at an anvil.' },
 ];
 
 export const SKILL_NAME = Object.fromEntries(SKILLS.map((s) => [s.id, s.name]));

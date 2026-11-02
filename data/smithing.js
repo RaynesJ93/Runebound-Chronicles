@@ -1,0 +1,39 @@
+// Smelting (at a furnace) and smithing (at an anvil, with a hammer).
+// Same recipe shape as fletching.js, plus:
+//   skill:   which skill gets the XP
+//   station: 'furnace' or 'anvil' — opened by tapping one
+//   bar:     which bar this anvil recipe is made from (groups the anvil menu)
+//   success: (level) => chance the make works; on a failure the materials are used up
+
+export const SMELTING = [
+  { id: 'bronzeBar', name: 'Bronze bar', level: 1, xp: 6.2, uses: { copperOre: 1, tinOre: 1 }, gives: { bronzeBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
+  { id: 'ironBar', name: 'Iron bar', level: 15, xp: 12.5, uses: { ironOre: 1 }, gives: { ironBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace',
+    success: (lvl) => Math.min(0.8, 0.5 + (lvl - 15) * 0.01), fail: 'The iron is too impure, and crumbles away.' },
+];
+
+const anvil = (bar, list) => list.map(([item, name, level, bars, xp, qty = 1]) => ({
+  id: item, name, level, xp, uses: { [bar]: bars }, gives: { [item]: qty }, tool: 'hammer', ticks: 4, skill: 'smithing', station: 'anvil', bar,
+}));
+
+export const SMITHING = [
+  ...anvil('bronzeBar', [
+    ['bronzeDagger', 'Bronze dagger', 1, 1, 12.5],
+    ['bronzeAxe', 'Bronze axe', 1, 1, 12.5],
+    ['bronzePickaxe', 'Bronze pickaxe', 2, 1, 12.5],
+    ['bronzeMedHelm', 'Bronze med helm', 3, 1, 12.5],
+    ['bronzeSword', 'Bronze sword', 4, 1, 12.5],
+    ['bronzeArrowtips', 'Bronze arrowtips', 5, 1, 12.5, 15],
+    ['bronzeSqShield', 'Bronze sq shield', 8, 2, 25],
+    ['bronzeChainbody', 'Bronze chainbody', 11, 3, 37.5],
+  ]),
+  ...anvil('ironBar', [
+    ['ironDagger', 'Iron dagger', 15, 1, 25],
+    ['ironAxe', 'Iron axe', 16, 1, 25],
+    ['ironPickaxe', 'Iron pickaxe', 17, 1, 25],
+    ['ironMedHelm', 'Iron med helm', 18, 1, 25],
+    ['ironSword', 'Iron sword', 19, 1, 25],
+    ['ironArrowtips', 'Iron arrowtips', 20, 1, 25, 15],
+    ['ironSqShield', 'Iron sq shield', 23, 2, 50],
+    ['ironChainbody', 'Iron chainbody', 26, 3, 75],
+  ]),
+];

@@ -1,7 +1,7 @@
 // Route 1 — Thornwood Forest.
 // A winding road north from Brambleford, through thick woods, over a stream,
 // past Bram the woodcutter's cabin, a goblin camp (west) and a wolf den
-// (north-east), to the mine road — blocked by a rockslide for now.
+// (north-east), to Copperdeep Mine at the top of the road.
 //
 // Goblins and wolves move in with Batch 3; their clearings are ready for them.
 
@@ -92,15 +92,17 @@ export function buildRoute1() {
   for (const [x, y] of [[27, 10], [25, 12], [29, 13]]) one('bones', x, y, { blocks: false });
 
   // ---- North end: rockslide over the mine road -------------------------------------------
-  for (const [x, y] of [[11, 1], [12, 1], [13, 1], [14, 1], [12, 0], [13, 0], [11, 0], [14, 0]]) one('rock', x, y, x === 12 && y === 1
-    ? { interact: ['A rockslide blocks the road to Copperdeep Mine.', '(The mine opens in a later update.)'] } : {});
+  // ---- North end: the mine entrance (the rockslide has been cleared to the sides) --------
+  for (const [x, y] of [[11, 1], [14, 1], [11, 0], [14, 0], [10, 0], [15, 0]]) one('rock', x, y);
+  one('rubble', 15, 2, { blocks: false });
+  one('rubble', 10, 2, { blocks: false });
 
   // ---- Signs -------------------------------------------------------------------------------
   one('sign', 19, 56, { interact: ['ROUTE 1 — Thornwood Forest.', 'North: Copperdeep Mine.  South: Brambleford.'] });
   one('sign', 14, 45, { interact: ['DANGER! Goblin camp to the west.', 'Signed, the Brambleford Watch.'] });
   one('sign', 14, 16, { interact: ['Wolf den to the east. Travel in daylight.'] });
   one('sign', 24, 42, { interact: ["Bram's Woodcutting — logs, kindling and advice.", 'New to adventuring? Ask Bram for a FREE bow and arrows!'] });
-  one('sign', 14, 9, { interact: ['Copperdeep Mine road. CLOSED after the rockslide.'] });
+  one('sign', 14, 9, { interact: ['Copperdeep Mine — just ahead. Open again!', 'Miners wanted: see Dorrin inside.'] });
 
   // ---- Forest: thickest far from the road and clearings ------------------------------------
   const dist = new Int16Array(W * H).fill(99);
@@ -141,6 +143,7 @@ export function buildRoute1() {
     spawn: { x: 16, y: 58, facing: Math.PI },
     exits: [
       { tiles: [{ x: 16, y: 59 }, { x: 17, y: 59 }], to: 'brambleford', at: { x: 21, y: 1 }, facing: 0 },
+      { tiles: [{ x: 12, y: 0 }, { x: 13, y: 0 }], to: 'mine', at: { x: 15, y: 26 }, facing: Math.PI },
     ],
     // Monsters and where they live (see data/enemies.js).
     spawns: [
