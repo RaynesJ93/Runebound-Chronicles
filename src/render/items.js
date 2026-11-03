@@ -605,6 +605,38 @@ for (const part of ['Dagger', 'Axe', 'Pickaxe', 'Mace', 'MedHelm', 'Sword', 'Sci
 }
 DRAW.coal ||= recolour('ironOre', (d, i) => { const l = (d[i] + d[i + 1] + d[i + 2]) / 3; d[i] = d[i + 1] = l * 0.3; d[i + 2] = l * 0.36; });
 
+// Silver, gold, gems and jewellery, drawn simply (the painted art covers them normally).
+const GEM_COL = { sapphire: ['#14205e', '#2a48b8', '#8fb4ff'], emerald: ['#0b3f22', '#1c8a4c', '#7ef0a8'], ruby: ['#4e0814', '#a8182e', '#ff8a9a'], diamond: ['#5e6e80', '#c4dcee', '#ffffff'] };
+const METAL_COL = { silver: ['#4e545c', '#b4bec8', '#ffffff'], gold: ['#6e420c', '#e0ac34', '#fff3b8'] };
+const gemAt = (b, cx, cy, r, gem) => {
+  const [d, m, l] = GEM_COL[gem].map(hex);
+  for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) if (Math.abs(x) + Math.abs(y) <= r) b.set(cx + x, cy + y, y < 0 ? (x < 0 ? l : m) : d);
+};
+const toMetal = (base, metal) => recolour(base, (d, i) => {
+  const l = (d[i] + d[i + 1] + d[i + 2]) / 765; const [a, m, h] = METAL_COL[metal].map(hex);
+  const c = l < 0.35 ? a : l < 0.7 ? m : h; d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2];
+});
+DRAW.silverOre ||= toMetal('tinOre', 'silver');
+DRAW.goldOre ||= toMetal('copperOre', 'gold');
+DRAW.silverBar ||= toMetal('ironBar', 'silver');
+DRAW.goldBar ||= toMetal('bronzeBar', 'gold');
+DRAW.chisel ||= (b) => { line(b, 3, 13, 8, 8, WOOD[1]); line(b, 4, 13, 8, 9, WOOD[0]); line(b, 9, 7, 13, 3, hex('#c0c8d0')); b.set(13, 2, hex('#ffffff')); };
+DRAW.ringMould ||= (b) => { b.rect(2, 4, 12, 9, hex('#c8a878')); b.ellipse(8, 8.5, 3, 3, hex('#6a5232')); b.ellipse(8, 8.5, 1.4, 1.4, hex('#c8a878')); };
+DRAW.amuletMould ||= (b) => { b.rect(2, 4, 12, 9, hex('#c8a878')); b.ellipse(8, 9.5, 2.6, 2.6, hex('#6a5232')); line(b, 5, 5, 8, 8, hex('#6a5232')); line(b, 11, 5, 8, 8, hex('#6a5232')); };
+for (const gem of Object.keys(GEM_COL)) {
+  const cap = gem[0].toUpperCase() + gem.slice(1);
+  DRAW[gem] ||= (b) => gemAt(b, 8, 8, 5, gem);
+  DRAW[`uncut${cap}`] ||= recolour('tinOre', (d, i) => { const l = (d[i] + d[i + 1] + d[i + 2]) / 765; const [a, m, h] = GEM_COL[gem].map(hex); const c = l < 0.4 ? a : l < 0.7 ? m : h; d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; });
+}
+for (const metal of ['silver', 'gold']) {
+  const [a, m, h] = METAL_COL[metal].map(hex);
+  for (const gem of [null, ...Object.keys(GEM_COL)]) {
+    const cap = gem ? gem[0].toUpperCase() + gem.slice(1) : '';
+    DRAW[`${metal}${cap}Ring`] ||= (b) => { b.ellipse(8, 10, 5, 3.6, m); b.ellipse(8, 10, 3, 1.8, [0, 0, 0]); for (let i = 0; i < b.data.length; i += 4) if (!b.data[i] && !b.data[i + 1] && !b.data[i + 2]) b.data[i + 3] = 0; b.set(5, 8, h); if (gem) gemAt(b, 8, 5, 2, gem); };
+    DRAW[`${metal}${cap}Amulet`] ||= (b) => { line(b, 3, 2, 8, 8, a); line(b, 13, 2, 8, 8, a); b.ellipse(8, 11, 3.4, 3.4, m); b.set(7, 10, h); if (gem) gemAt(b, 8, 11, 2, gem); };
+  }
+}
+
 // Hard leather pieces: the leather drawing in darker, redder leather.
 for (const part of ['Gloves', 'Boots', 'Cowl', 'Chaps']) {
   DRAW[`hardLeather${part}`] = (b) => {

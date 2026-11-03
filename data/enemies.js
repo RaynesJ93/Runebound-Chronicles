@@ -169,8 +169,10 @@ export const ENEMIES = {
         { item: 'steelArrowtips', min: 5, max: 15, chance: 1 / 16 },
         { item: 'steelMedHelm', qty: 1, chance: 1 / 40 },
         { item: 'steelMace', qty: 1, chance: 1 / 48 },
+        { item: 'uncutSapphire', qty: 1, chance: 1 / 32 },
+        { item: 'uncutEmerald', qty: 1, chance: 1 / 64 },
       ],
-      rare: { chance: 1 / 128, table: [{ item: 'warCharm', qty: 1 }] },
+      rare: { chance: 1 / 128, table: [{ item: 'warCharm', qty: 1 }, { item: 'uncutRuby', qty: 1 }, { item: 'uncutDiamond', qty: 1 }] },
     },
   },
 };

@@ -13,6 +13,10 @@ export const ROCKS = {
     examine: 'A rock streaked with rusty iron.' },
   coal: { name: 'Coal rock', level: 30, xp: 50, ore: 'coal', chance: 0.25, deplete: 1, respawn: [20, 35],
     examine: 'A rock seamed with black, shiny coal.' },
+  silver: { name: 'Silver rock', level: 20, xp: 40, ore: 'silverOre', chance: 0.22, deplete: 1, respawn: [40, 70],
+    examine: 'A rock with bright streaks of silver.' },
+  gold: { name: 'Gold rock', level: 40, xp: 65, ore: 'goldOre', chance: 0.18, deplete: 1, respawn: [60, 100],
+    examine: 'A rock glinting with veins of gold.' },
 };
 
 // Best first. A pickaxe works from your bag or in your hand.
@@ -23,3 +27,18 @@ export const PICKAXES = [
 ];
 
 export const MINE_TICKS = 4;
+
+// Every ore you mine (not essence) has a small chance of turning up an uncut
+// gem as well: 1 in 80 at level 1, rising to about 1 in 40 at 99.
+export const GEMS = [
+  { item: 'uncutSapphire', weight: 55 },
+  { item: 'uncutEmerald', weight: 28 },
+  { item: 'uncutRuby', weight: 13 },
+  { item: 'uncutDiamond', weight: 4 },
+];
+export const gemChance = (level) => 1 / 80 + level * 0.000127;
+export function rollGem(rnd) {
+  let r = rnd() * GEMS.reduce((t, g) => t + g.weight, 0);
+  for (const g of GEMS) if ((r -= g.weight) < 0) return g.item;
+  return GEMS[0].item;
+}

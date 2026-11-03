@@ -2,7 +2,8 @@
 // back of the iron gallery.
 //
 // A landing at the south (the way back up), three coal caverns (west, north
-// and east) with a few iron rocks, and cave beasts roaming the dark.
+// and east) with a few iron, silver and gold rocks, and cave beasts roaming
+// the dark.
 
 import { GROUND } from '../../src/world/area.js';
 import { mulberry32 } from '../../src/core/rng.js';
@@ -65,6 +66,8 @@ export function buildDepths() {
   for (const [x, y] of [[16, 5], [19, 4], [23, 5], [25, 8], [15, 8]]) ore('coal', x, y);
   for (const [x, y] of [[30, 10], [34, 12], [28, 15], [35, 16], [32, 18]]) ore('coal', x, y);
   for (const [x, y] of [[12, 11], [21, 9], [33, 9], [6, 13]]) ore('iron', x, y);
+  for (const [x, y] of [[7, 10], [17, 6], [31, 9], [36, 14]]) ore('silver', x, y);
+  for (const [x, y] of [[21, 4], [5, 17], [34, 17]]) ore('gold', x, y);
   for (const [x, y] of [[9, 20], [31, 21], [20, 11]]) one('lamp', x, y);
 
   for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {

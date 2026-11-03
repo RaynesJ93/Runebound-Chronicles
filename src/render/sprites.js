@@ -797,6 +797,8 @@ const ORE_COLOUR = {
   tin: [hex('#9aa0a4'), hex('#c8ced2'), hex('#f2f6f8')],
   iron: [hex('#6e3a26'), hex('#9a5236'), hex('#c87a56')],
   coal: [hex('#141216'), hex('#2a2830'), hex('#6a6878')],
+  silver: [hex('#8e98a2'), hex('#cdd5dc'), hex('#ffffff')],
+  gold: [hex('#bf8a22'), hex('#efc444'), hex('#fff3b8')],
 };
 
 // A rock with veins of ore. With no `variant` it's a mined-out rock.
