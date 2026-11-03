@@ -23,12 +23,14 @@ export function buildStore() {
   // Counter across the room; Pell stands behind it.
   const counter = [2, 3, 4, 5, 6, 7, 8].map((x) => ({ x, y: 4 }));
   r.prop('counter', counter, { action: 'shop', interact: ['The shop counter. Talk to Pell to trade.'] });
-  for (const x of [2, 4, 6, 8]) r.prop('shelf', [{ x, y: 1 }], { blocks: false });
+  [2, 4, 6, 8].forEach((x, k) => r.prop('shelf', [{ x, y: 1 }], { blocks: false, variant: k })); // food, tools, potions, books
   r.prop('barrel', [{ x: 1, y: 2 }]);
   r.prop('barrel', [{ x: 9, y: 2 }]);
   r.prop('crate', [{ x: 1, y: 6 }]);
   r.prop('crate', [{ x: 9, y: 7 }]);
   r.prop('rug', [{ x: 5, y: 6 }], { blocks: false });
+  r.prop('grainSack', [{ x: 1, y: 7 }]);
+  for (const x of [3, 7]) r.prop('wallLamp', [{ x, y: 1 }], { blocks: false });
   // front wall either side of the door
   for (let x = 0; x < r.W; x++) if (x !== 5) { r.ground[r.i(x, r.H - 1)] = GROUND.WALL; r.blocked[r.i(x, r.H - 1)] = 1; }
   return {
@@ -45,8 +47,9 @@ export function buildBank() {
   for (const [a, b] of booths) r.prop('bankBooth', [{ x: a, y: 4 }, { x: b, y: 4 }], { action: 'bank', interact: ['A bank booth.'] });
   for (const x of [4, 7]) r.prop('counter', [{ x, y: 4 }]);
   for (const x of [1, 10, 11]) r.prop('counter', [{ x, y: 4 }]);
-  r.prop('chest', [{ x: 2, y: 2 }], { blocks: true });
-  r.prop('chest', [{ x: 10, y: 2 }], { blocks: true });
+  r.prop('coinChest', [{ x: 2, y: 2 }], { blocks: true });
+  r.prop('coinChest', [{ x: 10, y: 2 }], { blocks: true });
+  for (const x of [4, 8]) r.prop('wallLamp', [{ x, y: 1 }], { blocks: false });
   r.prop('rug', [{ x: 6, y: 6 }], { blocks: false });
   r.prop('plant', [{ x: 1, y: 7 }]);
   r.prop('plant', [{ x: 11, y: 7 }]);

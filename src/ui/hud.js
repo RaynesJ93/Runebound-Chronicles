@@ -1,7 +1,10 @@
 // The on-screen interface: area name banner, game messages, run orb,
 // D-pad, dialogue box and the settings panel (with save backup tools).
 
-import { iconUrl } from '../render/icons.js';
+import { iconUrl, paintedIconUrl } from '../render/icons.js';
+
+// A painted interface icon, or the drawn SVG if there isn't one.
+const uiIcon = (name, svg, size) => { const u = paintedIconUrl(name); return u ? `<img class="px ui-ic" src="${u}" alt="" width="${size}" height="${size}" id="ic-${name}">` : svg; };
 import { itemIcon, stackLabel } from '../render/items.js';
 import { ITEMS } from '../../data/items.js';
 import { SLOT_NAME, TYPES } from '../items/equipment.js';
@@ -34,8 +37,8 @@ export class Hud {
       </div>
       <div class="hud-top-right">
         <button class="icon-btn ui" id="btn-inv" aria-label="Inventory"><img class="px" src="${itemIcon('bag').url}" alt=""></button>
-        <button class="icon-btn ui" id="btn-skills" aria-label="Skills"><img class="px" src="${iconUrl('attack')}" alt=""></button>
-        <button class="icon-btn ui" id="btn-settings" aria-label="Settings">${GEAR_SVG}</button>
+        <button class="icon-btn ui" id="btn-skills" aria-label="Skills"><img class="px" src="${paintedIconUrl('equipment') || iconUrl('attack')}" alt=""></button>
+        <button class="icon-btn ui" id="btn-settings" aria-label="Settings">${uiIcon('settings', GEAR_SVG, 32)}</button>
         <div class="xp-drops" id="xp-drops" aria-hidden="true"></div>
       </div>
       <div class="levelup hidden" id="levelup" role="status">
@@ -109,12 +112,12 @@ export class Hud {
       </div>
       <div class="hud-bottom-right">
         <div class="hp-orb" id="hp-orb" aria-label="Hitpoints">
-          <span class="hp-icon">${HEART_SVG}</span>
+          <span class="hp-icon">${uiIcon('heart', HEART_SVG, 26)}</span>
           <span class="run-bar"><span class="hp-fill" id="hp-fill"></span></span>
           <span class="run-val" id="hp-val">10</span>
         </div>
         <button class="run-orb ui" id="run-orb" aria-label="Toggle run">
-          <span class="run-icon">${BOOT_SVG}</span>
+          <span class="run-icon">${uiIcon('walk', BOOT_SVG, 26)}</span>
           <span class="run-val" id="run-val">Run</span>
         </button>
       </div>
@@ -562,6 +565,9 @@ export class Hud {
     this.runOn = on;
     this.el.runOrb.classList.toggle('on', on);
     this.el.runVal.textContent = on ? 'Run' : 'Walk';
+    const boot = this.el.runOrb.querySelector('img.ui-ic');
+    const u = paintedIconUrl(on ? 'run' : 'walk');
+    if (boot && u) boot.src = u;
     this.el.runOrb.setAttribute('aria-pressed', String(on));
   }
 

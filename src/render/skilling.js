@@ -1,3 +1,4 @@
+import { art } from './art.js';
 import { TILE } from './pixel.js';
 import { iconUrl } from './icons.js';
 
@@ -82,7 +83,24 @@ function chips(ctx, x, y, t, cycle, colours, n = 5, spread = 1) {
 
 const TOOL = 13; // handle length in world pixels (a character is 16 x 24)
 
+// A painted tool from the art atlas, turned to `angle` around its grip.
+// Returns false if there isn't one, so the drawn tool is used instead.
+function paintedTool(ctx, key, hx, hy, angle) {
+  const spr = art('tool:' + key)?.[0];
+  if (!spr) return false;
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  ctx.translate(Math.round(hx), Math.round(hy));
+  ctx.rotate(angle);
+  // keep the blade on the outside of the swing when it points left
+  if (Math.cos(angle) < 0) ctx.scale(1, -1);
+  ctx.drawImage(spr.img, -spr.ax, -spr.ay);
+  ctx.restore();
+  return true;
+}
+
 function drawAxe(ctx, hx, hy, angle, metal) {
+  if (paintedTool(ctx, metal === 'iron' ? 'ironAxe' : 'bronzeAxe', hx, hy, angle)) return;
   const [d, m, l, h] = METAL[metal] || METAL.bronze;
   const cx = Math.cos(angle), cy = Math.sin(angle);
   const ex = hx + cx * TOOL, ey = hy + cy * TOOL;
@@ -99,6 +117,7 @@ function drawAxe(ctx, hx, hy, angle, metal) {
 }
 
 function drawPickaxe(ctx, hx, hy, angle, metal) {
+  if (paintedTool(ctx, metal === 'iron' ? 'ironPickaxe' : 'bronzePickaxe', hx, hy, angle)) return;
   const [d, m, l, h] = METAL[metal] || METAL.bronze;
   const cx = Math.cos(angle), cy = Math.sin(angle);
   const ex = hx + cx * TOOL, ey = hy + cy * TOOL;
@@ -115,6 +134,7 @@ function drawPickaxe(ctx, hx, hy, angle, metal) {
 }
 
 function drawHammer(ctx, hx, hy, angle, metal) {
+  if (paintedTool(ctx, 'hammer', hx, hy, angle)) return;
   const [d, m, l, h] = METAL.iron;
   const cx = Math.cos(angle), cy = Math.sin(angle);
   const ex = hx + cx * 10, ey = hy + cy * 10;
@@ -215,6 +235,15 @@ export function drawSkilling(ctx, sk, p, time) {
       const reach = lerp(9, 16, dip);
       const na = a.ang + (a.right ? -0.5 : 0.5) * (1 - dip);
       const ex = a.hx + Math.cos(na) * reach, ey = a.hy + Math.sin(na) * reach;
+      const netArt = art('tool:net');
+      if (netArt) {
+        const spr = netArt[Math.min(2, Math.floor(dip * 3))];
+        ctx.save(); ctx.translate(Math.round(a.hx), Math.round(a.hy)); if (!a.right) ctx.scale(-1, 1);
+        ctx.drawImage(spr.img, -spr.ax, -spr.ay + Math.round(dip * 4)); ctx.restore();
+        if (dip > 0.85) chips(ctx, ex, ey + 2, (phase - 0.4) * 3 % 1, cycle, ['#e8f6ff', '#a8d8f5'], 4, 0.8);
+        ripple(ctx, a.tx, a.ty + 1, (T % 1.8) / 1.8);
+        break;
+      }
       handle(ctx, a.hx, a.hy, ex, ey);
       // the net: a hoop with a mesh bag hanging from it
       for (let k = -4; k <= 4; k++) px(ctx, ex + k, ey - 1, WOOD[0]);
@@ -227,6 +256,13 @@ export function drawSkilling(ctx, sk, p, time) {
       // a pan held over the fire, given a little shake; steam rising
       const shake = Math.sin(T * 9) * 0.6;
       const ex = lerp(a.hx, a.tx, 0.55) + shake, ey = lerp(a.hy, a.ty, 0.55) - 4;
+      const pan = art('tool:pan');
+      if (pan) {
+        const spr = pan[Math.floor(T * 4) % pan.length];
+        ctx.save(); ctx.translate(Math.round(ex), Math.round(ey + 2)); if (!a.right) ctx.scale(-1, 1);
+        ctx.drawImage(spr.img, -Math.round(spr.w / 2), -spr.h + 2); ctx.restore();
+        break;
+      }
       handle(ctx, a.hx, a.hy, ex, ey, '#6e767e', '#2e3236');
       ctx.fillStyle = '#2e3236'; ctx.fillRect(Math.round(ex - 5), Math.round(ey - 1), 10, 3);
       ctx.fillStyle = '#4c5258'; ctx.fillRect(Math.round(ex - 4), Math.round(ey - 1), 8, 1);
@@ -323,10 +359,11 @@ export function drawSkilling(ctx, sk, p, time) {
   }
 
   // The skill's icon floating over your head.
-  const img = icon(sk.skill);
-  if (img && img.complete) {
+  const small = art('skillS:' + sk.skill)?.[0];
+  const img = small ? small.img : icon(sk.skill);
+  if (img && (small || img.complete)) {
     ctx.globalAlpha = 0.9;
-    ctx.drawImage(img, Math.round(p.fx - 8), Math.round(p.fy - 44 + Math.sin(time * 3) * 1.5));
+    ctx.drawImage(img, Math.round(p.fx - 7), Math.round(p.fy - 42 + Math.sin(time * 3) * 1.5), 14, 14); // painted icons are bigger: keep it small
     ctx.globalAlpha = 1;
   }
 }

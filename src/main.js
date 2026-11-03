@@ -1249,7 +1249,7 @@ function boot() {
     for (const npc of npcs) npc.update(dt);
     for (const e of enemies) e.update(dt);
 
-    view.render(player, { skilling: skillingView(), skillLungeAt, time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list, playerLook: playerLook || currentLook(),
+    view.render(player, { skilling: skillingView(), skillLungeAt, time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list, playerLook: playerLook || currentLook(), playerGear: equipment.slots,
       grave: state.grave && state.grave.area === area.id ? state.grave : null });
     if (state.grave) {
       const left = Math.max(0, GRAVE_SECONDS - (state.stats.playTimeSec - state.grave.createdAt));

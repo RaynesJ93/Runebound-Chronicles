@@ -43,25 +43,29 @@ function getLib() {
     scarecrow: art('scarecrow')?.[0] || S.scarecrow(),
     logPile: art('logPile')?.[0] || S.logPile(),
     crate: art('crate')?.[0] || S.crate(),
-    bones: S.bones(),
-    shelf: [S.shelf(1), S.shelf(2), S.shelf(3)],
+    bones: art('bones') || [S.bones()],
+    shelf: art('shelf') || [S.shelf(1), S.shelf(2), S.shelf(3)],
     barrel: art('barrel')?.[0] || S.barrel(),
     chest: art('chest')?.[0] || S.chest(),
-    rug: S.rug(),
-    plant: S.plant(),
-    gravestone: S.gravestone(),
+    rug: art('rug')?.[0] || S.rug(),
+    plant: art('plant')?.[0] || S.plant(),
+    gravestone: art('gravestone')?.[0] || S.gravestone(),
     ore: { ...Object.fromEntries(['copper', 'tin', 'iron'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
       essence: [S.essenceRock(1), S.essenceRock(2)] },
     // painted ore rocks replace the drawn ones where the atlas has them
     altar: Object.fromEntries(['air', 'mind', 'water'].map((v) => [v, art('altar:' + v) || [S.altar(v, 0), S.altar(v, 1)]])),
     standingStone: art('standingStone') || [S.standingStone(1), S.standingStone(2.5), S.standingStone(4)],
     campChest: art('campChest')?.[0] || S.campChest(),
-    ruinWall: [S.ruinWall(1), S.ruinWall(2), S.ruinWall(3), S.ruinWall(4)],
+    ruinWall: art('ruinWall') || [S.ruinWall(1), S.ruinWall(2), S.ruinWall(3), S.ruinWall(4)],
     caveMouth: art('caveMouth') || [S.caveMouth(false), S.caveMouth(true)],
     tombstone: [S.tombstone(1), S.tombstone(2), S.tombstone(3)],
-    graveStone: [0, 1, 2, 3].map((k) => S.graveStone(k)),
-    graveMound: [S.graveMound(1), S.graveMound(2), S.graveMound(3)],
-    memorial: S.memorial(),
+    graveStone: art('graveStone') || [0, 1, 2, 3].map((k) => S.graveStone(k)),
+    graveMound: art('graveMound') || [S.graveMound(1), S.graveMound(2), S.graveMound(3)],
+    memorial: art('memorial')?.[0] || S.memorial(),
+    ruinTower: art('ruinTower')?.[0], ruinArch: art('ruinArch')?.[0], ruinLow: art('ruinLow'), fallenPillar: art('fallenPillar')?.[0],
+    fishingSpotVale: art('fishingSpotVale'), wallLamp: art('wallLamp')?.[0], grainSack: art('grainSack')?.[0], coinChest: art('coinChest')?.[0],
+    bankBooth: art('bankBooth')?.[0], counterArt: [null, art('counter:1')?.[0], art('counter:2')?.[0], art('counter:3')?.[0]],
+    stool: art('stool')?.[0], table: art('table')?.[0],
     deadTree: art('deadTree') || Array.from({ length: VARIANTS }, (_, i) => S.deadTree(i + 151)),
     gloomTree: art('gloomTree') || Array.from({ length: VARIANTS }, (_, i) => S.gloomTree(i + 161)),
     thornBush: art('thornBush') || [S.thornBush(171), S.thornBush(172), S.thornBush(173)],
@@ -73,10 +77,10 @@ function getLib() {
     furnace: art('furnace')?.[0] || S.furnace(),
     mineLamp: art('mineLamp')?.[0] || null,
     tanningRack: art('tanningRack')?.[0] || S.tanningRack(),
-    fishingSpot: [S.fishingSpot(0), S.fishingSpot(1)],
+    fishingSpot: art('fishingSpot') || [S.fishingSpot(0), S.fishingSpot(1)],
     cookingPit: art('cookingPit') || [S.cookingPit(0), S.cookingPit(1)],
     anvil: art('anvil')?.[0] || S.anvil(),
-    rubble: [S.rubble(141), S.rubble(142), S.rubble(143)],
+    rubble: art('rubble') || [S.rubble(141), S.rubble(142), S.rubble(143)],
     treeShadow: S.shadow(15, 4),
     smallShadow: S.shadow(6, 2),
     player: S.playerFrames(),
@@ -103,17 +107,16 @@ function framesFor(lib, look, key, kind = 'person') {
 
 // A fence piece from the painted art: a post, rails to the east, and (drawn in
 // code, as the art has no side-on fence) rails running south.
-function paintedFence(east, south, picket = false) {
-  const post = art(picket ? 'picketPost' : 'fencePost')?.[0], rail = art(picket ? 'picketRail' : 'fenceRail')?.[0];
-  if (!post || !rail) return null;
-  const base = S.fence(false, south); // 28 x 32, post at x 6-9, anchor (8, 17)
+function paintedFence(east, south, style = 'wood') {
+  const post = art(`fence:${style}:post`)?.[0], railE = art(`fence:${style}:east`)?.[0], railS = art(`fence:${style}:south`)?.[0];
+  if (!post || !railE) return null;
   const c = document.createElement('canvas');
-  c.width = base.w; c.height = base.h;
+  c.width = 28; c.height = 40;
   const g = c.getContext('2d');
-  if (south) g.drawImage(base.img, 0, 0);
-  if (east) g.drawImage(rail.img, 9, 18 - rail.h - 2);
+  if (south && railS) g.drawImage(railS.img, 8 - Math.round(railS.w / 2), 13);
+  if (east) g.drawImage(railE.img, 9, 18 - railE.h - 1);
   g.drawImage(post.img, 8 - post.ax, 18 - post.ay);
-  return { img: c, ax: base.ax, ay: base.ay, w: base.w, h: base.h };
+  return { img: c, ax: 8, ay: 17, w: 28, h: 40 };
 }
 
 export function createWorldView(canvasEl, area) {
@@ -124,7 +127,7 @@ export function createWorldView(canvasEl, area) {
 
   const lib = getLib();
   const fences = {};
-  const fenceSprite = (e, s, k = false) => (fences[`${e}${s}${k}`] ||= (k === 'iron' ? S.ironFence(e, s) : paintedFence(e, s, k === 'picket')) || S.fence(e, s));
+  const fenceSprite = (e, s, k = 'wood') => (fences[`${e}${s}${k}`] ||= paintedFence(e, s, k) || (k === 'iron' ? S.ironFence(e, s) : S.fence(e, s)));
 
   // ---- Place everything -------------------------------------------------------------
   const decals = []; // drawn flat on the ground, under everything else
@@ -172,7 +175,7 @@ export function createWorldView(canvasEl, area) {
         break;
       }
       case 'crop': place(lib.crop[p.ripe ? 1 : lib.crop[2] && (p.x + p.y * 3) % 3 === 0 ? 2 : 0], f.x, f.y); break;
-      case 'fence': place(fenceSprite(isFence.has(`${p.x + 1},${p.y}`), isFence.has(`${p.x},${p.y + 1}`), p.style || false), f.x, f.y - 2); break;
+      case 'fence': place(fenceSprite(isFence.has(`${p.x + 1},${p.y}`), isFence.has(`${p.x},${p.y + 1}`), p.style || 'wood'), f.x, f.y - 2); break;
       case 'lamp': place(area.id === 'mine' && lib.mineLamp ? lib.mineLamp : lib.lamp, f.x, f.y); break;
       case 'sign': place(lib.sign, f.x, f.y); break;
       case 'well': place(lib.well, f.x, f.y + 1); break;
@@ -190,9 +193,26 @@ export function createWorldView(canvasEl, area) {
       case 'crystalShard': place(pick(lib.crystalShard, p), f.x, f.y); break;
       case 'glowShrooms': { const spr = pick(lib.glowShrooms, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
       case 'glowFlowers': { const spr = pick(lib.glowFlowers, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
-      case 'counter': place(S.counter(p.tiles.length), f.x, f.y); break;
-      case 'bankBooth': place(S.counter(p.tiles.length, true), f.x, f.y); break;
-      case 'shelf': place(pick(lib.shelf, p), f.x, f.y + 2); break;
+      case 'counter': {
+        // painted counter pieces laid end to end (3, 2 and 1 tiles long), or the drawn one
+        if (!lib.counterArt[3]) { place(S.counter(p.tiles.length), f.x, f.y); break; }
+        let left = Math.min(...p.tiles.map((t) => t.x)), n = p.tiles.length;
+        const y = (p.tiles[0].y + 1) * TILE - 1;
+        while (n > 0) {
+          const k = n >= 3 ? 3 : n;
+          const spr = lib.counterArt[k];
+          objects.push({ img: spr.img, x: left * TILE, y: y - spr.ay, w: spr.w, h: spr.h, sortY: y });
+          left += k; n -= k;
+        }
+        break;
+      }
+      case 'bankBooth': if (lib.bankBooth) place(lib.bankBooth, f.x, f.y); else place(S.counter(p.tiles.length, true), f.x, f.y); break;
+      case 'wallLamp': if (lib.wallLamp) place(lib.wallLamp, f.x, f.y - 8); break;
+      case 'grainSack': place(lib.grainSack || lib.crate, f.x, f.y); break;
+      case 'coinChest': place(lib.coinChest || lib.chest, f.x, f.y); break;
+      case 'stool': if (lib.stool) place(lib.stool, f.x + jit(p, 15) / 2, f.y); break;
+      case 'table': place(lib.table || lib.crate, f.x, f.y); break;
+      case 'shelf': place(p.variant !== undefined ? lib.shelf[p.variant % lib.shelf.length] : pick(lib.shelf, p), f.x, f.y + 2); break;
       case 'barrel': place(lib.barrel, f.x, f.y); break;
       case 'chest': place(lib.chest, f.x, f.y); break;
       case 'plant': place(lib.plant, f.x, f.y); break;
@@ -206,25 +226,29 @@ export function createWorldView(canvasEl, area) {
       case 'altar': place(lib.altar[p.variant][0], f.x, f.y + 1, { frames: lib.altar[p.variant], rate: 2.5 }); break;
       case 'standingStone': place(pick(lib.standingStone, p), f.x, f.y); break;
       case 'ruinWall': place(pick(lib.ruinWall, p), f.x, f.y); break;
+      case 'ruinTower': place(lib.ruinTower || lib.ruinWall[0], f.x, f.y); break;
+      case 'ruinArch': place(lib.ruinArch || lib.ruinWall[0], f.x, f.y); break;
+      case 'ruinLow': place(lib.ruinLow ? pick(lib.ruinLow, p) : lib.ruinWall[0], f.x, f.y); break;
+      case 'fallenPillar': place(lib.fallenPillar || lib.logPile, f.x, f.y); break;
       case 'caveMouth': place(lib.caveMouth[p.sealed ? 1 : 0], f.x, f.y); break;
       case 'tombstone': place(pick(lib.tombstone, p), f.x, f.y); break;
       case 'grave': {
         // headstone, with its mound of earth on the tile in front
         const m = lib.graveMound[(p.x + p.y) % 3];
         decals.push({ img: m.img, x: p.x * TILE, y: (p.y + 1) * TILE - 3 });
-        place(lib.graveStone[p.style ?? (p.x * 3 + p.y) % 4], f.x, f.y);
+        place(lib.graveStone[(p.style ?? (p.x * 3 + p.y)) % lib.graveStone.length], f.x, f.y);
         break;
       }
       case 'memorial': place(lib.memorial, f.x, f.y); break;
       case 'deadGrass': place(pick(lib.deadGrass, p), f.x + jit(p, 13), f.y + jit(p, 14) / 2, { sortY: (p.y + 1) * TILE + 1 }); break;
       case 'campChest': place(lib.campChest, f.x, f.y); break;
       // Ripples sit flat on the water, under anyone standing nearby.
-      case 'fishingSpot': place(lib.fishingSpot[0], f.x, f.y - 2, { frames: lib.fishingSpot, rate: 1.6, sortY: p.y * TILE }); break;
+      case 'fishingSpot': { const fr = area.theme === 'vale' && lib.fishingSpotVale ? lib.fishingSpotVale : lib.fishingSpot; place(fr[0], f.x, f.y - 2, { frames: fr, rate: fr.length > 2 ? 3.2 : 1.6, sortY: p.y * TILE }); break; }
       case 'cookingPit': place(lib.cookingPit[0], f.x, f.y, { frames: lib.cookingPit }); break;
       case 'anvil': place(lib.anvil, f.x, f.y); break;
       case 'rubble': { const spr = pick(lib.rubble, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
       case 'rug': decals.push({ img: lib.rug.img, x: (p.x + 0.5) * TILE - lib.rug.ax, y: (p.y + 0.5) * TILE - lib.rug.ay }); break;
-      case 'bones': decals.push({ img: lib.bones.img, x: p.x * TILE + jit(p, 5), y: p.y * TILE + 4 + jit(p, 6) / 2 }); break;
+      case 'bones': decals.push({ img: pick(lib.bones, p).img, x: p.x * TILE + jit(p, 5), y: p.y * TILE + 4 + jit(p, 6) / 2 }); break;
       case 'mushrooms': { const spr = pick(lib.mushrooms, p); decals.push({ img: spr.img, x: p.x * TILE + jit(p, 7), y: p.y * TILE + jit(p, 8) / 2 }); break; }
       default: break; // doors are drawn as part of their building
     }
@@ -384,21 +408,39 @@ export function createWorldView(canvasEl, area) {
   }
 
   // A drawable for anyone walking around: the player or a villager.
-  function personObj(frames, who, steps, extra, time = 0, lungeAt = -99) {
+  // Which way someone faces, as a direction name.
+  const dirOf = (a) => { const dx = Math.sin(a), dy = Math.cos(a); return Math.abs(dx) > Math.abs(dy) + 0.01 ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'); };
+  // A frame from a painted animation, `t` seconds in, `dur` long; null if not painted.
+  const animFrame = (key, t, dur, hold = false) => {
+    const fr = art('anim:' + key);
+    if (!fr || t < 0 || (!hold && t >= dur)) return null;
+    return fr[Math.min(fr.length - 1, Math.floor((t / dur) * fr.length))];
+  };
+
+  function personObj(frames, who, steps, extra, time = 0, lungeAt = -99, pose = null) {
     const wp = who.worldPosition();
     let fx = Math.round(wp.x * TILE);
     let fy = Math.round(wp.z * TILE + 6);
     const sortY = fy;
     // A quick lunge towards whatever they're hitting.
-    if (time - lungeAt < 0.18) {
+    if (!pose && time - lungeAt < 0.18) {
       fx += Math.round(Math.sin(who.facing) * 3);
       fy += Math.round(Math.cos(who.facing) * 3);
     }
-    const spr = frameOf(frames, who, steps);
-    return { img: spr.img, x: fx - spr.ax, y: fy - spr.ay, w: spr.w, h: spr.h, sortY, fx, fy, ...extra };
+    const spr = pose || frameOf(frames, who, steps);
+    return { img: spr.img, x: fx - spr.ax, y: fy - spr.ay, w: spr.w, h: spr.h, ax: spr.ax, ay: spr.ay, sortY, fx, fy, ...extra };
   }
 
   function healthBar(fx, fy, hp, max) {
+    const frame = art('bar:frame')?.[0];
+    if (frame) {
+      const x = fx - Math.floor(frame.w / 2), y = fy - 30;
+      const iw = frame.w - 2, ih = Math.max(2, frame.h - 2);
+      ctx.fillStyle = '#9a1a14'; ctx.fillRect(x + 1, y + 1, iw, ih);
+      ctx.fillStyle = '#4fd04a'; ctx.fillRect(x + 1, y + 1, Math.round((iw * Math.max(0, hp)) / max), ih);
+      ctx.drawImage(frame.img, x, y);
+      return;
+    }
     const x = fx - 9;
     const y = fy - 29;
     ctx.fillStyle = '#2b1d16';
@@ -413,15 +455,35 @@ export function createWorldView(canvasEl, area) {
   let lastLookKey = null;
 
   function render(player, opts) {
-    const { time, steps, marker, characters = [], enemies = [], combat = null, ground: groundItems = [], playerLook = null } = opts;
+    const { time, steps, marker, characters = [], enemies = [], combat = null, ground: groundItems = [], playerLook = null, playerGear = null } = opts;
     // Your character, dressed in whatever you're wearing.
     if (playerLook !== lastLook) { lastLook = playerLook; lastLookKey = playerLook ? `player:${JSON.stringify(playerLook)}` : null; }
     const pFrames = lib.paintedPlayer || (lastLookKey ? framesFor(lib, playerLook, lastLookKey) : lib.player);
-    const pObj = personObj(pFrames, player, steps, { player: true }, time, Math.max(combat?.playerLungeAt ?? -99, opts.skillLungeAt ?? -99));
+    let pPose = null;
+    if (combat && lib.paintedPlayer) {
+      const d = dirOf(player.facing);
+      pPose = animFrame(`player:${combat.playerAttackKind}:${d}`, time - combat.playerLungeAt, 0.45)
+        || animFrame(`player:hit:${d}`, time - combat.playerLastHit, 0.3);
+    }
+    const pObj = personObj(pFrames, player, steps, { player: true }, time, Math.max(combat?.playerLungeAt ?? -99, opts.skillLungeAt ?? -99), pPose);
     // Leaning into each swing while skilling.
     const lean = skillLean(opts.skilling, time, { fx: pObj.fx, fy: pObj.fy, facing: player.facing });
     pObj.x += lean.x;
     pObj.y += lean.y;
+    // Painted gear worn over the painted player, in drawing order. Capes go
+    // behind you (except from behind); from behind, so do weapons and shields.
+    if (lib.paintedPlayer && playerGear) {
+      const d = dirOf(player.facing);
+      const behind = [], front = [];
+      for (const slot of ['cape', 'legs', 'feet', 'body', 'neck', 'head', 'shield', 'weapon']) {
+        const id = playerGear[slot]?.id;
+        const spr = id && art(`gear:${id}:${d}`)?.[0];
+        if (!spr) continue;
+        const back = (slot === 'cape' && d !== 'up') || (d === 'up' && (slot === 'weapon' || slot === 'shield')) || (slot === 'shield' && (d === 'left' || d === 'right'));
+        (back ? behind : front).push(spr);
+      }
+      if (behind.length || front.length) pObj.gear = { behind, front };
+    }
     const footX = pObj.fx;
     const footY = pObj.fy;
     follow(footX, footY - 8);
@@ -477,7 +539,9 @@ export function createWorldView(canvasEl, area) {
     for (const e of enemies) {
       const since = time - e.diedAt;
       if (e.dead && since > 0.9) continue;
-      const o = personObj(framesFor(lib, e.def.look, `enemy:${e.def.id}`, e.def.sprite), e, e.steps, { person: true, enemy: e }, time, e.lungeAt);
+      const pose = e.dead ? animFrame(`${e.def.id}:fall`, since, 0.5, true)
+        : animFrame(`${e.def.id}:attack:${dirOf(e.facing)}`, time - e.lungeAt, 0.45) || animFrame(`${e.def.id}:hit`, time - e.lastHit, 0.3);
+      const o = personObj(framesFor(lib, e.def.look, `enemy:${e.def.id}`, e.def.sprite), e, e.steps, { person: true, enemy: e }, time, e.lungeAt, pose);
       if (e.dead) o.alpha = Math.max(0, 1 - since / 0.9);
       people.push(o);
       foes.push(o);
@@ -493,7 +557,6 @@ export function createWorldView(canvasEl, area) {
     for (const p of people) if (inView(p.x, p.y, p.w, p.h)) list.push(p);
     list.sort((a, b) => a.sortY - b.sortY || ((a.player || a.person) ? 1 : -1));
 
-    const flicker = Math.floor(time * 6) % 2;
     for (const o of list) {
       if (o.prop?.depleted) {
         // A chopped-down tree: just its stump until it grows back.
@@ -501,12 +564,14 @@ export function createWorldView(canvasEl, area) {
         ctx.drawImage(st.img, Math.round(o.fx - st.ax), Math.round(o.fy - st.ay));
         continue;
       }
-      if (o.frames) o.img = o.frames[o.rate ? Math.floor(time * o.rate) % 2 : flicker].img;
+      if (o.frames) o.img = o.frames[Math.floor(time * (o.rate || 6)) % o.frames.length].img;
       const behind = o.fade && o.sortY > pObj.sortY &&
         pObj.x + 12 > o.x + 6 && pObj.x + 4 < o.x + o.w - 6 && pObj.y + 4 < o.y + o.h - 10 && pObj.y + pObj.h > o.y;
       if (behind) ctx.globalAlpha = 0.5;
       if (o.alpha !== undefined) ctx.globalAlpha = o.alpha;
+      if (o.gear) for (const g of o.gear.behind) ctx.drawImage(g.img, o.x + o.ax - g.ax, o.y + o.ay - g.ay);
       ctx.drawImage(o.img, o.x, o.y);
+      if (o.gear) for (const g of o.gear.front) ctx.drawImage(g.img, o.x + o.ax - g.ax, o.y + o.ay - g.ay);
       ctx.globalAlpha = 1;
     }
 
@@ -523,13 +588,39 @@ export function createWorldView(canvasEl, area) {
     // Arrows and spells in flight.
     if (combat) {
       for (const pr of combat.projectiles) {
-        const k = Math.max(0, Math.min(1, (time - pr.start) / Math.max(0.01, pr.end - pr.start)));
+        const raw = (time - pr.start) / Math.max(0.01, pr.end - pr.start);
+        const k = Math.max(0, Math.min(1, raw));
         const tp = pr.to.worldPosition();
         const sx0 = pr.from.x * TILE, sy0 = pr.from.y * TILE - 8;
         const tx = tp.x * TILE, ty = tp.z * TILE - 6;
         const x = sx0 + (tx - sx0) * k;
         const y = sy0 + (ty - sy0) * k - Math.sin(k * Math.PI) * (pr.kind === 'arrow' ? 6 : 2);
         const ang = Math.atan2(ty - sy0, tx - sx0);
+        // painted arrows (nearest of eight directions) and spells, if the atlas has them
+        if (pr.kind === 'arrow' && art('arrow:e')) {
+          if (raw > 1) continue;
+          const dirs = ['e', 'se', 's', 'sw', 'w', 'nw', 'n', 'ne'];
+          const spr = art('arrow:' + dirs[((Math.round(ang / (Math.PI / 4)) % 8) + 8) % 8])[0];
+          ctx.drawImage(spr.img, Math.round(x - spr.w / 2), Math.round(y - spr.h / 2));
+          continue;
+        }
+        if (pr.kind !== 'arrow' && art('spell:' + pr.kind)) {
+          if (raw >= 1) {
+            const hit = art('spell:' + pr.kind + 'Hit');
+            const spr = hit[Math.min(hit.length - 1, Math.floor(((time - pr.end) / 0.35) * hit.length))];
+            ctx.drawImage(spr.img, Math.round(tx - spr.w / 2), Math.round(ty - spr.h / 2));
+            continue;
+          }
+          const fr = art('spell:' + pr.kind);
+          const spr = fr[Math.floor(time * 12) % fr.length];
+          ctx.save();
+          ctx.translate(Math.round(x), Math.round(y));
+          if (Math.cos(ang) < 0) ctx.scale(-1, 1); // the gust points the way it's going
+          ctx.drawImage(spr.img, -Math.round(spr.w / 2), -Math.round(spr.h / 2));
+          ctx.restore();
+          continue;
+        }
+        if (raw > 1) continue;
         if (pr.kind === 'arrow') {
           const dx = Math.cos(ang), dy = Math.sin(ang);
           ctx.fillStyle = '#8a5a32';
@@ -563,12 +654,21 @@ export function createWorldView(canvasEl, area) {
       ctx.fillStyle = '#fff6cf';
       ctx.fillRect(g.x * TILE + 7, g.y * TILE - 56, 2, 66);
       ctx.globalAlpha = 1;
+      const sp = art('sparkle')?.[0];
+      if (sp && Math.floor(time * 3 + g.x) % 3 !== 0) ctx.drawImage(sp.img, g.x * TILE + 2, g.y * TILE - 8 - Math.round(Math.sin(time * 4) * 2));
     }
 
     // Level-up sparkles spiralling out around the player.
     const lu = opts.levelUpAt ?? -99;
     if (time - lu < 1.5) {
       const k = (time - lu) / 1.5;
+      const burst = art('levelBurst')?.[0];
+      if (burst) {
+        ctx.globalAlpha = Math.max(0, 1 - k * 1.2);
+        const sz = Math.round(burst.w * (0.6 + k * 0.8));
+        ctx.drawImage(burst.img, Math.round(pObj.fx - sz / 2), Math.round(pObj.fy - 14 - sz / 2 - k * 6), sz, sz);
+        ctx.globalAlpha = 1;
+      }
       ctx.globalAlpha = 1 - k;
       for (let i = 0; i < 14; i++) {
         const ang = (i / 14) * Math.PI * 2 + k * 3;
@@ -589,7 +689,8 @@ export function createWorldView(canvasEl, area) {
         if (!o) continue;
         const k = stack.get(o) || 0;
         stack.set(o, k + 1);
-        const img = S.splat(Math.min(99, sp.dmg));
+        const base = art(sp.dmg === 0 ? 'splat:miss' : 'splat:hit')?.[0];
+        const img = base ? S.paintedSplat(base, Math.min(99, sp.dmg)) : S.splat(Math.min(99, sp.dmg));
         ctx.drawImage(img.img, o.fx - img.ax + (k % 2 ? 7 : 0), o.fy - 16 - img.ay - Math.floor(k / 2) * 9 - (k % 2 ? 4 : 0));
       }
     }
