@@ -30,3 +30,41 @@ export const SEWING = [
 
 // Tapping one of these items opens the sewing menu for that leather.
 export const CRAFT_GROUP = { leather: 'leather', hardLeather: 'hardLeather', needle: null, thread: null };
+
+// Gem cutting: tap an uncut gem (or the chisel). One gem per cut.
+const cut = (gem, name, level, xp) => ({
+  id: gem, name, level, xp, uses: { [`uncut${gem[0].toUpperCase()}${gem.slice(1)}`]: 1 }, gives: { [gem]: 1 }, tool: 'chisel', ticks: 2, skill: 'crafting',
+  msg: `You cut the ${gem}.`,
+});
+export const CUTTING = [
+  cut('sapphire', 'Sapphire', 20, 50),
+  cut('emerald', 'Emerald', 27, 67.5),
+  cut('ruby', 'Ruby', 34, 85),
+  cut('diamond', 'Diamond', 43, 107.5),
+];
+
+// Jewellery: cast at a furnace with a ring or amulet mould. Silver or gold,
+// plain or set with a cut gem. Silver is easier; gold gives twice the bonus.
+const GEM_XP = { sapphire: 25, emerald: 35, ruby: 45, diamond: 60 };
+const jewel = (metal, gem, kind, level, xp) => {
+  const cap = (w) => w[0].toUpperCase() + w.slice(1);
+  const id = `${metal}${gem ? cap(gem) : ''}${cap(kind)}`;
+  return {
+    id, name: `${cap(metal)} ${gem ? `${gem} ` : ''}${kind}`, level, xp: xp + (gem ? GEM_XP[gem] : 0),
+    uses: { [`${metal}Bar`]: 1, ...(gem ? { [gem]: 1 } : {}) }, gives: { [id]: 1 },
+    tool: `${kind}Mould`, ticks: 3, skill: 'crafting', station: 'furnace', metal: `${metal}Bar`,
+    msg: `You make a ${metal} ${gem ? `${gem} ` : ''}${kind}.`,
+  };
+};
+export const JEWELLERY = [
+  jewel('silver', null, 'ring', 8, 15), jewel('silver', null, 'amulet', 12, 20),
+  jewel('silver', 'sapphire', 'ring', 22, 15), jewel('silver', 'sapphire', 'amulet', 24, 20),
+  jewel('silver', 'emerald', 'ring', 28, 15), jewel('silver', 'emerald', 'amulet', 30, 20),
+  jewel('silver', 'ruby', 'ring', 35, 15), jewel('silver', 'ruby', 'amulet', 37, 20),
+  jewel('silver', 'diamond', 'ring', 44, 15), jewel('silver', 'diamond', 'amulet', 46, 20),
+  jewel('gold', null, 'ring', 20, 25), jewel('gold', null, 'amulet', 24, 30),
+  jewel('gold', 'sapphire', 'ring', 26, 25), jewel('gold', 'sapphire', 'amulet', 29, 30),
+  jewel('gold', 'emerald', 'ring', 32, 25), jewel('gold', 'emerald', 'amulet', 35, 30),
+  jewel('gold', 'ruby', 'ring', 38, 25), jewel('gold', 'ruby', 'amulet', 42, 30),
+  jewel('gold', 'diamond', 'ring', 47, 25), jewel('gold', 'diamond', 'amulet', 50, 30),
+];

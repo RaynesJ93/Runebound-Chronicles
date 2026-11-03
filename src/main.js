@@ -30,13 +30,16 @@ import { SHOPS } from '../data/shops.js';
 import { splitOnDeath, graveFee, reclaim, GRAVE_SECONDS, FREE_SECONDS } from './items/death.js';
 import { TREES, AXES, SWING_TICKS } from '../data/woodcutting.js';
 import { RECIPES, GROUP_OF } from '../data/fletching.js';
-import { ROCKS, PICKAXES, MINE_TICKS } from '../data/mining.js';
+import { ROCKS, PICKAXES, MINE_TICKS, gemChance, rollGem } from '../data/mining.js';
 import { SMELTING, SMITHING } from '../data/smithing.js';
 import { SPOTS, FISH_TICKS, spotLevel } from '../data/fishing.js';
 import { COOKING } from '../data/cooking.js';
-import { TANNING, SEWING, CRAFT_GROUP } from '../data/crafting.js';
+import { TANNING, SEWING, CRAFT_GROUP, CUTTING, JEWELLERY } from '../data/crafting.js';
 import { ALTARS, runesPerEssence } from '../data/runecrafting.js';
 import { mapPlace } from './ui/map.js';
+
+// Uncut gem -> its cutting recipe.
+const CUT_FROM = Object.fromEntries(CUTTING.map((r) => [Object.keys(r.uses)[0], r]));
 
 const AUTOSAVE_TICKS = 50; // 30 seconds
 
@@ -323,6 +326,9 @@ function boot() {
     if (ITEMS[id]?.noted) return () => hud.message(`These are bank notes. Put them in a bank, or the supply chest in Whispering Vale, to turn them back into ${itemName(ITEMS[id].noted).toLowerCase()}.`);
     if (id === 'cowhide') return () => hud.message("Tan cowhides into leather at Hilda's tanning rack, by the cow field.");
     if (/^raw/.test(id)) return () => hud.message('Cook this on a fire: the cooking pit by the pond, or the goblins\' campfire.');
+    if (CUT_FROM[id] || id === 'chisel') return () => cutMenu(x, y);
+    if (/Mould$/.test(id)) return () => hud.message('Use a mould at a furnace, with a silver or gold bar, to cast jewellery.');
+    if (id === 'silverBar' || id === 'goldBar') return () => hud.message('Cast it into rings and amulets at a furnace, with a ring or amulet mould.');
     if (id === 'knife') return () => fletchMenu(inventory.count('logs') ? 'logs' : inventory.count('oakLogs') ? 'oakLogs' : null, x, y);
     if (def.food || def.potion) return () => eat(i);
     if (def.equip) return () => wear(i);
@@ -339,6 +345,7 @@ function boot() {
     const options = [];
     if (GROUP_OF[s.id]) options.push({ label: 'Fletch', fn: () => fletchMenu(GROUP_OF[s.id], x, y) });
     if (CRAFT_GROUP[s.id]) options.push({ label: 'Sew', fn: () => sewMenu(CRAFT_GROUP[s.id], x, y) });
+    if (CUT_FROM[s.id] || s.id === 'chisel') options.push({ label: 'Cut', fn: () => cutMenu(x, y) });
     if (def.food) options.push({ label: 'Eat', fn: () => eat(i) });
     if (def.potion) options.push({ label: 'Drink', fn: () => eat(i) });
     if (def.equip) {
@@ -981,6 +988,11 @@ function boot() {
     if (!inventory.add(item, 1)) { hud.message(fullBag(g)); stopActivity(); return; }
     hud.message(g.got(d));
     book.add(g.skill, d.xp);
+    // Mining sometimes turns up a gem too.
+    if (g.skill === 'mining' && d.ore !== 'runeEssence' && rng() < gemChance(book.level('mining'))) {
+      const gem = rollGem(rng);
+      if (inventory.add(gem, 1)) hud.message(`You find an ${itemName(gem).toLowerCase()}!`);
+    }
     refreshInventory();
     if (rng() < d.deplete) {
       prop.depleted = true;
@@ -1073,9 +1085,8 @@ function boot() {
   // The furnace and the anvil. Tapping one opens a menu of what you can make.
   const stationMenu = (kind) => {
     const pos = view.tileToScreen(player.tile.x, player.tile.y);
-    const lvl = book.level('smithing');
     const option = (r, extra = '') => ({
-      label: `${r.name}${extra}${lvl < r.level ? ` — needs level ${r.level}` : ''}`,
+      label: `${r.name}${extra}${book.level(skillOf(r)) < r.level ? ` — needs level ${r.level}` : ''}`,
       icon: itemIcon(Object.keys(r.gives)[0]).url,
       fn: () => startMake(r),
     });
@@ -1103,7 +1114,23 @@ function boot() {
       return;
     }
     if (kind === 'smelt') {
-      hud.showMenu(pos.x, pos.y, 'Furnace', [...SMELTING.map((r) => option(r, ` (${Object.keys(r.uses).map((id) => itemName(id).toLowerCase()).join(' + ')})`)), { label: 'Cancel', fn: () => {} }]);
+      const smelt = () => hud.showMenu(pos.x, pos.y, 'Furnace', [...SMELTING.map((r) => option(r, ` (${Object.keys(r.uses).map((id) => itemName(id).toLowerCase()).join(' + ')})`)), { label: 'Cancel', fn: () => {} }]);
+      const metals = ['silverBar', 'goldBar'].filter((id) => inventory.count(id));
+      const moulds = ['ringMould', 'amuletMould'].filter((id) => inventory.count(id));
+      if (!metals.length || !moulds.length) { smelt(); return; }
+      // With a bar and a mould: cast jewellery, or smelt ore as usual.
+      const cast = () => hud.showMenu(pos.x, pos.y, 'Cast jewellery', [
+        ...JEWELLERY.filter((r) => metals.includes(r.metal) && moulds.includes(r.tool)).map((r) => {
+          const gem = Object.keys(r.uses).find((id) => !/Bar$/.test(id));
+          return option(r, gem && !inventory.count(gem) ? ` (needs ${itemName(gem).toLowerCase()})` : '');
+        }),
+        { label: 'Cancel', fn: () => {} },
+      ]);
+      hud.showMenu(pos.x, pos.y, 'Furnace', [
+        { label: 'Cast jewellery', icon: itemIcon(moulds[0] === 'ringMould' ? `${metals[0].replace('Bar', '')}Ring` : `${metals[0].replace('Bar', '')}Amulet`).url, fn: () => setTimeout(cast, 0) },
+        { label: 'Smelt ore', icon: itemIcon('bronzeBar').url, fn: () => setTimeout(smelt, 0) },
+        { label: 'Cancel', fn: () => {} },
+      ]);
       return;
     }
     if (!inventory.count('hammer')) { hud.message('You need a hammer to work the metal. Dorrin or Pell can help.'); return; }
@@ -1122,6 +1149,22 @@ function boot() {
     };
     if (bars.length === 1) { list(bars[0]); return; }
     hud.showMenu(pos.x, pos.y, 'Anvil', [...bars.map((bar) => ({ label: `Smith ${itemName(bar).toLowerCase()}s`, icon: itemIcon(bar).url, fn: () => setTimeout(() => list(bar), 0) })), { label: 'Cancel', fn: () => {} }]);
+  };
+
+  // Cutting gems: tap an uncut gem (or the chisel) and pick which to cut.
+  const cutMenu = (x, y) => {
+    if (!inventory.count('chisel')) { hud.message('You need a chisel to cut gems. Pell sells them.'); return; }
+    const have = CUTTING.filter((r) => inventory.count(Object.keys(r.uses)[0]));
+    if (!have.length) { hud.message('You have no uncut gems. You sometimes find them while mining.'); return; }
+    const lvl = book.level('crafting');
+    hud.showMenu(x, y, 'Cut gems', [
+      ...have.map((r) => ({
+        label: `${r.name} (${inventory.count(Object.keys(r.uses)[0])} uncut)${lvl < r.level ? ` — needs level ${r.level}` : ''}`,
+        icon: itemIcon(r.id).url,
+        fn: () => startMake(r),
+      })),
+      { label: 'Cancel', fn: () => {} },
+    ]);
   };
 
   // Sewing leather: tap leather (or the needle) and pick what to make.
@@ -1178,7 +1221,8 @@ function boot() {
     const n = outQ * k;
     const name = itemName(outId).toLowerCase();
     const an = /^[aeiou]/.test(name) ? 'an' : 'a';
-    if (n > 1) hud.message(`You make ${n} ${name}${/s$/.test(name) ? '' : 's'}.`);
+    if (r.msg && k === 1) hud.message(r.msg);
+    else if (n > 1) hud.message(`You make ${n} ${name}${/s$/.test(name) ? '' : 's'}.`);
     else if (r.station === 'furnace') hud.message(`You smelt the ore into ${an} ${name}.`);
     else if (r.station === 'anvil') hud.message(`You hammer the metal into ${an} ${name}.`);
     else if (r.station === 'fire') hud.message(`You cook the ${r.name.toLowerCase()}.`);

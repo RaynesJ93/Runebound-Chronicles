@@ -11,6 +11,8 @@ export const SMELTING = [
     success: (lvl) => Math.min(0.8, 0.5 + (lvl - 15) * 0.01), fail: 'The iron is too impure, and crumbles away.' },
   // Coal burns the impurities out, so steel never fails.
   { id: 'steelBar', name: 'Steel bar', level: 30, xp: 17.5, uses: { ironOre: 1, coal: 1 }, gives: { steelBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
+  { id: 'silverBar', name: 'Silver bar', level: 20, xp: 13.7, uses: { silverOre: 1 }, gives: { silverBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
+  { id: 'goldBar', name: 'Gold bar', level: 40, xp: 22.5, uses: { goldOre: 1 }, gives: { goldBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
 ];
 
 const anvil = (bar, list) => list.map(([item, name, level, bars, xp, qty = 1]) => ({

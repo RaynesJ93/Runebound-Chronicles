@@ -113,6 +113,21 @@ export const ITEMS = {
   ironBar: { name: 'Iron bar', value: 28, examine: 'Hammer it into shape at an anvil.' },
   ironArrowtips: { name: 'Iron arrowtips', stackable: true, value: 2, examine: 'Fix these onto headless arrows. Needs Fletching 15.' },
   coal: { name: 'Coal', value: 45, examine: 'A lump of coal. Smelt it with iron ore to make steel.' },
+  silverOre: { name: 'Silver ore', value: 75, examine: 'Smelt it into a silver bar.' },
+  goldOre: { name: 'Gold ore', value: 150, examine: 'Smelt it into a gold bar.' },
+  silverBar: { name: 'Silver bar', value: 100, examine: 'Cast it into rings and amulets at a furnace, with a mould.' },
+  goldBar: { name: 'Gold bar', value: 300, examine: 'Cast it into rings and amulets at a furnace, with a mould.' },
+  chisel: { name: 'Chisel', value: 5, examine: 'For cutting gems. Tap an uncut gem to start.' },
+  ringMould: { name: 'Ring mould', value: 5, examine: 'Cast rings in it at a furnace.' },
+  amuletMould: { name: 'Amulet mould', value: 5, examine: 'Cast amulets in it at a furnace.' },
+  uncutSapphire: { name: 'Uncut sapphire', value: 50, examine: 'A rough sapphire. Cut it with a chisel.' },
+  sapphire: { name: 'Sapphire', value: 75, examine: 'A cut sapphire. Set it in a ring or amulet at a furnace.' },
+  uncutEmerald: { name: 'Uncut emerald', value: 100, examine: 'A rough emerald. Cut it with a chisel.' },
+  emerald: { name: 'Emerald', value: 150, examine: 'A cut emerald. Set it in a ring or amulet at a furnace.' },
+  uncutRuby: { name: 'Uncut ruby', value: 250, examine: 'A rough ruby. Cut it with a chisel.' },
+  ruby: { name: 'Ruby', value: 375, examine: 'A cut ruby. Set it in a ring or amulet at a furnace.' },
+  uncutDiamond: { name: 'Uncut diamond', value: 800, examine: 'A rough diamond. Cut it with a chisel.' },
+  diamond: { name: 'Diamond', value: 1200, examine: 'A cut diamond. Set it in a ring or amulet at a furnace.' },
   steelBar: { name: 'Steel bar', value: 60, examine: 'Hammer it into shape at an anvil. Tougher than iron.' },
   steelArrowtips: { name: 'Steel arrowtips', stackable: true, value: 4, examine: 'Fix these onto headless arrows. Needs Fletching 30.' },
   steelArrow: {
@@ -342,6 +357,86 @@ export const ITEMS = {
     name: 'Steel platebody', value: 2000, examine: 'Solid steel plates. Heavy, but very tough.',
     equip: { slot: 'body', req: { defence: 10 }, att: { magic: -15, ranged: -7 }, def: { stab: 30, slash: 29, crush: 17, ranged: 29, magic: -6 }, look: { tunic: '#9aa2aa' } },
   },
+  silverRing: {
+    name: 'Silver ring', value: 130, examine: 'A silver ring. Plain, but it helps a little.',
+    equip: { slot: 'ring', req: {}, def: { stab: 1, slash: 1, crush: 1 } },
+  },
+  silverAmulet: {
+    name: 'Silver amulet', value: 130, examine: 'A silver amulet. Plain, but it helps a little.',
+    equip: { slot: 'neck', req: {}, def: { stab: 2, slash: 2, crush: 2 } },
+  },
+  silverSapphireRing: {
+    name: 'Silver sapphire ring', value: 227, examine: 'A silver sapphire ring. The sapphire sharpens your magic.',
+    equip: { slot: 'ring', req: {}, att: { magic: 2 }, def: { magic: 1 } },
+  },
+  silverSapphireAmulet: {
+    name: 'Silver sapphire amulet', value: 227, examine: 'A silver sapphire amulet. The sapphire sharpens your magic.',
+    equip: { slot: 'neck', req: {}, att: { magic: 4 }, def: { magic: 2 } },
+  },
+  silverEmeraldRing: {
+    name: 'Silver emerald ring', value: 325, examine: 'A silver emerald ring. The emerald steadies your aim.',
+    equip: { slot: 'ring', req: {}, att: { ranged: 2 }, def: { ranged: 1 } },
+  },
+  silverEmeraldAmulet: {
+    name: 'Silver emerald amulet', value: 325, examine: 'A silver emerald amulet. The emerald steadies your aim.',
+    equip: { slot: 'neck', req: {}, att: { ranged: 4 }, def: { ranged: 2 } },
+  },
+  silverRubyRing: {
+    name: 'Silver ruby ring', value: 617, examine: 'A silver ruby ring. The ruby lends you strength.',
+    equip: { slot: 'ring', req: {}, str: 1 },
+  },
+  silverRubyAmulet: {
+    name: 'Silver ruby amulet', value: 617, examine: 'A silver ruby amulet. The ruby lends you strength.',
+    equip: { slot: 'neck', req: {}, str: 2 },
+  },
+  silverDiamondRing: {
+    name: 'Silver diamond ring', value: 1690, examine: 'A silver diamond ring. The diamond makes you better at everything.',
+    equip: { slot: 'ring', req: {}, att: { stab: 1, slash: 1, crush: 1, ranged: 1, magic: 1 }, def: { stab: 1, slash: 1, crush: 1, ranged: 1, magic: 1 }, str: 1 },
+  },
+  silverDiamondAmulet: {
+    name: 'Silver diamond amulet', value: 1690, examine: 'A silver diamond amulet. The diamond makes you better at everything.',
+    equip: { slot: 'neck', req: {}, att: { stab: 2, slash: 2, crush: 2, ranged: 2, magic: 2 }, def: { stab: 2, slash: 2, crush: 2, ranged: 2, magic: 2 }, str: 1 },
+  },
+  goldRing: {
+    name: 'Gold ring', value: 390, examine: 'A gold ring. Plain, but it helps a little.',
+    equip: { slot: 'ring', req: {}, def: { stab: 2, slash: 2, crush: 2 } },
+  },
+  goldAmulet: {
+    name: 'Gold amulet', value: 390, examine: 'A gold amulet. Plain, but it helps a little.',
+    equip: { slot: 'neck', req: {}, def: { stab: 4, slash: 4, crush: 4 } },
+  },
+  goldSapphireRing: {
+    name: 'Gold sapphire ring', value: 487, examine: 'A gold sapphire ring. The sapphire sharpens your magic.',
+    equip: { slot: 'ring', req: {}, att: { magic: 4 }, def: { magic: 2 } },
+  },
+  goldSapphireAmulet: {
+    name: 'Gold sapphire amulet', value: 487, examine: 'A gold sapphire amulet. The sapphire sharpens your magic.',
+    equip: { slot: 'neck', req: {}, att: { magic: 8 }, def: { magic: 4 } },
+  },
+  goldEmeraldRing: {
+    name: 'Gold emerald ring', value: 585, examine: 'A gold emerald ring. The emerald steadies your aim.',
+    equip: { slot: 'ring', req: {}, att: { ranged: 4 }, def: { ranged: 2 } },
+  },
+  goldEmeraldAmulet: {
+    name: 'Gold emerald amulet', value: 585, examine: 'A gold emerald amulet. The emerald steadies your aim.',
+    equip: { slot: 'neck', req: {}, att: { ranged: 8 }, def: { ranged: 4 } },
+  },
+  goldRubyRing: {
+    name: 'Gold ruby ring', value: 877, examine: 'A gold ruby ring. The ruby lends you strength.',
+    equip: { slot: 'ring', req: {}, str: 2 },
+  },
+  goldRubyAmulet: {
+    name: 'Gold ruby amulet', value: 877, examine: 'A gold ruby amulet. The ruby lends you strength.',
+    equip: { slot: 'neck', req: {}, str: 4 },
+  },
+  goldDiamondRing: {
+    name: 'Gold diamond ring', value: 1950, examine: 'A gold diamond ring. The diamond makes you better at everything.',
+    equip: { slot: 'ring', req: {}, att: { stab: 2, slash: 2, crush: 2, ranged: 2, magic: 2 }, def: { stab: 2, slash: 2, crush: 2, ranged: 2, magic: 2 }, str: 1 },
+  },
+  goldDiamondAmulet: {
+    name: 'Gold diamond amulet', value: 1950, examine: 'A gold diamond amulet. The diamond makes you better at everything.',
+    equip: { slot: 'neck', req: {}, att: { stab: 4, slash: 4, crush: 4, ranged: 4, magic: 4 }, def: { stab: 4, slash: 4, crush: 4, ranged: 4, magic: 4 }, str: 2 },
+  },
   goblinMail: {
     name: 'Goblin mail', value: 5, examine: 'Armour made to fit a goblin. It might fit you if you squeeze.',
     equip: { slot: 'body', req: { defence: 1 }, def: { stab: 2, slash: 2, crush: 2, ranged: 1 }, look: { tunic: '#6f7a52' } },
@@ -372,7 +467,7 @@ for (const [skill, name, value] of [['attack', 'Attack', 60], ['strength', 'Stre
 // - coins: no limit
 // - weapons, armour, tools and potions: 1 (they don't stack)
 // The bank stacks everything without limit.
-const STACK_20 = /^(logs|oakLogs|copperOre|tinOre|ironOre|coal|bronzeBar|ironBar|steelBar|runeEssence|cowhide|wolfPelt|leather|hardLeather|raw[A-Z]\w*|burnt[A-Z]\w*)$/;
+const STACK_20 = /^(logs|oakLogs|copperOre|tinOre|ironOre|coal|silverOre|goldOre|bronzeBar|ironBar|steelBar|silverBar|goldBar|uncut[A-Z]\w*|sapphire|emerald|ruby|diamond|runeEssence|cowhide|wolfPelt|leather|hardLeather|raw[A-Z]\w*|burnt[A-Z]\w*)$/;
 for (const [id, it] of Object.entries(ITEMS)) {
   if (STACK_20.test(id) || it.food) { it.stackable = true; it.stack = 20; }
   else if (it.stackable) it.stack = id === 'coins' ? Infinity : 999;

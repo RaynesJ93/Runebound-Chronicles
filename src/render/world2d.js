@@ -50,7 +50,7 @@ function getLib() {
     rug: art('rug')?.[0] || S.rug(),
     plant: art('plant')?.[0] || S.plant(),
     gravestone: art('gravestone')?.[0] || S.gravestone(),
-    ore: { ...Object.fromEntries(['copper', 'tin', 'iron', 'coal'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
+    ore: { ...Object.fromEntries(['copper', 'tin', 'iron', 'coal', 'silver', 'gold'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
       essence: [S.essenceRock(1), S.essenceRock(2)] },
     // painted ore rocks replace the drawn ones where the atlas has them
     altar: Object.fromEntries(['air', 'mind', 'water'].map((v) => [v, art('altar:' + v) || [S.altar(v, 0), S.altar(v, 1)]])),
@@ -87,7 +87,7 @@ function getLib() {
     paintedPlayer: paintedFrames('player'),
     people: new Map(),
   };
-  for (const v of ['copper', 'tin', 'iron', 'coal']) if (art('ore:' + v)) LIB.ore[v] = art('ore:' + v);
+  for (const v of ['copper', 'tin', 'iron', 'coal', 'silver', 'gold']) if (art('ore:' + v)) LIB.ore[v] = art('ore:' + v);
   if (art('oreEssence')) LIB.ore.essence = art('oreEssence');
   return LIB;
 }

@@ -13,7 +13,7 @@ import { ROCKS, PICKAXES } from '../../data/mining.js';
 import { SMELTING, SMITHING } from '../../data/smithing.js';
 import { SPOTS } from '../../data/fishing.js';
 import { COOKING } from '../../data/cooking.js';
-import { TANNING, SEWING } from '../../data/crafting.js';
+import { TANNING, SEWING, CUTTING, JEWELLERY } from '../../data/crafting.js';
 import { ALTARS } from '../../data/runecrafting.js';
 import { SPELLS } from '../../data/spells.js';
 import { SKILLS, XP_RATE } from './skills.js';
@@ -72,6 +72,7 @@ const BUILD = {
   mining: () => [
     { title: 'Rocks', rows: byLevel(Object.values(ROCKS).map((r) => ({ level: r.level, icon: r.ore, name: r.name, sub: `${name(r.ore)} · ${xp(r.xp)}` }))) },
     { title: 'Pickaxes', rows: tools(PICKAXES, 'Mines') },
+    { title: 'Gems', note: 'Every ore you mine has a small chance of an uncut gem too: about 1 in 80, rising to 1 in 40 at level 99. Sapphires are common, diamonds rare.', rows: [] },
   ],
   smithing: () => {
     const bars = [...new Set(SMITHING.map((r) => r.bar))];
@@ -89,6 +90,9 @@ const BUILD = {
     { title: 'Tanning (tanning rack)', rows: recipes(TANNING) },
     { title: 'Leather (needle and thread)', rows: recipes(SEWING.filter((r) => r.group === 'leather')) },
     { title: 'Hard leather (needle and thread)', rows: recipes(SEWING.filter((r) => r.group === 'hardLeather')) },
+    { title: 'Gem cutting (chisel)', rows: recipes(CUTTING) },
+    { title: 'Silver jewellery (furnace and mould)', rows: recipes(JEWELLERY.filter((r) => r.metal === 'silverBar')) },
+    { title: 'Gold jewellery (furnace and mould)', rows: recipes(JEWELLERY.filter((r) => r.metal === 'goldBar')) },
   ],
   runecrafting: () => {
     const altars = Object.values(ALTARS);

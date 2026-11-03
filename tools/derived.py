@@ -15,6 +15,7 @@ from PIL import Image
 
 sys.path.insert(0, os.path.dirname(__file__))
 from shrink import shrink
+import jewel_art as J
 
 ROOT = os.path.join(os.path.dirname(__file__), '..')
 DIRS = ['down', 'up', 'left', 'right']
@@ -99,6 +100,39 @@ def coal_lump(im, get=None):
     out = rgba.copy()
     out[m, :3] = shade[m]
     return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
+def lum_to(palette):
+    """Recolour the whole sprite along a 4-step palette by brightness."""
+    def fn(im, get=None):
+        a = np.array(im.convert('RGBA')).astype(np.float32)
+        m = a[..., 3] > 0
+        l = lum(a[..., :3]) / 255
+        lo, hi = np.percentile(l[m], 4), np.percentile(l[m], 98)
+        t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+        out = a.copy()
+        out[m, :3] = J.ramp(palette, t)[m]
+        out[m & (l <= lo + 0.01), :3] = J.OUT
+        return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+    return fn
+
+
+def veins_to(palette):
+    """Copper's orange veins -> another metal's colours; the grey rock stays."""
+    def fn(im, get=None):
+        rgba = np.array(im.convert('RGBA')).astype(np.float32)
+        hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.float32)
+        h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
+        vein = (rgba[..., 3] > 0) & (s > 90) & ((h < 34) | (h > 235))
+        out = rgba.copy()
+        out[vein, :3] = J.ramp(palette, np.clip((v / 255 - 0.25) / 0.75, 0, 1) * 1.05)[vein]
+        return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+    return fn
+
+
+def drawn(make):
+    """A sprite drawn from scratch (the source only gives its anchor)."""
+    return lambda im, get=None: make()
 
 
 # ---- Reshapes (icons lie diagonally: grip bottom-left, tip top-right) -------------
@@ -264,9 +298,36 @@ for part in STEEL:
     DERIVED[f'steel{part}'] = dict(icon=(f'iron{part}', steel), small=(f'iron{part}', steel), gear=(f'iron{part}', steel))
 DERIVED['coal'] = dict(icon=('ironOre', coal_lump), small=('ironOre', coal_lump))
 
+# Silver, gold and gems. Jewellery is drawn in code (tools/jewel_art.py).
+S_, G_ = J.METAL['silver'], J.METAL['gold']
+DERIVED.update({
+    'silverOre': dict(icon=('tinOre', lum_to(S_)), small=('tinOre', lum_to(S_))),
+    'goldOre': dict(icon=('copperOre', veins_to(G_)), small=('copperOre', veins_to(G_))),
+    'silverBar': dict(icon=('ironBar', lum_to(S_)), small=('ironBar', lum_to(S_))),
+    'goldBar': dict(icon=('bronzeBar', lum_to(G_)), small=('bronzeBar', lum_to(G_))),
+    'chisel': dict(icon=('knife', drawn(J.chisel))),
+    'ringMould': dict(icon=('warCharm', drawn(lambda: J.mould('ring')))),
+    'amuletMould': dict(icon=('warCharm', drawn(lambda: J.mould('amulet')))),
+})
+for gem in J.GEM:
+    cap = gem[0].upper() + gem[1:]
+    DERIVED[f'uncut{cap}'] = dict(icon=('tinOre', lambda im, get=None, g=gem: J.uncut_gem(g, im)), small=('tinOre', lambda im, get=None, g=gem: J.uncut_gem(g, im)))
+    DERIVED[gem] = dict(icon=('warCharm', drawn(lambda g=gem: J.cut_gem(g))))
+for metal in ('silver', 'gold'):
+    M = metal[0].upper() + metal[1:]
+    neck = dict(gear=('warCharm', lum_to(J.METAL[metal])))
+    DERIVED[f'{metal}Ring'] = dict(icon=('warCharm', drawn(lambda m=metal: J.ring(m))))
+    DERIVED[f'{metal}Amulet'] = dict(icon=('warCharm', drawn(lambda m=metal: J.amulet(m))), **neck)
+    for gem in J.GEM:
+        cap = gem[0].upper() + gem[1:]
+        DERIVED[f'{metal}{cap}Ring'] = dict(icon=('warCharm', drawn(lambda m=metal, g=gem: J.ring(m, g))))
+        DERIVED[f'{metal}{cap}Amulet'] = dict(icon=('warCharm', drawn(lambda m=metal, g=gem: J.amulet(m, g))), **neck)
+
 # Other sprites: new key <- source key, every frame.
 EXTRA = [
     ('ore:coal', 'ore:copper', coal),
+    ('ore:silver', 'ore:copper', veins_to(J.METAL['silver'])),
+    ('ore:gold', 'ore:copper', veins_to(J.METAL['gold'])),
     ('tool:steelAxe', 'tool:ironAxe', steel),
     ('tool:steelPickaxe', 'tool:ironPickaxe', steel),
 ]
