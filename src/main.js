@@ -1247,7 +1247,7 @@ function boot() {
   });
 
   // What the renderer needs to animate the skill you're doing.
-  const METAL_OF = { bronzeAxe: 'bronze', ironAxe: 'iron', steelAxe: 'steel', bronzePickaxe: 'bronze', ironPickaxe: 'iron', steelPickaxe: 'steel' };
+  const METAL_OF = { bronzeAxe: 'bronze', ironAxe: 'iron', steelAxe: 'steel', mithrilAxe: 'mithril', bronzePickaxe: 'bronze', ironPickaxe: 'iron', steelPickaxe: 'steel', mithrilPickaxe: 'mithril' };
   const skillingView = () => {
     const a = activity;
     if (!a) return null;

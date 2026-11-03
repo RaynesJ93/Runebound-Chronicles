@@ -135,6 +135,26 @@ def drawn(make):
     return lambda im, get=None: make()
 
 
+MITHRIL = ['#1a2250', '#34428a', '#6676c8', '#c4d0ff']
+
+
+def mithril(im, get=None):
+    """Steel -> mithril: the grey metal takes a dark-blue ramp by brightness.
+    Wood, leather and anything else with real colour is left alone."""
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.float32)
+    h, s = hsv[..., 0], hsv[..., 1]
+    m = rgba[..., 3] > 0
+    metal = m & ((s < 70) | ((h > 120) & (h < 190) & (s < 110)))
+    if not metal.any(): return im.copy()
+    l = lum(rgba[..., :3]) / 255
+    lo, hi = np.percentile(l[metal], 3), np.percentile(l[metal], 99)
+    t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+    out = rgba.copy()
+    out[metal, :3] = J.ramp(MITHRIL, t)[metal]
+    return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
 # ---- Reshapes (icons lie diagonally: grip bottom-left, tip top-right) -------------
 
 def _axis(w, h):
@@ -323,6 +343,11 @@ for metal in ('silver', 'gold'):
         DERIVED[f'{metal}{cap}Ring'] = dict(icon=('warCharm', drawn(lambda m=metal, g=gem: J.ring(m, g))))
         DERIVED[f'{metal}{cap}Amulet'] = dict(icon=('warCharm', drawn(lambda m=metal, g=gem: J.amulet(m, g))), **neck)
 
+# Mithril: every steel item, recoloured, plus the ore and bar.
+for part in STEEL:
+    DERIVED[f'mithril{part}'] = dict(icon=(f'steel{part}', mithril), small=(f'steel{part}', mithril), gear=(f'steel{part}', mithril))
+DERIVED['mithrilOre'] = dict(icon=('ironOre', lum_to(MITHRIL)), small=('ironOre', lum_to(MITHRIL)))
+
 # Other sprites: new key <- source key, every frame.
 EXTRA = [
     ('ore:coal', 'ore:copper', coal),
@@ -330,6 +355,9 @@ EXTRA = [
     ('ore:gold', 'ore:copper', veins_to(J.METAL['gold'])),
     ('tool:steelAxe', 'tool:ironAxe', steel),
     ('tool:steelPickaxe', 'tool:ironPickaxe', steel),
+    ('ore:mithril', 'ore:copper', veins_to(MITHRIL)),
+    ('tool:mithrilAxe', 'tool:steelAxe', mithril),
+    ('tool:mithrilPickaxe', 'tool:steelPickaxe', mithril),
 ]
 
 # Side-on shields stay as they are (a kite shape only reads from the front or back).

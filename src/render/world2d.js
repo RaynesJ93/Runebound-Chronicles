@@ -50,7 +50,7 @@ function getLib() {
     rug: art('rug')?.[0] || S.rug(),
     plant: art('plant')?.[0] || S.plant(),
     gravestone: art('gravestone')?.[0] || S.gravestone(),
-    ore: { ...Object.fromEntries(['copper', 'tin', 'iron', 'coal', 'silver', 'gold'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
+    ore: { ...Object.fromEntries(['copper', 'tin', 'iron', 'coal', 'silver', 'gold', 'mithril'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
       essence: [S.essenceRock(1), S.essenceRock(2)] },
     // painted ore rocks replace the drawn ones where the atlas has them
     altar: Object.fromEntries(['air', 'mind', 'water'].map((v) => [v, art('altar:' + v) || [S.altar(v, 0), S.altar(v, 1)]])),
@@ -87,7 +87,7 @@ function getLib() {
     paintedPlayer: paintedFrames('player'),
     people: new Map(),
   };
-  for (const v of ['copper', 'tin', 'iron', 'coal', 'silver', 'gold']) if (art('ore:' + v)) LIB.ore[v] = art('ore:' + v);
+  for (const v of ['copper', 'tin', 'iron', 'coal', 'silver', 'gold', 'mithril']) if (art('ore:' + v)) LIB.ore[v] = art('ore:' + v);
   if (art('oreEssence')) LIB.ore.essence = art('oreEssence');
   return LIB;
 }
@@ -176,7 +176,7 @@ export function createWorldView(canvasEl, area) {
       }
       case 'crop': place(lib.crop[p.ripe ? 1 : lib.crop[2] && (p.x + p.y * 3) % 3 === 0 ? 2 : 0], f.x, f.y); break;
       case 'fence': place(fenceSprite(isFence.has(`${p.x + 1},${p.y}`), isFence.has(`${p.x},${p.y + 1}`), p.style || 'wood'), f.x, f.y - 2); break;
-      case 'lamp': place((area.id === 'mine' || area.id === 'depths') && lib.mineLamp ? lib.mineLamp : lib.lamp, f.x, f.y); break;
+      case 'lamp': place((area.id === 'mine' || area.id === 'depths' || area.id === 'hollow') && lib.mineLamp ? lib.mineLamp : lib.lamp, f.x, f.y); break;
       case 'sign': place(lib.sign, f.x, f.y); break;
       case 'well': place(lib.well, f.x, f.y + 1); break;
       case 'stall': place(lib.stall, f.x, f.y); break;
@@ -271,7 +271,8 @@ export function createWorldView(canvasEl, area) {
     for (const p of area.props) {
       let def = LIGHT[p.type];
       if (p.type === 'altar') def = LIGHT.altar[p.variant];
-      if (p.type === 'ore' && p.variant !== 'essence') def = null;
+      if (p.type === 'ore' && p.variant === 'mithril') def = ['#6f8cff', 30];
+      else if (p.type === 'ore' && p.variant !== 'essence') def = null;
       if (!def) continue;
       const cxw = (p.tiles.reduce((a, t) => a + t.x, 0) / p.tiles.length + 0.5) * TILE;
       const cyw = (p.tiles[0].y + 0.3) * TILE;

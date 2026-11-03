@@ -11,6 +11,7 @@ export const SMELTING = [
     success: (lvl) => Math.min(0.8, 0.5 + (lvl - 15) * 0.01), fail: 'The iron is too impure, and crumbles away.' },
   // Coal burns the impurities out, so steel never fails.
   { id: 'steelBar', name: 'Steel bar', level: 30, xp: 17.5, uses: { ironOre: 1, coal: 1 }, gives: { steelBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
+  { id: 'mithrilBar', name: 'Mithril bar', level: 50, xp: 30, uses: { mithrilOre: 1, coal: 2 }, gives: { mithrilBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
   { id: 'silverBar', name: 'Silver bar', level: 20, xp: 13.7, uses: { silverOre: 1 }, gives: { silverBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
   { id: 'goldBar', name: 'Gold bar', level: 40, xp: 22.5, uses: { goldOre: 1 }, gives: { goldBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
 ];
@@ -73,5 +74,23 @@ export const SMITHING = [
     ['steelKiteshield', 'Steel kiteshield', 42, 3, 112.5],
     ['steelPlatelegs', 'Steel platelegs', 46, 3, 112.5],
     ['steelPlatebody', 'Steel platebody', 48, 5, 187.5],
+  ]),
+  ...anvil('mithrilBar', [
+    ['mithrilDagger', 'Mithril dagger', 50, 1, 50],
+    ['mithrilAxe', 'Mithril axe', 51, 1, 50],
+    ['mithrilMace', 'Mithril mace', 52, 1, 50],
+    ['mithrilPickaxe', 'Mithril pickaxe', 52, 1, 50],
+    ['mithrilMedHelm', 'Mithril med helm', 53, 1, 50],
+    ['mithrilSword', 'Mithril sword', 54, 1, 50],
+    ['mithrilArrowtips', 'Mithril arrowtips', 55, 1, 50, 15],
+    ['mithrilScimitar', 'Mithril scimitar', 55, 2, 100],
+    ['mithrilLongsword', 'Mithril longsword', 56, 2, 100],
+    ['mithrilFullHelm', 'Mithril full helm', 57, 2, 100],
+    ['mithrilSqShield', 'Mithril sq shield', 58, 2, 100],
+    ['mithrilBattleaxe', 'Mithril battleaxe', 60, 3, 150],
+    ['mithrilChainbody', 'Mithril chainbody', 61, 3, 150],
+    ['mithrilKiteshield', 'Mithril kiteshield', 62, 3, 150],
+    ['mithrilPlatelegs', 'Mithril platelegs', 66, 3, 150],
+    ['mithrilPlatebody', 'Mithril platebody', 68, 5, 250],
   ]),
 ];

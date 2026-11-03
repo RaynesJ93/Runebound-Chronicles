@@ -603,6 +603,13 @@ for (const part of ['Dagger', 'Axe', 'Pickaxe', 'Mace', 'MedHelm', 'Sword', 'Sci
     if (grey) for (let c = 0; c < 3; c++) d[i + c] = Math.min(255, d[i + c] * 1.15 + 18);
   });
 }
+for (const part of ['Dagger', 'Axe', 'Pickaxe', 'Mace', 'MedHelm', 'Sword', 'Scimitar', 'Longsword', 'FullHelm', 'SqShield',
+  'Battleaxe', 'Chainbody', 'Kiteshield', 'Platelegs', 'Platebody', 'Arrowtips', 'Arrow', 'Bar', 'Ore']) {
+  DRAW[`mithril${part}`] ||= recolour(`iron${part}`, (d, i) => {
+    const grey = Math.max(d[i], d[i + 1], d[i + 2]) - Math.min(d[i], d[i + 1], d[i + 2]) < 40 || part === 'Ore';
+    if (grey) { const l = (d[i] + d[i + 1] + d[i + 2]) / 765; d[i] = 26 + 150 * l; d[i + 1] = 34 + 170 * l; d[i + 2] = 80 + 175 * l; }
+  });
+}
 DRAW.coal ||= recolour('ironOre', (d, i) => { const l = (d[i] + d[i + 1] + d[i + 2]) / 3; d[i] = d[i + 1] = l * 0.3; d[i + 2] = l * 0.36; });
 
 // Silver, gold, gems and jewellery, drawn simply (the painted art covers them normally).

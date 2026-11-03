@@ -402,7 +402,7 @@ function palette(look) {
     pants, pantsS: shade(pants, 0.78),
     boots: hex(L.boots), eye: hex(L.eyes || '#2b1d16'),
     ears: !!L.ears,
-    weapon: L.weapon ? (L.weapon === 'iron' ? [hex('#7a828b'), hex('#c0c8d0'), hex('#eef2f5')] : L.weapon === 'steel' ? [hex('#959ea6'), hex('#d4dade'), hex('#ffffff')] : [hex('#a8692e'), hex('#d4934f'), hex('#f2c48a')]) : null,
+    weapon: L.weapon ? (L.weapon === 'iron' ? [hex('#7a828b'), hex('#c0c8d0'), hex('#eef2f5')] : L.weapon === 'steel' ? [hex('#959ea6'), hex('#d4dade'), hex('#ffffff')] : L.weapon === 'mithril' ? [hex('#2e3a6e'), hex('#5a6ec0'), hex('#a8b8f4')] : [hex('#a8692e'), hex('#d4934f'), hex('#f2c48a')]) : null,
     blade: L.blade || 4,
     weaponKind: L.weaponKind || (L.weapon ? 'blade' : null),
     shield: L.shield || null,
@@ -777,6 +777,7 @@ const SHIELD_COLOUR = {
   bronze: ['#6e4320', '#c07a38', '#f2c48a'],
   iron: ['#4a4f56', '#9aa2aa', '#e2e8ec'],
   steel: ['#5e666e', '#c4ccd2', '#ffffff'],
+  mithril: ['#1e2850', '#4a5a9a', '#a8b8f4'],
 };
 export function shieldOn(b, x, y, kind = 'wood') {
   const [rim, face, boss] = (SHIELD_COLOUR[kind] || SHIELD_COLOUR.wood).map(hex);
@@ -799,6 +800,7 @@ const ORE_COLOUR = {
   coal: [hex('#141216'), hex('#2a2830'), hex('#6a6878')],
   silver: [hex('#8e98a2'), hex('#cdd5dc'), hex('#ffffff')],
   gold: [hex('#bf8a22'), hex('#efc444'), hex('#fff3b8')],
+  mithril: [hex('#2e3a6e'), hex('#5a6ec0'), hex('#a8c0ff')],
 };
 
 // A rock with veins of ore. With no `variant` it's a mined-out rock.

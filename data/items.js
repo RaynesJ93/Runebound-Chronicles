@@ -129,6 +129,13 @@ export const ITEMS = {
   uncutDiamond: { name: 'Uncut diamond', value: 800, examine: 'A rough diamond. Cut it with a chisel.' },
   diamond: { name: 'Diamond', value: 1200, examine: 'A cut diamond. Set it in a ring or amulet at a furnace.' },
   steelBar: { name: 'Steel bar', value: 60, examine: 'Hammer it into shape at an anvil. Tougher than iron.' },
+  mithrilOre: { name: 'Mithril ore', value: 160, examine: 'A light, blue-tinged ore. Smelt it with two coal.' },
+  mithrilBar: { name: 'Mithril bar', value: 300, examine: 'Hammer it into shape at an anvil. Light and very strong.' },
+  mithrilArrowtips: { name: 'Mithril arrowtips', stackable: true, value: 10, examine: 'Fix these onto headless arrows. Needs Fletching 45.' },
+  mithrilArrow: {
+    name: 'Mithril arrow', stackable: true, value: 14, examine: 'Arrows with mithril heads. They hit harder than steel.',
+    equip: { slot: 'ammo', req: {}, rangedStr: 22, ammo: 'arrow' },
+  },
   steelArrowtips: { name: 'Steel arrowtips', stackable: true, value: 4, examine: 'Fix these onto headless arrows. Needs Fletching 30.' },
   steelArrow: {
     name: 'Steel arrow', stackable: true, value: 6, examine: 'Arrows with steel heads. They hit harder than iron.',
@@ -357,6 +364,66 @@ export const ITEMS = {
     name: 'Steel platebody', value: 2000, examine: 'Solid steel plates. Heavy, but very tough.',
     equip: { slot: 'body', req: { defence: 10 }, att: { magic: -15, ranged: -7 }, def: { stab: 30, slash: 29, crush: 17, ranged: 29, magic: -6 }, look: { tunic: '#9aa2aa' } },
   },
+  mithrilDagger: {
+    name: 'Mithril dagger', value: 325, examine: 'A sturdy mithril dagger.',
+    equip: { slot: 'weapon', req: { attack: 20 }, type: 'stab', speed: 4, att: { stab: 12, slash: 5, crush: -4, magic: 1 }, def: { magic: 1 }, str: 9, look: { weapon: 'mithril', blade: 4 } },
+  },
+  mithrilAxe: {
+    name: 'Mithril axe', value: 520, tool: { woodcutting: 20 }, examine: 'A light mithril axe. Chops fast. Needs Woodcutting 20.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 5, att: { stab: -2, slash: 12, crush: 5 }, str: 9, look: { weapon: 'mithril', blade: 5 } },
+  },
+  mithrilPickaxe: {
+    name: 'Mithril pickaxe', value: 520, tool: { mining: 20 }, examine: 'A light mithril pickaxe. Mines fast. Needs Mining 20.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'stab', speed: 5, att: { stab: 12, slash: -2, crush: 5 }, str: 9, look: { weapon: 'mithril', blade: 5 } },
+  },
+  mithrilMace: {
+    name: 'Mithril mace', value: 585, examine: 'A flanged mithril mace. Good against armour.',
+    equip: { slot: 'weapon', req: { attack: 20 }, type: 'crush', speed: 4, att: { stab: 5, slash: -2, crush: 18 }, def: { crush: 1 }, str: 14, look: { weapon: 'mithril', blade: 5 } },
+  },
+  mithrilMedHelm: {
+    name: 'Mithril med helm', value: 780, examine: 'A medium-sized mithril helmet.',
+    equip: { slot: 'head', req: { defence: 20 }, att: { magic: -1 }, def: { stab: 8, slash: 9, crush: 5, magic: -1, ranged: 8 }, look: { hat: 'helmet', hatColor: '#4a5a9a' } },
+  },
+  mithrilSword: {
+    name: 'Mithril sword', value: 845, examine: 'A well-made mithril sword.',
+    equip: { slot: 'weapon', req: { attack: 20 }, type: 'slash', speed: 4, att: { stab: 12, slash: 16, crush: -2 }, def: { slash: 4, stab: 1 }, str: 14, look: { weapon: 'mithril', blade: 7 } },
+  },
+  mithrilScimitar: {
+    name: 'Mithril scimitar', value: 1040, examine: 'A curved mithril sword. Fast and slashing.',
+    equip: { slot: 'weapon', req: { attack: 20 }, type: 'slash', speed: 4, att: { stab: 4, slash: 20, crush: -2 }, def: { slash: 1 }, str: 18, look: { weapon: 'mithril', blade: 7 } },
+  },
+  mithrilLongsword: {
+    name: 'Mithril longsword', value: 1300, examine: 'A long mithril blade. Slower, but hits harder.',
+    equip: { slot: 'weapon', req: { attack: 20 }, type: 'slash', speed: 5, att: { stab: 12, slash: 22, crush: -2 }, def: { stab: 1, slash: 5 }, str: 22, look: { weapon: 'mithril', blade: 9 } },
+  },
+  mithrilFullHelm: {
+    name: 'Mithril full helm', value: 1430, examine: 'A full-face mithril helmet.',
+    equip: { slot: 'head', req: { defence: 20 }, att: { magic: -3, ranged: -1 }, def: { stab: 12, slash: 14, crush: 9, ranged: 12, magic: -1 }, look: { hat: 'helmet', hatColor: '#4a5a9a' } },
+  },
+  mithrilSqShield: {
+    name: 'Mithril sq shield', value: 1560, examine: 'A square mithril shield.',
+    equip: { slot: 'shield', req: { defence: 20 }, att: { magic: -1 }, def: { stab: 16, slash: 18, crush: 14, ranged: 16, magic: -1 }, look: { shield: 'mithril' } },
+  },
+  mithrilBattleaxe: {
+    name: 'Mithril battleaxe', value: 1690, examine: 'A heavy double-headed mithril axe.',
+    equip: { slot: 'weapon', req: { attack: 20 }, type: 'slash', speed: 6, att: { stab: -2, slash: 22, crush: 16 }, def: { slash: 1 }, str: 27, look: { weapon: 'mithril', blade: 6 } },
+  },
+  mithrilChainbody: {
+    name: 'Mithril chainbody', value: 1950, examine: 'A shirt of mithril rings.',
+    equip: { slot: 'body', req: { defence: 20 }, att: { magic: -4 }, def: { stab: 22, slash: 31, crush: 35, ranged: 26, magic: -1 }, look: { tunic: '#4a5a9a' } },
+  },
+  mithrilKiteshield: {
+    name: 'Mithril kiteshield', value: 2210, examine: 'A large mithril shield, pointed at the bottom.',
+    equip: { slot: 'shield', req: { defence: 20 }, att: { magic: -8, ranged: -2 }, def: { stab: 18, slash: 22, crush: 20, ranged: 20, magic: -1 }, look: { shield: 'mithril' } },
+  },
+  mithrilPlatelegs: {
+    name: 'Mithril platelegs', value: 2600, examine: 'Leg armour of mithril plates.',
+    equip: { slot: 'legs', req: { defence: 20 }, att: { magic: -10, ranged: -4 }, def: { stab: 22, slash: 20, crush: 18, ranged: 20, magic: -4 }, look: { pants: '#4a5a9a' } },
+  },
+  mithrilPlatebody: {
+    name: 'Mithril platebody', value: 5200, examine: 'Solid mithril plates. Heavy, but very tough.',
+    equip: { slot: 'body', req: { defence: 20 }, att: { magic: -15, ranged: -7 }, def: { stab: 41, slash: 39, crush: 23, ranged: 39, magic: -6 }, look: { tunic: '#4a5a9a' } },
+  },
   silverRing: {
     name: 'Silver ring', value: 130, examine: 'A silver ring. Plain, but it helps a little.',
     equip: { slot: 'ring', req: {}, def: { stab: 1, slash: 1, crush: 1 } },
@@ -467,7 +534,7 @@ for (const [skill, name, value] of [['attack', 'Attack', 60], ['strength', 'Stre
 // - coins: no limit
 // - weapons, armour, tools and potions: 1 (they don't stack)
 // The bank stacks everything without limit.
-const STACK_20 = /^(logs|oakLogs|copperOre|tinOre|ironOre|coal|silverOre|goldOre|bronzeBar|ironBar|steelBar|silverBar|goldBar|uncut[A-Z]\w*|sapphire|emerald|ruby|diamond|runeEssence|cowhide|wolfPelt|leather|hardLeather|raw[A-Z]\w*|burnt[A-Z]\w*)$/;
+const STACK_20 = /^(logs|oakLogs|copperOre|tinOre|ironOre|coal|silverOre|goldOre|mithrilOre|bronzeBar|ironBar|steelBar|mithrilBar|silverBar|goldBar|uncut[A-Z]\w*|sapphire|emerald|ruby|diamond|runeEssence|cowhide|wolfPelt|leather|hardLeather|raw[A-Z]\w*|burnt[A-Z]\w*)$/;
 for (const [id, it] of Object.entries(ITEMS)) {
   if (STACK_20.test(id) || it.food) { it.stackable = true; it.stack = 20; }
   else if (it.stackable) it.stack = id === 'coins' ? Infinity : 999;

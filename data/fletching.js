@@ -19,10 +19,11 @@ export const RECIPES = [
   { id: 'bronzeArrows', name: 'Bronze arrows', level: 1, xp: 1.3, uses: { headlessArrow: 1, bronzeArrowtips: 1 }, gives: { bronzeArrow: 1 }, batch: 15, ticks: 2, group: 'arrows' },
   { id: 'ironArrows', name: 'Iron arrows', level: 15, xp: 2.5, uses: { headlessArrow: 1, ironArrowtips: 1 }, gives: { ironArrow: 1 }, batch: 15, ticks: 2, group: 'arrows' },
   { id: 'steelArrows', name: 'Steel arrows', level: 30, xp: 5, uses: { headlessArrow: 1, steelArrowtips: 1 }, gives: { steelArrow: 1 }, batch: 15, ticks: 2, group: 'arrows' },
+  { id: 'mithrilArrows', name: 'Mithril arrows', level: 45, xp: 7.5, uses: { headlessArrow: 1, mithrilArrowtips: 1 }, gives: { mithrilArrow: 1 }, batch: 15, ticks: 2, group: 'arrows' },
 ];
 
 // Which recipe group an item belongs to when you tap it.
 export const GROUP_OF = {
   logs: 'logs', oakLogs: 'oakLogs',
-  arrowShaft: 'arrows', feather: 'arrows', headlessArrow: 'arrows', bronzeArrowtips: 'arrows', ironArrowtips: 'arrows', steelArrowtips: 'arrows',
+  arrowShaft: 'arrows', feather: 'arrows', headlessArrow: 'arrows', bronzeArrowtips: 'arrows', ironArrowtips: 'arrows', steelArrowtips: 'arrows', mithrilArrowtips: 'arrows',
 };
