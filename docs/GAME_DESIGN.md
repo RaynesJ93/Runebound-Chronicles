@@ -501,6 +501,12 @@ Each attempt tries the best fish you can catch first (its chance rises 1% a leve
 | Trout | 15 | 70 | 7 | 50 |
 | Salmon | 25 | 90 | 9 | 58 |
 
+### Map (v0.25.0)
+
+A map button (top right, or M on a keyboard) opens the map of the area you're in, with a pulsing marker for where you are. Tabs along the top (Brambleford, Thornwood, Mine, Vale) show the other areas; inside the shop or bank the map shows Brambleford with you at the door. Zoom in up to 4x with + and − and scroll around; zoomed in, villagers' names show.
+
+The map shows the ground, trees, water and buildings drawn small, and on top: place names (from `data/mapLabels.js`), villagers (yellow dots) and monsters (red; the Alpha Wolf ringed in gold) where they are right now, the ways out to other areas, and icons for the bank and shop, fishing, mining, smithing, cooking, tanning and runecrafting altars. Tap any marker to see what it is. Everything except the place names is read from the area data, so new areas and skilling spots show up by themselves; a new area only needs adding to `MAP_AREAS` and its labels.
+
 ### Skill guides (v0.24.0)
 
 Tap any skill in the skills panel to open its guide: everything the skill unlocks, in level order, with an icon, what it needs and the XP it gives. Rows you can already do are bright; locked rows are greyed with the level in red. The header shows your level and the next unlock. Guides are built from the data files (`src/skills/guide.js`), so new items, recipes, trees, rocks, fish, spells and altars appear automatically. Combat skills list the gear that needs them (Attack: weapons; Defence: armour; Ranged: bows and gear; Magic: spells and staffs); Strength and Hitpoints explain what they do.

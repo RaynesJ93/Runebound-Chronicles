@@ -20,11 +20,14 @@ const DOLL = [
 const sign = (n) => (n > 0 ? `+${n}` : String(n));
 import { SKILLS, xpForLevel, MAX_LEVEL } from '../skills/skills.js';
 import { guide } from '../skills/guide.js';
+import { drawArea, markers } from './map.js';
+import { MAP_AREAS, MAP_TAB } from '../../data/mapLabels.js';
 
 const fmt = (n) => Math.floor(n).toLocaleString('en-GB');
 
 const GEAR_SVG = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.2 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>';
 const HEART_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 21 3.5 12.6A5.2 5.2 0 0 1 12 6.2a5.2 5.2 0 0 1 8.5 6.4z"/></svg>';
+const MAP_SVG = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="#e8d8b0" stroke="#2b1d16" stroke-width="1.6" stroke-linejoin="round" d="M2.5 5.5 8.5 3l7 2.5 6-2.5v15l-6 2.5-7-2.5-6 2.5z"/><path stroke="#2b1d16" stroke-width="1.4" d="M8.5 3v15M15.5 5.5v15"/><path fill="none" stroke="#b0483a" stroke-width="1.6" stroke-dasharray="2 1.6" d="M4.5 15c2-3 4-1 5.5-4s3.5-2 5-4"/><path fill="#b0483a" d="m17 6.2 2.4.3-1.2 2.3z"/></svg>';
 const BOOT_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M7 3h5v8l6 3c1.7.8 3 2.4 3 4.3V20H4v-3l3-1z"/></svg>';
 
 export class Hud {
@@ -38,6 +41,7 @@ export class Hud {
       </div>
       <div class="hud-top-right">
         <button class="icon-btn ui" id="btn-inv" aria-label="Inventory"><img class="px" src="${itemIcon('bag').url}" alt=""></button>
+        <button class="icon-btn ui" id="btn-map" aria-label="Map">${uiIcon('map', MAP_SVG, 32)}</button>
         <button class="icon-btn ui" id="btn-skills" aria-label="Skills"><img class="px" src="${paintedIconUrl('equipment') || iconUrl('attack')}" alt=""></button>
         <button class="icon-btn ui" id="btn-settings" aria-label="Settings">${uiIcon('settings', GEAR_SVG, 32)}</button>
         <div class="xp-drops" id="xp-drops" aria-hidden="true"></div>
@@ -87,6 +91,27 @@ export class Hud {
         </div>
       </div>
       <div class="menu-backdrop ui hidden" id="menu-backdrop"><div class="menu" id="menu" role="menu"></div></div>
+      <div class="panel-backdrop ui hidden" id="map">
+        <div class="panel map-panel" role="dialog" aria-label="Map">
+          <div class="panel-head">
+            <h2>Map</h2>
+            <span class="zoom-ctl"><button class="chip sq" id="map-zoom-out" aria-label="Zoom out">−</button><button class="chip sq" id="map-zoom-in" aria-label="Zoom in">+</button></span>
+            <button class="close-btn" data-close aria-label="Close">✕</button>
+          </div>
+          <div class="panel-body">
+            <div class="map-areas" id="map-areas"></div>
+            <div class="map-view" id="map-view"><div class="map-inner" id="map-inner"></div></div>
+            <p class="map-where" id="map-where"></p>
+            <div class="map-legend">
+              <span><i class="mk-you"></i>You</span><span><i class="mk-npc"></i>People</span><span><i class="mk-enemy"></i>Monsters</span><span><i class="mk-exit">▲</i>Way out</span>
+              <span><img class="px" src="${itemIcon('coins').url}" alt="">Bank</span><span><img class="px" src="${itemIcon('bag').url}" alt="">Shop</span>
+              <span><img class="px" src="${iconUrl('fishing')}" alt="">Fishing</span><span><img class="px" src="${iconUrl('mining')}" alt="">Mining</span>
+              <span><img class="px" src="${iconUrl('smithing')}" alt="">Smithing</span><span><img class="px" src="${iconUrl('cooking')}" alt="">Cooking</span>
+              <span><img class="px" src="${iconUrl('crafting')}" alt="">Tanning</span><span><img class="px" src="${iconUrl('runecrafting')}" alt="">Altar</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="panel-backdrop ui hidden" id="skills">
         <div class="panel" role="dialog" aria-label="Skills">
           <div class="panel-head">
@@ -193,6 +218,18 @@ export class Hud {
 
     $('btn-settings').addEventListener('click', () => this.openSettings());
     $('btn-skills').addEventListener('click', () => this.openSkills());
+    $('btn-map').addEventListener('click', () => this.openMap());
+    this.el.map = $('map');
+    this.mapZoom = 1;
+    this.el.map.addEventListener('click', (e) => {
+      if (e.target === this.el.map || e.target.closest('[data-close]')) { this.closeMap(); return; }
+      const t = e.target.closest('[data-map]');
+      if (t) { this.mapShown = t.dataset.map; this.renderMap(true); return; }
+      const m = e.target.closest('[data-mk]');
+      if (m) this.$('map-where').textContent = m.dataset.mk;
+    });
+    $('map-zoom-in').addEventListener('click', () => this.zoomMap(1));
+    $('map-zoom-out').addEventListener('click', () => this.zoomMap(-1));
     $('btn-inv').addEventListener('click', () => this.openInventory());
     this.el.inv = $('inv');
     this.el.inv.addEventListener('click', (e) => {
@@ -244,7 +281,7 @@ export class Hud {
   }
 
   get settingsOpen() {
-    return !this.el.settings.classList.contains('hidden') || !this.el.skills.classList.contains('hidden') || this.invOpen || this.menuOpen || this.tradeOpen;
+    return !this.el.settings.classList.contains('hidden') || !this.el.skills.classList.contains('hidden') || this.mapOpen || this.invOpen || this.menuOpen || this.tradeOpen;
   }
 
   // ---- Bank and shop -------------------------------------------------------------
@@ -438,6 +475,88 @@ export class Hud {
 
   get skillsOpen() {
     return !this.el.skills.classList.contains('hidden');
+  }
+
+  // ---- Map ---------------------------------------------------------------------
+  // here: { id, x, y } — the map you're on and your tile; live: { npcs, enemies }.
+  get mapOpen() { return !this.el.map.classList.contains('hidden'); }
+
+  openMap() {
+    this.el.map.classList.remove('hidden');
+    this.mapShown = null;
+    this.mapZoom = 1;
+    this.onMapOpen?.();
+  }
+
+  closeMap() { this.el.map.classList.add('hidden'); }
+
+  // Called by the game with where you are; redraws the open map.
+  setMapHere(here, live) {
+    this.mapHere = here;
+    this.mapLive = live;
+    if (this.mapOpen) this.renderMap(!this.mapShown);
+  }
+
+  zoomMap(dir) {
+    const z = Math.max(1, Math.min(4, this.mapZoom * (dir > 0 ? 2 : 0.5)));
+    if (z === this.mapZoom) return;
+    const v = this.$('map-view');
+    // keep the middle of the view in the middle
+    const cx = (v.scrollLeft + v.clientWidth / 2) / v.scrollWidth, cy = (v.scrollTop + v.clientHeight / 2) / v.scrollHeight;
+    this.mapZoom = z;
+    this.layoutMap();
+    v.scrollLeft = cx * v.scrollWidth - v.clientWidth / 2;
+    v.scrollTop = cy * v.scrollHeight - v.clientHeight / 2;
+  }
+
+  layoutMap() {
+    const inner = this.$('map-inner');
+    inner.style.width = `${this.mapZoom * 100}%`;
+    inner.classList.toggle('zoomed', this.mapZoom > 1);
+    this.$('map-zoom-out').disabled = this.mapZoom <= 1;
+    this.$('map-zoom-in').disabled = this.mapZoom >= 4;
+  }
+
+  // centre: scroll so you (or the middle of the map) are in view.
+  renderMap(centre = false) {
+    const here = this.mapHere;
+    if (!here) return;
+    const id = this.mapShown || here.id;
+    const onIt = id === here.id;
+    this.$('map-areas').innerHTML = MAP_AREAS.map((a) => `<button class="chip ${a === id ? 'on' : ''}" data-map="${a}">${MAP_TAB[a]}${a === here.id ? ' •' : ''}</button>`).join('');
+    const m = markers(id, onIt ? this.mapLive : null);
+    const pct = (x, y) => `left:${(x / m.W) * 100}%;top:${(y / m.H) * 100}%`;
+    const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const mk = m.list.map((k) => {
+      if (k.type === 'label') return `<span class="mk-label ${k.x / m.W < 0.14 ? 'al' : k.x / m.W > 0.86 ? 'ar' : ''}" style="${pct(k.x, k.y)}">${esc(k.name)}</span>`;
+      if (k.type === 'spot') return `<img class="px mk-spot" data-mk="${esc(k.name)}" style="${pct(k.x, k.y)}" src="${k.icon}" alt="${esc(k.name)}">`;
+      if (k.type === 'exit') return `<span class="mk-exit-wrap edge-${k.edge}" data-mk="${esc(k.name)}" style="${pct(k.x, k.y)}"><i class="mk-exit">▲</i><b>${esc(k.name)}</b></span>`;
+      if (k.type === 'npc') return `<span class="mk-dot mk-npc" data-mk="${esc(k.name)}" style="${pct(k.x, k.y)}"><b>${esc(k.name)}</b></span>`;
+      return `<span class="mk-dot mk-enemy ${k.boss ? 'boss' : ''}" data-mk="${esc(k.name)}" style="${pct(k.x, k.y)}"></span>`;
+    }).join('');
+    const you = onIt ? `<span class="mk-you" style="${pct(here.x + 0.5, here.y + 0.5)}"></span>` : '';
+    const inner = this.$('map-inner');
+    if (inner.dataset.area !== id) {
+      inner.dataset.area = id;
+      inner.innerHTML = '<div class="map-marks"></div>';
+      const c = drawArea(id);
+      c.className = 'map-canvas';
+      inner.prepend(c);
+    }
+    inner.style.aspectRatio = `${m.W} / ${m.H}`;
+    inner.querySelector('.map-marks').innerHTML = mk + you;
+    this.layoutMap();
+    if (centre) {
+      const tab = this.$('map-areas').querySelector('.on');
+      if (tab) this.$('map-areas').scrollLeft = tab.offsetLeft - this.$('map-areas').offsetLeft - 8;
+      this.$('map-where').textContent = onIt ? `You are in ${m.name}. Tap a marker to see what it is.` : `${m.name}. Tap a marker to see what it is.`;
+      const v = this.$('map-view');
+      requestAnimationFrame(() => {
+        const tx = onIt ? (here.x + 0.5) / m.W : 0.5, ty = onIt ? (here.y + 0.5) / m.H : 0.5;
+        v.scrollLeft = tx * v.scrollWidth - v.clientWidth / 2;
+        v.scrollTop = ty * v.scrollHeight - v.clientHeight / 2;
+      });
+    }
   }
 
   // ---- Skills panel ------------------------------------------------------------
