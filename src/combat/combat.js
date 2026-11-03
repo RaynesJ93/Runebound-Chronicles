@@ -48,6 +48,7 @@ export class Combat {
     this.splats = [];
     this.playerLastHit = -99;
     this.playerLungeAt = -99;
+    this.playerAttackKind = 'slash'; // which attack animation to show: slash, bow or cast
     this.now = 0;
   }
 
@@ -184,7 +185,7 @@ export class Combat {
 
     // Arrows and spells landing this tick.
     this.ticks++;
-    this.projectiles = this.projectiles.filter((pr) => now < pr.end + 0.05);
+    this.projectiles = this.projectiles.filter((pr) => now < pr.end + (pr.kind === 'arrow' ? 0.05 : 0.35)); // spells linger a moment to splash
     const landing = this.pending.filter((h) => h.at <= this.ticks);
     this.pending = this.pending.filter((h) => h.at > this.ticks);
     for (const h of landing) this.land(h);
@@ -223,6 +224,7 @@ export class Combat {
     const ticks = this.flightTicks(e, false);
     this.launch(e, 'arrow', ticks);
     this.playerLungeAt = this.now;
+    this.playerAttackKind = 'bow';
     // Like OSRS, most arrows can be picked up again where they land.
     this.pending.push({ target: e, dmg, at: this.ticks + ticks, mode: 'ranged', arrow: ammo.id, keepArrow: this.rng() < 0.6 });
     this.on.inventoryChanged?.();
@@ -252,6 +254,7 @@ export class Combat {
     const ticks = this.flightTicks(e, true);
     this.launch(e, spell.colour, ticks);
     this.playerLungeAt = this.now;
+    this.playerAttackKind = 'cast';
     this.book.add('magic', spell.xp); // every cast gives some Magic XP
     this.pending.push({ target: e, dmg, at: this.ticks + ticks, mode: 'magic', spell });
     this.on.inventoryChanged?.();
@@ -280,6 +283,7 @@ export class Combat {
       { attack: s.attack, strength: s.strength, ...this.meleeBonuses(), attackStyle: style.bonus.attack || 0, strengthStyle: style.bonus.strength || 0 },
       { defence: e.def.defence, defenceBonus: e.def.defenceBonus });
     this.playerLungeAt = this.now;
+    this.playerAttackKind = 'slash';
     const dealt = Math.min(dmg, e.hp); // can't do more damage than it has health
     this.hurtEnemy(e, dealt);
     // XP: 4 per damage shared by the style's skills, plus 1.33 Hitpoints.

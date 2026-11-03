@@ -1,3 +1,4 @@
+import { art } from './art.js';
 import { Bitmap, hex, OUTLINE } from './pixel.js';
 
 // 16 x 16 pixel icons for skills and attack styles, drawn from little text
@@ -280,8 +281,16 @@ ART.waterStrike = ART.magic;
 const cache = new Map();
 
 // A data: URL for an <img>, drawn once and remembered.
+// The painted icon for a skill or interface button, if the art atlas has one.
+export function paintedIconUrl(name) {
+  const a = art('skill:' + name)?.[0] || art('ui:' + name)?.[0];
+  return a ? a.img.toDataURL('image/png') : null;
+}
+
 export function iconUrl(name) {
   if (cache.has(name)) return cache.get(name);
+  const painted = paintedIconUrl(name);
+  if (painted) { cache.set(name, painted); return painted; }
   const rows = ART[name] || ART.attack;
   const b = new Bitmap(16, 16);
   rows.forEach((row, y) => {

@@ -523,3 +523,6 @@ img.px { -webkit-user-drag: none; }
   #skills .panel-head { padding-top: 6px; }
   .skill-foot { margin-top: 6px; }
 }
+
+.hp-icon img.ui-ic, .run-icon img.ui-ic { display: block; width: 26px; height: 26px; image-rendering: pixelated; }
+.icon-btn img.ui-ic { width: 32px; height: 32px; }

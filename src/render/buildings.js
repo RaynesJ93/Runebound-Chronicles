@@ -18,7 +18,7 @@ const TOP = 8; // extra room above the roof for chimneys
 
 // Painted buildings from the art atlas. Where across each picture its door is
 // (a fraction of the width), so the picture can be lined up on the real door.
-const PAINTED_DOOR = { house: 0.49, cabin: 0.5, store: 0.31, bank: 0.41 };
+const PAINTED_DOOR = { house: 0.49, cabin: 0.5, store: 0.31, bank: 0.41, chiefHut: 0.5, hermit: 0.47, farmstead: 0.49 };
 const ROOFS = { red: [154, 59, 48], blue: [61, 95, 140], green: [79, 109, 58], purple: [107, 78, 138] };
 
 function nearestRoof(rgb) {
@@ -31,23 +31,30 @@ function nearestRoof(rgb) {
 }
 
 function paintedBuilding(b) {
-  if (!PAINTED_DOOR[b.kind] || (b.w !== 5 && b.w !== 6)) return null;
+  // a one-off building with its own picture (the chief's hut, the hermit's...)
+  const own = b.art && art(`building:${b.art}`)?.[0];
+  if (!own && (!PAINTED_DOOR[b.kind] || (b.w !== 5 && b.w !== 6))) return null;
   const kind = b.kind === 'house' ? `house-${nearestRoof(hex(b.roof ?? STYLES.house.roof))}` : b.kind;
-  const spr = art(`building:${kind}:${b.w}`)?.[0];
+  const spr = own || art(`building:${kind}:${b.w}`)?.[0];
   if (!spr) return null;
+  const doorAt = PAINTED_DOOR[own ? b.art : b.kind] ?? 0.5;
   let img = spr.img;
   const doorX = (b.doorTiles.reduce((s, t) => s + t.x, 0) / b.doorTiles.length + 0.5) * TILE;
-  const left = Math.round(doorX - PAINTED_DOOR[b.kind] * spr.w);
+  const left = Math.round(doorX - doorAt * spr.w);
   if (b.sign === 'bow') {
     // add the "free bows" board beside the door
     const c = document.createElement('canvas');
     c.width = spr.w; c.height = spr.h;
     const g = c.getContext('2d');
     g.drawImage(img, 0, 0);
-    const board = new Bitmap(14, 13);
-    bowSign(board, 0, 0);
-    board.outline();
-    g.drawImage(board.toCanvas(), Math.round(PAINTED_DOOR[b.kind] * spr.w + 10), spr.h - 34);
+    const painted = art('bowSign')?.[0];
+    if (painted) g.drawImage(painted.img, Math.round(doorAt * spr.w + 9), spr.h - 36);
+    else {
+      const board = new Bitmap(14, 13);
+      bowSign(board, 0, 0);
+      board.outline();
+      g.drawImage(board.toCanvas(), Math.round(doorAt * spr.w + 10), spr.h - 34);
+    }
     img = c;
   }
   return { img, x: left, y: (b.y + b.h) * TILE - spr.ay - 1, sortY: (b.y + b.h) * TILE };

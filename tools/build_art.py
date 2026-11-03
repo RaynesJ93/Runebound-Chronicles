@@ -78,10 +78,6 @@ add('crop', src(PROPS, 7, (0, 0, 0.34, 0.5)), w=12, box=(16, 16))      # young t
 add('crop', src(PROPS, 8, (0, 0.5, 0.34, 1)), w=14, box=(16, 16))      # a ripe pumpkin
 add('crop', src(PROPS, 8, (0, 0, 0.34, 0.5)), w=13, box=(16, 16))      # a cabbage
 add('tanningRack', src(PROPS, 9), h=28)
-pit = src(PROPS, 10)
-add('cookingPit', pit, w=24); add('cookingPit', tint(pit, 1.12), w=24)
-fire = src(PROPS, 11)
-add('campfire', fire, w=18); add('campfire', tint(ImageOps.mirror(fire), 1.1), w=18)
 tent = src(PROPS, 12)
 add('tent', tent, w=36); add('tent', ImageOps.mirror(tent), w=36)
 add('crate', src(PROPS, 13), w=16)
@@ -215,6 +211,105 @@ def char_frames(sheet, cols, c0, r0, height):
 for key, spec in CHARS.items():
     FRAMES[key] = char_frames(*spec)
 
+# ==== Second set of sheets (17-31) ====================================================
+FIRE, GRAVE, BLD2, FENCE, INT = '17_fire_and_water_animations', '22_graveyard_and_ruins', '23_unique_buildings', '24_fences', '25_shop_and_bank_interiors'
+
+# Fire and water: 4 frames each
+for k in range(4):
+    add('campfire', src(FIRE, k), w=18)
+    add('cookingPit', src(FIRE, 4 + k), w=24)
+    add('fishingSpot', src(FIRE, 8 + k), w=16)
+    add('fishingSpotVale', src(FIRE, 12 + k), w=16)
+
+# Fences: a post, the rails to the east (from the left-right section) and the
+# rails to the south (from the top-bottom section), for each style.
+for name, sheet, post, ew, ns, ph in (('wood', FENCE, 0, 1, 2, 20), ('picket', FENCE, 5, 6, 7, 18), ('iron', GRAVE, 0, 1, 2, 20)):
+    add(f'fence:{name}:post', src(sheet, post), h=ph)
+    add(f'fence:{name}:east', src(sheet, ew, (0.14, 0, 0.86, 1)), w=18, outline=False)
+    add(f'fence:{name}:south', src(sheet, ns, (0, 0.22, 1, 0.8)), h=17, outline=False)
+
+# Graveyard and ruins
+for k, n in enumerate((5, 6, 7, 8, 9)): add('graveStone', src(GRAVE, n), h=18)
+for n in (10, 11, 12): add('graveMound', src(GRAVE, n), w=16, box=(16, 16))
+add('memorial', src(GRAVE, 13), h=38)
+add('gravestone', src(GRAVE, 14), h=20)           # the player's own grave: a wooden cross
+add('ruinTower', src(GRAVE, 15), h=46)
+add('ruinArch', src(GRAVE, 16), w=40)
+add('ruinLow', src(GRAVE, 17), w=36); add('ruinLow', src(GRAVE, 18), w=32)
+add('ruinWall', src(GRAVE, 17), w=18); add('ruinWall', src(GRAVE, 18), w=18)
+add('fallenPillar', src(GRAVE, 19), w=32)
+for n in (20, 21, 22): add('rubble', src(GRAVE, n), w=15, box=(16, 16))
+add('bones', src(GRAVE, 24), w=15, box=(16, 12)); add('bones', src(GRAVE, 23), w=10, box=(16, 12)); add('bones', src(GRAVE, 25), w=13, box=(16, 12))
+
+# Unique buildings and the bow board
+add('building:chiefHut', src(BLD2, 0), w=6 * 16 + 10)
+add('building:hermit', src(BLD2, 1), w=5 * 16 + 14)
+add('building:farmstead', src(BLD2, 2), w=6 * 16 + 8)
+add('bowSign', src(BLD2, 3), h=18)
+
+# Interiors
+add('counter:3', src(INT, 1), w=48); add('counter:2', src(INT, 0), w=32); add('counter:1', src(INT, 2), w=16)
+add('bankBooth', src(INT, 3), w=32)
+for n in (4, 5, 6, 7): add('shelf', src(INT, n), w=18)
+add('rug', src(INT, 8), w=50)
+add('plant', src(INT, 9), h=24)
+add('stool', src(INT, 10), w=10); add('table', src(INT, 11), w=22)
+add('interiorDoor', src(INT, 13), h=30)
+add('wallLamp', src(INT, 14), h=16)
+add('grainSack', src(INT, 15), w=15)
+add('coinChest', src(INT, 16), w=18)
+
+# Edda the banker
+CHARS['edda'] = ('20_edda_the_banker', 3, 0, 0, 24)
+FRAMES['edda'] = char_frames(*CHARS['edda'])
+
+# Skill icons, interface icons, combat effects (32 px box for the menus)
+SKILLS_ORDER = ['attack', 'strength', 'defence', 'hitpoints', 'ranged', 'magic', 'woodcutting', 'fletching', 'mining', 'smithing', 'fishing', 'cooking', 'crafting', 'runecrafting']
+for n, sk in enumerate(SKILLS_ORDER):
+    im = src('26_skill_icons', n); add('skill:' + sk, im, **fit(im, 30)); add('skillS:' + sk, im, **fit(im, 14))
+UI = ['equipment', 'settings', 'heart', 'run', 'walk', 'bag', 'bank', 'coins', 'accurate', 'aggressive', 'defensive', 'controlled', 'rapid', 'longrange', 'retaliateOn', 'retaliateOff']
+for n, k in enumerate(UI):
+    im = src('27_interface_icons', n); add('ui:' + k, im, **fit(im, 30))
+FX = '28_combat_effects'
+add('splat:hit', src(FX, 0), w=15); add('splat:miss', src(FX, 1), w=15); add('splat:heal', src(FX, 2), w=15)
+add('bar:frame', src(FX, 3), w=20, outline=False)
+add('levelBurst', src(FX, 6), w=30); add('sparkle', src(FX, 7), w=12)
+
+# Spells and arrows
+SP = '30_spells_and_projectiles'
+for k in range(4): add('spell:wind', src(SP, k), w=14); add('spell:water', src(SP, 8 + k), w=13)
+for k in range(3): add('spell:windHit', src(SP, 4 + k), w=16); add('spell:waterHit', src(SP, 12 + k), w=16)
+for k, d in enumerate(['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw']): add('arrow:' + d, src(SP, 15 + k), w=11 if d in ('e', 'w') else None, h=11 if d in ('n', 's') else None) if d in ('e', 'w', 'n', 's') else add('arrow:' + d, src(SP, 15 + k), w=10)
+
+# Combat animations. Each direction's frames; right is the left frames mirrored
+# so they always face the right way.
+ANIMS = {}  # key: (list of images, scale)
+def grid_frames(sheet, cols, r, c):
+    return src(sheet, r * cols + c)
+ADV = '18_adventurer_combat_animations'
+adv_scale = 24 / src(ADV, 6).height
+for move, c0, n in (('slash', 0, 3), ('bow', 3, 3), ('cast', 6, 3), ('hit', 9, 2), ('fall', 11, 2)):
+    for r, d in enumerate(['down', 'up', 'left']):
+        ANIMS[f'player:{move}:{d}'] = ([grid_frames(ADV, 13, r, c0 + k) for k in range(n)], adv_scale)
+        if d == 'left': ANIMS[f'player:{move}:right'] = ([ImageOps.mirror(grid_frames(ADV, 13, r, c0 + k)) for k in range(n)], adv_scale)
+EN = '19_enemy_and_animal_attacks'
+for row, (key, h) in enumerate((('goblin', 20), ('goblinBrute', 28), ('tunnelGoblin', 21), ('essenceGolem', 30), ('wolf', 18), ('alphaWolf', 25), ('cow', 22), ('chicken', 12))):
+    sc = h / src(EN, row * 16).height
+    for d, c0 in (('down', 0), ('up', 3), ('left', 6)):
+        ANIMS[f'{key}:attack:{d}'] = ([src(EN, row * 16 + c0 + k) for k in range(3)], sc)
+    ANIMS[f'{key}:attack:right'] = ([ImageOps.mirror(src(EN, row * 16 + 6 + k)) for k in range(3)], sc)
+    ANIMS[f'{key}:hit'] = ([src(EN, row * 16 + 12 + k) for k in range(2)], sc)
+    ANIMS[f'{key}:fall'] = ([src(EN, row * 16 + 14 + k) for k in range(2)], sc)
+
+# Future enemies: walking frames plus attacks, ready for when they arrive
+FUT = '31_future_enemies'
+for k0, (key, h) in enumerate((('goblinChief', 30), ('caveBeast', 34), ('nightStalker', 26))):
+    r0 = k0 * 4
+    sc = h / src(FUT, r0 * 6 + 1).height
+    FRAMES['enemy:' + key] = ([src(FUT, (r0 + r) * 6 + c) for r in range(4) for c in (1, 0, 2)], sc)
+    for r, d in enumerate(['down', 'up', 'left', 'right']):
+        ANIMS[f'{key}:attack:{d}'] = ([src(FUT, (r0 + r) * 6 + 3 + k) for k in range(3)], sc)
+
 # ---- Ground textures (64 x 64, repeat every 4 tiles) --------------------------------
 # name: (cut-out number, size in pixels, calm) — calm pulls colours toward the
 # average so busy textures don't fight the sprites drawn on top of them.
@@ -257,6 +352,88 @@ def build():
             cols = np.where(feet.any(0))[0]
             ax = int(round((cols.min() + cols.max()) / 2)) if len(cols) else w // 2
             tiles.append(('chars:' + key, k, sm, ax, ay))
+    for key, (ims, scale) in ANIMS.items():
+        for k, im in enumerate(ims):
+            w, h = max(1, round(im.width * scale)), max(1, round(im.height * scale))
+            sm = shrink(im, w=w, h=h)
+            a = np.array(sm.getchannel('A')) > 0
+            rows = np.where(a.any(1))[0]
+            ay = int(rows[-1]) if len(rows) else h - 1
+            feet = a[max(0, ay - max(2, h // 5)):ay + 1]
+            cols = np.where(feet.any(0))[0]
+            ax = int(round((cols.min() + cols.max()) / 2)) if len(cols) else w // 2
+            tiles.append(('anim:' + key, k, sm, ax, ay))
+    # Gear worn by the player: each piece placed on the standing frame of each
+    # direction, anchored to the player's feet so it can be drawn on top.
+    std = {}
+    for (name, k, im, ax, ay) in tiles:
+        if name == 'chars:player' and k in (0, 3, 6, 9): std[['down', 'up', 'left', 'right'][k // 3]] = (np.array(im.getchannel('A')) > 0, ax, ay)
+    gdir = os.path.join(CUT, '21_gear')
+    if std and os.path.isdir(gdir):
+        a0, _, _ = std['down']
+        rows = np.where(a0.any(1))[0]; top, bot = rows[0], rows[-1]; H = bot - top
+        headRows = a0[top:top + max(3, int(H * 0.36))]
+        hc = np.where(headRows.any(0))[0]
+        headW = hc.max() - hc.min() + 1
+        helm = Image.open(f'{gdir}/bronzeMedHelm-down.png')
+        g = headW * 1.12 / helm.width
+        SLOT = {}
+        for id_ in ['bronzeMedHelm', 'ironMedHelm', 'leatherCowl']: SLOT[id_] = 'head'
+        for id_ in ['bronzeChainbody', 'ironChainbody', 'leatherBody', 'hardLeatherBody', 'goblinMail']: SLOT[id_] = 'body'
+        SLOT.update(leatherChaps='legs', leatherBoots='feet', wolfCloak='cape', warCharm='neck')
+        for id_ in ['bronzeDagger', 'ironDagger', 'bronzeSword', 'ironSword', 'bronzeAxe', 'ironAxe', 'shortbow', 'longbow', 'oakShortbow', 'oakLongbow', 'apprenticeStaff']: SLOT[id_] = 'weapon'
+        for id_ in ['woodenShield', 'bronzeSqShield', 'ironSqShield']: SLOT[id_] = 'shield'
+        for id_, slot in SLOT.items():
+            for d in ['down', 'up', 'left', 'right']:
+                f = f'{gdir}/{id_}-{d}.png'
+                if not os.path.exists(f): continue
+                src_im = Image.open(f).convert('RGBA')
+                # each kind of piece shrunk to fit its part of the body (game pixels)
+                size = {'head': ('w', 12), 'body': ('w', 11), 'legs': ('h', 8), 'feet': ('h', 6), 'cape': ('h', 16), 'neck': ('w', 7), 'shield': ('h', 10)}.get(slot)
+                if slot == 'weapon':
+                    size = ('h', 8 if 'Dagger' in id_ else 12 if 'Sword' in id_ else 11 if 'Axe' in id_ else 18 if id_ == 'apprenticeStaff' else 16 if 'long' in id_.lower() else 13)
+                    if d in ('left', 'right') and 'bow' not in id_.lower() and id_ != 'apprenticeStaff': size = ('w', size[1])
+                box = {'head': (12, 11), 'body': (12, 10), 'legs': (10, 8), 'feet': (12, 5), 'neck': (7, 5)}.get(slot)
+                if id_ == 'leatherCowl': box = (13, 12)
+                if box and d in ('left', 'right'): box = (box[0] - 2, box[1])  # narrower side-on
+                if box: w, h = box
+                else:
+                    k_ = size[1] / (src_im.width if size[0] == 'w' else src_im.height)
+                    w, h = max(1, round(src_im.width * k_)), max(1, round(src_im.height * k_))
+                sm = shrink(src_im, w=w, h=h)
+                al, pax, pay = std[d]
+                rws = np.where(al.any(1))[0]; t0, b0 = rws[0], rws[-1]; HH = b0 - t0
+                def span(y0, y1):
+                    c = np.where(al[int(y0):int(y1) + 1].any(0))[0]
+                    return (c.min(), c.max()) if len(c) else (pax - 3, pax + 3)
+                hl, hr = span(t0, t0 + HH * 0.36); bl, br = span(t0 + HH * 0.45, t0 + HH * 0.7)
+                hcx, bcx = (hl + hr) / 2, (bl + br) / 2
+                if slot == 'head': tx, ty = hcx - w / 2, t0 - (2 if id_ == 'leatherCowl' else 1)
+                elif slot == 'body': tx, ty = bcx - w / 2, t0 + HH * 0.6 - h / 2
+                elif slot == 'legs': tx, ty = bcx - w / 2, b0 - h
+                elif slot == 'feet': tx, ty = bcx - w / 2, b0 - h + 1
+                elif slot == 'cape': tx, ty = bcx - w / 2, t0 + HH * 0.58 - h / 2
+                elif slot == 'neck': tx, ty = hcx - w / 2, t0 + HH * 0.42 - h / 2
+                elif slot == 'weapon':
+                    hx = {'down': bl + 1, 'up': br - 1, 'left': bl + 1, 'right': br - 1}[d]
+                    tx, ty = hx - w / 2, t0 + HH * 0.66 - h / 2
+                else:
+                    hx = {'down': br - 1, 'up': bl + 1, 'left': br - 2, 'right': bl + 2}[d]
+                    tx, ty = hx - w / 2, t0 + HH * 0.6 - h / 2
+                tiles.append((f'gear:{id_}:{d}', 0, sm, int(round(pax - tx)), int(round(pay - ty))))
+    # Skilling tools, lying along +x with the grip at the left end, so the game
+    # can turn them to any angle as they swing.
+    T29 = '29_skilling_tools'
+    if os.path.isdir(os.path.join(CUT, T29)):
+        for name, n, w in (('bronzeAxe', 2, 15), ('ironAxe', 8, 15), ('bronzePickaxe', 14, 15), ('ironPickaxe', 20, 15), ('hammer', 26, 12)):
+            sm = shrink(src(T29, n), w=w)
+            a_ = np.array(sm.getchannel('A')) > 0
+            col = next(x for x in range(a_.shape[1]) if a_[:, x].any())
+            ys_ = np.where(a_[:, col:col + 2].any(1))[0]
+            tiles.append((f'tool:{name}', 0, sm, col, int(round(ys_.mean()))))
+        for k in range(3):
+            sm = shrink(src(T29, 21 + k), w=16); tiles.append(('tool:pan', k, sm, 3, sm.height - 4))
+            sm = shrink(src(T29, 15 + k), w=15); tiles.append(('tool:net', k, sm, 2, sm.height - 4))
     for name, spec in TEXTURES.items():
         n, size, k = spec[:3]
         sat = spec[3] if len(spec) > 3 else 1

@@ -118,7 +118,7 @@ export function buildRoute1() {
   for (const [x, y] of [[14, 46], [29, 46], [9, 50], [24, 56], [30, 54]]) one('crate', x, y);
   for (const [x, y] of [[16, 52], [23, 47], [12, 57], [28, 44], [19, 56]]) one('bones', x, y, { blocks: false });
   one('standingStone', 20, 45, { interact: ['A goblin war totem, daubed with red paint and hung with teeth.'] });
-  building({ id: 'chiefHut', kind: 'cabin', label: null, x: 13, y: 33, w: 6, h: 4, doorX: 15,
+  building({ id: 'chiefHut', kind: 'cabin', art: 'chiefHut', label: null, x: 13, y: 33, w: 6, h: 4, doorX: 15,
     doorText: ["The goblin chief's hut. Something big is snoring inside.", 'Best not to wake it... yet.'] });
   one('sign', 37, 47, { interact: ['DANGER! GOBLIN CAMP.', 'Signed, the Brambleford Watch.'] });
 
@@ -171,15 +171,20 @@ export function buildRoute1() {
   // The ruined watchtower
   clearArea(38, 18, 50, 31);
   rect(41, 21, 47, 27, GROUND.PLAZA);
-  for (let x = 41; x <= 47; x++) for (let y = 21; y <= 27; y++) {
-    const edge = x === 41 || x === 47 || y === 21 || y === 27;
-    if (edge && (x + y) % 3 !== 0 && !(y === 27 && x === 44)) one('ruinWall', x, y);
-  }
+  // what's left of it: the stump of the tower, an arched wall, low broken
+  // walls along the sides, a fallen pillar and heaps of rubble
+  const ruin = { interact: ['Broken stone, blackened by an old fire.'] };
+  prop('ruinTower', [{ x: 41, y: 22 }, { x: 42, y: 22 }], ruin);
+  prop('ruinArch', [{ x: 45, y: 22 }, { x: 46, y: 22 }, { x: 47, y: 22 }], ruin);
+  prop('ruinLow', [{ x: 41, y: 25 }, { x: 41, y: 26 }], ruin);
+  prop('ruinLow', [{ x: 46, y: 27 }, { x: 47, y: 27 }], ruin);
+  prop('ruinLow', [{ x: 41, y: 27 }, { x: 42, y: 27 }], ruin);
+  prop('fallenPillar', [{ x: 44, y: 24 }, { x: 45, y: 24 }], { interact: ['A fallen stone pillar, half sunk in the earth.'] });
   for (const [x, y] of [[43, 23], [45, 25], [39, 24], [48, 22]]) one('rubble', x, y, { blocks: false });
   one('sign', 44, 29, { interact: ['THE OLD WATCHTOWER', 'It fell in the Goblin War, long ago. The stairs have collapsed.'] });
 
   // The hermit's hut
-  building({ id: 'hermit', kind: 'cabin', label: null, x: 13, y: 22, w: 5, h: 4, doorX: 15,
+  building({ id: 'hermit', kind: 'cabin', art: 'hermit', label: null, x: 13, y: 22, w: 5, h: 4, doorX: 15,
     doorText: ['A crooked hut. A sign on the door says: "GO AWAY."', 'Underneath, smaller: "Unless you have mushrooms."'] });
   for (const [x, y] of [[19, 23], [20, 27], [11, 27]]) one('mushrooms', x, y, { blocks: false });
   one('scarecrow', 21, 24, { interact: ['A scarecrow made of sticks and an old robe. Its button eyes follow you.'] });
@@ -211,7 +216,7 @@ export function buildRoute1() {
 
   // The abandoned farmstead
   clearArea(80, 76, 104, 92);
-  building({ id: 'farmstead', kind: 'house', roof: 0x6a5a4a, label: null, x: 90, y: 77, w: 6, h: 4, doorX: 92,
+  building({ id: 'farmstead', kind: 'house', art: 'farmstead', roof: 0x6a5a4a, label: null, x: 90, y: 77, w: 6, h: 4, doorX: 92,
     doorText: ['The farmhouse door is boarded up.', 'Scratched into the wood: "THEY CAME AT NIGHT."'] });
   rect(84, 86, 100, 90, GROUND.DIRT);
   for (let x = 84; x <= 100; x++) for (let y = 86; y <= 90; y += 2) if ((x * 5 + y) % 4 !== 0) one('crop', x, y, { blocks: false, ripe: (x + y) % 5 === 0 });

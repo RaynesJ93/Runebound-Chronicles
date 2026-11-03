@@ -1460,3 +1460,29 @@ export function memorial() {
   b.outline();
   return sprite(b, 10, 36);
 }
+
+// A damage number on a painted splat (from the art atlas).
+const paintedSplatCache = new Map();
+export function paintedSplat(base, n) {
+  const key = `${n}`;
+  if (paintedSplatCache.has(key)) return paintedSplatCache.get(key);
+  const b = new Bitmap(base.w, base.h);
+  const str = String(n);
+  const w = str.length * 4 - 1;
+  let x = Math.round((base.w - w) / 2);
+  const y0 = Math.round((base.h - 5) / 2);
+  for (const ch of str) {
+    const g = DIGITS[ch];
+    for (let r = 0; r < 5; r++) for (let c = 0; c < 3; c++) if (g[r][c] === '1') b.set(x + c, y0 + r, [255, 255, 255]);
+    x += 4;
+  }
+  b.outline([30, 10, 10]);
+  const c = document.createElement('canvas');
+  c.width = base.w; c.height = base.h;
+  const g = c.getContext('2d');
+  g.drawImage(base.img, 0, 0);
+  g.drawImage(b.toCanvas(), 0, 0);
+  const spr = { img: c, ax: Math.floor(base.w / 2), ay: Math.floor(base.h / 2), w: base.w, h: base.h };
+  paintedSplatCache.set(key, spr);
+  return spr;
+}
