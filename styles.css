@@ -549,3 +549,66 @@ img.px { -webkit-user-drag: none; }
 
 .hp-icon img.ui-ic, .run-icon img.ui-ic { display: block; width: 26px; height: 26px; image-rendering: pixelated; }
 .icon-btn img.ui-ic { width: 32px; height: 32px; }
+
+/* ---- Map ---- */
+.map-panel { width: min(640px, 100%); }
+.map-panel .panel-head { gap: 8px; }
+.map-panel .panel-head h2 { flex: 1; }
+.map-panel .zoom-ctl { gap: 6px; }
+.map-panel .zoom-ctl .chip { font-size: 22px; line-height: 1; }
+.map-panel .chip:disabled { opacity: 0.45; }
+.map-areas { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 8px; -webkit-overflow-scrolling: touch; }
+.map-areas .chip { min-width: 0; flex: none; height: 36px; padding: 0 10px; font-size: 15px; }
+.map-areas .chip.on { background: #ffe9a8; box-shadow: inset 0 0 0 2px var(--gold); }
+.map-view {
+  position: relative; overflow: auto; max-height: min(62vh, 560px); -webkit-overflow-scrolling: touch;
+  border: 3px solid var(--wood-dark); border-radius: 6px; background: #2b1d16;
+}
+.map-inner { position: relative; width: 100%; }
+.map-canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges; }
+.map-marks { position: absolute; inset: 0; }
+.map-marks > * { position: absolute; transform: translate(-50%, -50%); }
+.mk-label {
+  padding: 1px 5px; border-radius: 4px; white-space: nowrap; pointer-events: none;
+  background: rgba(255, 246, 220, 0.88); border: 1px solid var(--wood-dark);
+  font-size: 11px; font-weight: 700; color: var(--ink);
+}
+.zoomed .mk-label { font-size: 13px; }
+.map-marks .mk-label.al { transform: translate(-6px, -50%); }
+.map-marks .mk-label.ar { transform: translate(calc(-100% + 6px), -50%); }
+img.mk-spot { width: 18px; height: 18px; filter: drop-shadow(0 0 1px #fff6dc) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6)); cursor: pointer; }
+.zoomed img.mk-spot { width: 24px; height: 24px; }
+.mk-dot { width: 7px; height: 7px; border-radius: 50%; border: 1px solid #2b1d16; cursor: pointer; }
+.zoomed .mk-dot { width: 9px; height: 9px; }
+.mk-dot b { display: none; }
+.zoomed .mk-npc b {
+  display: block; position: absolute; left: 50%; top: 100%; transform: translateX(-50%); margin-top: 1px;
+  font-size: 10px; white-space: nowrap; color: #fff6dc; text-shadow: 0 1px 1px #000, 0 0 2px #000; pointer-events: none;
+}
+.mk-npc, .map-legend .mk-npc { background: #ffd23a; }
+.mk-enemy, .map-legend .mk-enemy { background: #d8342a; }
+.mk-enemy.boss { width: 11px; height: 11px; box-shadow: 0 0 0 2px #ffd23a; }
+.mk-you, .map-legend .mk-you {
+  width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 2px solid #1e5fd0;
+  box-shadow: 0 0 0 2px #fff; z-index: 2;
+}
+.map-marks .mk-you { animation: map-you 1.2s ease-in-out infinite; }
+@keyframes map-you { 50% { box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.25); } }
+.mk-exit-wrap { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+.mk-exit-wrap b { font-size: 11px; white-space: nowrap; padding: 0 4px; border-radius: 3px; background: rgba(43, 29, 22, 0.8); color: #fff6dc; }
+.mk-exit, .map-legend .mk-exit { font-style: normal; font-size: 13px; color: #fff6dc; text-shadow: 0 0 2px #000, 0 1px 1px #000; }
+.mk-exit-wrap.edge-n { transform: translate(-50%, 0); }
+.mk-exit-wrap.edge-s { transform: translate(-50%, -100%); flex-direction: column-reverse; }
+.mk-exit-wrap.edge-s .mk-exit { transform: rotate(180deg); }
+.mk-exit-wrap.edge-e { transform: translate(-100%, -50%); }
+.mk-exit-wrap.edge-e .mk-exit { transform: rotate(90deg); }
+.mk-exit-wrap.edge-w { transform: translate(0, -50%); }
+.mk-exit-wrap.edge-w .mk-exit { transform: rotate(-90deg); }
+.map-where { margin: 8px 2px 4px; font-size: 15px; color: var(--ink); min-height: 1.3em; }
+.map-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13px; color: var(--ink-soft); }
+.map-legend span { display: inline-flex; align-items: center; gap: 4px; }
+.map-legend img.px { width: 18px; height: 18px; }
+.map-legend i { display: inline-block; }
+.map-legend .mk-npc, .map-legend .mk-enemy { width: 8px; height: 8px; border-radius: 50%; border: 1px solid #2b1d16; }
+.map-legend .mk-you { width: 9px; height: 9px; box-shadow: none; }
+.map-legend .mk-exit { color: var(--ink); text-shadow: none; }

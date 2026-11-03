@@ -36,6 +36,7 @@ import { SPOTS, FISH_TICKS, spotLevel } from '../data/fishing.js';
 import { COOKING } from '../data/cooking.js';
 import { TANNING, SEWING, CRAFT_GROUP } from '../data/crafting.js';
 import { ALTARS, runesPerEssence } from '../data/runecrafting.js';
+import { mapPlace } from './ui/map.js';
 
 const AUTOSAVE_TICKS = 50; // 30 seconds
 
@@ -269,6 +270,13 @@ function boot() {
       `Max hit: ${currentMaxHit()} · Combat level: ${combat.level} · ${w.name} (${reach}, ${(combat.speed * 0.6).toFixed(1)} s per attack).`, c.intro);
   };
   hud.onSkillsOpen = () => refreshSkills();
+  // Map: where you are, and the people and monsters around you right now.
+  let mapRefreshAt = 0;
+  const refreshMap = () => {
+    const here = mapPlace(area.id, state.player.x, state.player.y);
+    hud.setMapHere(here, here.id === area.id ? { npcs, enemies } : null);
+  };
+  hud.onMapOpen = () => refreshMap();
   // Inventory panel: tap for options, drag to rearrange.
   refreshInventory = () => {
     currentLook();
@@ -728,7 +736,8 @@ function boot() {
     if (e.code === 'KeyR') toggleRun();
     else if (e.code === 'Equal' || e.code === 'NumpadAdd') zoomBy(1);
     else if (e.code === 'Minus' || e.code === 'NumpadSubtract') zoomBy(-1);
-    else if (e.code === 'Escape') { if (hud.menuOpen) hud.closeMenu(); else if (hud.dialogOpen) hud.advanceDialog(); else if (hud.settingsOpen) { hud.closeSettings(); hud.closeSkills(); hud.closeInventory(); } }
+    else if (e.code === 'Escape') { if (hud.menuOpen) hud.closeMenu(); else if (hud.dialogOpen) hud.advanceDialog(); else if (hud.settingsOpen) { hud.closeSettings(); hud.closeSkills(); hud.closeInventory(); hud.closeMap(); } }
+    else if (e.code === 'KeyM' && !hud.dialogOpen) { if (hud.mapOpen) hud.closeMap(); else hud.openMap(); }
     else if ((e.code === 'KeyI' || e.code === 'KeyB') && !hud.dialogOpen) { if (hud.invOpen) hud.closeInventory(); else hud.openInventory(); }
     else if (e.code === 'KeyK' && !hud.dialogOpen) { if (hud.skillsOpen) hud.closeSkills(); else hud.openSkills('skills'); }
     else if ((e.code === 'Space' || e.code === 'Enter') && hud.dialogOpen) { e.preventDefault(); hud.advanceDialog(); }
@@ -1248,6 +1257,7 @@ function boot() {
     if (pickup) tryPickup();
     for (const npc of npcs) npc.update(dt);
     for (const e of enemies) e.update(dt);
+    if (hud.mapOpen && time >= mapRefreshAt) { mapRefreshAt = time + 0.5; refreshMap(); }
 
     view.render(player, { skilling: skillingView(), skillLungeAt, time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list, playerLook: playerLook || currentLook(), playerGear: equipment.slots,
       grave: state.grave && state.grave.area === area.id ? state.grave : null });
