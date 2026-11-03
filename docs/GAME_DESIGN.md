@@ -501,6 +501,10 @@ Each attempt tries the best fish you can catch first (its chance rises 1% a leve
 | Trout | 15 | 70 | 7 | 50 |
 | Salmon | 25 | 90 | 9 | 58 |
 
+### Skill guides (v0.24.0)
+
+Tap any skill in the skills panel to open its guide: everything the skill unlocks, in level order, with an icon, what it needs and the XP it gives. Rows you can already do are bright; locked rows are greyed with the level in red. The header shows your level and the next unlock. Guides are built from the data files (`src/skills/guide.js`), so new items, recipes, trees, rocks, fish, spells and altars appear automatically. Combat skills list the gear that needs them (Attack: weapons; Defence: armour; Ranged: bows and gear; Magic: spells and staffs); Strength and Hitpoints explain what they do.
+
 ### Gathering skills
 - **Woodcutting** — trees on routes and in forests (see above)
 - **Mining** — ore rocks in mines and caves (see above)

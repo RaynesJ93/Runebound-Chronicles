@@ -316,6 +316,29 @@ img.px { image-rendering: pixelated; image-rendering: crisp-edges; }
   background: #fff6dc; border: 3px solid var(--wood); border-radius: 6px;
 }
 .skill img.px { width: 32px; height: 32px; flex: none; }
+button.skill { width: 100%; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+button.skill:active { background: #ffe9a8; }
+@media (hover: hover) { button.skill:hover { border-color: var(--wood-dark); } }
+
+/* Skill guide: everything a skill unlocks */
+.guide-head { display: flex; align-items: center; gap: 10px; margin: 6px 0 2px; }
+.guide-head img.px { width: 32px; height: 32px; }
+.guide-title { display: flex; flex-direction: column; line-height: 1.15; }
+.guide-title b { font-size: 20px; }
+.guide-title small { font-size: 14px; color: var(--ink-soft); }
+.guide-sec { margin: 14px 0 6px; font-size: 16px; padding-bottom: 3px; border-bottom: 2px dashed rgba(122, 90, 58, 0.3); }
+.guide-row {
+  display: flex; align-items: center; gap: 8px; padding: 5px 8px; margin-bottom: 4px;
+  background: #fff6dc; border: 2px solid var(--wood); border-radius: 6px;
+}
+.guide-row img.px { width: 32px; height: 32px; flex: none; }
+.guide-lvl { min-width: 28px; font-weight: 700; font-size: 20px; text-align: center; color: #2f7a24; }
+.guide-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.guide-text b { font-size: 15px; }
+.guide-text small { font-size: 12px; color: var(--ink-soft); }
+.guide-row.locked { background: var(--parch-dark); border-color: rgba(122, 90, 58, 0.45); }
+.guide-row.locked .guide-lvl { color: #9a3a2a; }
+.guide-row.locked img.px, .guide-row.locked .guide-text { opacity: 0.6; }
 .skill-main { flex: 1; min-width: 0; }
 .skill-top { display: flex; justify-content: space-between; align-items: baseline; }
 .skill-name { font-weight: 700; font-size: 16px; }

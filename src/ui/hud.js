@@ -19,6 +19,7 @@ const DOLL = [
 ];
 const sign = (n) => (n > 0 ? `+${n}` : String(n));
 import { SKILLS, xpForLevel, MAX_LEVEL } from '../skills/skills.js';
+import { guide } from '../skills/guide.js';
 
 const fmt = (n) => Math.floor(n).toLocaleString('en-GB');
 
@@ -94,8 +95,11 @@ export class Hud {
           </div>
           <div class="panel-body">
             <div data-pane="skills">
-              <div class="skill-grid" id="skill-grid"></div>
-              <div class="skill-foot" id="skill-foot"></div>
+              <div id="skill-list">
+                <div class="skill-grid" id="skill-grid"></div>
+                <div class="skill-foot" id="skill-foot"></div>
+              </div>
+              <div class="skill-guide hidden" id="skill-guide"></div>
             </div>
             <div data-pane="combat" class="hidden">
               <p class="muted" id="style-intro"></p>
@@ -225,6 +229,9 @@ export class Hud {
       if (tab) this.showTab(tab.dataset.tab);
       const st = e.target.closest('[data-style]');
       if (st) this.onStylePick?.(st.dataset.style);
+      const sk = e.target.closest('[data-skill]');
+      if (sk) this.openGuide(sk.dataset.skill);
+      if (e.target.closest('[data-guide-back]')) this.openGuide(null);
     });
     this.el.settings.addEventListener('click', (e) => {
       if (e.target === this.el.settings || e.target.closest('[data-close]')) this.closeSettings();
@@ -442,9 +449,48 @@ export class Hud {
 
   closeSkills() {
     this.el.skills.classList.add('hidden');
+    this.openGuide(null);
+  }
+
+  // Tap a skill to see everything it unlocks; null goes back to the list.
+  openGuide(skillId) {
+    this.guideSkill = skillId;
+    this.$('skill-list').classList.toggle('hidden', !!skillId);
+    this.$('skill-guide').classList.toggle('hidden', !skillId);
+    if (skillId) {
+      this.renderGuide();
+      this.el.skills.querySelector('.panel-body').scrollTop = 0;
+    }
+  }
+
+  renderGuide() {
+    const g = this.guideSkill && guide(this.guideSkill);
+    if (!g || !this.lastBook) return;
+    const lvl = this.lastBook.level(g.id);
+    const row = (r) => {
+      const ok = lvl >= r.level;
+      return `<div class="guide-row ${ok ? '' : 'locked'}">
+        <span class="guide-lvl">${r.level}</span>
+        <img class="px" src="${itemIcon(r.icon).url}" alt="">
+        <span class="guide-text"><b>${r.name}</b>${r.sub ? `<small>${r.sub[0].toUpperCase()}${r.sub.slice(1)}</small>` : ''}</span>
+      </div>`;
+    };
+    const next = g.sections.flatMap((s) => s.rows).filter((r) => r.level > lvl).sort((a, b) => a.level - b.level)[0];
+    this.$('skill-guide').innerHTML = `
+      <div class="guide-head">
+        <button class="chip" data-guide-back>‹ Skills</button>
+        <img class="px" src="${iconUrl(g.id)}" alt="">
+        <span class="guide-title"><b>${g.name}</b><small>Level ${lvl}${next ? ` · next unlock at ${next.level}` : ''}</small></span>
+      </div>
+      <p class="muted small">${g.about}</p>
+      ${g.sections.map((s) => `
+        <h3 class="guide-sec">${s.title}</h3>
+        ${s.note ? `<p class="muted small">${s.note}</p>` : ''}
+        ${s.rows.map(row).join('')}`).join('')}`;
   }
 
   showTab(name) {
+    if (name === 'skills' && this.guideSkill) this.openGuide(null);
     for (const t of this.el.skills.querySelectorAll('[data-tab]')) t.classList.toggle('on', t.dataset.tab === name);
     for (const p of this.el.skills.querySelectorAll('[data-pane]')) p.classList.toggle('hidden', p.dataset.pane !== name);
     this.onSkillsOpen?.();
@@ -452,6 +498,8 @@ export class Hud {
 
   // book: SkillBook. Draws every skill with its level and progress to the next.
   renderSkills(book, combatLevel, boosts = {}) {
+    this.lastBook = book;
+    if (this.guideSkill) this.renderGuide();
     const grid = this.$('skill-grid');
     grid.innerHTML = SKILLS.map((sk) => {
       const xp = book.xp(sk.id);
@@ -460,14 +508,14 @@ export class Hud {
       const hi = xpForLevel(lvl + 1);
       const pct = lvl >= MAX_LEVEL ? 100 : Math.floor((100 * (xp - lo)) / (hi - lo));
       const next = lvl >= MAX_LEVEL ? 'Maxed!' : `${fmt(hi - xp)} XP to level ${lvl + 1}`;
-      return `<div class="skill" title="${sk.about} (${fmt(xp)} XP)">
+      return `<button class="skill" data-skill="${sk.id}" title="${sk.about} (${fmt(xp)} XP)" aria-label="${sk.name} level ${lvl}: see what it unlocks">
         <img class="px" src="${iconUrl(sk.id)}" alt="">
         <div class="skill-main">
           <div class="skill-top"><span class="skill-name">${sk.name}</span><span class="skill-lvl">${boosts[sk.id] ? `<b class="boost">${lvl + boosts[sk.id]}</b>/` : ''}${lvl}</span></div>
           <div class="skill-bar"><span style="width:${pct}%"></span></div>
           <div class="skill-xp">${next}</div>
         </div>
-      </div>`;
+      </button>`;
     }).join('');
     this.$('skill-foot').innerHTML = `<span>Combat level <b>${combatLevel}</b></span><span>Total level <b>${book.total()}</b></span>`;
   }
