@@ -48,36 +48,47 @@ function getLib() {
     gravestone: S.gravestone(),
     ore: { ...Object.fromEntries(['copper', 'tin', 'iron'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
       essence: [S.essenceRock(1), S.essenceRock(2)] },
-    altar: Object.fromEntries(['air', 'mind', 'water'].map((v) => [v, [S.altar(v, 0), S.altar(v, 1)]])),
-    standingStone: [S.standingStone(1), S.standingStone(2.5), S.standingStone(4)],
+    // painted ore rocks replace the drawn ones where the atlas has them
+    altar: Object.fromEntries(['air', 'mind', 'water'].map((v) => [v, art('altar:' + v) || [S.altar(v, 0), S.altar(v, 1)]])),
+    standingStone: art('standingStone') || [S.standingStone(1), S.standingStone(2.5), S.standingStone(4)],
     campChest: art('campChest')?.[0] || S.campChest(),
     ruinWall: [S.ruinWall(1), S.ruinWall(2), S.ruinWall(3), S.ruinWall(4)],
-    caveMouth: [S.caveMouth(false), S.caveMouth(true)],
+    caveMouth: art('caveMouth') || [S.caveMouth(false), S.caveMouth(true)],
     tombstone: [S.tombstone(1), S.tombstone(2), S.tombstone(3)],
-    deadTree: Array.from({ length: VARIANTS }, (_, i) => S.deadTree(i + 151)),
-    gloomTree: Array.from({ length: VARIANTS }, (_, i) => S.gloomTree(i + 161)),
-    thornBush: [S.thornBush(171), S.thornBush(172), S.thornBush(173)],
-    glowShrooms: [S.glowShrooms(181), S.glowShrooms(182), S.glowShrooms(183)],
-    glowFlowers: Array.from({ length: VARIANTS }, (_, i) => S.glowFlowers(i + 191)),
-    crystalShard: [S.crystalShard(201), S.crystalShard(202), S.crystalShard(203)],
-    deadGrass: Array.from({ length: VARIANTS }, (_, i) => S.deadGrass(i + 211)),
-    oreEmpty: [S.oreRock(null, 131), S.oreRock(null, 132)],
-    furnace: S.furnace(),
+    deadTree: art('deadTree') || Array.from({ length: VARIANTS }, (_, i) => S.deadTree(i + 151)),
+    gloomTree: art('gloomTree') || Array.from({ length: VARIANTS }, (_, i) => S.gloomTree(i + 161)),
+    thornBush: art('thornBush') || [S.thornBush(171), S.thornBush(172), S.thornBush(173)],
+    glowShrooms: art('glowShrooms') || [S.glowShrooms(181), S.glowShrooms(182), S.glowShrooms(183)],
+    glowFlowers: art('glowFlowers') || Array.from({ length: VARIANTS }, (_, i) => S.glowFlowers(i + 191)),
+    crystalShard: art('crystalShard') || [S.crystalShard(201), S.crystalShard(202), S.crystalShard(203)],
+    deadGrass: art('deadGrass') || Array.from({ length: VARIANTS }, (_, i) => S.deadGrass(i + 211)),
+    oreEmpty: art('oreEmpty') || [S.oreRock(null, 131), S.oreRock(null, 132)],
+    furnace: art('furnace')?.[0] || S.furnace(),
+    mineLamp: art('mineLamp')?.[0] || null,
     tanningRack: art('tanningRack')?.[0] || S.tanningRack(),
     fishingSpot: [S.fishingSpot(0), S.fishingSpot(1)],
     cookingPit: art('cookingPit') || [S.cookingPit(0), S.cookingPit(1)],
-    anvil: S.anvil(),
+    anvil: art('anvil')?.[0] || S.anvil(),
     rubble: [S.rubble(141), S.rubble(142), S.rubble(143)],
     treeShadow: S.shadow(15, 4),
     smallShadow: S.shadow(6, 2),
     player: S.playerFrames(),
     people: new Map(),
   };
+  for (const v of ['copper', 'tin', 'iron']) if (art('ore:' + v)) LIB.ore[v] = art('ore:' + v);
+  if (art('oreEssence')) LIB.ore.essence = art('oreEssence');
   return LIB;
 }
 
 // Walking frames for a villager, drawn the first time they're needed.
+function paintedFrames(key) {
+  const a = art('chars:' + key);
+  if (!a || a.length < 12) return null;
+  return { down: a.slice(0, 3), up: a.slice(3, 6), left: a.slice(6, 9), right: a.slice(9, 12) };
+}
+
 function framesFor(lib, look, key, kind = 'person') {
+  if (!lib.people.has(key) && paintedFrames(key)) lib.people.set(key, paintedFrames(key));
   if (!lib.people.has(key)) lib.people.set(key, kind === 'wolf' ? S.wolfFrames(look) : kind === 'chicken' ? S.chickenFrames(look) : kind === 'cow' ? S.cowFrames(look) : kind === 'golem' ? S.golemFrames(look) : S.characterFrames(look));
   return lib.people.get(key);
 }
@@ -142,7 +153,7 @@ export function createWorldView(canvasEl, area) {
       }
       case 'crop': place(lib.crop[p.ripe ? 1 : 0], f.x, f.y); break;
       case 'fence': place(fenceSprite(isFence.has(`${p.x + 1},${p.y}`), isFence.has(`${p.x},${p.y + 1}`)), f.x, f.y - 2); break;
-      case 'lamp': place(lib.lamp, f.x, f.y); break;
+      case 'lamp': place(area.id === 'mine' && lib.mineLamp ? lib.mineLamp : lib.lamp, f.x, f.y); break;
       case 'sign': place(lib.sign, f.x, f.y); break;
       case 'well': place(lib.well, f.x, f.y + 1); break;
       case 'stall': place(lib.stall, f.x, f.y); break;

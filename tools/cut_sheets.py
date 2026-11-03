@@ -25,13 +25,13 @@ def key_magenta(rgb):
     out[..., 2][fringe] = np.minimum(b[fringe], gg + 40)
     return out, alpha
 
-def cut(path, out_dir):
+def cut(path, out_dir, join=6):
     name = os.path.splitext(os.path.basename(path))[0]
     im = np.array(Image.open(path).convert('RGB'))
     rgb, alpha = key_magenta(im)
     solid = alpha > 0
     solid = ndimage.binary_opening(solid, iterations=1)  # drop specks
-    grown = ndimage.binary_dilation(solid, iterations=6)  # join loose bits of one object
+    grown = ndimage.binary_dilation(solid, iterations=join)  # join loose bits of one object
     lab, n = ndimage.label(grown)
     boxes = []
     for k, sl in enumerate(ndimage.find_objects(lab), 1):
@@ -60,4 +60,70 @@ def cut(path, out_dir):
     print(name, len(ordered))
 
 if __name__ == '__main__':
-    for p in sorted(glob.glob(os.path.join(sys.argv[1], '*.png'))): cut(p, sys.argv[2])
+    # character and creature sheets are packed tightly: join less so frames stay apart
+    TIGHT = ('07_', '11_', '12_')
+    for p in sorted(glob.glob(os.path.join(sys.argv[1], '*.png'))):
+        cut(p, sys.argv[2], 2 if os.path.basename(p).startswith(TIGHT) else 6)
+
+def clusters(vals, gap):
+    """Groups sorted numbers into runs separated by more than `gap`; returns run centres."""
+    vals = sorted(vals); out = [[vals[0]]]
+    for v in vals[1:]:
+        if v - out[-1][-1] > gap: out.append([v])
+        else: out[-1].append(v)
+    return [sum(c) / len(c) for c in out]
+
+def cut_grid(path, out_dir, cols, rows):
+    """For frame sheets: every object goes into the grid cell nearest its centre,
+    so frames that touch, or bits that came apart, still come out one per cell.
+    Saves OUT/<sheet>/<row*cols+col>.png."""
+    name = os.path.splitext(os.path.basename(path))[0]
+    im = np.array(Image.open(path).convert('RGB'))
+    rgb, alpha = key_magenta(im)
+    solid = ndimage.binary_opening(alpha > 0, iterations=1)
+    lab, n = ndimage.label(solid)
+    objs = ndimage.find_objects(lab)
+    sizes = ndimage.sum(solid, lab, range(1, n + 1))
+    big = [k for k in range(n) if sizes[k] > 300]
+    cx = [(objs[k][1].start + objs[k][1].stop) / 2 for k in big]
+    cy = [(objs[k][0].start + objs[k][0].stop) / 2 for k in big]
+    gx = clusters(cx, 30); gy = clusters(cy, 25)
+    if len(gx) != cols or len(gy) != rows:
+        # fall back to evenly spaced cells over the content
+        ys, xs = np.where(solid)
+        gx = [xs.min() + (i + 0.5) * (xs.max() - xs.min()) / cols for i in range(cols)]
+        gy = [ys.min() + (i + 0.5) * (ys.max() - ys.min()) / rows for i in range(rows)]
+        print('  (even grid)', name)
+    near = lambda g, v: min(range(len(g)), key=lambda i: abs(g[i] - v))
+    sx = (gx[-1] - gx[0]) / max(1, cols - 1); sy = (gy[-1] - gy[0]) / max(1, rows - 1)
+    owner = np.full(lab.shape, -1, np.int32)  # which cell each pixel belongs to
+    for k in range(n):
+        if sizes[k] < 6: continue
+        sl = objs[k]
+        m = lab[sl] == k + 1
+        if (sl[0].stop - sl[0].start) > 1.4 * sy or (sl[1].stop - sl[1].start) > 1.4 * sx:
+            # several frames touching: split them pixel by pixel at the cell borders
+            yy, xx = np.nonzero(m)
+            ry = np.array([near(gy, v + sl[0].start) for v in range(sl[0].stop - sl[0].start)])
+            rx = np.array([near(gx, v + sl[1].start) for v in range(sl[1].stop - sl[1].start)])
+            owner[yy + sl[0].start, xx + sl[1].start] = ry[yy] * cols + rx[xx]
+        else:
+            x = (sl[1].start + sl[1].stop) / 2; y = (sl[0].start + sl[0].stop) / 2
+            owner[sl][m] = near(gy, y) * cols + near(gx, x)
+    cell = {(int(v) // cols, int(v) % cols): v for v in np.unique(owner) if v >= 0}
+    import shutil; shutil.rmtree(f'{out_dir}/{name}', ignore_errors=True)
+    os.makedirs(f'{out_dir}/{name}', exist_ok=True)
+    rgba = np.dstack([rgb, np.zeros(im.shape[:2], np.uint8)])
+    for (r, c), v in cell.items():
+        m = owner == v
+        ys, xs = np.where(m)
+        y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
+        crop = rgba[y0:y1, x0:x1].copy(); crop[..., 3] = np.where(m[y0:y1, x0:x1], 255, 0)
+        Image.fromarray(crop).save(f'{out_dir}/{name}/{r * cols + c}.png')
+    print(name, 'grid', len(cell), 'of', cols * rows, 'missing', sorted(set(range(cols * rows)) - {r * cols + c for r, c in cell}))
+
+GRIDS = {'07_': (6, 8), '08_': (9, 4), '09_': (9, 4), '10_': (9, 4), '11_': (6, 8), '12_': (6, 8)}
+if __name__ == '__main__':
+    for p in sorted(glob.glob(os.path.join(sys.argv[1], '*.png'))):
+        g = GRIDS.get(os.path.basename(p)[:3])
+        if g: cut_grid(p, sys.argv[2], *g)

@@ -1,3 +1,4 @@
+import { art } from './art.js';
 import { Bitmap, hex, rnd } from './pixel.js';
 import { ITEMS } from '../../data/items.js';
 
@@ -598,8 +599,33 @@ function potion(b, skill, doses) {
   b.set(6, 8, hex('#ffffff'));
 }
 
+// Painted icon for an item, if the art atlas has one: the 32 px picture for
+// menus and the bag, the 16 px one for things lying on the ground. Potions
+// share one picture per kind, with a dot for each dose left.
+function paintedIcon(id) {
+  const pm = /^(attack|strength|defence)Potion(\d)$/.exec(id);
+  const key = pm ? `${pm[1]}Potion` : id;
+  const big = art('icon:' + key)?.[0], small = art('iconS:' + key)?.[0];
+  if (!big || !small) return null;
+  let bigImg = big.img;
+  if (pm) {
+    const c = document.createElement('canvas');
+    c.width = big.w; c.height = big.h;
+    const g = c.getContext('2d');
+    g.drawImage(big.img, 0, 0);
+    for (let k = 0; k < Number(pm[2]); k++) {
+      g.fillStyle = '#2b1d16'; g.fillRect(2 + k * 5, big.h - 5, 4, 4);
+      g.fillStyle = '#ffe9a8'; g.fillRect(3 + k * 5, big.h - 4, 2, 2);
+    }
+    bigImg = c;
+  }
+  return { img: small.img, url: bigImg.toDataURL('image/png') };
+}
+
 export function itemIcon(id) {
   if (cache.has(id)) return cache.get(id);
+  const painted = ITEMS[id]?.noted ? null : paintedIcon(id);
+  if (painted) { cache.set(id, painted); return painted; }
   const b = new Bitmap(16, 16);
   // Bank notes: a slip of paper with the real item drawn small on it.
   const real = ITEMS[id]?.noted;
