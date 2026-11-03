@@ -5,18 +5,19 @@
 // Tiles are (x, y) in the area's own grid. Keep labels short.
 
 // The outdoor maps, in the order of the map's tabs.
-export const MAP_AREAS = ['brambleford', 'route1', 'mine', 'vale'];
+export const MAP_AREAS = ['brambleford', 'route1', 'mine', 'depths', 'vale'];
 
 // Short names for the tabs and for "To ..." exit labels.
 export const MAP_NAME = {
   brambleford: 'Brambleford',
   route1: 'Thornwood',
   mine: 'Copperdeep Mine',
+  depths: 'Copperdeep Depths',
   vale: 'Whispering Vale',
 };
 
 // Even shorter names for the map's tabs.
-export const MAP_TAB = { brambleford: 'Brambleford', route1: 'Thornwood', mine: 'Mine', vale: 'Vale' };
+export const MAP_TAB = { brambleford: 'Brambleford', route1: 'Thornwood', mine: 'Mine', depths: 'Depths', vale: 'Vale' };
 
 // Rooms you walk into from another map. Inside them the map shows the
 // outside, with you at the door.
@@ -54,6 +55,12 @@ export const LABELS = {
     { x: 7, y: 5, text: 'Copper and tin' },
     { x: 25, y: 3, text: 'Iron' },
     { x: 12, y: 17, text: 'Furnace and anvil' },
+  ],
+  depths: [
+    { x: 8, y: 7, text: 'West coal' },
+    { x: 20, y: 1, text: 'North coal' },
+    { x: 32, y: 7, text: 'East coal' },
+    { x: 20, y: 22, text: 'Landing' },
   ],
   vale: [
     { x: 9, y: 2, text: 'Essence quarry' },

@@ -112,6 +112,13 @@ export const ITEMS = {
   bronzeBar: { name: 'Bronze bar', value: 8, examine: 'Hammer it into shape at an anvil.' },
   ironBar: { name: 'Iron bar', value: 28, examine: 'Hammer it into shape at an anvil.' },
   ironArrowtips: { name: 'Iron arrowtips', stackable: true, value: 2, examine: 'Fix these onto headless arrows. Needs Fletching 15.' },
+  coal: { name: 'Coal', value: 45, examine: 'A lump of coal. Smelt it with iron ore to make steel.' },
+  steelBar: { name: 'Steel bar', value: 60, examine: 'Hammer it into shape at an anvil. Tougher than iron.' },
+  steelArrowtips: { name: 'Steel arrowtips', stackable: true, value: 4, examine: 'Fix these onto headless arrows. Needs Fletching 30.' },
+  steelArrow: {
+    name: 'Steel arrow', stackable: true, value: 6, examine: 'Arrows with steel heads. They hit harder than iron.',
+    equip: { slot: 'ammo', req: {}, rangedStr: 16, ammo: 'arrow' },
+  },
   ironArrow: {
     name: 'Iron arrow', stackable: true, value: 3, examine: 'Arrows with iron heads. They hit harder than bronze.',
     equip: { slot: 'ammo', req: {}, rangedStr: 10, ammo: 'arrow' },
@@ -275,6 +282,66 @@ export const ITEMS = {
     name: 'Iron battleaxe', value: 182, examine: 'A heavy double-headed iron axe.',
     equip: { slot: 'weapon', req: { attack: 5 }, type: 'slash', speed: 6, att: { stab: -2, slash: 11, crush: 8 }, def: { slash: 1 }, str: 14, look: { weapon: 'iron', blade: 6 } },
   },
+  steelDagger: {
+    name: 'Steel dagger', value: 125, examine: 'A sturdy steel dagger.',
+    equip: { slot: 'weapon', req: { attack: 10 }, type: 'stab', speed: 4, att: { stab: 9, slash: 4, crush: -4, magic: 1 }, def: { magic: 1 }, str: 7, look: { weapon: 'steel', blade: 4 } },
+  },
+  steelAxe: {
+    name: 'Steel axe', value: 200, tool: { woodcutting: 10 }, examine: 'A steel axe. Chops faster still. Needs Woodcutting 10.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 5, att: { stab: -2, slash: 9, crush: 4 }, str: 7, look: { weapon: 'steel', blade: 5 } },
+  },
+  steelPickaxe: {
+    name: 'Steel pickaxe', value: 200, tool: { mining: 10 }, examine: 'A steel pickaxe. Mines faster still. Needs Mining 10.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'stab', speed: 5, att: { stab: 9, slash: -2, crush: 4 }, str: 7, look: { weapon: 'steel', blade: 5 } },
+  },
+  steelMace: {
+    name: 'Steel mace', value: 225, examine: 'A flanged steel mace. Good against armour.',
+    equip: { slot: 'weapon', req: { attack: 10 }, type: 'crush', speed: 4, att: { stab: 4, slash: -2, crush: 13 }, def: { crush: 1 }, str: 10, look: { weapon: 'steel', blade: 5 } },
+  },
+  steelMedHelm: {
+    name: 'Steel med helm', value: 300, examine: 'A medium-sized steel helmet.',
+    equip: { slot: 'head', req: { defence: 10 }, att: { magic: -1 }, def: { stab: 6, slash: 7, crush: 4, magic: -1, ranged: 6 }, look: { hat: 'helmet', hatColor: '#aab2ba' } },
+  },
+  steelSword: {
+    name: 'Steel sword', value: 325, examine: 'A well-made steel sword.',
+    equip: { slot: 'weapon', req: { attack: 10 }, type: 'slash', speed: 4, att: { stab: 9, slash: 12, crush: -2 }, def: { slash: 3, stab: 1 }, str: 10, look: { weapon: 'steel', blade: 7 } },
+  },
+  steelScimitar: {
+    name: 'Steel scimitar', value: 400, examine: 'A curved steel sword. Fast and slashing.',
+    equip: { slot: 'weapon', req: { attack: 10 }, type: 'slash', speed: 4, att: { stab: 3, slash: 15, crush: -2 }, def: { slash: 1 }, str: 13, look: { weapon: 'steel', blade: 7 } },
+  },
+  steelLongsword: {
+    name: 'Steel longsword', value: 500, examine: 'A long steel blade. Slower, but hits harder.',
+    equip: { slot: 'weapon', req: { attack: 10 }, type: 'slash', speed: 5, att: { stab: 9, slash: 16, crush: -2 }, def: { stab: 1, slash: 4 }, str: 16, look: { weapon: 'steel', blade: 9 } },
+  },
+  steelFullHelm: {
+    name: 'Steel full helm', value: 550, examine: 'A full-face steel helmet.',
+    equip: { slot: 'head', req: { defence: 10 }, att: { magic: -3, ranged: -1 }, def: { stab: 9, slash: 10, crush: 7, ranged: 9, magic: -1 }, look: { hat: 'helmet', hatColor: '#aab2ba' } },
+  },
+  steelSqShield: {
+    name: 'Steel sq shield', value: 600, examine: 'A square steel shield.',
+    equip: { slot: 'shield', req: { defence: 10 }, att: { magic: -1 }, def: { stab: 12, slash: 13, crush: 10, ranged: 12, magic: -1 }, look: { shield: 'steel' } },
+  },
+  steelBattleaxe: {
+    name: 'Steel battleaxe', value: 650, examine: 'A heavy double-headed steel axe.',
+    equip: { slot: 'weapon', req: { attack: 10 }, type: 'slash', speed: 6, att: { stab: -2, slash: 16, crush: 12 }, def: { slash: 1 }, str: 20, look: { weapon: 'steel', blade: 6 } },
+  },
+  steelChainbody: {
+    name: 'Steel chainbody', value: 750, examine: 'A shirt of steel rings.',
+    equip: { slot: 'body', req: { defence: 10 }, att: { magic: -4 }, def: { stab: 16, slash: 23, crush: 26, ranged: 19, magic: -1 }, look: { tunic: '#9aa2aa' } },
+  },
+  steelKiteshield: {
+    name: 'Steel kiteshield', value: 850, examine: 'A large steel shield, pointed at the bottom.',
+    equip: { slot: 'shield', req: { defence: 10 }, att: { magic: -8, ranged: -2 }, def: { stab: 13, slash: 16, crush: 15, ranged: 15, magic: -1 }, look: { shield: 'steel' } },
+  },
+  steelPlatelegs: {
+    name: 'Steel platelegs', value: 1000, examine: 'Leg armour of steel plates.',
+    equip: { slot: 'legs', req: { defence: 10 }, att: { magic: -10, ranged: -4 }, def: { stab: 16, slash: 15, crush: 13, ranged: 15, magic: -4 }, look: { pants: '#9aa2aa' } },
+  },
+  steelPlatebody: {
+    name: 'Steel platebody', value: 2000, examine: 'Solid steel plates. Heavy, but very tough.',
+    equip: { slot: 'body', req: { defence: 10 }, att: { magic: -15, ranged: -7 }, def: { stab: 30, slash: 29, crush: 17, ranged: 29, magic: -6 }, look: { tunic: '#9aa2aa' } },
+  },
   goblinMail: {
     name: 'Goblin mail', value: 5, examine: 'Armour made to fit a goblin. It might fit you if you squeeze.',
     equip: { slot: 'body', req: { defence: 1 }, def: { stab: 2, slash: 2, crush: 2, ranged: 1 }, look: { tunic: '#6f7a52' } },
@@ -305,7 +372,7 @@ for (const [skill, name, value] of [['attack', 'Attack', 60], ['strength', 'Stre
 // - coins: no limit
 // - weapons, armour, tools and potions: 1 (they don't stack)
 // The bank stacks everything without limit.
-const STACK_20 = /^(logs|oakLogs|copperOre|tinOre|ironOre|bronzeBar|ironBar|runeEssence|cowhide|wolfPelt|leather|hardLeather|raw[A-Z]\w*|burnt[A-Z]\w*)$/;
+const STACK_20 = /^(logs|oakLogs|copperOre|tinOre|ironOre|coal|bronzeBar|ironBar|steelBar|runeEssence|cowhide|wolfPelt|leather|hardLeather|raw[A-Z]\w*|burnt[A-Z]\w*)$/;
 for (const [id, it] of Object.entries(ITEMS)) {
   if (STACK_20.test(id) || it.food) { it.stackable = true; it.stack = 20; }
   else if (it.stackable) it.stack = id === 'coins' ? Infinity : 999;

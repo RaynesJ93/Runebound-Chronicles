@@ -402,7 +402,7 @@ function palette(look) {
     pants, pantsS: shade(pants, 0.78),
     boots: hex(L.boots), eye: hex(L.eyes || '#2b1d16'),
     ears: !!L.ears,
-    weapon: L.weapon ? (L.weapon === 'iron' ? [hex('#7a828b'), hex('#c0c8d0'), hex('#eef2f5')] : [hex('#a8692e'), hex('#d4934f'), hex('#f2c48a')]) : null,
+    weapon: L.weapon ? (L.weapon === 'iron' ? [hex('#7a828b'), hex('#c0c8d0'), hex('#eef2f5')] : L.weapon === 'steel' ? [hex('#959ea6'), hex('#d4dade'), hex('#ffffff')] : [hex('#a8692e'), hex('#d4934f'), hex('#f2c48a')]) : null,
     blade: L.blade || 4,
     weaponKind: L.weaponKind || (L.weapon ? 'blade' : null),
     shield: L.shield || null,
@@ -776,6 +776,7 @@ const SHIELD_COLOUR = {
   wood: ['#5e3b1f', '#9a6234', '#a8a39a'],
   bronze: ['#6e4320', '#c07a38', '#f2c48a'],
   iron: ['#4a4f56', '#9aa2aa', '#e2e8ec'],
+  steel: ['#5e666e', '#c4ccd2', '#ffffff'],
 };
 export function shieldOn(b, x, y, kind = 'wood') {
   const [rim, face, boss] = (SHIELD_COLOUR[kind] || SHIELD_COLOUR.wood).map(hex);
@@ -795,6 +796,7 @@ const ORE_COLOUR = {
   copper: [hex('#b8642a'), hex('#e08a44'), hex('#ffc07a')],
   tin: [hex('#9aa0a4'), hex('#c8ced2'), hex('#f2f6f8')],
   iron: [hex('#6e3a26'), hex('#9a5236'), hex('#c87a56')],
+  coal: [hex('#141216'), hex('#2a2830'), hex('#6a6878')],
 };
 
 // A rock with veins of ore. With no `variant` it's a mined-out rock.
