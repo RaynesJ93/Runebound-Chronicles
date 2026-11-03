@@ -234,6 +234,7 @@ Enemy names show their combat level, coloured green (weaker), yellow (similar) o
 
 | Enemy | Level | HP | Behaviour | Where |
 | --- | --- | --- | --- | --- |
+| Essence golem | 12 | 24 | Passive; six spread thinly across Whispering Vale; 4–12 noted rune essence every kill, air runes (8–20) 1/2, mind runes (5–15) 1/3, water runes (4–12) 1/3, rolled separately | Whispering Vale |
 | Cow | 2 | 8 | Passive, stays in its field; bones and cowhide every kill, raw beef 1/2 | Cow field, Brambleford |
 | Chicken | 1 | 3 | Passive, stays in its pen; bones every kill, raw chicken 1/2 and 5–15 feathers 1/2, rolled separately | Wyn's chicken pen, Brambleford |
 | Goblin | 2 | 5 | Passive, roams in groups of 3–5 | Village outskirts, Route 1 |
@@ -308,6 +309,8 @@ Ranged gear follows the same idea (leather → hide armour, shortbow → oak →
   - Antipoison: cures poison and gives immunity for a while (poison arrives with later enemies)
 
 ### Bank
+
+- **Bank notes:** some drops come as notes (e.g. noted rune essence from essence golems). A stack of notes takes one bag slot and can't be used directly; putting notes in a bank (or the vale's supply chest) turns them back into the real item, which you then withdraw as normal.
 
 - Found in every town. Opened by talking to the banker or clicking the bank booth.
 - Hundreds of slots, every item stacks in the bank.
@@ -407,7 +410,7 @@ New gear: iron sword, iron med helm, bronze and iron sq shields, bronze and iron
 
 ### Runecrafting and Whispering Vale (shipped in v0.16.0)
 
-**Whispering Vale** (72 × 60 tiles) lies east of Thornwood: follow the trail past the oak grove on Route 1 to the map's east edge. It's quiet, with no monsters:
+**Whispering Vale** (72 × 60 tiles) lies east of Thornwood: follow the trail past the oak grove on Route 1 to the map's east edge. It's quiet: six essence golems wander its meadows, but they never attack first.
 - **Essence quarry** (north-west): a rocky pit of essence crystals. Mine them with any pickaxe for rune essence (Mining 1, 5 XP, 60% a swing); they never run dry.
 - **Runekeeper's camp** (middle): Aldric the Runekeeper, a tent, a cooking fire, and the runekeepers' **supply chest**, an iron-banded camp trunk that opens your bank.
 - **Air altar** (north-east): a pale pedestal on a windswept stone dais, with a great swirl of wind above it.

@@ -7,13 +7,29 @@
 // wander: how far it strolls from its spawn when idle
 // leash: how far from spawn it will chase before giving up and walking home
 // respawn: ticks after death before it comes back
-// sprite: 'wolf' draws a four-legged animal, 'chicken' a hen, 'cow' a cow, instead of a person
+// sprite: 'wolf' draws a four-legged animal, 'chicken' a hen, 'cow' a cow, 'golem' an essence golem, instead of a person
 // loot: always   -> dropped every kill
 //       main     -> one roll; each entry has a chance (e.g. 1/16); otherwise nothing
 //       each     -> every entry rolls separately (so you can get several, or none)
 //       rare     -> a separate roll at `chance`; hits drop with a light beam
 
 export const ENEMIES = {
+  essenceGolem: {
+    id: 'essenceGolem', name: 'Essence golem', level: 12, hp: 24, sprite: 'golem',
+    attack: 8, strength: 8, defence: 10,
+    attackBonus: 0, strengthBonus: 0, defenceBonus: 10, maxHit: 3,
+    speed: 6, attackType: 'crush', aggressive: false, wander: 4, leash: 7, respawn: 60,
+    look: {},
+    examine: 'Living stone, held together by rune essence. It hums as it walks.',
+    loot: {
+      always: [{ item: 'runeEssenceNoted', min: 4, max: 12 }],
+      each: [
+        { item: 'airRune', min: 8, max: 20, chance: 1 / 2 },
+        { item: 'mindRune', min: 5, max: 15, chance: 1 / 3 },
+        { item: 'waterRune', min: 4, max: 12, chance: 1 / 3 },
+      ],
+    },
+  },
   cow: {
     id: 'cow', name: 'Cow', level: 2, hp: 8, sprite: 'cow',
     attack: 1, strength: 1, defence: 1,

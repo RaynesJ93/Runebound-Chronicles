@@ -142,6 +142,8 @@ export const ITEMS = {
   },
   // ---- Runecrafting ----------------------------------------------------------------
   runeEssence: { name: 'Rune essence', value: 4, examine: 'Pure magical essence. Take it to an altar to bind it into runes.' },
+  runeEssenceNoted: { name: 'Rune essence (noted)', stackable: true, noted: 'runeEssence', value: 4,
+    examine: 'A bank note for rune essence. Put it in a bank (or the supply chest) to turn it back into essence.' },
   // ---- Crafting --------------------------------------------------------------------
   leather: { name: 'Leather', value: 15, examine: 'Soft tanned leather. Sew it with a needle and thread.' },
   hardLeather: { name: 'Hard leather', value: 30, examine: 'Stiff, tough leather. Good for armour.' },

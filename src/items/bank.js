@@ -1,5 +1,6 @@
 // The bank: unlimited space, and every item stacks. Saved in state.bank as
-// [{ id, qty }] in the order you put things in.
+// [{ id, qty }] in the order you put things in. Bank notes (items with
+// `noted: <id>`) turn back into the real item when they go in.
 
 import { ITEMS } from '../../data/items.js';
 
@@ -8,6 +9,8 @@ export class Bank {
     this.state = state;
     if (!Array.isArray(state.bank)) state.bank = [];
     state.bank = state.bank.filter((s) => s && ITEMS[s.id] && s.qty > 0);
+    // older banks could never hold notes, but just in case: un-note them
+    for (const s of state.bank.filter((x) => ITEMS[x.id].noted)) { state.bank.splice(state.bank.indexOf(s), 1); this.put(s.id, s.qty); }
   }
 
   get items() { return this.state.bank; }
@@ -16,6 +19,7 @@ export class Bank {
 
   put(id, qty) {
     if (qty <= 0) return;
+    id = ITEMS[id]?.noted || id; // notes become the real thing
     const s = this.items.find((x) => x.id === id);
     if (s) s.qty += qty;
     else this.items.push({ id, qty });
