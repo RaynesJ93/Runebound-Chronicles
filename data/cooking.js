@@ -11,6 +11,7 @@ const cook = (raw, cooked, burnt, name, level, xp, stopBurn) => ({
 export const COOKING = [
   cook('rawShrimps', 'shrimps', 'burntFish', 'Shrimps', 1, 30, 34),
   cook('rawChicken', 'cookedChicken', 'burntChicken', 'Chicken', 1, 30, 34),
+  cook('rawBeef', 'cookedMeat', 'burntMeat', 'Beef', 1, 30, 34),
   cook('rawAnchovies', 'anchovies', 'burntFish', 'Anchovies', 1, 30, 34),
   cook('rawSardine', 'sardine', 'burntFish', 'Sardine', 1, 40, 38),
   cook('rawHerring', 'herring', 'burntFish', 'Herring', 5, 50, 41),

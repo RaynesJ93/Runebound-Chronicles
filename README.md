@@ -19,8 +19,9 @@ There are no turn-based battles, no battle screens and no creature catching. You
 - **iPhone:** tap to walk, or use the on-screen joystick. Pinch to zoom. For full-screen play, open the link in Safari, tap Share, then **Add to Home Screen**.
 - Tap or click people to talk to them, and signs, doors and other objects to look at them. Number keys pick answers on desktop.
 - **Long-press** (iPhone) or **right-click** (desktop) anything — monsters, people, loot, doors, your items — for all its options: attack, talk, examine, take, walk here, drop.
+- Brambleford's **east end** has an orchard to chop and a **cow field** down the south road (cows drop cowhide and raw beef), plus a river with more fishing spots.
 - South of the lower lane is **Wyn's chicken pen**: an easy first fight. Chickens always drop bones, and sometimes raw chicken and feathers.
-- Head north out of the village to reach Route 1 — Thornwood Forest.
+- Head north out of the village to reach Route 1 — Thornwood Forest, with a lake and hunter's camp, Bram's cabin, an oak grove, the goblin camp, the wolf den and ridge, and Copperdeep Mine at the top.
 - Open **Skills** (sword button, or K) to see your levels. The **Combat** tab chooses your attack style: Accurate trains Attack, Aggressive trains Strength, Defensive trains Defence, Controlled trains all three.
 - Tap or click a goblin to attack it. Your character walks up and fights automatically. Tap the ground or move to stop. Beware the Goblin Brute by the tents: it attacks on sight.
 - Tap loot on the ground to walk over and pick it up (a pile gives you a choice). Open your **Inventory** (bag button, or I) and tap an item to examine or drop it; drag items to rearrange them. Tap a weapon or armour piece and choose **Wield** or **Wear**; the **Equipment** tab shows what you're wearing and your total bonuses.

@@ -1,3 +1,3 @@
 // Shown in Settings. Bump with every batch.
-export const GAME_VERSION = '0.13.1';
-export const BUILD_NAME = 'Phase 2.3 — Fishing and Cooking';
+export const GAME_VERSION = '0.14.0';
+export const BUILD_NAME = 'Bigger Brambleford and Route 1';
