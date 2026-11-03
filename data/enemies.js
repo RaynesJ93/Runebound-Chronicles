@@ -152,4 +152,25 @@ export const ENEMIES = {
       rare: { chance: 1 / 32, table: [{ item: 'wolfCloak', qty: 1 }] },
     },
   },
+  caveBeast: {
+    id: 'caveBeast', name: 'Cave beast', level: 20, hp: 30, sprite: 'wolf',
+    attack: 16, strength: 16, defence: 14,
+    attackBonus: 5, strengthBonus: 5, defenceBonus: 10, maxHit: 4,
+    speed: 5, attackType: 'crush', aggressive: true, aggroRange: 2, wander: 3, leash: 7, respawn: 40,
+    look: { fur: '#5e3b2e', dark: '#3a2418', light: '#a8786a', eyes: '#ffcf3a', big: true },
+    examine: 'A huge, shaggy beast that lives in the dark. It does not like visitors.',
+    loot: {
+      always: [{ item: 'bones', qty: 1 }],
+      main: [
+        { item: 'coins', min: 20, max: 80, chance: 1 / 3 },
+        { item: 'coal', min: 1, max: 3, chance: 1 / 4 },
+        { item: 'ironOre', min: 1, max: 2, chance: 1 / 6 },
+        { item: 'steelBar', qty: 1, chance: 1 / 12 },
+        { item: 'steelArrowtips', min: 5, max: 15, chance: 1 / 16 },
+        { item: 'steelMedHelm', qty: 1, chance: 1 / 40 },
+        { item: 'steelMace', qty: 1, chance: 1 / 48 },
+      ],
+      rare: { chance: 1 / 128, table: [{ item: 'warCharm', qty: 1 }] },
+    },
+  },
 };

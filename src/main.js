@@ -1107,7 +1107,7 @@ function boot() {
       return;
     }
     if (!inventory.count('hammer')) { hud.message('You need a hammer to work the metal. Dorrin or Pell can help.'); return; }
-    const bars = ['bronzeBar', 'ironBar'].filter((id) => inventory.count(id));
+    const bars = [...new Set(SMITHING.map((r) => r.bar))].filter((id) => inventory.count(id));
     if (!bars.length) { hud.message('You need some metal bars. Smelt ore at the furnace first.'); return; }
     const list = (bar) => {
       const rs = SMITHING.filter((r) => r.bar === bar);
@@ -1203,7 +1203,7 @@ function boot() {
   });
 
   // What the renderer needs to animate the skill you're doing.
-  const METAL_OF = { bronzeAxe: 'bronze', ironAxe: 'iron', bronzePickaxe: 'bronze', ironPickaxe: 'iron' };
+  const METAL_OF = { bronzeAxe: 'bronze', ironAxe: 'iron', steelAxe: 'steel', bronzePickaxe: 'bronze', ironPickaxe: 'iron', steelPickaxe: 'steel' };
   const skillingView = () => {
     const a = activity;
     if (!a) return null;
@@ -1218,7 +1218,7 @@ function boot() {
     const t = a.station?.tiles[0] || null;
     const anim = r.station === 'fire' ? 'cook' : r.station === 'furnace' ? 'smelt' : r.station === 'anvil' ? 'smith'
       : r.station === 'tan' ? 'tan' : r.skill === 'crafting' ? 'sew' : 'fletch';
-    return { anim, skill: r.skill || 'fletching', target: t, since: a.since, metal: r.bar === 'ironBar' ? 'iron' : 'bronze' };
+    return { anim, skill: r.skill || 'fletching', target: t, since: a.since, metal: r.bar ? r.bar.replace('Bar', '') : 'bronze' };
   };
 
   // ---- Frame loop -------------------------------------------------------------

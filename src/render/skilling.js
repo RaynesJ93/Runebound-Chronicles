@@ -13,6 +13,7 @@ import { iconUrl } from './icons.js';
 const METAL = {
   bronze: ['#6e4320', '#a8692e', '#d4934f', '#f2c48a'],
   iron: ['#4a4f56', '#7a828b', '#a8b0b8', '#dfe5ea'],
+  steel: ['#5e666e', '#959ea6', '#c4ccd2', '#f2f6f8'],
 };
 const WOOD = ['#4a2c16', '#7a4a26', '#a0703f'];
 
@@ -100,7 +101,7 @@ function paintedTool(ctx, key, hx, hy, angle) {
 }
 
 function drawAxe(ctx, hx, hy, angle, metal) {
-  if (paintedTool(ctx, metal === 'iron' ? 'ironAxe' : 'bronzeAxe', hx, hy, angle)) return;
+  if ((paintedTool(ctx, `${metal}Axe`, hx, hy, angle) || paintedTool(ctx, 'bronzeAxe', hx, hy, angle))) return;
   const [d, m, l, h] = METAL[metal] || METAL.bronze;
   const cx = Math.cos(angle), cy = Math.sin(angle);
   const ex = hx + cx * TOOL, ey = hy + cy * TOOL;
@@ -117,7 +118,7 @@ function drawAxe(ctx, hx, hy, angle, metal) {
 }
 
 function drawPickaxe(ctx, hx, hy, angle, metal) {
-  if (paintedTool(ctx, metal === 'iron' ? 'ironPickaxe' : 'bronzePickaxe', hx, hy, angle)) return;
+  if ((paintedTool(ctx, `${metal}Pickaxe`, hx, hy, angle) || paintedTool(ctx, 'bronzePickaxe', hx, hy, angle))) return;
   const [d, m, l, h] = METAL[metal] || METAL.bronze;
   const cx = Math.cos(angle), cy = Math.sin(angle);
   const ex = hx + cx * TOOL, ey = hy + cy * TOOL;

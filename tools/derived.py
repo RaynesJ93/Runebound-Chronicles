@@ -61,6 +61,46 @@ def metal_of(ref_key):
     return fn
 
 
+def steel(im, get=None):
+    """Iron -> steel: the grey metal gets lighter and cleaner. Wood, leather
+    and anything else with real colour is left alone."""
+    rgba = np.array(im.convert('RGBA'))
+    hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.float32)
+    h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
+    metal = (rgba[..., 3] > 0) & ((s < 70) | ((h > 120) & (h < 190) & (s < 110)))
+    v2 = np.where(metal, np.clip(v * 1.16 + 14, 0, 255), v)
+    s2 = np.where(metal, s * 0.55, s)
+    out = np.array(Image.fromarray(np.stack([h, s2, v2], -1).astype(np.uint8), 'HSV').convert('RGBA'))
+    out[..., 3] = rgba[..., 3]
+    return Image.fromarray(out, 'RGBA')
+
+
+def coal(im, get=None):
+    """Copper's orange veins -> seams of glossy black coal; the grey rock stays."""
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.float32)
+    h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
+    vein = (rgba[..., 3] > 0) & (s > 90) & ((h < 34) | (h > 235))
+    l = v / 255
+    shade = np.stack([12 + 90 * l ** 2.6, 11 + 88 * l ** 2.6, 16 + 104 * l ** 2.6], -1)
+    out = rgba.copy()
+    out[vein, :3] = shade[vein]
+    return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
+def coal_lump(im, get=None):
+    """Any ore lump -> a lump of coal: black all over, with a cool glossy sheen."""
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    l = lum(rgba[..., :3]) / 255
+    m = rgba[..., 3] > 0
+    lo, hi = np.percentile(l[m], 5), np.percentile(l[m], 98)
+    t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+    shade = np.stack([14 + 96 * t ** 2.4, 13 + 94 * t ** 2.4, 18 + 112 * t ** 2.4], -1)
+    out = rgba.copy()
+    out[m, :3] = shade[m]
+    return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
 # ---- Reshapes (icons lie diagonally: grip bottom-left, tip top-right) -------------
 
 def _axis(w, h):
@@ -216,6 +256,21 @@ for metal in ('bronze', 'iron'):
         f'{metal}Battleaxe': dict(icon=(f'{metal}Axe', battleaxe), gear=(f'{metal}Axe', same)),
         f'{metal}Mace': dict(icon=(f'{metal}Pickaxe', mace_of(f'icon:{metal}MedHelm')), gear=(f'{metal}Axe', same)),
     })
+# Steel: every iron item, recoloured (made after the iron ones above, so the
+# new iron pieces are included).
+STEEL = ['Dagger', 'Axe', 'Pickaxe', 'Mace', 'MedHelm', 'Sword', 'Scimitar', 'Longsword', 'FullHelm', 'SqShield',
+         'Battleaxe', 'Chainbody', 'Kiteshield', 'Platelegs', 'Platebody', 'Arrowtips', 'Arrow', 'Bar']
+for part in STEEL:
+    DERIVED[f'steel{part}'] = dict(icon=(f'iron{part}', steel), small=(f'iron{part}', steel), gear=(f'iron{part}', steel))
+DERIVED['coal'] = dict(icon=('ironOre', coal_lump), small=('ironOre', coal_lump))
+
+# Other sprites: new key <- source key, every frame.
+EXTRA = [
+    ('ore:coal', 'ore:copper', coal),
+    ('tool:steelAxe', 'tool:ironAxe', steel),
+    ('tool:steelPickaxe', 'tool:ironPickaxe', steel),
+]
+
 # Side-on shields stay as they are (a kite shape only reads from the front or back).
 SIDE_SAME = {'kite'}
 
@@ -232,31 +287,41 @@ def _small_from(icon, src_small):
     return box
 
 
-def derive(get):
+def derive(get0):
     """get(name) -> list of (k, image, ax, ay) for an existing sprite, or [].
-    Returns new (name, k, image, ax, ay) tiles."""
+    Returns new (name, k, image, ax, ay) tiles. Later items can be made from
+    earlier derived ones (steel from the derived iron pieces)."""
     out = []
+    made = {}
+    def get(name):
+        return get0(name) or made.get(name, [])
+    def emit(t):
+        out.append(t)
+        made.setdefault(t[0], []).append((t[1], t[2], t[3], t[4]))
     for new, spec in DERIVED.items():
         src, fn = spec['icon']
         icons = get(f'icon:{src}')
         if not icons: continue
         k, im, ax, ay = icons[0]
         icon = fn(im, get)
-        out.append((f'icon:{new}', 0, icon, ax, ay))
+        emit((f'icon:{new}', 0, icon, ax, ay))
         if spec.get('small'):
             s2, f2 = spec['small']
             for k, im, ax, ay in get(f'iconS:{s2}'):
-                out.append((f'iconS:{new}', k, f2(im, get), ax, ay))
+                emit((f'iconS:{new}', k, f2(im, get), ax, ay))
         else:
             srcS = get(f'iconS:{src}')
             ax, ay = (srcS[0][2], srcS[0][3]) if srcS else (8, 13)
-            out.append((f'iconS:{new}', 0, _small_from(icon, srcS[0][1] if srcS else None), ax, ay))
+            emit((f'iconS:{new}', 0, _small_from(icon, srcS[0][1] if srcS else None), ax, ay))
         if spec.get('gear'):
             gs, gf = spec['gear']
             for d in DIRS:
                 f = same if (d in ('left', 'right') and gf is kite) else gf
                 for k, im, ax, ay in get(f'gear:{gs}:{d}'):
-                    out.append((f'gear:{new}:{d}', k, f(im, get), ax, ay))
+                    emit((f'gear:{new}:{d}', k, f(im, get), ax, ay))
+    for new, src, fn in EXTRA:
+        for k, im, ax, ay in get(src):
+            emit((new, k, fn(im, get), ax, ay))
     return out
 
 
@@ -268,15 +333,7 @@ def patch():
     def get(name):
         return [(k, atlas.crop((x, y, x + w, y + h)), ax, ay) for k, (x, y, w, h, ax, ay) in enumerate(meta.get(name, []))]
 
-    # Derived items can build on each other (platebody from hard leather), so
-    # look up earlier derived tiles too.
-    made = {}
-    def get2(name):
-        return get(name) or made.get(name, [])
-    tiles = []
-    for t in derive(get2):
-        made.setdefault(t[0], []).append((t[1], t[2], t[3], t[4]))
-        if t[0] not in meta: tiles.append(t)
+    tiles = [t for t in derive(get) if t[0] not in meta]
     if not tiles:
         print('nothing to add'); return
     # pack below the existing atlas, tallest first, same row packing as build_art.py

@@ -432,7 +432,29 @@ Dorrin gives you a bronze pickaxe and a hammer when you ask him to teach you; Pe
 
 Plate armour costs a lot of magic and some ranged attack. The new pieces' painted art is made from existing art in `tools/derived.py` (platebody and platelegs from the leather body and chaps in metal colours, the kiteshield and full helm reshaped from the sq shield and med helm, the scimitar and longsword from the sword, the battleaxe from the axe, the mace from the pickaxe's haft and a helm), until they get sheets of their own. The mace, scimitar, longsword and battleaxe use the sword and axe sprites in your hand. Long menus (like the anvil's) now scroll.
 
-**Planned next** (in order): coal and steel with a lower level of Copperdeep Mine, then silver and gold (with gems), then mithril.
+**Copperdeep Depths, coal and steel (v0.27.0).** A tunnel at the back of the iron gallery leads down to **Copperdeep Depths**, a deeper cave with coal rocks, more iron, and **cave beasts** (level 20, hard-hitting, attack if you get close). A tunnel leads back up.
+
+| Rock | Level | XP | Base chance | Refills in |
+| --- | --- | --- | --- | --- |
+| Coal | 30 | 50 | 25% | 12–21 s |
+
+**Steel bars** (furnace, Smithing 30): 1 iron ore + 1 coal, 17.5 XP, never fail. **Steel items** (anvil, 37.5 XP a bar; steel gear needs Attack or Defence 10):
+
+| Item | Level | Bars | | Item | Level | Bars |
+| --- | --- | --- | --- | --- | --- | --- |
+| Dagger | 30 | 1 | | Full helm | 37 | 2 |
+| Axe | 31 | 1 | | Sq shield | 38 | 2 |
+| Mace | 32 | 1 | | Battleaxe | 40 | 3 |
+| Pickaxe | 32 | 1 | | Chainbody | 41 | 3 |
+| Med helm | 33 | 1 | | Kiteshield | 42 | 3 |
+| Sword | 34 | 1 | | Platelegs | 46 | 3 |
+| 15 arrowtips | 35 | 1 | | Platebody | 48 | 5 |
+| Scimitar | 35 | 2 | | | | |
+| Longsword | 36 | 2 | | | | |
+
+The **steel pickaxe** (Mining 10) and **steel axe** (Woodcutting 10) work 20% faster than bronze; Pell stocks a couple of each. **Steel arrows** (Fletching 30, ranged strength 16) are made from steel arrowtips like the others. Cave beasts drop coal, iron ore, steel bars and the odd piece of steel gear. Coal and steel art is recoloured from the existing art (`tools/derived.py`: steel from iron, coal rocks from copper rocks); cave beasts use their painted sheet.
+
+**Planned next** (in order): silver and gold (with gems), then mithril.
 
 New gear: iron sword, iron med helm, bronze and iron sq shields, bronze and iron chainbodies (iron needs Attack/Defence 5), and iron arrows (ranged strength 10; Fletching 15 from iron arrowtips). Shields show their metal on your character.
 

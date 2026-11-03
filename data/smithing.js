@@ -9,6 +9,8 @@ export const SMELTING = [
   { id: 'bronzeBar', name: 'Bronze bar', level: 1, xp: 6.2, uses: { copperOre: 1, tinOre: 1 }, gives: { bronzeBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
   { id: 'ironBar', name: 'Iron bar', level: 15, xp: 12.5, uses: { ironOre: 1 }, gives: { ironBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace',
     success: (lvl) => Math.min(0.8, 0.5 + (lvl - 15) * 0.01), fail: 'The iron is too impure, and crumbles away.' },
+  // Coal burns the impurities out, so steel never fails.
+  { id: 'steelBar', name: 'Steel bar', level: 30, xp: 17.5, uses: { ironOre: 1, coal: 1 }, gives: { steelBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
 ];
 
 const anvil = (bar, list) => list.map(([item, name, level, bars, xp, qty = 1]) => ({
@@ -51,5 +53,23 @@ export const SMITHING = [
     ['ironKiteshield', 'Iron kiteshield', 27, 3, 75],
     ['ironPlatelegs', 'Iron platelegs', 31, 3, 75],
     ['ironPlatebody', 'Iron platebody', 33, 5, 125],
+  ]),
+  ...anvil('steelBar', [
+    ['steelDagger', 'Steel dagger', 30, 1, 37.5],
+    ['steelAxe', 'Steel axe', 31, 1, 37.5],
+    ['steelMace', 'Steel mace', 32, 1, 37.5],
+    ['steelPickaxe', 'Steel pickaxe', 32, 1, 37.5],
+    ['steelMedHelm', 'Steel med helm', 33, 1, 37.5],
+    ['steelSword', 'Steel sword', 34, 1, 37.5],
+    ['steelArrowtips', 'Steel arrowtips', 35, 1, 37.5, 15],
+    ['steelScimitar', 'Steel scimitar', 35, 2, 75],
+    ['steelLongsword', 'Steel longsword', 36, 2, 75],
+    ['steelFullHelm', 'Steel full helm', 37, 2, 75],
+    ['steelSqShield', 'Steel sq shield', 38, 2, 75],
+    ['steelBattleaxe', 'Steel battleaxe', 40, 3, 112.5],
+    ['steelChainbody', 'Steel chainbody', 41, 3, 112.5],
+    ['steelKiteshield', 'Steel kiteshield', 42, 3, 112.5],
+    ['steelPlatelegs', 'Steel platelegs', 46, 3, 112.5],
+    ['steelPlatebody', 'Steel platebody', 48, 5, 187.5],
   ]),
 ];

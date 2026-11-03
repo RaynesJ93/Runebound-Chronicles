@@ -3,7 +3,8 @@
 //
 // Entrance hall (south) with the miners' furnace and anvil; a west gallery of
 // copper and tin rocks; a deeper east gallery of iron, where tunnel goblins
-// have moved in.
+// have moved in. A tunnel at the back of the iron gallery leads down to
+// Copperdeep Depths (depths.js).
 
 import { GROUND } from '../../src/world/area.js';
 import { mulberry32 } from '../../src/core/rng.js';
@@ -43,6 +44,7 @@ export function buildMine() {
   tunnel(11, 19, 7, 15);
   tunnel(19, 18, 23, 13);
   tunnel(10, 9, 19, 8);
+  for (let y = 2; y <= 5; y++) dig(23, y); // down to the depths
 
   const prop = (type, tiles, extra = {}) => {
     props.push({ type, tiles, x: tiles[0].x, y: tiles[0].y, ...extra });
@@ -58,6 +60,10 @@ export function buildMine() {
   for (const [x, y] of [[20, 19], [21, 20]]) one('crate', x, y);
   one('barrel', 10, 22);
   for (const [x, y] of [[12, 23], [19, 23]]) one('lamp', x, y);
+
+  // ---- The way down, at the back of the iron gallery ------------------------------------
+  one('caveMouth', 23, 2, { blocks: false });
+  one('sign', 24, 4, { interact: ['DOWN: COPPERDEEP DEPTHS', 'Coal below. Cave beasts too: bring food.'] });
 
   // ---- Ore rocks -----------------------------------------------------------------------
   const ore = (variant, x, y) => { if (isFloor(x, y)) one('ore', x, y, { variant }); };
@@ -80,6 +86,7 @@ export function buildMine() {
     spawn: { x: 15, y: 25, facing: Math.PI },
     exits: [
       { tiles: [{ x: 15, y: H - 1 }, { x: 16, y: H - 1 }], to: 'route1', at: { x: 30, y: 2 }, facing: 0 },
+      { tiles: [{ x: 23, y: 2 }], to: 'depths', at: { x: 20, y: 28 }, facing: Math.PI },
     ],
     spawns: [
       { enemy: 'tunnelGoblin', x: 24, y: 9 },

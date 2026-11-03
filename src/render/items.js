@@ -591,6 +591,20 @@ for (const m of ['bronze', 'iron']) {
   };
 }
 
+// Steel: the iron drawing, lighter. Coal: the iron ore drawing, in black.
+const recolour = (base, fn) => (b) => {
+  DRAW[base](b);
+  for (let i = 0; i < b.data.length; i += 4) if (b.data[i + 3]) fn(b.data, i);
+};
+for (const part of ['Dagger', 'Axe', 'Pickaxe', 'Mace', 'MedHelm', 'Sword', 'Scimitar', 'Longsword', 'FullHelm', 'SqShield',
+  'Battleaxe', 'Chainbody', 'Kiteshield', 'Platelegs', 'Platebody', 'Arrowtips', 'Arrow', 'Bar']) {
+  DRAW[`steel${part}`] ||= recolour(`iron${part}`, (d, i) => {
+    const grey = Math.max(d[i], d[i + 1], d[i + 2]) - Math.min(d[i], d[i + 1], d[i + 2]) < 40;
+    if (grey) for (let c = 0; c < 3; c++) d[i + c] = Math.min(255, d[i + c] * 1.15 + 18);
+  });
+}
+DRAW.coal ||= recolour('ironOre', (d, i) => { const l = (d[i] + d[i + 1] + d[i + 2]) / 3; d[i] = d[i + 1] = l * 0.3; d[i + 2] = l * 0.36; });
+
 // Hard leather pieces: the leather drawing in darker, redder leather.
 for (const part of ['Gloves', 'Boots', 'Cowl', 'Chaps']) {
   DRAW[`hardLeather${part}`] = (b) => {
