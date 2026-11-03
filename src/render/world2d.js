@@ -59,6 +59,9 @@ function getLib() {
     ruinWall: [S.ruinWall(1), S.ruinWall(2), S.ruinWall(3), S.ruinWall(4)],
     caveMouth: art('caveMouth') || [S.caveMouth(false), S.caveMouth(true)],
     tombstone: [S.tombstone(1), S.tombstone(2), S.tombstone(3)],
+    graveStone: [0, 1, 2, 3].map((k) => S.graveStone(k)),
+    graveMound: [S.graveMound(1), S.graveMound(2), S.graveMound(3)],
+    memorial: S.memorial(),
     deadTree: art('deadTree') || Array.from({ length: VARIANTS }, (_, i) => S.deadTree(i + 151)),
     gloomTree: art('gloomTree') || Array.from({ length: VARIANTS }, (_, i) => S.gloomTree(i + 161)),
     thornBush: art('thornBush') || [S.thornBush(171), S.thornBush(172), S.thornBush(173)],
@@ -121,7 +124,7 @@ export function createWorldView(canvasEl, area) {
 
   const lib = getLib();
   const fences = {};
-  const fenceSprite = (e, s, k = false) => (fences[`${e}${s}${k}`] ||= paintedFence(e, s, k) || S.fence(e, s));
+  const fenceSprite = (e, s, k = false) => (fences[`${e}${s}${k}`] ||= (k === 'iron' ? S.ironFence(e, s) : paintedFence(e, s, k === 'picket')) || S.fence(e, s));
 
   // ---- Place everything -------------------------------------------------------------
   const decals = []; // drawn flat on the ground, under everything else
@@ -169,7 +172,7 @@ export function createWorldView(canvasEl, area) {
         break;
       }
       case 'crop': place(lib.crop[p.ripe ? 1 : lib.crop[2] && (p.x + p.y * 3) % 3 === 0 ? 2 : 0], f.x, f.y); break;
-      case 'fence': place(fenceSprite(isFence.has(`${p.x + 1},${p.y}`), isFence.has(`${p.x},${p.y + 1}`), p.style === 'picket'), f.x, f.y - 2); break;
+      case 'fence': place(fenceSprite(isFence.has(`${p.x + 1},${p.y}`), isFence.has(`${p.x},${p.y + 1}`), p.style || false), f.x, f.y - 2); break;
       case 'lamp': place(area.id === 'mine' && lib.mineLamp ? lib.mineLamp : lib.lamp, f.x, f.y); break;
       case 'sign': place(lib.sign, f.x, f.y); break;
       case 'well': place(lib.well, f.x, f.y + 1); break;
@@ -205,6 +208,15 @@ export function createWorldView(canvasEl, area) {
       case 'ruinWall': place(pick(lib.ruinWall, p), f.x, f.y); break;
       case 'caveMouth': place(lib.caveMouth[p.sealed ? 1 : 0], f.x, f.y); break;
       case 'tombstone': place(pick(lib.tombstone, p), f.x, f.y); break;
+      case 'grave': {
+        // headstone, with its mound of earth on the tile in front
+        const m = lib.graveMound[(p.x + p.y) % 3];
+        decals.push({ img: m.img, x: p.x * TILE, y: (p.y + 1) * TILE - 3 });
+        place(lib.graveStone[p.style ?? (p.x * 3 + p.y) % 4], f.x, f.y);
+        break;
+      }
+      case 'memorial': place(lib.memorial, f.x, f.y); break;
+      case 'deadGrass': place(pick(lib.deadGrass, p), f.x + jit(p, 13), f.y + jit(p, 14) / 2, { sortY: (p.y + 1) * TILE + 1 }); break;
       case 'campChest': place(lib.campChest, f.x, f.y); break;
       // Ripples sit flat on the water, under anyone standing nearby.
       case 'fishingSpot': place(lib.fishingSpot[0], f.x, f.y - 2, { frames: lib.fishingSpot, rate: 1.6, sortY: p.y * TILE }); break;

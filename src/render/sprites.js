@@ -1391,3 +1391,72 @@ export function tombstone(seed) {
   b.outline();
   return sprite(b, 6, 17);
 }
+
+// ---- The old graveyard -----------------------------------------------------------------
+
+// Black iron railings: a post with a spear tip, bars running east and/or south.
+export function ironFence(east, south) {
+  const b = new Bitmap(28, 32);
+  const d = hex('#1e1c20'), m = hex('#3a3740'), h = hex('#5e5a66');
+  if (east) {
+    for (const y of [6, 14]) { b.rect(9, y, 18, 1, m); b.rect(9, y + 1, 18, 1, d); }
+    for (const x of [13, 17, 21, 25]) { b.rect(x, 4, 1, 12, m); b.set(x, 3, h); b.set(x, 2, m); } // thin uprights
+  }
+  if (south) { b.rect(7, 10, 1, 18, m); b.rect(8, 10, 1, 18, d); }
+  b.rect(7, 2, 2, 16, m); b.rect(7, 2, 1, 16, h);
+  b.set(7, 1, h); b.set(8, 1, m); b.set(7, 0, h); // spear tip
+  b.rect(6, 17, 4, 1, d);
+  b.outline();
+  return sprite(b, 8, 17);
+}
+
+// A headstone: 0 rounded, 1 a stone cross, 2 mossy and leaning, 3 square with a carved panel.
+export function graveStone(kind) {
+  const b = new Bitmap(14, 20);
+  const st = [hex('#5e5b58'), hex('#807c76'), hex('#a39e96'), hex('#c2bdb3')];
+  const moss = hex('#5e8a3e');
+  if (kind === 1) {
+    b.rect(5, 2, 4, 17, st[1]); b.rect(1, 6, 12, 4, st[1]);
+    b.rect(5, 2, 1, 17, st[2]); b.rect(1, 6, 12, 1, st[2]); b.rect(8, 3, 1, 16, st[0]);
+    b.set(6, 8, st[0]); b.set(7, 8, st[0]);
+  } else if (kind === 2) {
+    for (let y = 4; y < 19; y++) { const lean = Math.floor((19 - y) / 5); b.rect(3 + lean, y, 8, 1, y < 6 ? st[2] : st[1]); b.set(3 + lean, y, st[2]); b.set(10 + lean, y, st[0]); }
+    b.ellipse(7 + 3, 5, 4, 2.5, st[1]);
+    for (const [x, y] of [[4, 17], [5, 16], [8, 18], [10, 15], [11, 9], [9, 6]]) b.set(x, y, moss);
+  } else if (kind === 3) {
+    b.rect(2, 4, 10, 15, st[1]); b.rect(2, 4, 10, 1, st[3]); b.rect(2, 4, 1, 15, st[2]); b.rect(11, 5, 1, 14, st[0]);
+    b.rect(4, 7, 6, 8, st[0]); b.rect(5, 8, 4, 6, st[1]);
+    b.rect(6, 9, 2, 1, st[0]); b.rect(6, 11, 2, 1, st[0]);
+  } else {
+    b.rect(2, 6, 10, 13, st[1]); b.ellipse(7, 6, 5, 4, st[1]); b.ellipse(6, 5, 3, 2, st[2]);
+    b.rect(2, 6, 1, 13, st[2]); b.rect(11, 6, 1, 13, st[0]);
+    for (let k = 0; k < 3; k++) b.rect(4, 9 + k * 2, 6, 1, st[0]);
+    b.set(3, 17, moss); b.set(10, 16, moss);
+  }
+  b.outline();
+  return sprite(b, 7, 18);
+}
+
+// The low mound of earth in front of a grave (flat, drawn on the ground).
+export function graveMound(seed) {
+  const b = new Bitmap(16, 16);
+  const e = [hex('#4a3322'), hex('#5e4129'), hex('#755234')];
+  b.ellipse(8, 8, 6, 5.5, e[1]);
+  b.ellipse(7, 6.5, 4, 3, e[2]);
+  b.ellipse(9, 11, 4.5, 2, e[0]);
+  for (let k = 0; k < 6; k++) b.set(3 + Math.floor(rnd(seed, k, 3) * 10), 3 + Math.floor(rnd(seed, k, 4) * 10), hex('#3d6b2e'));
+  return sprite(b, 8, 8);
+}
+
+// A tall memorial stone with a cross on top, at the head of the graveyard path.
+export function memorial() {
+  const b = new Bitmap(20, 38);
+  const st = [hex('#5e5b58'), hex('#807c76'), hex('#a39e96'), hex('#c2bdb3')];
+  b.rect(2, 31, 16, 6, st[0]); b.rect(3, 30, 14, 2, st[2]);         // plinth
+  b.rect(5, 12, 10, 19, st[1]); b.rect(5, 12, 2, 19, st[2]); b.rect(14, 12, 1, 19, st[0]);
+  b.rect(7, 17, 6, 9, st[0]); b.rect(8, 18, 4, 7, st[1]);            // carved panel
+  b.rect(9, 2, 2, 11, st[2]); b.rect(6, 5, 8, 2, st[2]); b.rect(10, 2, 1, 11, st[1]); // cross
+  b.set(5, 29, hex('#5e8a3e')); b.set(14, 27, hex('#5e8a3e')); b.set(6, 30, hex('#5e8a3e'));
+  b.outline();
+  return sprite(b, 10, 36);
+}
