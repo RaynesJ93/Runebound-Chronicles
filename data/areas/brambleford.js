@@ -159,7 +159,7 @@ export function buildBrambleford() {
     interact: ['Welcome to Brambleford!', 'General Store: west of the square.  Bank: east of the square.'],
   });
   one('sign', 23, 5, {
-    interact: ['NORTH: Route 1 — Thornwood Forest.', 'Travellers beware: goblins and wolves roam the woods.'],
+    interact: ['NORTH: Thornwood.', 'Travellers beware: goblins and wolves roam the woods.'],
   });
 
   // ---- North road: the fallen oak has been cleared and cut into logs ------
@@ -258,7 +258,7 @@ export function buildBrambleford() {
     spawn: { x: 16, y: 24, facing: 0 },
     // Walking onto these tiles takes you to another area.
     exits: [
-      { tiles: [{ x: 21, y: 0 }, { x: 22, y: 0 }], to: 'route1', at: { x: 16, y: 76 }, facing: Math.PI },
+      { tiles: [{ x: 21, y: 0 }, { x: 22, y: 0 }], to: 'route1', at: { x: 55, y: 93 }, facing: Math.PI },
       ...exits, // shop and bank doors
     ],
     spawns: [

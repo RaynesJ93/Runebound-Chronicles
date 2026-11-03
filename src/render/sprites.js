@@ -1339,3 +1339,55 @@ export function deadGrass(seed) {
   }
   return sprite(b, 8, 14);
 }
+
+// ---- Thornwood ---------------------------------------------------------------------
+
+// A crumbling stretch of old stone wall. Each one is a different height.
+export function ruinWall(seed) {
+  const b = new Bitmap(16, 24);
+  const st = C.stone;
+  const top = 6 + Math.floor(rnd(seed, 1, 3) * 8);
+  for (let y = top; y < 23; y++) for (let x = 1; x < 15; x++) {
+    const row = Math.floor((y - top) / 4);
+    const joint = (y - top) % 4 === 3 || (x + row * 4) % 8 === 0;
+    let c = joint ? st[0] : x < 4 ? st[2] : x > 11 ? st[1] : st[1];
+    if (y === top) c = st[3];
+    if (!joint && rnd(x, y, seed) < 0.08) c = st[0];
+    b.set(x, y, c);
+  }
+  // a broken, uneven top
+  for (let x = 1; x < 15; x++) { const cut = Math.floor(rnd(x, seed, 9) * 3); for (let y = top; y < top + cut; y++) b.set(x, y, 0, 0); }
+  for (const [x, y] of [[3, 20], [10, 21], [12, top + 4]]) b.set(x, y, hex('#5e8a3e')); // moss
+  b.outline();
+  return sprite(b, 8, 22);
+}
+
+// A dark opening in a rock face. Sealed caves are stopped up with boulders.
+export function caveMouth(sealed) {
+  const b = new Bitmap(24, 22);
+  const st = C.rock;
+  b.ellipse(12, 12, 11, 10, st[1]);
+  b.ellipse(10, 9, 7, 6, st[2]);
+  b.ellipse(12, 15, 7, 7, hex('#141210'));
+  b.ellipse(12, 16, 5, 5, hex('#070605'));
+  b.rect(4, 19, 16, 3, hex('#141210'));
+  if (sealed) {
+    shadedBlobs(b, [[8, 16, 4], [15, 15, 4.5], [12, 11, 3.5], [11, 19, 3.5]], st, 3);
+  }
+  b.outline();
+  return sprite(b, 12, 21);
+}
+
+// A plain headstone in the old graveyard.
+export function tombstone(seed) {
+  const b = new Bitmap(12, 18);
+  const st = C.stone;
+  const round = rnd(seed, 2, 2) < 0.5;
+  b.rect(2, 5, 8, 12, st[1]);
+  if (round) b.ellipse(6, 5, 4, 3, st[1]); else b.rect(2, 3, 8, 2, st[1]);
+  b.rect(2, 5, 2, 12, st[2]);
+  for (let k = 0; k < 3; k++) b.rect(4, 8 + k * 2, 4, 1, st[0]); // worn lettering
+  if (rnd(seed, 3, 3) < 0.4) { b.set(3, 15, hex('#5e8a3e')); b.set(8, 14, hex('#5e8a3e')); }
+  b.outline();
+  return sprite(b, 6, 17);
+}

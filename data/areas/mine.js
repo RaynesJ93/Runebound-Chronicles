@@ -1,4 +1,4 @@
-// Copperdeep Mine — reached from the north end of Route 1, now the rockslide
+// Copperdeep Mine — reached from the north-west road through Thornwood, now the rockslide
 // has been cleared.
 //
 // Entrance hall (south) with the miners' furnace and anvil; a west gallery of
@@ -79,7 +79,7 @@ export function buildMine() {
     W, H, ground, blocked, props, indoors: true,
     spawn: { x: 15, y: 25, facing: Math.PI },
     exits: [
-      { tiles: [{ x: 15, y: H - 1 }, { x: 16, y: H - 1 }], to: 'route1', at: { x: 12, y: 2 }, facing: 0 },
+      { tiles: [{ x: 15, y: H - 1 }, { x: 16, y: H - 1 }], to: 'route1', at: { x: 30, y: 2 }, facing: 0 },
     ],
     spawns: [
       { enemy: 'tunnelGoblin', x: 24, y: 9 },

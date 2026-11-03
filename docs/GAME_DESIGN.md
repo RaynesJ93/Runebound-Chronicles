@@ -67,7 +67,7 @@ The world is a graph of connected areas, each a hand-built tile map.
 | Area type | Purpose | Examples |
 | --- | --- | --- |
 | Town / village | Safe zone: bank, shops, NPCs, quests, respawn point | Starting village (Brambleford — working name) |
-| Route | Paths between towns, low–mid enemies, trees, rocks, fishing spots | Forest route (Route 1) |
+| Route | Paths between towns, low–mid enemies, trees, rocks, fishing spots | Thornwood |
 | Forest | Dense woodland, wolves, woodcutting | Thornwood |
 | Mine | Ore rocks, dwarves, low light | Copperdeep Mine |
 | Cave | Linked tunnels, darkness, stronger enemies | — |
@@ -237,8 +237,8 @@ Enemy names show their combat level, coloured green (weaker), yellow (similar) o
 | Essence golem | 12 | 24 | Passive; six spread thinly across Whispering Vale; 4–12 rune essence every kill, air runes (8–20) 1/2, mind runes (5–15) 1/3, water runes (4–12) 1/3, rolled separately | Whispering Vale |
 | Cow | 2 | 8 | Passive, stays in its field; bones and cowhide every kill, raw beef 1/2 | Cow field, Brambleford |
 | Chicken | 1 | 3 | Passive, stays in its pen; bones every kill, raw chicken 1/2 and 5–15 feathers 1/2, rolled separately | Wyn's chicken pen, Brambleford |
-| Goblin | 2 | 5 | Passive, roams in groups of 3–5 | Village outskirts, Route 1 |
-| Goblin Brute | 5 | 12 | Aggressive to low levels | Route 1 goblin camp |
+| Goblin | 2 | 5 | Passive, roams in groups of 3–5 | Thornwood goblin camp |
+| Goblin Brute | 5 | 12 | Aggressive to low levels | Thornwood goblin camp |
 | Wolf | 7 | 14 | Aggressive, fast, chases further | Forest route |
 | Alpha Wolf (mini-boss) | 14 | 40 | Aggressive, rare spawn, always drops something good | Deep forest clearing |
 
@@ -371,7 +371,7 @@ Feathers and bronze arrowtips come from Pell; goblins also drop feathers. Longbo
 
 ### Mining and Smithing (shipped in v0.12.0)
 
-**Copperdeep Mine** opens at the top of Route 1 now the rockslide is cleared. It has three parts:
+**Copperdeep Mine** opens at the end of Thornwood's north-west road now the rockslide is cleared. It has three parts:
 - an entrance hall with the miners' furnace and anvil, and Dorrin the Miner
 - a west gallery of copper and tin
 - an east gallery of iron, where tunnel goblins (level 4) have moved in
@@ -410,7 +410,16 @@ New gear: iron sword, iron med helm, bronze and iron sq shields, bronze and iron
 
 ### Runecrafting and Whispering Vale (shipped in v0.16.0)
 
-**Whispering Vale** (72 × 60 tiles) lies east of Thornwood. It looks like nowhere else: it is always night there, and only glowing things give light: the altars cast pools of coloured light, the campfire and lanterns flicker, the essence crystals, glowing mushrooms and ghost-flowers glow faintly blue, and a small circle of light follows you. The grass is dead blue-green, the earth grey-violet, the water murky; twisted dead trees and purple gloom trees replace the forest, with thorny black shrubs, crystal shards in the ground and wisps of light drifting through the air. (The light map is worked out at a quarter of the screen's resolution so it stays cheap on phones.) To get there, follow the trail past the oak grove on Route 1 to the map's east edge. It's quiet: six essence golems wander its meadows, but they never attack first.
+**Thornwood** (112 × 96 tiles, v0.18) replaced the old Route 1: one big open zone instead of a corridor, in daylight. Roads meet at a stone crossroads with a well: south to Brambleford, north-west to Copperdeep Mine, east to Whispering Vale, west to the goblin camp. A stream with fishing spots winds across the south, with a bridge on the road.
+
+- **Goblin territory** (west): a palisaded camp with tents, a cooking campfire, a war totem and the goblin chief's hut (locked for now). 8 goblins and 2 brutes.
+- **Wolf hills** (north-east): open rocky ground scattered with bones, 6 wolves, and the alpha wolf at the mouth of its den in a rock face.
+- **Bram's cabin** south-east of the bridge, with practice pines; the **oak grove** to the east; the **lake** and **hunters' camp** (fire, three fishing spots) to the south-west.
+- **Points of interest for later quests**: the ruined watchtower, the hermit's hut, a sealed cave (boulders, something breathing inside), the old graveyard, an abandoned farmstead ("they came at night"), a stone shrine with an empty altar, a wrecked merchant's cart with goblin footprints, and a fairy ring.
+
+Saves from before v0.18 that were standing in the old Route 1 (or left a gravestone there) are moved to the south road by Brambleford, since the old positions don't match the new map.
+
+**Whispering Vale** (72 × 60 tiles) lies east of Thornwood. It looks like nowhere else: it is always night there, and only glowing things give light: the altars cast pools of coloured light, the campfire and lanterns flicker, the essence crystals, glowing mushrooms and ghost-flowers glow faintly blue, and a small circle of light follows you. The grass is dead blue-green, the earth grey-violet, the water murky; twisted dead trees and purple gloom trees replace the forest, with thorny black shrubs, crystal shards in the ground and wisps of light drifting through the air. (The light map is worked out at a quarter of the screen's resolution so it stays cheap on phones.) To get there, follow Thornwood's east road from the crossroads to the map's east edge. It's quiet: six essence golems wander its meadows, but they never attack first.
 - **Essence quarry** (north-west): a rocky pit of essence crystals. Mine them with any pickaxe for rune essence (Mining 1, 5 XP, 60% a swing); they never run dry.
 - **Runekeeper's camp** (middle): Aldric the Runekeeper, a tent, a cooking fire, and the runekeepers' **supply chest**, an iron-banded camp trunk that opens your bank.
 - **Air altar** (north-east): a pale pedestal on a windswept stone dais, with a great swirl of wind above it.
@@ -467,12 +476,12 @@ While you skill, an animation loops for as long as you're working (`src/render/s
 | Spot | Where | Needs | Catches |
 | --- | --- | --- | --- |
 | Net | Brambleford pond | Small fishing net | Shrimps (level 1, 10 XP), anchovies (15, 40 XP) |
-| Bait | Brambleford pond, Route 1 stream | Fishing rod + 1 fishing bait per fish | Sardines (5, 20 XP), herring (10, 30 XP) |
-| Lure | Route 1 stream (north bank) | Fly fishing rod + 1 feather per fish | Trout (20, 50 XP), salmon (30, 70 XP) |
+| Bait | Brambleford pond, Thornwood stream and lake | Fishing rod + 1 fishing bait per fish | Sardines (5, 20 XP), herring (10, 30 XP) |
+| Lure | Thornwood stream and lake | Fly fishing rod + 1 feather per fish | Trout (20, 50 XP), salmon (30, 70 XP) |
 
 Each attempt tries the best fish you can catch first (its chance rises 1% a level above it), then the next one down. **Old Finn** by the pond gives you a net, a rod and 30 bait; Pell sells all three rods and nets, and bait. Chickens are a good source of feathers for lure fishing.
 
-**Cooking.** Tap the cooking pit by the pond, or the goblins' campfire on Route 1, and pick what to cook; it keeps going until that food runs out. At the level you can first cook something, half of it burns; that drops evenly until the "stops burning" level. Burnt food is ruined and gives no XP.
+**Cooking.** Tap the cooking pit by the pond, or the goblins' campfire or hunters' fire in Thornwood, and pick what to cook; it keeps going until that food runs out. At the level you can first cook something, half of it burns; that drops evenly until the "stops burning" level. Burnt food is ruined and gives no XP.
 
 | Food | Level | XP | Heals | Stops burning |
 | --- | --- | --- | --- | --- |

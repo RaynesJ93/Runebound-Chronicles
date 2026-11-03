@@ -167,6 +167,15 @@ test('broken numbers and settings are repaired', () => {
   assert.deepEqual(s.boosts, {});
 });
 
+test('old Route 1 positions move onto the new Thornwood road', () => {
+  const s = migrate(2, structuredClone(V2_BATCH8));
+  assert.deepEqual([s.grave.x, s.grave.y], [57, 91]);
+  const t = migrate(2, structuredClone(V2_BATCH2));
+  assert.deepEqual([t.player.area, t.player.x, t.player.y], ['route1', 55, 93]);
+  const u = migrate(3, structuredClone({ ...V2_BATCH2, player: { area: 'route1', x: 20, y: 50 } }));
+  assert.deepEqual([u.player.x, u.player.y], [20, 50]); // new saves are left alone
+});
+
 test('saves from a newer game version are refused', () => {
   assert.throws(() => migrate(SAVE_VERSION + 1, {}), /newer version/);
 });
