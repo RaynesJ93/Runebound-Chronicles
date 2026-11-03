@@ -10,7 +10,7 @@
 import { defaultState } from './state.js';
 import { sanitize } from './sanitize.js';
 
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 const SLOT_KEYS = ['rbc.save.0', 'rbc.save.1'];
 const LAST_KEY = 'rbc.save.last';
@@ -26,6 +26,14 @@ const migrations = {
     delete s.shadows;
     s.zoomStep = 0;
     d.settings = s;
+    return d;
+  },
+  // v2 -> v3: Route 1 was rebuilt as the much bigger Thornwood (v0.18), so old
+  // positions there no longer match the map. Anyone standing in it, and any
+  // gravestone left there, moves to the south road, by Brambleford.
+  2: (d) => {
+    if (d.player?.area === 'route1') Object.assign(d.player, { x: 55, y: 93, facing: Math.PI });
+    if (d.grave?.area === 'route1') Object.assign(d.grave, { x: 57, y: 91 });
     return d;
   },
 };

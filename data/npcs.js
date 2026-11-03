@@ -203,11 +203,11 @@ export const NPCS = [
         },
         cook: {
           say: ['Tap the cooking pit right there, then pick what to cook.', "You'll burn a lot at first. Everyone does. You burn less as your Cooking level goes up.",
-            'Wyn\'s chickens cook up nicely too. The goblins\' campfire on Route 1 works in a pinch.'],
+            'Wyn\'s chickens cook up nicely too. The goblins\' campfire in Thornwood works in a pinch, and so does the hunters\' fire by the lake.'],
           next: 'menu',
         },
         big: {
-          say: ['Trout and salmon swim in the fast water of the stream on Route 1.', 'You need a fly fishing rod from Pell, and feathers for lures. Trout need Fishing 20, salmon 30.'],
+          say: ['Trout and salmon swim in the fast water of the stream in Thornwood.', 'You need a fly fishing rod from Pell, and feathers for lures. Trout need Fishing 20, salmon 30.'],
           next: 'menu',
         },
         bye: { say: 'And may they be big ones.' },
@@ -257,10 +257,10 @@ export const NPCS = [
     },
   },
 
-  // ---- Route 1 -----------------------------------------------------------------
+  // ---- Thornwood -----------------------------------------------------------------
   {
     examine: 'A big, bearded woodcutter. He smells of pine.',
-    id: 'bram', name: 'Bram the Woodcutter', area: 'route1', x: 27, y: 38, radius: 2, wander: 0.18,
+    id: 'bram', name: 'Bram the Woodcutter', area: 'route1', x: 64, y: 77, radius: 2, wander: 0.18,
     look: { hair: '#a8462a', tunic: '#b0302a', pants: '#4a3a2a', beard: '#a8462a' },
     talk: {
       start: (c) => (c.flags.metBram ? 'again' : 'intro'),
@@ -313,7 +313,7 @@ export const NPCS = [
   },
   {
     examine: 'A traveller with a staff and a lot of stories.',
-    id: 'wren', name: 'Wren the Traveller', area: 'route1', x: 13, y: 5, radius: 1, wander: 0.15,
+    id: 'wren', name: 'Wren the Traveller', area: 'route1', x: 33, y: 14, radius: 1, wander: 0.15,
     look: { hair: '#3a2a1a', tunic: '#4a6b3a', pants: '#5a4a3a', hat: 'hood', hatColor: '#3d5a30' },
     talk: {
       start: 'hi',

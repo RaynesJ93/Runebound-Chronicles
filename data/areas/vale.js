@@ -139,7 +139,7 @@ export function buildVale() {
     dark: true, // always night here: only glowing things give light
     spawn: { x: 2, y: 29, facing: Math.PI / 2 },
     exits: [
-      { tiles: [{ x: 0, y: 29 }, { x: 0, y: 30 }], to: 'route1', at: { x: 49, y: 42 }, facing: -Math.PI / 2 },
+      { tiles: [{ x: 0, y: 29 }, { x: 0, y: 30 }], to: 'route1', at: { x: 109, y: 48 }, facing: -Math.PI / 2 },
     ],
     // Six essence golems, spread thinly across the vale.
     spawns: [

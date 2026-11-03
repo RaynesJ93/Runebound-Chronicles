@@ -50,6 +50,9 @@ function getLib() {
     altar: Object.fromEntries(['air', 'mind', 'water'].map((v) => [v, [S.altar(v, 0), S.altar(v, 1)]])),
     standingStone: [S.standingStone(1), S.standingStone(2.5), S.standingStone(4)],
     campChest: S.campChest(),
+    ruinWall: [S.ruinWall(1), S.ruinWall(2), S.ruinWall(3), S.ruinWall(4)],
+    caveMouth: [S.caveMouth(false), S.caveMouth(true)],
+    tombstone: [S.tombstone(1), S.tombstone(2), S.tombstone(3)],
     deadTree: Array.from({ length: VARIANTS }, (_, i) => S.deadTree(i + 151)),
     gloomTree: Array.from({ length: VARIANTS }, (_, i) => S.gloomTree(i + 161)),
     thornBush: [S.thornBush(171), S.thornBush(172), S.thornBush(173)],
@@ -153,6 +156,9 @@ export function createWorldView(canvasEl, area) {
       case 'tanningRack': place(lib.tanningRack, f.x, f.y); break;
       case 'altar': place(lib.altar[p.variant][0], f.x, f.y + 1, { frames: lib.altar[p.variant], rate: 2.5 }); break;
       case 'standingStone': place(pick(lib.standingStone, p), f.x, f.y); break;
+      case 'ruinWall': place(pick(lib.ruinWall, p), f.x, f.y); break;
+      case 'caveMouth': place(lib.caveMouth[p.sealed ? 1 : 0], f.x, f.y); break;
+      case 'tombstone': place(pick(lib.tombstone, p), f.x, f.y); break;
       case 'campChest': place(lib.campChest, f.x, f.y); break;
       // Ripples sit flat on the water, under anyone standing nearby.
       case 'fishingSpot': place(lib.fishingSpot[0], f.x, f.y - 2, { frames: lib.fishingSpot, rate: 1.6, sortY: p.y * TILE }); break;
