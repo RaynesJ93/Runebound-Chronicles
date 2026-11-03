@@ -1,4 +1,5 @@
 import { TILE, Bitmap, hex, shade, rnd } from './pixel.js';
+import { art } from './art.js';
 
 // Draws a building as one pixel-art sprite in a 3/4 top-down view:
 // a big shingled roof on top and the front wall (with door and windows) below.
@@ -15,7 +16,46 @@ const STYLES = {
 const OVER = 3; // roof overhang in pixels on each side
 const TOP = 8; // extra room above the roof for chimneys
 
+// Painted buildings from the art atlas. Where across each picture its door is
+// (a fraction of the width), so the picture can be lined up on the real door.
+const PAINTED_DOOR = { house: 0.49, cabin: 0.5, store: 0.31, bank: 0.41 };
+const ROOFS = { red: [154, 59, 48], blue: [61, 95, 140], green: [79, 109, 58], purple: [107, 78, 138] };
+
+function nearestRoof(rgb) {
+  let best = 'red', d = Infinity;
+  for (const [k, c] of Object.entries(ROOFS)) {
+    const e = (c[0] - rgb[0]) ** 2 + (c[1] - rgb[1]) ** 2 + (c[2] - rgb[2]) ** 2;
+    if (e < d) { d = e; best = k; }
+  }
+  return best;
+}
+
+function paintedBuilding(b) {
+  if (!PAINTED_DOOR[b.kind] || (b.w !== 5 && b.w !== 6)) return null;
+  const kind = b.kind === 'house' ? `house-${nearestRoof(hex(b.roof ?? STYLES.house.roof))}` : b.kind;
+  const spr = art(`building:${kind}:${b.w}`)?.[0];
+  if (!spr) return null;
+  let img = spr.img;
+  const doorX = (b.doorTiles.reduce((s, t) => s + t.x, 0) / b.doorTiles.length + 0.5) * TILE;
+  const left = Math.round(doorX - PAINTED_DOOR[b.kind] * spr.w);
+  if (b.sign === 'bow') {
+    // add the "free bows" board beside the door
+    const c = document.createElement('canvas');
+    c.width = spr.w; c.height = spr.h;
+    const g = c.getContext('2d');
+    g.drawImage(img, 0, 0);
+    const board = new Bitmap(14, 13);
+    bowSign(board, 0, 0);
+    board.outline();
+    g.drawImage(board.toCanvas(), Math.round(PAINTED_DOOR[b.kind] * spr.w + 10), spr.h - 34);
+    img = c;
+  }
+  return { img, x: left, y: (b.y + b.h) * TILE - spr.ay - 1, sortY: (b.y + b.h) * TILE };
+}
+
 export function buildingSprite(b) {
+  const painted = paintedBuilding(b);
+  if (painted) return painted;
   const style = { ...STYLES[b.kind] };
   const roofRGB = hex(b.roof ?? style.roof);
   const W = b.w * TILE + OVER * 2;
@@ -123,30 +163,7 @@ export function buildingSprite(b) {
     bmp.rect(sx + 4, sy + 3, 3, 1, hex('#8a5a32'));
   }
 
-  if (b.sign === 'bow') {
-    // A hanging board with a bow and arrow: "free bows here"
-    const sx = Math.round(dc + 9);
-    const sy = wallTop + 5;
-    bmp.rect(sx + 2, sy - 2, 1, 3, hex('#3d2412'));
-    bmp.rect(sx + 10, sy - 2, 1, 3, hex('#3d2412'));
-    bmp.rect(sx, sy, 13, 12, hex('#c99a5b'));
-    bmp.rect(sx, sy, 13, 1, hex('#e3c08a'));
-    bmp.rect(sx, sy + 11, 13, 1, hex('#8a5a32'));
-    // the bow: a curved limb on the left, a string on the right
-    const wood = hex('#6a3a1a');
-    for (let k = 0; k < 9; k++) {
-      const off = [3, 2, 1, 1, 1, 1, 1, 2, 3][k];
-      bmp.set(sx + 2 + off, sy + 1 + k, wood);
-      bmp.set(sx + 3 + off, sy + 1 + k, wood);
-    }
-    for (let k = 1; k < 10; k++) bmp.set(sx + 6, sy + k, hex('#f1e6c8'));
-    // the arrow across it
-    bmp.rect(sx + 3, sy + 5, 8, 1, hex('#8a5a32'));
-    bmp.rect(sx + 10, sy + 4, 2, 3, hex('#b0b4b8'));
-    bmp.set(sx + 12, sy + 5, hex('#b0b4b8'));
-    bmp.set(sx + 3, sy + 4, hex('#c4402f'));
-    bmp.set(sx + 3, sy + 6, hex('#c4402f'));
-  }
+  if (b.sign === 'bow') bowSign(bmp, Math.round(dc + 9), wallTop + 5);
 
   // ---- Roof ----------------------------------------------------------------------
   for (let y = TOP; y < roofBottom; y++) {
@@ -201,3 +218,26 @@ function doorCenter(b) {
   const avg = b.doorTiles.reduce((s, t) => s + t.x, 0) / b.doorTiles.length;
   return OVER + (avg + 0.5 - b.x) * TILE;
 }
+
+// A hanging board with a bow and arrow: "free bows here"
+function bowSign(bmp, sx, sy) {
+  bmp.rect(sx + 2, sy - 2, 1, 3, hex('#3d2412'));
+  bmp.rect(sx + 10, sy - 2, 1, 3, hex('#3d2412'));
+  bmp.rect(sx, sy, 13, 12, hex('#c99a5b'));
+  bmp.rect(sx, sy, 13, 1, hex('#e3c08a'));
+  bmp.rect(sx, sy + 11, 13, 1, hex('#8a5a32'));
+  // the bow: a curved limb on the left, a string on the right
+  const wood = hex('#6a3a1a');
+  for (let k = 0; k < 9; k++) {
+    const off = [3, 2, 1, 1, 1, 1, 1, 2, 3][k];
+    bmp.set(sx + 2 + off, sy + 1 + k, wood);
+    bmp.set(sx + 3 + off, sy + 1 + k, wood);
+  }
+  for (let k = 1; k < 10; k++) bmp.set(sx + 6, sy + k, hex('#f1e6c8'));
+  // the arrow across it
+  bmp.rect(sx + 3, sy + 5, 8, 1, hex('#8a5a32'));
+  bmp.rect(sx + 10, sy + 4, 2, 3, hex('#b0b4b8'));
+  bmp.set(sx + 12, sy + 5, hex('#b0b4b8'));
+  bmp.set(sx + 3, sy + 4, hex('#c4402f'));
+  bmp.set(sx + 3, sy + 6, hex('#c4402f'));
+  }
