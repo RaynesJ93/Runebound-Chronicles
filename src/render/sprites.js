@@ -1227,3 +1227,115 @@ export function golemFrames(look) {
   }
   return frames;
 }
+
+// ---- Whispering Vale scenery: dead and gloomy trees, thorns, glowing things ----------
+
+// A twisted dead tree: a grey trunk and bare, crooked branches.
+export function deadTree(seed) {
+  const b = new Bitmap(40, 52);
+  const bark = [hex('#2a2428'), hex('#3e363c'), hex('#544a50'), hex('#6a5e64')];
+  // the trunk leans a little and narrows towards the top
+  const lean = (rnd(seed, 1, 1) - 0.5) * 6;
+  for (let y = 18; y < 50; y++) {
+    const t = (50 - y) / 32;
+    const w = Math.round(3 + (1 - t) * 3);
+    const cx = Math.round(20 + lean * t);
+    for (let x = cx - w; x <= cx + w; x++) b.set(x, y, x < cx - w + 2 ? bark[2] : x > cx + w - 2 ? bark[0] : bark[1]);
+  }
+  b.rect(13, 48, 14, 2, bark[1]); // roots
+  // branches: crooked lines splitting into twigs
+  const branch = (x, y, ang, len, depth) => {
+    let px = x, py = y;
+    for (let k = 0; k < len; k++) {
+      ang += (rnd(seed, x * 7 + k, depth + y) - 0.5) * 0.5;
+      px += Math.cos(ang); py += Math.sin(ang);
+      b.set(Math.round(px), Math.round(py), depth === 0 ? bark[2] : bark[1]);
+      if (depth === 0) b.set(Math.round(px) + 1, Math.round(py), bark[1]);
+    }
+    if (depth < 2) { branch(px, py, ang - 0.6, len * 0.6, depth + 1); branch(px, py, ang + 0.5, len * 0.55, depth + 1); }
+  };
+  branch(20 + lean * 0.9, 22, -Math.PI / 2 - 0.5, 12, 0);
+  branch(20 + lean * 0.9, 24, -Math.PI / 2 + 0.6, 11, 0);
+  branch(20 + lean * 0.6, 32, -Math.PI + 0.3, 8, 1);
+  branch(20 + lean * 0.6, 30, -0.3, 8, 1);
+  b.outline();
+  return sprite(b, 20, 50);
+}
+
+// A gloomy tree: a dark trunk under a heavy crown of purple-black leaves.
+const GLOOM = [hex('#1c1628'), hex('#2a2140'), hex('#3a2f58'), hex('#544878')];
+export function gloomTree(seed) {
+  const b = new Bitmap(46, 56);
+  const j = (k) => (rnd(seed, k, 3) - 0.5) * 3;
+  for (let y = 32; y < 52; y++) for (let x = 19; x < 27; x++) b.set(x, y, x < 21 ? hex('#3a3034') : x > 24 ? hex('#1e181c') : hex('#2c2428'));
+  b.rect(16, 50, 14, 2, hex('#2c2428'));
+  shadedBlobs(b, [[23 + j(1), 13 + j(2), 11], [12 + j(3), 21, 9.5], [34 + j(4), 21, 9.5], [23, 24, 12.5], [14, 30, 8], [32, 30, 8], [23, 32, 9]], GLOOM, seed);
+  // a few pale blossoms glowing in the leaves
+  for (let k = 0; k < 5; k++) b.set(8 + Math.floor(rnd(seed, k, 8) * 30), 8 + Math.floor(rnd(seed, k, 9) * 26), hex('#b8a8ff'));
+  b.outline();
+  return sprite(b, 23, 51);
+}
+
+// A thorny black shrub with a few blood-red berries.
+export function thornBush(seed) {
+  const b = new Bitmap(20, 16);
+  shadedBlobs(b, [[7, 10, 5], [13, 10, 5], [10, 7, 4.5]], [hex('#141c18'), hex('#1e2a24'), hex('#2a3a32'), hex('#3a4e44')], seed);
+  for (let k = 0; k < 8; k++) {
+    const a = rnd(seed, k, 4) * Math.PI * 2;
+    b.set(Math.round(10 + Math.cos(a) * 7), Math.round(9 + Math.sin(a) * 5), hex('#5a6a60'));
+  }
+  for (let k = 0; k < 3; k++) b.set(5 + Math.floor(rnd(seed, k, 5) * 10), 6 + Math.floor(rnd(seed, k, 6) * 6), hex('#a8202a'));
+  b.outline();
+  return sprite(b, 10, 15);
+}
+
+// Glowing blue mushrooms (flat, walk over them).
+export function glowShrooms(seed) {
+  const b = new Bitmap(16, 16);
+  for (let k = 0; k < 3; k++) {
+    const x = 3 + Math.floor(rnd(seed, k, 1) * 10), y = 6 + Math.floor(rnd(seed, k, 2) * 7);
+    b.rect(x, y + 1, 1, 2, hex('#cfd8e0'));
+    b.rect(x - 1, y, 3, 1, hex('#5fd8ff'));
+    b.set(x, y - 1, hex('#bff4ff'));
+  }
+  return sprite(b, 8, 8);
+}
+
+// Pale ghost-flowers.
+export function glowFlowers(seed) {
+  const b = new Bitmap(16, 16);
+  const col = rnd(seed, 0, 3) < 0.5 ? hex('#c8b8ff') : hex('#a8e8ff');
+  for (let k = 0; k < 3; k++) {
+    const x = 3 + Math.floor(rnd(seed, k, 4) * 10), y = 4 + Math.floor(rnd(seed, k, 5) * 8);
+    b.set(x, y + 2, hex('#2e4a40')); b.set(x, y + 3, hex('#2e4a40'));
+    b.set(x - 1, y, col); b.set(x + 1, y, col); b.set(x, y - 1, col); b.set(x, y + 1, col);
+    b.set(x, y, hex('#ffffff'));
+  }
+  return sprite(b, 8, 14);
+}
+
+// A small essence crystal poking out of the ground.
+export function crystalShard(seed) {
+  const b = new Bitmap(16, 16);
+  const c = [hex('#4a6a88'), hex('#8ab8e0'), hex('#d0ecff')];
+  const n = 1 + Math.floor(rnd(seed, 0, 6) * 2);
+  for (let s = 0; s < n; s++) {
+    const cx = 6 + s * 4, h = 4 + Math.floor(rnd(seed, s, 7) * 4);
+    for (let y = 0; y < h; y++) { b.set(cx, 13 - y, y === h - 1 ? c[2] : c[1]); if (y < h - 2) b.set(cx + 1, 13 - y, c[0]); }
+  }
+  b.outline();
+  return sprite(b, 8, 14);
+}
+
+// Dark, withered tall grass.
+export function deadGrass(seed) {
+  const b = new Bitmap(16, 14);
+  const cols = [hex('#1c2a26'), hex('#2a3c36'), hex('#3a5048'), hex('#4e6658')];
+  for (let k = 0; k < 8; k++) {
+    const x = 1 + Math.floor(rnd(seed, k, 1) * 14);
+    const h = 4 + Math.floor(rnd(seed, k, 2) * 6);
+    const lean = rnd(seed, k, 3) < 0.5 ? -1 : 1;
+    for (let j = 0; j < h; j++) b.set(x + (j > h * 0.5 ? lean : 0) + (j > h * 0.8 ? lean : 0), 13 - j, cols[Math.min(3, Math.floor((j / h) * 3.4))]);
+  }
+  return sprite(b, 8, 14);
+}

@@ -1,4 +1,5 @@
-// Whispering Vale — a quiet, wide valley east of Thornwood, reached by the trail
+// Whispering Vale — a dark, quiet valley east of Thornwood, where it is always
+// night, reached by the trail
 // through the oak grove. Old magic gathers here.
 //
 // - North-west: the essence quarry, a rocky pit of glowing essence crystals
@@ -75,6 +76,8 @@ export function buildVale() {
   for (const [x, y] of [[33, 24], [25, 27]]) one('crate', x, y);
   one('barrel', 33, 25);
   one('logPile', 32, 23, { interact: ['Firewood.'] });
+  // Lanterns at the crossroads, so the way is never quite lost in the dark.
+  for (const [x, y] of [[21, 28], [24, 32], [50, 28], [21, 45], [21, 14]]) one('lamp', x, y);
   one('sign', 24, 31, { interact: ['WHISPERING VALE', 'Quarry: north-west.  Air altar: north-east.  Mind altar: south-east.  Water altar: south-west.'] });
 
   // ---- Air altar (north-east): a windswept hilltop ----------------------------------------
@@ -103,7 +106,7 @@ export function buildVale() {
   rect(12, 44, 17, 49, GROUND.PLAZA); // a stone platform on the shore
   clearArea(11, 41, 21, 52);
   prop('altar', [{ x: 14, y: 46 }, { x: 15, y: 46 }], { variant: 'water' });
-  for (const [x, y] of [[17, 51], [12, 42]]) placeIfFree('bush', x, y);
+  for (const [x, y] of [[17, 51], [12, 42]]) placeIfFree('thornBush', x, y);
 
   // ---- Trees: a forest rim round the vale, and copses within it --------------------------
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
@@ -111,25 +114,29 @@ export function buildVale() {
     const d = Math.min(x, y, W - 1 - x, H - 1 - y);
     const edge = d <= 1 ? 1 : d === 2 ? 0.7 : d === 3 ? 0.3 : 0;
     const copse = (Math.sin(x * 0.31) + Math.cos(y * 0.27) + Math.sin((x + y) * 0.17)) > 1.6 ? 0.55 : 0.02;
-    if (rng() < Math.max(edge, copse)) placeIfFree('tree', x, y, { variant: rng() < 0.55 ? 'pine' : 'oak' });
+    if (rng() < Math.max(edge, copse)) placeIfFree('tree', x, y, { variant: rng() < 0.45 ? 'dead' : 'gloom' });
   }
 
-  // ---- Wild things: tall grass, flowers, bushes, the odd rock ------------------------------
+  // ---- Wild things: dead grass, ghost-flowers, thorns, glowing mushrooms, crystal shards ----
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
     if (!free(x, y) || keep[i(x, y)] || ground[i(x, y)] !== GROUND.GRASS) continue;
     const r = rng();
     const meadow = Math.sin(x * 0.5) + Math.cos(y * 0.4) > 1.1;
     if (meadow && r < 0.7) one('tallGrass', x, y, { blocks: false });
-    else if (r < 0.03) one('bush', x, y);
-    else if (r < 0.09) one('flowers', x, y, { blocks: false });
-    else if (r < 0.1) one('rock', x, y);
-    else if (r < 0.12) one('mushrooms', x, y, { blocks: false });
+    else if (r < 0.03) one('thornBush', x, y);
+    else if (r < 0.06) one('glowFlowers', x, y, { blocks: false });
+    else if (r < 0.07) one('rock', x, y);
+    else if (r < 0.09) one('glowShrooms', x, y, { blocks: false });
+    else if (r < 0.1) one('crystalShard', x, y, { blocks: false });
+    else if (r < 0.105) one('bones', x, y, { blocks: false });
   }
 
   return {
     id: 'vale',
     name: 'Whispering Vale',
     W, H, ground, blocked, props,
+    theme: 'vale', // its own ground colours and scenery
+    dark: true, // always night here: only glowing things give light
     spawn: { x: 2, y: 29, facing: Math.PI / 2 },
     exits: [
       { tiles: [{ x: 0, y: 29 }, { x: 0, y: 30 }], to: 'route1', at: { x: 49, y: 42 }, facing: -Math.PI / 2 },
@@ -138,7 +145,7 @@ export function buildVale() {
     spawns: [
       { enemy: 'essenceGolem', x: 40, y: 16 },
       { enemy: 'essenceGolem', x: 44, y: 8 },
-      { enemy: 'essenceGolem', x: 11, y: 24 },
+      { enemy: 'essenceGolem', x: 12, y: 24 },
       { enemy: 'essenceGolem', x: 33, y: 38 },
       { enemy: 'essenceGolem', x: 56, y: 37 },
       { enemy: 'essenceGolem', x: 30, y: 51 },

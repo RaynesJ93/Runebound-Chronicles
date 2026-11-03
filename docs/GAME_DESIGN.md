@@ -410,7 +410,7 @@ New gear: iron sword, iron med helm, bronze and iron sq shields, bronze and iron
 
 ### Runecrafting and Whispering Vale (shipped in v0.16.0)
 
-**Whispering Vale** (72 × 60 tiles) lies east of Thornwood: follow the trail past the oak grove on Route 1 to the map's east edge. It's quiet: six essence golems wander its meadows, but they never attack first.
+**Whispering Vale** (72 × 60 tiles) lies east of Thornwood. It looks like nowhere else: it is always night there, and only glowing things give light: the altars cast pools of coloured light, the campfire and lanterns flicker, the essence crystals, glowing mushrooms and ghost-flowers glow faintly blue, and a small circle of light follows you. The grass is dead blue-green, the earth grey-violet, the water murky; twisted dead trees and purple gloom trees replace the forest, with thorny black shrubs, crystal shards in the ground and wisps of light drifting through the air. (The light map is worked out at a quarter of the screen's resolution so it stays cheap on phones.) To get there, follow the trail past the oak grove on Route 1 to the map's east edge. It's quiet: six essence golems wander its meadows, but they never attack first.
 - **Essence quarry** (north-west): a rocky pit of essence crystals. Mine them with any pickaxe for rune essence (Mining 1, 5 XP, 60% a swing); they never run dry.
 - **Runekeeper's camp** (middle): Aldric the Runekeeper, a tent, a cooking fire, and the runekeepers' **supply chest**, an iron-banded camp trunk that opens your bank.
 - **Air altar** (north-east): a pale pedestal on a windswept stone dais, with a great swirl of wind above it.
