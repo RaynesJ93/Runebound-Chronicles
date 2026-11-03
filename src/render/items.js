@@ -492,6 +492,15 @@ const DRAW = {
       b.set(x, y, x === 8 || (y === 9 && torso) ? c[0] : (x + y) % 5 === 0 ? c[2] : c[1]);
     }
   },
+  runeEssence(b) {
+    const c = [hex('#6a8aa8'), hex('#a8c8e0'), hex('#d8ecfa'), hex('#ffffff')];
+    for (let y = 2; y < 15; y++) for (let x = 3; x < 13; x++) {
+      const dx = Math.abs(x + 0.5 - 8), top = 2 + dx * 0.9;
+      if (y < top || y > 14 - dx * 0.4) continue;
+      b.set(x, y, x < 7 ? c[2] : x > 9 ? c[0] : c[1]);
+    }
+    b.set(8, 2, c[3]); b.set(6, 6, c[3]); b.set(7, 10, c[3]);
+  },
   leather(b) { hideSheet(b, [hex('#7a4a26'), hex('#a8703c'), hex('#c8925a')]); },
   hardLeather(b) { hideSheet(b, [hex('#4a2c16'), hex('#6e4422'), hex('#8a5a32')]); b.set(5, 6, hex('#d8b07a')); b.set(10, 10, hex('#d8b07a')); },
   needle(b) {

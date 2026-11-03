@@ -31,13 +31,14 @@ There are no turn-based battles, no battle screens and no creature catching. You
 - Head to the top of Route 1 for **Copperdeep Mine**. Ask **Dorrin** to teach you: he'll give you a pickaxe and a hammer. Mine copper and tin, smelt them into bronze bars at the furnace, then hammer bars into daggers, swords, helmets, shields, chainbodies and arrowtips at the anvil. Iron needs Mining 15 and Smithing 15.
 - Ask **Old Finn** by Brambleford's pond to teach you fishing: he'll give you a net, a rod and some bait. Tap the ripples to fish, then cook your catch (and Wyn's chickens) on the cooking pit. Trout and salmon live in the Route 1 stream: you'll need a fly fishing rod and feathers.
 - By the cow field, **Hilda the Tanner** teaches crafting: tan cowhides into leather at her rack, then tap the leather to sew gloves, boots, a cowl, vambraces, a body and chaps (a ranged armour set you make yourself).
+- Follow the trail east past Route 1's oak grove to **Whispering Vale**: mine rune essence in the quarry, then take it to the **Air**, **Mind** or **Water** altar to turn it into runes. Aldric the Runekeeper explains it all, and the camp's supply chest opens your bank.
 - If you die you keep your 3 most valuable items; the rest wait in a gravestone where you fell for 15 minutes (free to reclaim for the first 5).
 
 ## Status
 
-**v0.15.0 — Phase 2 in progress.** The first playable version (Brambleford, Thornwood, real-time combat with melee, bows and magic, six combat skills to 99, loot, inventory, equipment, bank, shop, food, potions and gravestones) plus **Woodcutting**, **Fletching**, **Mining**, **Smithing**, **Fishing**, **Cooking** and **Crafting**, Copperdeep Mine and Wyn's chicken pen. All XP is 5× the base rates.
+**v0.16.0 — Phase 2 in progress.** The first playable version (Brambleford, Thornwood, real-time combat with melee, bows and magic, six combat skills to 99, loot, inventory, equipment, bank, shop, food, potions and gravestones) plus **Woodcutting**, **Fletching**, **Mining**, **Smithing**, **Fishing**, **Cooking**, **Crafting** and **Runecrafting**, Copperdeep Mine, Whispering Vale and Wyn's chicken pen. All XP is 5× the base rates.
 
-Next: Runecrafting (see the [roadmap](docs/ROADMAP.md)).
+Next: bank tabs and search, then Phase 3 (quests and new regions) (see the [roadmap](docs/ROADMAP.md)).
 
 ## Running it locally
 
@@ -81,6 +82,7 @@ node tests/save.test.mjs
 | `data/fishing.js` | Fishing spots and what they catch |
 | `data/cooking.js` | Cooking recipes and burn rates |
 | `data/crafting.js` | Tanning and sewing recipes |
+| `data/runecrafting.js` | Runecrafting altars |
 | `tests` | Save-loading tests (run with Node) |
 
 ## Stack

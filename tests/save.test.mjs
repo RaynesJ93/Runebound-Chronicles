@@ -84,7 +84,7 @@ const checkComplete = (s) => {
   for (const k of Object.keys(d.settings)) assert.ok(k in s.settings, `missing settings.${k}`);
   assert.equal(s.inventory.length, 28);
   assert.equal(Object.keys(s.equipment).length, 11);
-  for (const sk of ['attack', 'strength', 'defence', 'hitpoints', 'ranged', 'magic', 'woodcutting', 'fletching', 'mining', 'smithing', 'fishing', 'cooking', 'crafting']) assert.equal(typeof s.skills[sk].xp, 'number');
+  for (const sk of ['attack', 'strength', 'defence', 'hitpoints', 'ranged', 'magic', 'woodcutting', 'fletching', 'mining', 'smithing', 'fishing', 'cooking', 'crafting', 'runecrafting']) assert.equal(typeof s.skills[sk].xp, 'number');
 };
 
 test('a 3D-era save (version 1) upgrades', () => {

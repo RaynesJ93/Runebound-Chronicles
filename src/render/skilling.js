@@ -16,7 +16,7 @@ const METAL = {
 const WOOD = ['#4a2c16', '#7a4a26', '#a0703f'];
 
 // How long one loop of each animation takes, in seconds.
-const PERIOD = { tan: 1.1, sew: 1.2, chop: 0.9, mine: 1.0, smith: 0.8, fletch: 0.7, net: 2.2, rod: 3, cook: 1.4, smelt: 1.2 };
+const PERIOD = { runecraft: 1.2, tan: 1.1, sew: 1.2, chop: 0.9, mine: 1.0, smith: 0.8, fletch: 0.7, net: 2.2, rod: 3, cook: 1.4, smelt: 1.2 };
 
 const ease = (t) => t * t * (3 - 2 * t);
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -257,6 +257,32 @@ export function drawSkilling(ctx, sk, p, time) {
       // and the bar in your hands, glowing
       px(ctx, a.hx - 1, a.hy, '#ff9a3a', 3, 2);
       px(ctx, a.hx, a.hy, '#ffe08a');
+      break;
+    }
+    case 'runecraft': {
+      // streams of rune-coloured light flow from your hands into the altar,
+      // then burst upwards from it
+      const [hi, mid, deep] = sk.colour || ['#ffffff', '#cfe8ff', '#9ec8f0'];
+      const sx = p.fx, sy = p.fy - 12;
+      const ax = a.tx, ay = a.ty - 10;
+      for (let k = 0; k < 10; k++) {
+        const t = ((T * 1.4 + k / 10) % 1);
+        const wob = Math.sin(t * Math.PI * 2 + k) * 3;
+        ctx.globalAlpha = Math.sin(t * Math.PI);
+        px(ctx, lerp(sx, ax, t) + wob * 0.4, lerp(sy, ay, t) - Math.sin(t * Math.PI) * 8 + wob * 0.3, k % 3 ? mid : hi, 2, 2);
+      }
+      ctx.globalAlpha = 1;
+      // the burst at the altar
+      const b = (T % 0.6) / 0.6;
+      for (let k = 0; k < 8; k++) {
+        const ang = (k / 8) * Math.PI * 2 + T;
+        ctx.globalAlpha = 1 - b;
+        px(ctx, ax + Math.cos(ang) * b * 9, ay + Math.sin(ang) * b * 5 - b * 6, k % 2 ? deep : hi, 2, 2);
+      }
+      ctx.globalAlpha = 1;
+      // a glow in your raised hands
+      px(ctx, sx - 2, sy - 1, hi, 4, 3);
+      px(ctx, sx - 1, sy, mid, 2, 1);
       break;
     }
     case 'tan': {

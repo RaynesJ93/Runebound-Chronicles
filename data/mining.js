@@ -7,6 +7,8 @@ export const ROCKS = {
     examine: 'A rock with veins of copper.' },
   tin: { name: 'Tin rock', level: 1, xp: 17.5, ore: 'tinOre', chance: 0.38, deplete: 1, respawn: [4, 7],
     examine: 'A rock with flecks of tin.' },
+  essence: { name: 'Essence crystal', level: 1, xp: 5, ore: 'runeEssence', chance: 0.6, deplete: 0, respawn: [1, 1],
+    examine: 'A crystal of pure rune essence, humming faintly. It never runs dry.' },
   iron: { name: 'Iron rock', level: 15, xp: 35, ore: 'ironOre', chance: 0.3, deplete: 1, respawn: [9, 15],
     examine: 'A rock streaked with rusty iron.' },
 };

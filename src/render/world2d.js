@@ -45,7 +45,11 @@ function getLib() {
     rug: S.rug(),
     plant: S.plant(),
     gravestone: S.gravestone(),
-    ore: Object.fromEntries(['copper', 'tin', 'iron'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
+    ore: { ...Object.fromEntries(['copper', 'tin', 'iron'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
+      essence: [S.essenceRock(1), S.essenceRock(2)] },
+    altar: Object.fromEntries(['air', 'mind', 'water'].map((v) => [v, [S.altar(v, 0), S.altar(v, 1)]])),
+    standingStone: [S.standingStone(1), S.standingStone(2.5), S.standingStone(4)],
+    campChest: S.campChest(),
     oreEmpty: [S.oreRock(null, 131), S.oreRock(null, 132)],
     furnace: S.furnace(),
     tanningRack: S.tanningRack(),
@@ -136,6 +140,9 @@ export function createWorldView(canvasEl, area) {
       }
       case 'furnace': place(lib.furnace, f.x, f.y + 1); break;
       case 'tanningRack': place(lib.tanningRack, f.x, f.y); break;
+      case 'altar': place(lib.altar[p.variant][0], f.x, f.y + 1, { frames: lib.altar[p.variant], rate: 2.5 }); break;
+      case 'standingStone': place(pick(lib.standingStone, p), f.x, f.y); break;
+      case 'campChest': place(lib.campChest, f.x, f.y); break;
       // Ripples sit flat on the water, under anyone standing nearby.
       case 'fishingSpot': place(lib.fishingSpot[0], f.x, f.y - 2, { frames: lib.fishingSpot, rate: 1.6, sortY: p.y * TILE }); break;
       case 'cookingPit': place(lib.cookingPit[0], f.x, f.y, { frames: lib.cookingPit }); break;

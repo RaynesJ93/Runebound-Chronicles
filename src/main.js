@@ -34,6 +34,7 @@ import { SMELTING, SMITHING } from '../data/smithing.js';
 import { SPOTS, FISH_TICKS, spotLevel } from '../data/fishing.js';
 import { COOKING } from '../data/cooking.js';
 import { TANNING, SEWING, CRAFT_GROUP } from '../data/crafting.js';
+import { ALTARS, runesPerEssence } from '../data/runecrafting.js';
 
 const AUTOSAVE_TICKS = 50; // 30 seconds
 
@@ -68,7 +69,7 @@ function boot() {
     for (const p of a.props) if (p.interact) for (const t of p.tiles) look.set(a.idx(t.x, t.y), p);
     // Trees can be chopped: their trunk, and the canopy just above it.
     for (const p of a.props) {
-      if ((p.type === 'ore' && ROCKS[p.variant]) || (p.type === 'fishingSpot' && SPOTS[p.variant])) { for (const t of p.tiles) look.set(a.idx(t.x, t.y), p); continue; }
+      if ((p.type === 'ore' && ROCKS[p.variant]) || (p.type === 'fishingSpot' && SPOTS[p.variant]) || (p.type === 'altar' && ALTARS[p.variant])) { for (const t of p.tiles) look.set(a.idx(t.x, t.y), p); continue; }
       if (p.type !== 'tree' || !TREES[p.variant]) continue;
       for (const t of p.tiles) {
         look.set(a.idx(t.x, t.y), p);
@@ -688,6 +689,11 @@ function boot() {
         title ||= p.depleted ? 'Tree stump' : tree.name;
         if (!p.depleted) opts.push({ label: `Chop down ${tree.name}`, fn: () => { combat.stop(); useProp(p); } });
         opts.push({ label: 'Examine', fn: () => hud.message(p.depleted ? 'A stump. The tree will grow back soon.' : `${tree.examine} (Woodcutting ${tree.level})`) });
+      } else if (p.type === 'altar' && ALTARS[p.variant]) {
+        const alt = ALTARS[p.variant];
+        title ||= alt.name;
+        opts.push({ label: 'Craft runes', fn: () => { combat.stop(); useProp(p); } });
+        opts.push({ label: 'Examine', fn: () => hud.message(`${alt.examine} (Runecrafting ${alt.level})`) });
       } else if (p.type === 'fishingSpot' && SPOTS[p.variant]) {
         const spot = SPOTS[p.variant];
         title ||= `Fishing spot (${spot.verb.toLowerCase()})`;
@@ -703,7 +709,7 @@ function boot() {
         opts.push({ label: `Enter ${b?.label || 'building'}`, fn: () => { combat.stop(); useProp(p); } });
       } else if (p.action) {
         const ACTION_LABEL = { bank: 'Use bank booth', shop: 'Trade', smelt: 'Smelt ore', smith: 'Smith metal', cook: 'Cook food', tan: 'Tan hides' };
-        opts.push({ label: ACTION_LABEL[p.action] || 'Use', fn: () => { combat.stop(); useProp(p); } });
+        opts.push({ label: p.type === 'campChest' ? 'Open supply chest' : ACTION_LABEL[p.action] || 'Use', fn: () => { combat.stop(); useProp(p); } });
       } else if (p.interact) {
         opts.push({ label: `Look at ${PROP_NAME[p.type] || p.type || 'this'}`, fn: () => { combat.stop(); useProp(p); } });
       }
@@ -742,7 +748,7 @@ function boot() {
   const runAction = (name) => {
     combat.stop();
     if (name === 'smelt' || name === 'smith' || name === 'cook' || name === 'tan') { stationMenu(name); return; }
-    if (name === 'bank') hud.openTrade('bank', 'Bank of Brambleford');
+    if (name === 'bank') hud.openTrade('bank', lastStation?.type === 'campChest' ? "Runekeepers' supply chest" : 'Bank of Brambleford');
     else if (name === 'shop') hud.openTrade('shop', shop.name);
     refreshTrade();
   };
@@ -860,6 +866,7 @@ function boot() {
     }
     if (prop.grave) { graveMenu(); return; }
     if (prop.type === 'tree' || prop.type === 'ore' || prop.type === 'fishingSpot') { startGather(prop); return; }
+    if (prop.type === 'altar') { lastStation = null; startRunecraft(prop); return; }
     if (prop.action) { lastStation = prop; runAction(prop.action); return; }
     if (prop.interact) hud.showDialog(prop.interact);
   };
@@ -994,6 +1001,33 @@ function boot() {
     book.add('fishing', c.xp);
     refreshInventory();
     if (!inventory.freeSlots) { hud.message(fullBag(a.g)); stopActivity(); }
+  };
+
+  // ---- Runecrafting -----------------------------------------------------------------
+  // Touch an altar: every piece of essence in your bag becomes runes at once.
+  const startRunecraft = (prop) => {
+    const alt = ALTARS[prop.variant];
+    if (!alt) return;
+    const lvl = book.level('runecrafting');
+    if (lvl < alt.level) { hud.message(`You need a Runecrafting level of ${alt.level} to use the ${alt.name.toLowerCase()}.`); return; }
+    if (!inventory.count('runeEssence')) { hud.message('You need rune essence to craft runes. Mine it in the quarry to the north-west.'); return; }
+    combat.stop();
+    player.faceTowards(prop.tiles[0].x, prop.tiles[0].y);
+    activity = { kind: 'runecraft', prop, alt, next: ticker.count + 2, since: time };
+    hud.message(`You hold the essence up to the ${alt.name.toLowerCase()}...`);
+  };
+  const runecraftStep = (a) => {
+    const n = inventory.count('runeEssence');
+    activity = null;
+    if (!n) return;
+    const per = runesPerEssence(a.alt, book.level('runecrafting'));
+    inventory.remove('runeEssence', n);
+    inventory.add(a.alt.rune, n * per);
+    const total = n * per;
+    hud.message(`You bind the essence into ${total.toLocaleString('en-GB')} ${itemName(a.alt.rune).toLowerCase()}${total === 1 ? '' : 's'}.`);
+    book.add('runecrafting', a.alt.xp * n);
+    refreshInventory();
+    save();
   };
 
   // ---- Fletching -----------------------------------------------------------------
@@ -1155,6 +1189,7 @@ function boot() {
     if (dying || transitioning || combat.target || player.moving) { activity = null; return; }
     if (n < a.next) return;
     if (a.kind === 'gather') gatherStep(a);
+    else if (a.kind === 'runecraft') runecraftStep(a);
     else makeStep(a);
   });
 
@@ -1163,6 +1198,7 @@ function boot() {
   const skillingView = () => {
     const a = activity;
     if (!a) return null;
+    if (a.kind === 'runecraft') return { anim: 'runecraft', skill: 'runecrafting', target: { x: a.prop.tiles[0].x + 0.5, y: a.prop.tiles[0].y }, since: a.since, colour: a.alt.colour };
     if (a.kind === 'gather') {
       const t = a.prop.tiles[0];
       if (a.g.perSpot) return { anim: a.d.tool === 'smallNet' ? 'net' : 'rod', skill: 'fishing', target: t, since: a.since, fly: a.d.tool === 'flyFishingRod' };

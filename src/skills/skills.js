@@ -49,6 +49,7 @@ export const SKILLS = [
   { id: 'fishing', name: 'Fishing', about: 'Catch fish with nets and rods. Higher levels catch better fish.' },
   { id: 'cooking', name: 'Cooking', about: 'Cook raw food on a fire. Higher levels burn less and unlock better fish.' },
   { id: 'crafting', name: 'Crafting', about: 'Tan hides into leather, then sew leather armour with a needle and thread.' },
+  { id: 'runecrafting', name: 'Runecrafting', about: 'Bind rune essence into runes at altars. Higher levels give more runes per essence.' },
 ];
 
 export const SKILL_NAME = Object.fromEntries(SKILLS.map((s) => [s.id, s.name]));
