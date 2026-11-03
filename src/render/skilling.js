@@ -14,6 +14,7 @@ const METAL = {
   bronze: ['#6e4320', '#a8692e', '#d4934f', '#f2c48a'],
   iron: ['#4a4f56', '#7a828b', '#a8b0b8', '#dfe5ea'],
   steel: ['#5e666e', '#959ea6', '#c4ccd2', '#f2f6f8'],
+  mithril: ['#1e2850', '#3a4a8a', '#6a7ed0', '#b8c8ff'],
 };
 const WOOD = ['#4a2c16', '#7a4a26', '#a0703f'];
 

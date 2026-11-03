@@ -3,7 +3,8 @@
 //
 // A landing at the south (the way back up), three coal caverns (west, north
 // and east) with a few iron, silver and gold rocks, and cave beasts roaming
-// the dark.
+// the dark. A tunnel at the top of the north cavern leads down to Copperdeep
+// Hollow (hollow.js).
 
 import { GROUND } from '../../src/world/area.js';
 import { mulberry32 } from '../../src/core/rng.js';
@@ -45,6 +46,7 @@ export function buildDepths() {
   tunnel(19, 21, 20, 11);
   tunnel(13, 10, 14, 7);
   tunnel(27, 7, 29, 9);
+  for (let y = 1; y <= 4; y++) dig(24, y); // down to the Hollow
 
   const prop = (type, tiles, extra = {}) => {
     props.push({ type, tiles, x: tiles[0].x, y: tiles[0].y, ...extra });
@@ -55,6 +57,8 @@ export function buildDepths() {
 
   // ---- The landing -----------------------------------------------------------------------
   one('caveMouth', 20, 30, { blocks: false });
+  one('caveMouth', 24, 1, { blocks: false });
+  one('sign', 25, 3, { interact: ['DOWN: COPPERDEEP HOLLOW', 'Mithril, they say. And things that hunt in the dark.'] });
   one('sign', 23, 27, { interact: ['COPPERDEEP DEPTHS', 'Coal in every cavern. Cave beasts too.', 'Up: back to the iron gallery.'] });
   for (const [x, y] of [[16, 26], [24, 24]]) one('lamp', x, y);
   one('crate', 15, 24);
@@ -82,6 +86,7 @@ export function buildDepths() {
     spawn: { x: 20, y: 28, facing: Math.PI },
     exits: [
       { tiles: [{ x: 20, y: 30 }], to: 'mine', at: { x: 23, y: 4 }, facing: 0 },
+      { tiles: [{ x: 24, y: 1 }], to: 'hollow', at: { x: 22, y: 30 }, facing: Math.PI },
     ],
     spawns: [
       { enemy: 'caveBeast', x: 8, y: 13 },

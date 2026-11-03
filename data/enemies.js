@@ -174,5 +174,27 @@ export const ENEMIES = {
       ],
       rare: { chance: 1 / 128, table: [{ item: 'warCharm', qty: 1 }, { item: 'uncutRuby', qty: 1 }, { item: 'uncutDiamond', qty: 1 }] },
     },
+  },  nightStalker: {
+    id: 'nightStalker', name: 'Night stalker', level: 35, hp: 45,
+    attack: 30, strength: 28, defence: 24,
+    attackBonus: 10, strengthBonus: 8, defenceBonus: 12, maxHit: 6,
+    speed: 4, attackType: 'slash', aggressive: true, aggroRange: 3, wander: 4, leash: 8, respawn: 45,
+    look: { skin: '#3a2a5a', hair: '#1a1028', tunic: '#2a1e40', pants: '#1a1028', belt: '#1a1028', eyes: '#5ff0ff' },
+    examine: 'A thing made of shadow, with eyes like cold fire. It moves too quickly.',
+    loot: {
+      always: [{ item: 'bones', qty: 1 }],
+      main: [
+        { item: 'coins', min: 40, max: 150, chance: 1 / 3 },
+        { item: 'coal', min: 2, max: 4, chance: 1 / 4 },
+        { item: 'mithrilOre', qty: 1, chance: 1 / 8 },
+        { item: 'mithrilBar', qty: 1, chance: 1 / 14 },
+        { item: 'mithrilArrowtips', min: 5, max: 15, chance: 1 / 16 },
+        { item: 'uncutSapphire', qty: 1, chance: 1 / 20 },
+        { item: 'uncutEmerald', qty: 1, chance: 1 / 40 },
+        { item: 'mithrilMedHelm', qty: 1, chance: 1 / 50 },
+        { item: 'mithrilScimitar', qty: 1, chance: 1 / 64 },
+      ],
+      rare: { chance: 1 / 96, table: [{ item: 'uncutRuby', qty: 1 }, { item: 'uncutDiamond', qty: 1 }, { item: 'mithrilKiteshield', qty: 1 }] },
+    },
   },
 };

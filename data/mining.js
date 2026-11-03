@@ -17,10 +17,13 @@ export const ROCKS = {
     examine: 'A rock with bright streaks of silver.' },
   gold: { name: 'Gold rock', level: 40, xp: 65, ore: 'goldOre', chance: 0.18, deplete: 1, respawn: [60, 100],
     examine: 'A rock glinting with veins of gold.' },
+  mithril: { name: 'Mithril rock', level: 55, xp: 80, ore: 'mithrilOre', chance: 0.16, deplete: 1, respawn: [80, 130],
+    examine: 'A rock shot through with faintly glowing blue mithril.' },
 };
 
 // Best first. A pickaxe works from your bag or in your hand.
 export const PICKAXES = [
+  { id: 'mithrilPickaxe', level: 20, bonus: 0.3 },
   { id: 'steelPickaxe', level: 10, bonus: 0.2 },
   { id: 'ironPickaxe', level: 5, bonus: 0.1 },
   { id: 'bronzePickaxe', level: 1, bonus: 0 },

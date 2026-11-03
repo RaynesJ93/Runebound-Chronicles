@@ -456,7 +456,17 @@ The **steel pickaxe** (Mining 10) and **steel axe** (Woodcutting 10) work 20% fa
 
 **Silver, gold and gems (v0.28.0).** Copperdeep Depths also has silver rocks (Mining 20, 40 XP) and gold rocks (Mining 40, 65 XP). Smelt silver bars at Smithing 20 and gold bars at Smithing 40 (one ore each, never fail). Every ore you mine (not essence) has a small chance of an uncut gem as well: about 1 in 80, rising to 1 in 40 at level 99 (sapphire 55%, emerald 28%, ruby 13%, diamond 4%). Cave beasts drop uncut gems too.
 
-**Planned next:** mithril.
+**Copperdeep Hollow and mithril (v0.29.0).** A tunnel at the top of the Depths' north cavern leads down to **Copperdeep Hollow**: pitch dark except for lamps and the faint blue glow of mithril. Night stalkers (level 35, fast, aggressive) hunt there. It has mithril rocks, coal and a little gold.
+
+| Rock | Level | XP | Base chance | Refills in |
+| --- | --- | --- | --- | --- |
+| Mithril | 55 | 80 | 16% | 48–78 s |
+
+**Mithril bars** (furnace, Smithing 50): 1 mithril ore + 2 coal, 30 XP, never fail. **Mithril items** (anvil, 50 XP a bar; mithril gear needs Attack or Defence 20): dagger 50, axe 51, mace 52, pickaxe 52, med helm 53, sword 54, 15 arrowtips 55, scimitar 55, longsword 56, full helm 57, sq shield 58, battleaxe 60, chainbody 61, kiteshield 62, platelegs 66, platebody 68 (same bar counts as the other metals).
+
+The **mithril pickaxe** (Mining 20) and **mithril axe** (Woodcutting 20) work 30% faster than bronze. **Mithril arrows**: Fletching 45, ranged strength 22. Night stalkers drop mithril ore, coal, mithril bars and arrowtips, gems and the odd piece of mithril gear. Mithril art is recoloured from the steel art in a dark blue; night stalkers use their painted sheet.
+
+**Planned next:** adamant and rune come with the endgame areas (Phase 5).
 
 New gear: iron sword, iron med helm, bronze and iron sq shields, bronze and iron chainbodies (iron needs Attack/Defence 5), and iron arrows (ranged strength 10; Fletching 15 from iron arrowtips). Shields show their metal on your character.
 
