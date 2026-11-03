@@ -311,6 +311,7 @@ function boot() {
       const group = CRAFT_GROUP[id] || (inventory.count('leather') ? 'leather' : inventory.count('hardLeather') ? 'hardLeather' : null);
       return () => sewMenu(group, x, y);
     }
+    if (ITEMS[id]?.noted) return () => hud.message(`These are bank notes. Put them in a bank, or the supply chest in Whispering Vale, to turn them back into ${itemName(ITEMS[id].noted).toLowerCase()}.`);
     if (id === 'cowhide') return () => hud.message("Tan cowhides into leather at Hilda's tanning rack, by the cow field.");
     if (/^raw/.test(id)) return () => hud.message('Cook this on a fire: the cooking pit by the pond, or the goblins\' campfire.');
     if (id === 'knife') return () => fletchMenu(inventory.count('logs') ? 'logs' : inventory.count('oakLogs') ? 'oakLogs' : null, x, y);
@@ -772,7 +773,8 @@ function boot() {
     const q = hud.tradeQty;
     if (hud.tradeMode === 'bank') {
       const n = bank.deposit(inventory, i, q);
-      hud.tradeStatus(`Deposited ${itemName(slot.id)} × ${n}.`);
+      const real = ITEMS[slot.id].noted;
+      hud.tradeStatus(real ? `Deposited ${n} notes: they turn back into ${itemName(real).toLowerCase()} in the bank.` : `Deposited ${itemName(slot.id)} × ${n}.`);
     } else {
       if (slot.id === 'coins') { hud.tradeStatus("You can't sell coins!"); return; }
       const r = shop.sell(i, q, inventory);
@@ -1010,7 +1012,10 @@ function boot() {
     if (!alt) return;
     const lvl = book.level('runecrafting');
     if (lvl < alt.level) { hud.message(`You need a Runecrafting level of ${alt.level} to use the ${alt.name.toLowerCase()}.`); return; }
-    if (!inventory.count('runeEssence')) { hud.message('You need rune essence to craft runes. Mine it in the quarry to the north-west.'); return; }
+    if (!inventory.count('runeEssence')) {
+      hud.message(inventory.count('runeEssenceNoted') ? "Noted essence won't work. Bank it at the supply chest to turn it back into essence." : 'You need rune essence to craft runes. Mine it in the quarry to the north-west.');
+      return;
+    }
     combat.stop();
     player.faceTowards(prop.tiles[0].x, prop.tiles[0].y);
     activity = { kind: 'runecraft', prop, alt, next: ticker.count + 2, since: time };

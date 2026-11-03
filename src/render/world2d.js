@@ -67,7 +67,7 @@ function getLib() {
 
 // Walking frames for a villager, drawn the first time they're needed.
 function framesFor(lib, look, key, kind = 'person') {
-  if (!lib.people.has(key)) lib.people.set(key, kind === 'wolf' ? S.wolfFrames(look) : kind === 'chicken' ? S.chickenFrames(look) : kind === 'cow' ? S.cowFrames(look) : S.characterFrames(look));
+  if (!lib.people.has(key)) lib.people.set(key, kind === 'wolf' ? S.wolfFrames(look) : kind === 'chicken' ? S.chickenFrames(look) : kind === 'cow' ? S.cowFrames(look) : kind === 'golem' ? S.golemFrames(look) : S.characterFrames(look));
   return lib.people.get(key);
 }
 

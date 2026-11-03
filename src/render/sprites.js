@@ -1172,3 +1172,58 @@ export function campChest() {
   b.outline();
   return sprite(b, 11, 21);
 }
+
+// ---- Essence golems ----------------------------------------------------------------
+
+// A golem of grey-blue stone with essence crystals growing from it. view:
+// 'front' (eyes glowing), 'back' (crystals on its back) or 'side'. f = walk frame.
+function drawGolem(look, view, f) {
+  const b = new Bitmap(26, 32);
+  const st = [hex('#3e4652'), hex('#5a6472'), hex('#7a8494'), hex('#9aa4b4')];
+  const cr = [hex('#6a8aa8'), hex('#a8d0f0'), hex('#e0f4ff'), hex('#ffffff')];
+  const bob = f === 0 ? 0 : 1;
+  const block = (x, y, w, h, shade = 1) => {
+    b.rect(x, y, w, h, st[shade]);
+    b.rect(x, y, w, 1, st[Math.min(3, shade + 1)]);
+    b.rect(x, y + h - 1, w, 1, st[Math.max(0, shade - 1)]);
+  };
+  // legs: chunky blocks that step
+  const [l1, l2] = f === 1 ? [[7, 22], [15, 24]] : f === 2 ? [[7, 24], [15, 22]] : [[7, 23], [15, 23]];
+  block(l1[0], l1[1], 5, 29 - l1[1], 1);
+  block(l2[0], l2[1], 5, 29 - l2[1], 1);
+  // body and head
+  block(5, 10 + bob, 16, 13, view === 'back' ? 1 : 2);
+  block(8, 3 + bob, 10, 8, 2);
+  // arms hanging heavy, swinging a little
+  const swing = f === 1 ? 1 : f === 2 ? -1 : 0;
+  if (view !== 'side') { block(1, 11 + bob + swing, 4, 11, 1); block(21, 11 + bob - swing, 4, 11, 1); }
+  else block(10, 12 + bob + swing, 5, 11, 0);
+  // cracks
+  for (const [x, y] of [[9, 14], [10, 15], [16, 18], [15, 19], [12, 6]]) b.set(x, y + bob, st[0]);
+  // essence crystals
+  const shard = (x, y, h) => { for (let k = 0; k < h; k++) { b.set(x, y - k, k === h - 1 ? cr[3] : cr[1 + (k % 2)]); if (k < h - 2) b.set(x + 1, y - k, cr[0]); } };
+  if (view === 'back') { shard(9, 15 + bob, 5); shard(13, 13 + bob, 7); shard(17, 15 + bob, 5); }
+  shard(3, 11 + bob, 7); shard(5, 11 + bob, 4); shard(22, 11 + bob, 7); shard(20, 11 + bob, 4); shard(13, 3 + bob, 4);
+  if (view === 'front') {
+    // glowing eyes and a crystal heart
+    b.rect(10, 6 + bob, 2, 2, cr[2]); b.rect(14, 6 + bob, 2, 2, cr[2]);
+    b.set(10, 6 + bob, cr[3]); b.set(14, 6 + bob, cr[3]);
+    b.rect(12, 15 + bob, 3, 3, cr[1]); b.set(13, 15 + bob, cr[3]);
+  } else if (view === 'side') {
+    b.rect(9, 6 + bob, 2, 2, cr[2]);
+  }
+  b.outline();
+  return b;
+}
+
+export function golemFrames(look) {
+  const frames = { down: [], up: [], left: [], right: [] };
+  for (let f = 0; f < 3; f++) {
+    frames.down.push(sprite(drawGolem(look, 'front', f), 13, 29));
+    frames.up.push(sprite(drawGolem(look, 'back', f), 13, 29));
+    const side = drawGolem(look, 'side', f);
+    frames.left.push(sprite(side, 13, 29));
+    frames.right.push(sprite(mirror(side), 13, 29));
+  }
+  return frames;
+}

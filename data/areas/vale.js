@@ -134,6 +134,14 @@ export function buildVale() {
     exits: [
       { tiles: [{ x: 0, y: 29 }, { x: 0, y: 30 }], to: 'route1', at: { x: 49, y: 42 }, facing: -Math.PI / 2 },
     ],
-    spawns: [],
+    // Six essence golems, spread thinly across the vale.
+    spawns: [
+      { enemy: 'essenceGolem', x: 40, y: 16 },
+      { enemy: 'essenceGolem', x: 44, y: 8 },
+      { enemy: 'essenceGolem', x: 11, y: 24 },
+      { enemy: 'essenceGolem', x: 33, y: 38 },
+      { enemy: 'essenceGolem', x: 56, y: 37 },
+      { enemy: 'essenceGolem', x: 30, y: 51 },
+    ],
   };
 }

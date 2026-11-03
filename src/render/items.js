@@ -1,4 +1,5 @@
 import { Bitmap, hex, rnd } from './pixel.js';
+import { ITEMS } from '../../data/items.js';
 
 // 16 x 16 item icons, drawn in code, outlined like everything else.
 // Used both in the inventory and lying on the ground.
@@ -600,6 +601,23 @@ function potion(b, skill, doses) {
 export function itemIcon(id) {
   if (cache.has(id)) return cache.get(id);
   const b = new Bitmap(16, 16);
+  // Bank notes: a slip of paper with the real item drawn small on it.
+  const real = ITEMS[id]?.noted;
+  if (real) {
+    const n = new Bitmap(16, 16);
+    n.rect(2, 1, 12, 14, hex('#f4ecd6'));
+    n.rect(2, 1, 12, 1, hex('#fffaf0'));
+    n.rect(11, 1, 3, 3, hex('#d8ccb0')); // folded corner
+    n.rect(4, 12, 6, 1, hex('#b8a888'));
+    n.outline();
+    const c = n.toCanvas();
+    const g = c.getContext('2d');
+    g.imageSmoothingEnabled = false;
+    g.drawImage(itemIcon(real).img, 3, 2, 10, 10);
+    const out = { img: c, url: c.toDataURL('image/png') };
+    cache.set(id, out);
+    return out;
+  }
   const pm = /^(attack|strength|defence)Potion(\d)$/.exec(id);
   if (pm) potion(b, pm[1], Number(pm[2]));
   else (DRAW[id] || DRAW.bag)(b);
