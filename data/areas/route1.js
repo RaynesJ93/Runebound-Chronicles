@@ -218,7 +218,7 @@ export function buildRoute1() {
     if (k === 2) continue; // gap facing the road
     one('standingStone', Math.round(99.5 + Math.cos(a) * 5), Math.round(41 + Math.sin(a) * 3.5));
   }
-  one('ruinWall', 99, 41, { interact: ['A worn stone altar. Carvings of a great tree circle its base.', "There's a hollow in the top, as if something used to sit there."] });
+  one('shrine', 99, 41, { interact: ['A worn stone altar. Carvings of a great tree circle its base.', "There's a hollow in the top, as if something used to sit there."] });
 
   // The wrecked merchant's cart, on the mine road
   clearArea(36, 33, 42, 38);
@@ -232,6 +232,26 @@ export function buildRoute1() {
     const a = (k / 10) * Math.PI * 2;
     one('mushrooms', Math.round(70 + Math.cos(a) * 3), Math.round(89 + Math.sin(a) * 2.2), { blocks: false });
   }
+
+  // A glowing rune stone stands in the middle of the ring
+  one('runeStone', 70, 89, { interact: ['A standing stone carved with a glowing rune.', 'The mushrooms around it grow in a perfect circle. Nobody planted them.'] });
+
+  // ---- The mine entrance: a timbered tunnel in a rock face at the end of the north-west road ----
+  for (let x = 24; x <= 37; x++) for (let y = 0; y <= 1; y++) {
+    if (y === 1 && (x === 30 || x === 31)) continue;
+    ground[i(x, y)] = GROUND.ROCKWALL; block(x, y); taken[i(x, y)] = 1; keep[i(x, y)] = 1;
+  }
+  props.push({ type: 'mineEntrance', tiles: [{ x: 30, y: 1 }, { x: 31, y: 1 }], x: 30, y: 1 });
+
+  // ---- Old trees, fallen logs and leftovers ------------------------------------------------------
+  for (const [x, y] of [[24, 20], [62, 39], [47, 71], [101, 58], [9, 69], [76, 37]]) at('tree', x, y, { variant: 'oldOak' });
+  const log2 = (x, y) => { if (free(x, y) && free(x + 1, y) && ground[i(x, y)] === GROUND.GRASS && ground[i(x + 1, y)] === GROUND.GRASS) prop('hollowLog', [{ x, y }, { x: x + 1, y }]); };
+  for (const [x, y] of [[40, 43], [70, 44], [25, 71], [88, 64], [60, 89], [16, 15]]) log2(x, y);
+  for (const [x, y] of [[93, 9], [100, 9], [89, 12]]) at('skeleton', x, y, { blocks: false, interact: ['Old bones. Something big did this.'] });
+  for (const [x, y] of [[30, 41], [10, 57]]) at('crateStack', x, y);                  // goblin loot
+  at('openBarrel', 12, 44); at('openBarrel', 26, 52);
+  at('crateStack', 25, 77); at('openBarrel', 30, 79);                                 // hunters' camp
+  at('crateStack', 39, 37);                                                           // the merchant's cart
 
   // ---- Forest: thick round the edge, copses and woods everywhere else -------------------------
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
@@ -261,6 +281,13 @@ export function buildRoute1() {
     else if (r < 0.06) one('tallGrass', x, y, { blocks: false });
   }
 
+  // Birches among the woods (only out in the wild woods, so the trees you
+  // came to chop stay oaks and pines), and young saplings among the bushes.
+  for (const p of props) {
+    if (p.type === 'tree' && (p.variant === 'oak' || p.variant === 'pine') && !keep[i(p.x, p.y)] && (p.x * 13 + p.y * 7) % 9 === 0) p.variant = 'birch';
+    if (p.type === 'bush' && (p.x * 5 + p.y * 3) % 4 === 0) p.type = 'sapling';
+  }
+
   return {
     id: 'route1',
     name: 'Thornwood',
@@ -268,7 +295,7 @@ export function buildRoute1() {
     spawn: { x: 55, y: H - 3, facing: Math.PI },
     exits: [
       { tiles: [{ x: 55, y: H - 1 }, { x: 56, y: H - 1 }], to: 'brambleford', at: { x: 21, y: 1 }, facing: 0 },
-      { tiles: [{ x: 30, y: 0 }, { x: 31, y: 0 }], to: 'mine', at: { x: 15, y: 26 }, facing: Math.PI },
+      { tiles: [{ x: 30, y: 1 }, { x: 31, y: 1 }], to: 'mine', at: { x: 15, y: 26 }, facing: Math.PI },
       { tiles: [{ x: W - 1, y: 48 }, { x: W - 1, y: 49 }], to: 'vale', at: { x: 2, y: 29 }, facing: Math.PI / 2 },
     ],
     spawns: [

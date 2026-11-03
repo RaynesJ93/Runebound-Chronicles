@@ -66,9 +66,27 @@ function textures(theme) {
   if (TEX[theme]) return TEX[theme];
   const t = (n) => texture(n);
   TEX[theme] = theme === 'vale'
-    ? { grass: t('valeGrass'), path: t('valePath'), sand: t('valePath'), water: [t('valeWater0'), t('valeWater1')], cave: t('cave'), rockwall: t('rockwall'), bridge: t('bridge'), floor: t('floor') }
-    : { grass: t('grass'), path: t('path'), plaza: t('plaza'), sand: t('sand'), dirt: t('dirt'), water: [t('water0'), t('water1')], bridge: t('bridge'), floor: t('floor'), cave: t('cave'), rockwall: t('rockwall') };
+    ? { flowers: flowerMasks([t('valeBlue'), t('valePurple')]), grass: t('valeGrass'), path: t('valePath'), sand: t('valePath'), water: [t('valeWater0'), t('valeWater1')], cave: t('cave'), rockwall: t('rockwall'), bridge: t('bridge'), floor: t('floor') }
+    : { flowers: flowerMasks([t('grassPink'), t('grassYellow')]), wall: t('wall'), grass: t('grass'), path: t('path'), plaza: t('plaza'), sand: t('sand'), dirt: t('dirt'), water: [t('water0'), t('water1')], bridge: t('bridge'), floor: t('floor'), cave: t('cave'), rockwall: t('rockwall') };
   return TEX[theme];
+}
+// From a flowery grass texture, keep just the flowers: pixels much brighter
+// than the texture's average and a different colour from it.
+function flowerMasks(list) {
+  return list.filter(Boolean).map((tx) => {
+    const n = tx.w * tx.h;
+    let r = 0, g = 0, b = 0;
+    for (let k = 0; k < n; k++) { r += tx.data[k * 4]; g += tx.data[k * 4 + 1]; b += tx.data[k * 4 + 2]; }
+    r /= n; g /= n; b /= n;
+    const lum0 = (r + g + b) / 3;
+    const mask = new Uint8Array(n);
+    for (let k = 0; k < n; k++) {
+      const R = tx.data[k * 4], G = tx.data[k * 4 + 1], B = tx.data[k * 4 + 2];
+      const d = Math.abs(R - r) + Math.abs(G - g) + Math.abs(B - b);
+      if ((R + G + B) / 3 - lum0 > 30 && d > 110 && !(G > R + 15 && G > B + 15)) mask[k] = 1;
+    }
+    return { tx, mask };
+  });
 }
 const px = (tx, x, y) => { const i = (((y % tx.h) * tx.w) + (x % tx.w)) * 4; return [tx.data[i], tx.data[i + 1], tx.data[i + 2]]; };
 
@@ -118,7 +136,17 @@ export function buildGround(area) {
 
       let c;
       switch (t) {
-        case GROUND.GRASS: c = T.grass ? px(T.grass, x, y) : grassPixel(x, y); break;
+        case GROUND.GRASS: {
+          c = T.grass ? px(T.grass, x, y) : grassPixel(x, y);
+          // flower meadows here and there
+          for (let k = 0; k < T.flowers.length; k++) {
+            if (vn(x, y, 56, 140 + k) < 0.72) continue;
+            const F = T.flowers[k];
+            const fx = (x + 17 * k) % F.tx.w, fy = (y + 29 * k) % F.tx.h;
+            if (F.mask[fy * F.tx.w + fx]) { c = px(F.tx, fx, fy); break; }
+          }
+          break;
+        }
         case GROUND.PATH: {
           if (T.path) { c = px(T.path, x, y); break; }
           const n = rnd(x, y, 31);
@@ -173,6 +201,7 @@ export function buildGround(area) {
           const below = g(tx, ty + 1);
           if (below !== GROUND.WALL && ly >= 13) c = P.skirting;
           else if (ly < 2 && g(tx, ty - 1) !== GROUND.WALL) c = P.wallTop;
+          else if (T.wall) c = px(T.wall, x, y);
           else c = (lx % 8 === 0) ? P.wall[0] : P.wall[1 + (rnd(tx * 2 + (lx >> 3), ty, 96) < 0.5 ? 0 : 1)];
           break;
         }

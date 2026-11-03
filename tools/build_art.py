@@ -44,7 +44,12 @@ add('oak', oak, h=56); add('oak', ImageOps.mirror(oak), h=54)
 add('oak', tint(oak, 0.9, 0.95), h=52); add('oak', tint(ImageOps.mirror(oak), 1.06), h=58)
 add('pine', pine, h=58); add('pine', ImageOps.mirror(pine), h=54)
 add('pine', tint(pine, 0.88), h=60); add('pine', tint(ImageOps.mirror(pine), 1.05), h=52)
-add('birch', src(NAT, 3), h=56); add('oldOak', src(NAT, 1), h=72); add('sapling', src(NAT, 19), h=22)
+birch, old, sap = src(NAT, 3), src(NAT, 1), src(NAT, 19)
+add('birch', birch, h=56); add('birch', ImageOps.mirror(birch), h=52); add('birch', tint(birch, 0.92), h=58)
+add('oldOak', old, h=72); add('oldOak', ImageOps.mirror(old), h=68)
+add('sapling', sap, h=22); add('sapling', ImageOps.mirror(sap), h=19)
+hollow = src(NAT, 15)
+add('hollowLog', hollow, w=32); add('hollowLog', ImageOps.mirror(hollow), w=30)
 bush, berry = src(NAT, 4), src(NAT, 5)
 add('bush', bush, w=22); add('bush', ImageOps.mirror(bush), w=20); add('bush', berry, w=20); add('bush', tint(bush, 0.9), w=21)
 grass = src(NAT, 6)
@@ -59,7 +64,9 @@ add('rock', big, w=20); add('rock', ImageOps.mirror(big), w=19); add('rock', sma
 stump = src(NAT, 14)
 add('stump', stump, w=18); add('stump', ImageOps.mirror(stump), w=17)
 add('logPile', src(NAT, 16), w=30)
-add('reeds', src(NAT, 18), h=20); add('lilyPads', src(NAT, 17), w=16)
+reeds, lily = src(NAT, 18), src(NAT, 17)
+add('reeds', reeds, h=20); add('reeds', ImageOps.mirror(reeds), h=17); add('reeds', reeds, h=14)
+add('lilyPads', lily, w=15, box=(16, 16)); add('lilyPads', ImageOps.mirror(lily), w=12, box=(16, 16)); add('lilyPads', lily, w=9, box=(16, 16))
 
 # ---- Village props -------------------------------------------------------------
 add('well', src(PROPS, 0), h=42)
@@ -69,6 +76,7 @@ add('sign', src(PROPS, 3), w=20)
 add('scarecrow', src(PROPS, 6), h=34)
 add('crop', src(PROPS, 7, (0, 0, 0.34, 0.5)), w=12, box=(16, 16))      # young turnip leaves
 add('crop', src(PROPS, 8, (0, 0.5, 0.34, 1)), w=14, box=(16, 16))      # a ripe pumpkin
+add('crop', src(PROPS, 8, (0, 0, 0.34, 0.5)), w=13, box=(16, 16))      # a cabbage
 add('tanningRack', src(PROPS, 9), h=28)
 pit = src(PROPS, 10)
 add('cookingPit', pit, w=24); add('cookingPit', tint(pit, 1.12), w=24)
@@ -85,6 +93,14 @@ add('openBarrel', src(PROPS, 19), w=15)
 # fence: one post, and the rails between two posts (taken from the straight fence)
 add('fencePost', src(PROPS, 4, (0, 0, 0.17, 1)), h=20)
 add('fenceRail', src(PROPS, 4, (0.12, 0.08, 0.88, 0.85)), w=18, outline=False)
+add('picketPost', src(PROPS, 16, (0, 0, 0.2, 1)), h=18)
+add('picketRail', src(PROPS, 16, (0.15, 0.05, 0.85, 1)), w=18, outline=False)
+
+# ---- One-off pieces --------------------------------------------------------------------
+add('coop', src('04_village_buildings', 7, (0, 0, 0.62, 1)), w=34)
+add('shrine', src('03_altars_magic', 3), w=34)
+add('runeStone', src('03_altars_magic', 4), h=30)
+add('skeleton', src('02_whispering_vale', 9), w=24); add('skeleton', ImageOps.mirror(src('02_whispering_vale', 9)), w=20)
 
 # ---- Whispering Vale ------------------------------------------------------------------
 VALE, ALT, MINE = '02_whispering_vale', '03_altars_magic', '06_mine_smithing'
@@ -163,6 +179,7 @@ for sheet, ids in ICONS.items():
 # (down, up, left, right). The game wants each direction as [stand, step, step].
 # key: (sheet, columns in sheet, first column, first row, height of the standing front frame)
 CHARS = {
+    'player': ('07_characters_adventurer_elder_guard_child', 6, 0, 0, 24),
     'maren': ('07_characters_adventurer_elder_guard_child', 6, 3, 0, 24),
     'tomas': ('07_characters_adventurer_elder_guard_child', 6, 0, 4, 26),
     'pip': ('07_characters_adventurer_elder_guard_child', 6, 3, 4, 20),
@@ -203,7 +220,8 @@ for key, spec in CHARS.items():
 # average so busy textures don't fight the sprites drawn on top of them.
 TEXTURES = {'grass': (0, 64, 0.45), 'path': (3, 32, 0.25), 'plaza': (4, 32, 0.15), 'sand': (5, 48, 0.2), 'dirt': (6, 48, 0.1),
             'water0': (7, 64, 0.25), 'water1': (8, 64, 0.25), 'bridge': (9, 32, 0), 'floor': (10, 32, 0.1), 'cave': (12, 32, 0.2),
-            'rockwall': (13, 64, 0.15, 0.45), 'valeGrass': (14, 64, 0.4), 'valePath': (15, 32, 0.25), 'valeWater0': (16, 64, 0.2), 'valeWater1': (17, 64, 0.2)}
+            'rockwall': (13, 64, 0.15, 0.45), 'valeGrass': (14, 64, 0.4), 'valePath': (15, 32, 0.25), 'valeWater0': (16, 64, 0.2), 'valeWater1': (17, 64, 0.2),
+            'grassPink': (1, 64, 0.2), 'grassYellow': (2, 64, 0.2), 'valeBlue': (18, 64, 0.2), 'valePurple': (19, 64, 0.2), 'wall': (11, 32, 0.1)}
 
 def calm(im, k):
     a = np.array(im).astype(np.float32)

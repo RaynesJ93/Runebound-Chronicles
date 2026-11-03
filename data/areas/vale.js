@@ -75,6 +75,7 @@ export function buildVale() {
   one('campfire', 31, 26, { action: 'cook', interact: ['A small cooking fire.'] });
   for (const [x, y] of [[33, 24], [25, 27]]) one('crate', x, y);
   one('barrel', 33, 25);
+  for (const [x, y, t] of [[34, 27, 'crateStack'], [24, 26, 'openBarrel']]) if (free(x, y)) one(t, x, y);
   one('logPile', 32, 23, { interact: ['Firewood.'] });
   // Lanterns at the crossroads, so the way is never quite lost in the dark.
   for (const [x, y] of [[21, 28], [24, 32], [50, 28], [21, 45], [21, 14]]) one('lamp', x, y);
@@ -107,6 +108,9 @@ export function buildVale() {
   clearArea(11, 41, 21, 52);
   prop('altar', [{ x: 14, y: 46 }, { x: 15, y: 46 }], { variant: 'water' });
   for (const [x, y] of [[17, 51], [12, 42]]) placeIfFree('thornBush', x, y);
+
+  // Old skeletons lie where the golems roam
+  for (const [x, y] of [[38, 18], [48, 10], [30, 40], [54, 36]]) if (free(x, y)) one('skeleton', x, y, { blocks: false, interact: ['A skeleton, half sunk in the dead grass. Crystal dust glitters on the bones.'] });
 
   // ---- Trees: a forest rim round the vale, and copses within it --------------------------
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
