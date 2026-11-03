@@ -19,6 +19,7 @@ export class Area {
     this.spawns = def.spawns || [];
     this.indoors = !!def.indoors; // interiors: dark surroundings, no forest skirt
     this.theme = def.theme || null; // a different look for the ground and scenery (e.g. 'vale')
+    this.neat = def.neat || []; // [x0, y0, x1, y1] squares of paving kept crisp and straight-edged
     this.dark = !!def.dark; // night-time: only lights and glowing things show up
     // Things that move (villagers, later enemies) and block tiles while they stand on them.
     this.dynamicBlock = null;
