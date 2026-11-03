@@ -112,6 +112,8 @@ export function createWorldView(canvasEl, area) {
   const shadows = [];
   const objects = []; // depth-sorted
   const pick = (arr, p) => arr[(p.x * 7 + p.y * 13) % arr.length];
+  // Small things sit a little off the tile grid so they don't line up in rows.
+  const jit = (p, k) => ((p.x * 37 + p.y * 11 + k * 17) % 9) - 4;
   const footOf = (p) => {
     const xs = p.tiles.map((t) => t.x);
     const ys = p.tiles.map((t) => t.y);
@@ -135,7 +137,7 @@ export function createWorldView(canvasEl, area) {
       case 'rock': place(pick(lib.rock, p), f.x, f.y); break;
       case 'flowers': {
         const spr = pick(lib.flowers, p);
-        decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE });
+        decals.push({ img: spr.img, x: p.x * TILE + jit(p, 1), y: p.y * TILE + jit(p, 2) });
         break;
       }
       case 'crop': place(lib.crop[p.ripe ? 1 : 0], f.x, f.y); break;
@@ -152,7 +154,7 @@ export function createWorldView(canvasEl, area) {
       case 'tent': place(pick(lib.tent, p), f.x, f.y); break;
       case 'campfire': place(lib.campfire[0], f.x, f.y, { frames: lib.campfire }); break;
       // Tall grass is drawn just in front of anyone standing in it, hiding their feet.
-      case 'tallGrass': place(pick(area.theme === 'vale' ? lib.deadGrass : lib.tallGrass, p), f.x, f.y, { sortY: (p.y + 1) * TILE + 1 }); break;
+      case 'tallGrass': place(pick(area.theme === 'vale' ? lib.deadGrass : lib.tallGrass, p), f.x + jit(p, 3), f.y + jit(p, 4) / 2, { sortY: (p.y + 1) * TILE + 1 }); break;
       case 'thornBush': place(pick(lib.thornBush, p), f.x, f.y); break;
       case 'crystalShard': place(pick(lib.crystalShard, p), f.x, f.y); break;
       case 'glowShrooms': { const spr = pick(lib.glowShrooms, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
@@ -182,8 +184,8 @@ export function createWorldView(canvasEl, area) {
       case 'anvil': place(lib.anvil, f.x, f.y); break;
       case 'rubble': { const spr = pick(lib.rubble, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
       case 'rug': decals.push({ img: lib.rug.img, x: (p.x + 0.5) * TILE - lib.rug.ax, y: (p.y + 0.5) * TILE - lib.rug.ay }); break;
-      case 'bones': decals.push({ img: lib.bones.img, x: p.x * TILE, y: p.y * TILE + 4 }); break;
-      case 'mushrooms': { const spr = pick(lib.mushrooms, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
+      case 'bones': decals.push({ img: lib.bones.img, x: p.x * TILE + jit(p, 5), y: p.y * TILE + 4 + jit(p, 6) / 2 }); break;
+      case 'mushrooms': { const spr = pick(lib.mushrooms, p); decals.push({ img: spr.img, x: p.x * TILE + jit(p, 7), y: p.y * TILE + jit(p, 8) / 2 }); break; }
       default: break; // doors are drawn as part of their building
     }
   }

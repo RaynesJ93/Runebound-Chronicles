@@ -36,7 +36,7 @@ There are no turn-based battles, no battle screens and no creature catching. You
 
 ## Status
 
-**v0.19.0 — Phase 2 in progress.** The first playable version (Brambleford, Thornwood, real-time combat with melee, bows and magic, six combat skills to 99, loot, inventory, equipment, bank, shop, food, potions and gravestones) plus **Woodcutting**, **Fletching**, **Mining**, **Smithing**, **Fishing**, **Cooking**, **Crafting** and **Runecrafting**, Copperdeep Mine, Whispering Vale and Wyn's chicken pen. All XP is 5× the base rates.
+**v0.19.1 — Phase 2 in progress.** The first playable version (Brambleford, Thornwood, real-time combat with melee, bows and magic, six combat skills to 99, loot, inventory, equipment, bank, shop, food, potions and gravestones) plus **Woodcutting**, **Fletching**, **Mining**, **Smithing**, **Fishing**, **Cooking**, **Crafting** and **Runecrafting**, Copperdeep Mine, Whispering Vale and Wyn's chicken pen. All XP is 5× the base rates.
 
 Next: bank tabs and search, then Phase 3 (quests and new regions) (see the [roadmap](docs/ROADMAP.md)).
 

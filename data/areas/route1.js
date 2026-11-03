@@ -66,15 +66,20 @@ export function buildRoute1() {
   road([[55, 95], [55, 50]]);                               // south, from Brambleford, to the crossroads
   road([[55, 50], [44, 38], [36, 30], [30, 20], [30, 0]]);  // north-west, to Copperdeep Mine
   road([[55, 48], [111, 48]]);                              // east, to Whispering Vale
-  road([[35, 50], [55, 50]]);                               // west, to the goblin camp
+  road([[33, 50], [55, 50]]);                               // west, through the goblin camp's gate
   road([[56, 82], [24, 82]]);                               // south-west, past the graveyard to the lake
   road([[57, 84], [86, 84]]);                               // south-east, to the old farmstead
   road([[84, 48], [84, 32]]);                               // north, into the wolf hills
   road([[80, 50], [80, 56]]);                               // down to the oak grove
-  road([[30, 26], [20, 26]]);                               // west, to the hermit's hut
-  road([[30, 10], [12, 10]]);                               // west, to the sealed cave
-  road([[57, 74], [62, 74]]);                               // to Bram's cabin
+  road([[30, 26], [15, 26]]);                               // west, to the hermit's door
+  road([[30, 10], [7, 10], [7, 7]]);                        // west, up to the sealed cave
+  road([[57, 75], [64, 75]]);                               // to Bram's door
+  road([[86, 84], [92, 84], [92, 81]]);                     // up to the farmhouse door
+  road([[43, 83], [43, 85]]);                               // into the graveyard
+  road([[44, 28], [44, 30], [40, 34]]);                     // the watchtower, off the mine road
+  road([[99, 44], [99, 47]]);                               // into the shrine
   rect(52, 46, 59, 53, GROUND.PLAZA);                       // the crossroads square
+  clearArea(49, 43, 62, 57);
 
   // ---- The stream, winding across the south, with a bridge on the road ------------------
   const streamY = (x) => 66 + Math.round(Math.sin(x / 7) * 2.2 + Math.sin(x / 3.1) * 0.8);
@@ -99,18 +104,18 @@ export function buildRoute1() {
 
   // ---- Goblin territory (west) ------------------------------------------------------------
   clearArea(4, 29, 36, 64);
-  rect(8, 33, 32, 60, GROUND.PATH);                         // trampled earth
+  rect(8, 33, 32, 57, GROUND.PATH);                         // trampled earth
   // a rough palisade ring, gate on the east side
-  for (let x = 6; x <= 34; x++) for (let y = 31; y <= 62; y++) {
-    const edge = x === 6 || x === 34 || y === 31 || y === 62;
+  for (let x = 6; x <= 34; x++) for (let y = 31; y <= 59; y++) {
+    const edge = x === 6 || x === 34 || y === 31 || y === 59;
     const gate = x === 34 && (y === 49 || y === 50 || y === 51);
     const broken = (x * 7 + y * 3) % 11 === 0; // gaps where it's fallen down
-    if (edge && !gate && !broken) one('fence', x, y);
+    if (edge && !gate && !broken && ground[i(x, y)] !== GROUND.WATER) one('fence', x, y);
   }
   for (const [x, y] of [[11, 42], [18, 41], [25, 42], [10, 55], [27, 57]]) prop('tent', [{ x, y }, { x: x + 1, y }], { interact: ['A grubby goblin tent. It smells awful.'] });
   one('campfire', 20, 50, { action: 'cook', interact: ['The goblins\' campfire. Something is burnt to the pot.'] });
-  for (const [x, y] of [[14, 46], [29, 46], [9, 50], [24, 58], [30, 54]]) one('crate', x, y);
-  for (const [x, y] of [[16, 52], [23, 47], [12, 59], [28, 44], [19, 56]]) one('bones', x, y, { blocks: false });
+  for (const [x, y] of [[14, 46], [29, 46], [9, 50], [24, 56], [30, 54]]) one('crate', x, y);
+  for (const [x, y] of [[16, 52], [23, 47], [12, 57], [28, 44], [19, 56]]) one('bones', x, y, { blocks: false });
   one('standingStone', 20, 45, { interact: ['A goblin war totem, daubed with red paint and hung with teeth.'] });
   building({ id: 'chiefHut', kind: 'cabin', label: null, x: 13, y: 33, w: 6, h: 4, doorX: 15,
     doorText: ["The goblin chief's hut. Something big is snoring inside.", 'Best not to wake it... yet.'] });
@@ -242,7 +247,7 @@ export function buildRoute1() {
     if (!free(x, y) || keep[i(x, y)] || ground[i(x, y)] !== GROUND.GRASS) continue;
     const r = rng();
     const patch = Math.sin(x * 0.7) + Math.cos(y * 0.45) > 0.95;
-    if (patch && r < 0.8) one('tallGrass', x, y, { blocks: false });
+    if (patch && r < 0.4) one('tallGrass', x, y, { blocks: false });
     else if (r < 0.025) one('bush', x, y);
     else if (r < 0.065) one('flowers', x, y, { blocks: false });
     else if (r < 0.08) one('mushrooms', x, y, { blocks: false });
@@ -269,9 +274,9 @@ export function buildRoute1() {
     spawns: [
       // Goblin territory
       { enemy: 'goblin', x: 13, y: 45 }, { enemy: 'goblin', x: 21, y: 43 }, { enemy: 'goblin', x: 27, y: 49 },
-      { enemy: 'goblin', x: 12, y: 52 }, { enemy: 'goblin', x: 22, y: 54 }, { enemy: 'goblin', x: 29, y: 58 },
+      { enemy: 'goblin', x: 12, y: 52 }, { enemy: 'goblin', x: 22, y: 54 }, { enemy: 'goblin', x: 29, y: 56 },
       { enemy: 'goblin', x: 17, y: 49 }, { enemy: 'goblin', x: 9, y: 46 },
-      { enemy: 'goblinBrute', x: 16, y: 58 }, { enemy: 'goblinBrute', x: 24, y: 40 },
+      { enemy: 'goblinBrute', x: 16, y: 55 }, { enemy: 'goblinBrute', x: 24, y: 40 },
       // Wolf hills
       { enemy: 'wolf', x: 74, y: 20 }, { enemy: 'wolf', x: 80, y: 13 }, { enemy: 'wolf', x: 86, y: 24 },
       { enemy: 'wolf', x: 92, y: 17 }, { enemy: 'wolf', x: 77, y: 28 }, { enemy: 'wolf', x: 100, y: 22 },
