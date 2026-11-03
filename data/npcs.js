@@ -243,12 +243,13 @@ export const NPCS = [
         full: { say: "Your bag's full! Make a bit of room first.", next: 'menu' },
         lesson: {
           say: ['First, kill a cow or two and take the hides. Every cow drops one.',
-            'Bring them to my tanning rack here and tap it to tan them into leather. Hard leather needs Crafting 10.',
+            'Bring them to my tanning rack here and tap it to tan them into leather. Hard leather needs Crafting 6.',
             'Then tap your leather with a needle and thread in your bag, and pick what to sew. Each piece uses one thread. Pell sells more.'],
           next: 'menu',
         },
         make: {
-          say: ['Gloves to start with. Boots at 7, a cowl at 9, vambraces at 11.', 'A leather body at 14, chaps at 18, and a hard leather body at 28.',
+          say: ['Gloves to start with. Boots at 4, a cowl at 6, vambraces at 8.', 'A leather body at 10 and chaps at 13.',
+            'Then hard leather: gloves at 15, boots at 16, a cowl at 18, a body at 20 and chaps at 22.',
             "It all helps an archer. The vambraces and chaps especially."],
           next: 'menu',
         },

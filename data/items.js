@@ -183,6 +183,22 @@ export const ITEMS = {
     name: 'Hard leather body', value: 170, examine: 'Boiled and hardened leather. Needs Defence 10.',
     equip: { slot: 'body', req: { defence: 10 }, att: { ranged: 8, magic: -6 }, def: { stab: 12, slash: 15, crush: 18, ranged: 20, magic: 6 }, look: { tunic: '#5e3b1f' } },
   },
+  hardLeatherGloves: {
+    name: 'Hard leather gloves', value: 40, examine: 'Stiff leather gloves. A sure grip on the bowstring.',
+    equip: { slot: 'hands', req: {}, att: { ranged: 2 }, def: { stab: 2, slash: 2, crush: 2, ranged: 1 } },
+  },
+  hardLeatherBoots: {
+    name: 'Hard leather boots', value: 40, examine: 'Hardened leather boots with thick soles.',
+    equip: { slot: 'feet', req: {}, att: { ranged: 1 }, def: { stab: 2, slash: 2, crush: 2, ranged: 1 } },
+  },
+  hardLeatherCowl: {
+    name: 'Hard leather cowl', value: 60, examine: 'A hood of hardened leather. Needs Defence 5.',
+    equip: { slot: 'head', req: { defence: 5 }, att: { ranged: 2, magic: -1 }, def: { stab: 3, slash: 4, crush: 4, ranged: 4, magic: 2 }, look: { hat: 'hood', hatColor: '#5e3b1f' } },
+  },
+  hardLeatherChaps: {
+    name: 'Hard leather chaps', value: 90, examine: 'Hardened leather leggings. Needs Defence 5.',
+    equip: { slot: 'legs', req: { defence: 5 }, att: { ranged: 6, magic: -2 }, def: { stab: 4, slash: 4, crush: 4, ranged: 6, magic: 2 }, look: { pants: '#5e3b1f' } },
+  },
   leatherGloves: {
     name: 'Leather gloves', value: 6, examine: 'Keeps your hands warm and your grip firm.',
     equip: { slot: 'hands', req: {}, def: { stab: 1, slash: 1, crush: 1 }, att: { ranged: 1 } },

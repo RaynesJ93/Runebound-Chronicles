@@ -580,6 +580,18 @@ const DRAW = {
   },
 };
 
+// Hard leather pieces: the leather drawing in darker, redder leather.
+for (const part of ['Gloves', 'Boots', 'Cowl', 'Chaps']) {
+  DRAW[`hardLeather${part}`] = (b) => {
+    DRAW[`leather${part}`](b);
+    const d = b.data;
+    for (let i = 0; i < d.length; i += 4) {
+      if (!d[i + 3] || (d[i] > 180 && d[i + 1] > 140)) continue; // keep brass bright
+      d[i] = d[i] * 0.78; d[i + 1] = d[i + 1] * 0.66; d[i + 2] = d[i + 2] * 0.7;
+    }
+  };
+}
+
 const cache = new Map();
 
 // { img: canvas, url: data URL } for an item id.
