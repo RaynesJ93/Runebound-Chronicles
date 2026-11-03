@@ -33,7 +33,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 1. ✅ Woodcutting (trees on the forest route) and Fletching (bows, arrows) — v0.11.0
 2. ✅ Mining (a small mine area) and Smithing (bars, bronze/iron gear) — v0.12.0
 3. ✅ Fishing and Cooking (food you make yourself) — v0.13.0
-4. Crafting and Runecrafting (leather armour, runes for magic)
+4. ✅ Crafting (leather armour) — v0.15.0; Runecrafting (runes for magic) next
 5. Bank tabs and search
 
 ## Phase 3 — Quests and new regions (v0.3)
@@ -62,6 +62,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Date | Change |
 | --- | --- |
+| 3 Nov 2026 | v0.15.0: Phase 2.4 — Crafting. Hilda the Tanner and her tanning rack by the cow field; tan cowhides into leather (hard leather at 10); sew gloves, boots, cowl, vambraces, body, chaps and a hard leather body with a needle and thread. New leather cowl, vambraces, chaps and hard leather body; Pell sells needles and thread. Skill cards tighten on short phones so all 13 skills fit. |
 | 3 Nov 2026 | v0.14.0: bigger maps. Brambleford grew from 44×36 to 64×54 tiles: an east end with three more houses, an orchard of pines and oaks, a south road to a river with a bridge and four fishing spots, and a fenced cow field (cows: bones and cowhide every kill, raw beef 1 in 2; beef cooks into cooked meat). Route 1 grew from 34×60 to 52×78: an oak grove and a wolf ridge (two more wolves) to the east, and a longer road south past a lake (three fishing spots) and a hunter's camp with a cooking fire. Nothing that was already there moved, so old saves line up. |
 | 3 Nov 2026 | v0.13.1: continuous skilling animations — axe and pickaxe swings with wood chips and rock chips/sparks, a fishing rod with line and bobbing float (or a net dipping in and out), a pan over the fire with steam, furnace embers, hammer and sparks at the anvil, knife and shavings for fletching; you lean into each swing, and the skill's icon floats above your head while you work. |
 | 2 Nov 2026 | v0.13.0: Phase 2.3 shipped — Fishing (net, bait and lure spots on Brambleford's pond and the Route 1 stream; shrimps, anchovies, sardines, herring, trout, salmon) and Cooking (cooking pit by the pond and the goblin campfire; food burns less as you level). Old Finn teaches fishing and gives a net, rod and bait; Pell sells rods, nets and bait. Raw chicken can now be cooked. |

@@ -33,6 +33,7 @@ import { ROCKS, PICKAXES, MINE_TICKS } from '../data/mining.js';
 import { SMELTING, SMITHING } from '../data/smithing.js';
 import { SPOTS, FISH_TICKS, spotLevel } from '../data/fishing.js';
 import { COOKING } from '../data/cooking.js';
+import { TANNING, SEWING, CRAFT_GROUP } from '../data/crafting.js';
 
 const AUTOSAVE_TICKS = 50; // 30 seconds
 
@@ -305,6 +306,11 @@ function boot() {
     const def = ITEMS[id];
     if (!def) return null;
     if (GROUP_OF[id]) return () => fletchMenu(GROUP_OF[id], x, y);
+    if (id in CRAFT_GROUP) {
+      const group = CRAFT_GROUP[id] || (inventory.count('leather') ? 'leather' : inventory.count('hardLeather') ? 'hardLeather' : null);
+      return () => sewMenu(group, x, y);
+    }
+    if (id === 'cowhide') return () => hud.message("Tan cowhides into leather at Hilda's tanning rack, by the cow field.");
     if (/^raw/.test(id)) return () => hud.message('Cook this on a fire: the cooking pit by the pond, or the goblins\' campfire.');
     if (id === 'knife') return () => fletchMenu(inventory.count('logs') ? 'logs' : inventory.count('oakLogs') ? 'oakLogs' : null, x, y);
     if (def.food || def.potion) return () => eat(i);
@@ -321,6 +327,7 @@ function boot() {
     const def = ITEMS[s.id];
     const options = [];
     if (GROUP_OF[s.id]) options.push({ label: 'Fletch', fn: () => fletchMenu(GROUP_OF[s.id], x, y) });
+    if (CRAFT_GROUP[s.id]) options.push({ label: 'Sew', fn: () => sewMenu(CRAFT_GROUP[s.id], x, y) });
     if (def.food) options.push({ label: 'Eat', fn: () => eat(i) });
     if (def.potion) options.push({ label: 'Drink', fn: () => eat(i) });
     if (def.equip) {
@@ -695,7 +702,7 @@ function boot() {
         const b = area.buildings.find((x) => x.doorTiles === p.tiles);
         opts.push({ label: `Enter ${b?.label || 'building'}`, fn: () => { combat.stop(); useProp(p); } });
       } else if (p.action) {
-        const ACTION_LABEL = { bank: 'Use bank booth', shop: 'Trade', smelt: 'Smelt ore', smith: 'Smith metal', cook: 'Cook food' };
+        const ACTION_LABEL = { bank: 'Use bank booth', shop: 'Trade', smelt: 'Smelt ore', smith: 'Smith metal', cook: 'Cook food', tan: 'Tan hides' };
         opts.push({ label: ACTION_LABEL[p.action] || 'Use', fn: () => { combat.stop(); useProp(p); } });
       } else if (p.interact) {
         opts.push({ label: `Look at ${PROP_NAME[p.type] || p.type || 'this'}`, fn: () => { combat.stop(); useProp(p); } });
@@ -734,7 +741,7 @@ function boot() {
   };
   const runAction = (name) => {
     combat.stop();
-    if (name === 'smelt' || name === 'smith' || name === 'cook') { stationMenu(name); return; }
+    if (name === 'smelt' || name === 'smith' || name === 'cook' || name === 'tan') { stationMenu(name); return; }
     if (name === 'bank') hud.openTrade('bank', 'Bank of Brambleford');
     else if (name === 'shop') hud.openTrade('shop', shop.name);
     refreshTrade();
@@ -1025,6 +1032,15 @@ function boot() {
       icon: itemIcon(Object.keys(r.gives)[0]).url,
       fn: () => startMake(r),
     });
+    if (kind === 'tan') {
+      if (!inventory.count('cowhide')) { hud.message('You need cowhides to tan. The cows in the field drop them.'); return; }
+      const cl = book.level('crafting');
+      hud.showMenu(pos.x, pos.y, `Tanning rack (${inventory.count('cowhide')} hides)`, [
+        ...TANNING.map((r) => ({ label: `${r.name}${cl < r.level ? ` — needs level ${r.level}` : ''}`, icon: itemIcon(r.id).url, fn: () => startMake(r) })),
+        { label: 'Cancel', fn: () => {} },
+      ]);
+      return;
+    }
     if (kind === 'cook') {
       const have = COOKING.filter((r) => inventory.count(r.raw));
       if (!have.length) { hud.message('You have nothing to cook. Raw fish and chicken can be cooked here.'); return; }
@@ -1059,6 +1075,22 @@ function boot() {
     };
     if (bars.length === 1) { list(bars[0]); return; }
     hud.showMenu(pos.x, pos.y, 'Anvil', [...bars.map((bar) => ({ label: `Smith ${itemName(bar).toLowerCase()}s`, icon: itemIcon(bar).url, fn: () => setTimeout(() => list(bar), 0) })), { label: 'Cancel', fn: () => {} }]);
+  };
+
+  // Sewing leather: tap leather (or the needle) and pick what to make.
+  const sewMenu = (group, x, y) => {
+    if (!group) { hud.message('You need some leather to sew. Tan cowhides at the tanning rack.'); return; }
+    if (!inventory.count('needle')) { hud.message('You need a needle to sew leather. Hilda or Pell can help.'); return; }
+    const lvl = book.level('crafting');
+    const list = SEWING.filter((r) => r.group === group);
+    hud.showMenu(x, y, `Sew ${itemName(group).toLowerCase()}`, [
+      ...list.map((r) => ({
+        label: `${r.name}${lvl < r.level ? ` — needs level ${r.level}` : ''}`,
+        icon: itemIcon(r.id).url,
+        fn: () => (inventory.count('thread') ? startMake(r) : hud.message('You need some thread. Pell sells it.')),
+      })),
+      { label: 'Cancel', fn: () => {} },
+    ]);
   };
 
   const startMake = (r) => {
@@ -1107,6 +1139,8 @@ function boot() {
     else if (r.station === 'furnace') hud.message(`You smelt the ore into ${an} ${name}.`);
     else if (r.station === 'anvil') hud.message(`You hammer the metal into ${an} ${name}.`);
     else if (r.station === 'fire') hud.message(`You cook the ${r.name.toLowerCase()}.`);
+    else if (r.station === 'tan') hud.message(`You tan the hide into ${name}.`);
+    else if (r.skill === 'crafting') hud.message(`You sew ${/s$/.test(name) ? 'some' : an} ${name}.`);
     else hud.message(`You carve the logs into ${an} ${name}.`);
     book.add(skillOf(r), r.xp * k);
     a.made++;
@@ -1137,7 +1171,8 @@ function boot() {
     }
     const r = a.recipe;
     const t = a.station?.tiles[0] || null;
-    const anim = r.station === 'fire' ? 'cook' : r.station === 'furnace' ? 'smelt' : r.station === 'anvil' ? 'smith' : 'fletch';
+    const anim = r.station === 'fire' ? 'cook' : r.station === 'furnace' ? 'smelt' : r.station === 'anvil' ? 'smith'
+      : r.station === 'tan' ? 'tan' : r.skill === 'crafting' ? 'sew' : 'fletch';
     return { anim, skill: r.skill || 'fletching', target: t, since: a.since, metal: r.bar === 'ironBar' ? 'iron' : 'bronze' };
   };
 

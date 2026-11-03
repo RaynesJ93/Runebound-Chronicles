@@ -16,7 +16,7 @@ const METAL = {
 const WOOD = ['#4a2c16', '#7a4a26', '#a0703f'];
 
 // How long one loop of each animation takes, in seconds.
-const PERIOD = { chop: 0.9, mine: 1.0, smith: 0.8, fletch: 0.7, net: 2.2, rod: 3, cook: 1.4, smelt: 1.2 };
+const PERIOD = { tan: 1.1, sew: 1.2, chop: 0.9, mine: 1.0, smith: 0.8, fletch: 0.7, net: 2.2, rod: 3, cook: 1.4, smelt: 1.2 };
 
 const ease = (t) => t * t * (3 - 2 * t);
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -257,6 +257,29 @@ export function drawSkilling(ctx, sk, p, time) {
       // and the bar in your hands, glowing
       px(ctx, a.hx - 1, a.hy, '#ff9a3a', 3, 2);
       px(ctx, a.hx, a.hy, '#ffe08a');
+      break;
+    }
+    case 'tan': {
+      // scraping the hide on the rack in long strokes; flecks fall away
+      const k = Math.sin(phase * Math.PI * 2);
+      const ex = lerp(a.hx, a.tx, 0.6), ey = lerp(a.hy, a.ty, 0.6) - 6 + k * 4;
+      handle(ctx, a.hx, a.hy, ex, ey);
+      px(ctx, ex - 2, ey - 1, '#a8b0b8', 5, 2); // the scraper's blade
+      px(ctx, ex - 2, ey - 1, '#dfe5ea', 5, 1);
+      const t = (phase * 2) % 1;
+      chips(ctx, ex, ey + 1, t, cycle * 2 + (phase > 0.5 ? 1 : 0), ['#d0a070', '#8a5a32'], 3, 0.5);
+      break;
+    }
+    case 'sew': {
+      // a piece of leather held up; the needle goes in and out, trailing thread
+      const cx = p.fx, cy = p.fy - 9;
+      ctx.fillStyle = '#7a4a26'; ctx.fillRect(Math.round(cx - 5), Math.round(cy - 2), 10, 5);
+      ctx.fillStyle = '#a8703c'; ctx.fillRect(Math.round(cx - 5), Math.round(cy - 2), 10, 1);
+      for (let s = -4; s <= 2; s += 2) px(ctx, cx + s, cy + 1, '#e8d8b0'); // stitches so far
+      const pull = Math.sin(phase * Math.PI * 2);
+      const nx = cx + 3 + pull * 3, ny = cy - 3 - Math.max(0, pull) * 5;
+      seg(ctx, cx + 2, cy + 1, nx, ny, '#e8d8b0'); // thread
+      seg(ctx, nx, ny, nx + 2, ny - 3, '#dfe5ea'); // needle
       break;
     }
     case 'fletch': {

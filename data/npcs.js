@@ -215,6 +215,48 @@ export const NPCS = [
     },
   },
 
+  {
+    examine: 'A strong-armed tanner. Her apron is stained every shade of brown.',
+    id: 'hilda', name: 'Hilda the Tanner', short: 'Hilda', area: 'brambleford', x: 37, y: 40, radius: 1, wander: 0.12,
+    look: { hair: '#7a3a1e', tunic: '#6e5a3a', pants: '#4a3a2a', hat: 'bun' },
+    talk: {
+      start: (c) => (c.flags.metHilda ? 'again' : 'intro'),
+      nodes: {
+        intro: {
+          say: ["Hello, love. Hilda's the name, hides are the game.", "Those cows over there give the best hides in Brambleford. I turn them into leather."],
+          set: { metHilda: true },
+          next: 'menu',
+        },
+        again: { say: 'Brought me some hides?', next: 'menu' },
+        menu: { say: [], choices: [
+          { text: 'Can you teach me to craft?', next: 'teach', if: (c) => !c.flags.gotNeedle },
+          { text: 'How does crafting work again?', next: 'lesson', if: (c) => c.flags.gotNeedle },
+          { text: 'What can I make?', next: 'make' },
+          { text: 'Bye, Hilda.', next: 'bye' },
+        ] },
+        teach: {
+          say: ["Course I can. Here's a needle, and some thread to get you started."],
+          give: { flag: 'gotNeedle', items: [{ item: 'needle', qty: 1 }, { item: 'thread', qty: 20 }] },
+          giveFail: 'full',
+          next: 'lesson',
+        },
+        full: { say: "Your bag's full! Make a bit of room first.", next: 'menu' },
+        lesson: {
+          say: ['First, kill a cow or two and take the hides. Every cow drops one.',
+            'Bring them to my tanning rack here and tap it to tan them into leather. Hard leather needs Crafting 10.',
+            'Then tap your leather with a needle and thread in your bag, and pick what to sew. Each piece uses one thread. Pell sells more.'],
+          next: 'menu',
+        },
+        make: {
+          say: ['Gloves to start with. Boots at 7, a cowl at 9, vambraces at 11.', 'A leather body at 14, chaps at 18, and a hard leather body at 28.',
+            "It all helps an archer. The vambraces and chaps especially."],
+          next: 'menu',
+        },
+        bye: { say: 'Mind the cow pats.' },
+      },
+    },
+  },
+
   // ---- Route 1 -----------------------------------------------------------------
   {
     examine: 'A big, bearded woodcutter. He smells of pine.',
