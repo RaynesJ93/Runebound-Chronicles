@@ -411,6 +411,30 @@ const DRAW = {
     b.rect(12, 8, 2, 3, c[1]);
     b.set(3, 9, hex('#1d1d1d'));
   },
+  rawBeef(b) {
+    b.ellipse(8, 9, 6, 4.2, hex('#b8403a'));
+    b.ellipse(7.5, 8.4, 5, 3.2, hex('#d8605a'));
+    b.ellipse(10, 8, 2, 1.4, hex('#f4e8e0'));
+    b.set(5, 9, hex('#f0a0a0')); b.set(7, 10, hex('#f0a0a0'));
+  },
+  cookedMeat(b) {
+    b.ellipse(8, 9, 6, 4.2, hex('#5e3218'));
+    b.ellipse(7.5, 8.4, 5, 3.2, hex('#8a4a22'));
+    for (const x of [5, 8, 11]) { b.set(x, 7, hex('#3a1e0e')); b.set(x + 1, 8, hex('#3a1e0e')); }
+  },
+  burntMeat(b) {
+    b.ellipse(8, 9, 6, 4.2, hex('#141010'));
+    b.ellipse(7.5, 8.4, 5, 3.2, hex('#2e2420'));
+  },
+  cowhide(b) {
+    const w = hex('#efe8dc'), s = hex('#cfc4b2'), k = hex('#2b2622');
+    for (let y = 3; y < 14; y++) for (let x = 2; x < 14; x++) {
+      const edge = (x === 2 || x === 13) && (y < 5 || y > 11);
+      if (edge) continue;
+      const patch = ((x - 5) ** 2 + (y - 6) ** 2 < 5) || ((x - 10) ** 2 + (y - 10) ** 2 < 4);
+      b.set(x, y, patch ? k : (x + y) % 5 === 0 ? s : w);
+    }
+  },
   rawChicken(b) {
     // a raw drumstick: pink meat, a pale bone end
     b.ellipse(6.5, 9.5, 4.6, 3.8, hex('#d77a7a'));

@@ -5,8 +5,11 @@
 import { GROUND } from '../../src/world/area.js';
 import { mulberry32 } from '../../src/core/rng.js';
 
-const W = 44;
-const H = 36;
+// The original village is the top-left 44 x 36; the map grew east and south
+// (an east end, an orchard, a river and a cow field) without moving anything,
+// so old saves still line up.
+const W = 64;
+const H = 54;
 
 export function buildBrambleford() {
   const ground = new Uint8Array(W * H);
@@ -76,6 +79,30 @@ export function buildBrambleford() {
 
   // Farm field
   rect(29, 29, 37, 32, GROUND.DIRT);
+
+  // ---- The east end and the south road (added when the village grew) --------
+  rect(39, 17, 59, 18, GROUND.PATH);   // main street, continued east
+  rect(39, 25, 59, 25, GROUND.PATH);   // lower lane, continued east
+  rect(40, 26, 41, 48, GROUND.PATH);   // south road, over the river
+  rect(42, 38, 44, 38, GROUND.PATH);   // to the cow field gate
+  rect(59, 18, 59, 25, GROUND.PATH);   // round the end of the lanes
+
+  // The river: across the south of the village, with a bridge on the south road.
+  const riverY = (x) => 45 + Math.round(Math.sin(x / 5.5) * 1.2);
+  for (let x = 0; x < W; x++) {
+    const cy = riverY(x);
+    for (let y = cy - 1; y <= cy + 1; y++) {
+      if (!inB(x, y)) continue;
+      if (x === 40 || x === 41) { ground[i(x, y)] = GROUND.BRIDGE; continue; }
+      ground[i(x, y)] = GROUND.WATER; block(x, y); occupy(x, y);
+    }
+  }
+  // Fishing spots on the river (the bank beside each is kept clear).
+  for (const [x, side, variant] of [[30, -1, 'net'], [47, -1, 'bait'], [54, -1, 'lure'], [24, -1, 'bait']]) {
+    const y = riverY(x) + side;
+    prop('fishingSpot', [{ x, y }], { variant });
+    occupy(x, y - 1);
+  }
 
   // ---- Buildings (all doors face south, towards the camera) ---------------
   const building = (b) => {
@@ -163,6 +190,44 @@ export function buildBrambleford() {
   one('cookingPit', 14, 30, { action: 'cook', interact: ['A stone-ringed cooking pit. The fire never quite goes out.'] });
   one('sign', 14, 27, { interact: ['FISHING POND', 'Ask Old Finn for a net and a rod. Cook your catch on the pit.'] });
 
+  // ---- East end houses -------------------------------------------------------
+  building({
+    id: 'eastA', kind: 'house', roof: 0x9a3b30, label: null, x: 44, y: 11, w: 5, h: 4, doorX: 46, doorW: 1,
+    doorText: ['A neat house with a polished door knocker. Nobody answers.'],
+  });
+  building({
+    id: 'eastB', kind: 'house', roof: 0x3f6f6a, label: null, x: 52, y: 11, w: 5, h: 4, doorX: 54, doorW: 1,
+    doorText: ['Someone inside is singing, badly.'],
+  });
+  building({
+    id: 'eastC', kind: 'house', roof: 0x7a5a2a, label: null, x: 47, y: 20, w: 5, h: 4, doorX: 49, doorW: 1,
+    doorText: ['A note on the door: "Gone to see the cows."'],
+  });
+  rect(46, 15, 46, 16, GROUND.PATH);
+  rect(54, 15, 54, 16, GROUND.PATH);
+  rect(49, 24, 49, 24, GROUND.PATH);
+  for (const [x, y] of [[43, 13], [50, 13], [58, 13], [45, 22], [53, 22]]) one('bush', x, y);
+  for (const [x, y] of [[43, 16], [57, 16]]) one('lamp', x, y);
+  one('sign', 42, 19, { interact: ['EAST END', 'Orchard: south of the lane.  Cow field and river: down the south road.'] });
+
+  // ---- Orchard (rows of trees you can chop) ----------------------------------
+  for (let x = 45; x <= 57; x += 3) for (let y = 28; y <= 34; y += 3) one('tree', x, y, { variant: (x + y) % 2 ? 'oak' : 'pine' });
+  one('sign', 44, 27, { interact: ['THE ORCHARD', 'Pines for beginners, oaks for the skilled (Woodcutting 15).'] });
+
+  // ---- Cow field: fenced, gate on the west side at (44, 38) -------------------
+  for (let x = 44; x <= 58; x++) for (let y = 36; y <= 42; y++) {
+    const edge = x === 44 || x === 58 || y === 36 || y === 42;
+    if (edge && !(x === 44 && y === 38)) one('fence', x, y);
+  }
+  one('crate', 57, 37, { interact: ['A trough of fresh hay.'] });
+  one('sign', 43, 40, { interact: ['COW FIELD', 'Cows give beef for cooking, and hides for crafting.'] });
+
+  // ---- South meadow, between the pond and the river ---------------------------
+  for (const [x, y] of [[6, 38], [14, 36], [20, 40], [28, 38], [33, 41], [10, 41]]) placeIfFree('bush', x, y);
+  for (const [x, y] of [[4, 36], [17, 42], [35, 37], [26, 42]]) placeIfFree('rock', x, y);
+  for (const [x, y] of [[12, 38], [24, 37], [31, 35], [8, 43], [37, 42]]) placeIfFree('tree', x, y, { variant: 'oak' });
+  one('sign', 39, 34, { interact: ['SOUTH ROAD', 'River and fishing ahead. Cows to the east.'] });
+
   // ---- Decoration ---------------------------------------------------------
   for (const [x, y] of [[4, 9], [8, 6], [16, 6], [27, 6], [33, 5], [38, 7], [4, 21], [39, 22], [25, 22], [12, 22]]) {
     placeIfFree('tree', x, y, { variant: rng() < 0.5 ? 'oak' : 'pine' });
@@ -191,10 +256,15 @@ export function buildBrambleford() {
     spawn: { x: 16, y: 24, facing: 0 },
     // Walking onto these tiles takes you to another area.
     exits: [
-      { tiles: [{ x: 21, y: 0 }, { x: 22, y: 0 }], to: 'route1', at: { x: 16, y: 58 }, facing: Math.PI },
+      { tiles: [{ x: 21, y: 0 }, { x: 22, y: 0 }], to: 'route1', at: { x: 16, y: 76 }, facing: Math.PI },
       ...exits, // shop and bank doors
     ],
     spawns: [
+      { enemy: 'cow', x: 48, y: 39 },
+      { enemy: 'cow', x: 52, y: 38 },
+      { enemy: 'cow', x: 55, y: 40 },
+      { enemy: 'cow', x: 50, y: 41 },
+      { enemy: 'cow', x: 46, y: 40 },
       { enemy: 'chicken', x: 20, y: 29 },
       { enemy: 'chicken', x: 23, y: 29 },
       { enemy: 'chicken', x: 24, y: 30 },

@@ -7,13 +7,25 @@
 // wander: how far it strolls from its spawn when idle
 // leash: how far from spawn it will chase before giving up and walking home
 // respawn: ticks after death before it comes back
-// sprite: 'wolf' draws a four-legged animal, 'chicken' a hen, instead of a person
+// sprite: 'wolf' draws a four-legged animal, 'chicken' a hen, 'cow' a cow, instead of a person
 // loot: always   -> dropped every kill
 //       main     -> one roll; each entry has a chance (e.g. 1/16); otherwise nothing
 //       each     -> every entry rolls separately (so you can get several, or none)
 //       rare     -> a separate roll at `chance`; hits drop with a light beam
 
 export const ENEMIES = {
+  cow: {
+    id: 'cow', name: 'Cow', level: 2, hp: 8, sprite: 'cow',
+    attack: 1, strength: 1, defence: 1,
+    attackBonus: -15, strengthBonus: 0, defenceBonus: -15, maxHit: 1,
+    speed: 6, attackType: 'crush', aggressive: false, wander: 3, leash: 5, respawn: 20,
+    look: { hide: '#f2eee6', patch: '#2b2622' },
+    examine: 'A big, calm cow. It chews and stares.',
+    loot: {
+      always: [{ item: 'bones', qty: 1 }, { item: 'cowhide', qty: 1 }],
+      each: [{ item: 'rawBeef', qty: 1, chance: 1 / 2 }],
+    },
+  },
   chicken: {
     id: 'chicken', name: 'Chicken', level: 1, hp: 3, sprite: 'chicken',
     attack: 1, strength: 1, defence: 1,

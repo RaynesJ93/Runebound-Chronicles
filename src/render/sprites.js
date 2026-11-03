@@ -955,3 +955,46 @@ export function cookingPit(frame) {
   b.outline();
   return sprite(b, 10, 22);
 }
+
+// ---- Cows --------------------------------------------------------------------------
+
+// A black-and-white cow, facing left. f = walk frame.
+function drawCow(look, f) {
+  const b = new Bitmap(26, 20);
+  const white = hex(look.hide || '#f2eee6'), shadow = hex('#cfc8bc'), black = hex(look.patch || '#2b2622');
+  const bob = f === 0 ? 0 : 1;
+  // legs
+  const legs = f === 1 ? [6, 10, 16, 20] : f === 2 ? [7, 9, 17, 19] : [6, 9, 17, 20];
+  for (const x of legs) { b.rect(x, 14, 2, 5, shadow); b.rect(x, 18, 2, 1, black); }
+  // body
+  for (let y = 6; y < 15; y++) for (let x = 5; x < 23; x++) {
+    const dx = (x + 0.5 - 14) / 9, dy = (y + 0.5 - 10.5 - bob * 0.3) / 4.6;
+    if (dx * dx + dy * dy > 1.05) continue;
+    const patch = (x > 15 && x < 20 && y < 11) || (x > 8 && x < 12 && y > 9 && y < 13);
+    b.set(x, y + bob - (bob ? 1 : 0), patch ? black : y > 12 ? shadow : white);
+  }
+  // udder and tail
+  b.rect(15, 14, 3, 2, hex('#f2a8a8'));
+  b.set(23, 8, black); b.set(24, 9, black); b.set(24, 10, black); b.set(24, 11, hex('#5a4e44'));
+  // head
+  b.ellipse(4.5, 8.5 + bob, 3.6, 3.4, white);
+  b.rect(1, 9 + bob, 4, 3, hex('#e8b4a8')); // muzzle
+  b.set(1, 10 + bob, hex('#8a5a52'));
+  b.set(4, 7 + bob, black); // eye
+  b.rect(5, 5 + bob, 2, 2, black); // ear patch
+  b.set(3, 4 + bob, hex('#d8d0b8')); b.set(6, 4 + bob, hex('#d8d0b8')); // horns
+  b.outline();
+  return b;
+}
+
+export function cowFrames(look) {
+  const frames = { down: [], up: [], left: [], right: [] };
+  for (let f = 0; f < 3; f++) {
+    const c = drawCow(look, f);
+    const left = sprite(c, 13, 19);
+    const right = sprite(mirror(c), 13, 19);
+    frames.left.push(left); frames.up.push(left);
+    frames.right.push(right); frames.down.push(right);
+  }
+  return frames;
+}

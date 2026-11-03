@@ -234,6 +234,7 @@ Enemy names show their combat level, coloured green (weaker), yellow (similar) o
 
 | Enemy | Level | HP | Behaviour | Where |
 | --- | --- | --- | --- | --- |
+| Cow | 2 | 8 | Passive, stays in its field; bones and cowhide every kill, raw beef 1/2 | Cow field, Brambleford |
 | Chicken | 1 | 3 | Passive, stays in its pen; bones every kill, raw chicken 1/2 and 5–15 feathers 1/2, rolled separately | Wyn's chicken pen, Brambleford |
 | Goblin | 2 | 5 | Passive, roams in groups of 3–5 | Village outskirts, Route 1 |
 | Goblin Brute | 5 | 12 | Aggressive to low levels | Route 1 goblin camp |

@@ -8,8 +8,10 @@
 import { GROUND } from '../../src/world/area.js';
 import { mulberry32 } from '../../src/core/rng.js';
 
-const W = 34;
-const H = 60;
+// The original route is the top-left 34 x 60. It grew east (an oak grove and a
+// wolf ridge) and south (a lake and a hunter's camp) without moving anything.
+const W = 52;
+const H = 78;
 
 export function buildRoute1() {
   const ground = new Uint8Array(W * H);
@@ -52,7 +54,7 @@ export function buildRoute1() {
       open[i(x, y)] = 1;
       if (!onRoad) { block(x, y); taken[i(x, y)] = 1; }
     }
-    clear(x, cy - 2, x, cy + 2); // grassy banks
+    clear(x, cy - 3, x, cy + 3); // grassy banks (wide enough to stay joined where the stream bends)
   }
 
   // Fishing spots on the stream: fast water for lure fishing, a calmer pool for bait.
@@ -64,6 +66,38 @@ export function buildRoute1() {
     taken[i(x, y)] = 1;
     taken[i(x, y + side)] = 1; // the bank
   }
+
+  // ---- The southern stretch: the road goes on, past a lake and a hunter's camp ----
+  rect(16, 60, 17, H - 1, GROUND.PATH);
+  // Lake (west of the road)
+  const lake = { cx: 8.5, cy: 67.5, rx: 5.2, ry: 3.2 };
+  for (let y = 60; y < H; y++) for (let x = 0; x < 16; x++) {
+    const d = ((x + 0.5 - lake.cx) / lake.rx) ** 2 + ((y + 0.5 - lake.cy) / lake.ry) ** 2;
+    if (d < 1) { ground[i(x, y)] = GROUND.WATER; block(x, y); taken[i(x, y)] = 1; open[i(x, y)] = 1; }
+    else if (d < 1.9) { open[i(x, y)] = 1; if (d < 1.35) ground[i(x, y)] = GROUND.SAND; }
+  }
+  rect(12, 67, 15, 67, GROUND.PATH); // a little trail to the shore
+  // Fishing spots round the lake: water tiles next to the shore.
+  const lakeShore = [];
+  for (let y = 60; y < H; y++) for (let x = 0; x < 16; x++) {
+    if (ground[i(x, y)] !== GROUND.WATER) continue;
+    if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => inB(x + dx, y + dy) && ground[i(x + dx, y + dy)] !== GROUND.WATER)) lakeShore.push({ x, y });
+  }
+  const nearestShore = (tx, ty) => lakeShore.slice().sort((a, b) => Math.hypot(a.x - tx, a.y - ty) - Math.hypot(b.x - tx, b.y - ty))[0];
+  for (const [tx, ty, variant] of [[14, 67, 'net'], [9, 63, 'bait'], [9, 72, 'lure']]) {
+    const t = nearestShore(tx, ty);
+    lakeShore.splice(lakeShore.indexOf(t), 1);
+    props.push({ type: 'fishingSpot', tiles: [t], x: t.x, y: t.y, variant });
+  }
+  // Hunter's camp (east of the road)
+  clear(20, 61, 29, 69);
+  rect(18, 65, 21, 65, GROUND.PATH);
+  rect(22, 64, 27, 66, GROUND.PATH);
+
+  // ---- The east: an oak grove and a wolf ridge ---------------------------------------
+  rect(24, 42, 37, 42, GROUND.PATH); // trail from the road to the grove
+  clear(36, 34, 48, 47);
+  clear(32, 3, 45, 15); // the ridge, joining the wolf den
 
   // ---- Clearings ---------------------------------------------------------------------
   // Goblin camp (west), linked by a little trail
@@ -107,11 +141,28 @@ export function buildRoute1() {
   one('rubble', 15, 2, { blocks: false });
   one('rubble', 10, 2, { blocks: false });
 
+  // ---- Hunter's camp props ------------------------------------------------------------
+  prop('tent', [{ x: 25, y: 62 }, { x: 26, y: 62 }], { interact: ["A hunter's tent. Snares and a bow hang inside."] });
+  one('campfire', 24, 67, { action: 'cook', interact: ['A hunters\' cooking fire, still burning.'] });
+  for (const [x, y] of [[28, 63], [21, 68]]) one('crate', x, y);
+  one('logPile', 28, 67, { interact: ['Firewood, neatly stacked.'] });
+
+  // ---- Oak grove: rows of oaks (Woodcutting 15) ----------------------------------------
+  for (let x = 38; x <= 47; x += 3) for (let y = 35; y <= 46; y += 3) if (!(y === 41 && x <= 41)) one('tree', x, y, { variant: 'oak' });
+  for (const [x, y] of [[37, 44], [46, 36]]) one('stump', x, y);
+
+  // ---- Wolf ridge: more rocks and bones --------------------------------------------------
+  for (const [x, y] of [[34, 5], [37, 4], [41, 6], [44, 9], [36, 12], [40, 14], [43, 13], [33, 9]]) one('rock', x, y);
+  for (const [x, y] of [[38, 9], [42, 11], [35, 7]]) one('bones', x, y, { blocks: false });
+
   // ---- Signs -------------------------------------------------------------------------------
   one('sign', 19, 56, { interact: ['ROUTE 1 — Thornwood Forest.', 'North: Copperdeep Mine.  South: Brambleford.'] });
   one('sign', 14, 45, { interact: ['DANGER! Goblin camp to the west.', 'Signed, the Brambleford Watch.'] });
   one('sign', 14, 16, { interact: ['Wolf den to the east. Travel in daylight.'] });
   one('sign', 24, 42, { interact: ["Bram's Woodcutting — logs, kindling and advice.", 'New to adventuring? Ask Bram for a FREE bow and arrows!'] });
+  one('sign', 35, 42, { interact: ['THE OAK GROVE', 'Old oaks, good timber. Woodcutting 15.'] });
+  one('sign', 19, 63, { interact: ["HUNTER'S CAMP", 'Cook your catch at the fire. The lake has fish too.'] });
+  one('sign', 18, 74, { interact: ['ROUTE 1 — Thornwood Forest.', 'North: Copperdeep Mine.  South: Brambleford.'] });
   one('sign', 14, 9, { interact: ['Copperdeep Mine — just ahead. Open again!', 'Miners wanted: see Dorrin inside.'] });
 
   // ---- Forest: thickest far from the road and clearings ------------------------------------
@@ -150,9 +201,9 @@ export function buildRoute1() {
     id: 'route1',
     name: 'Route 1 — Thornwood',
     W, H, ground, blocked, props, buildings,
-    spawn: { x: 16, y: 58, facing: Math.PI },
+    spawn: { x: 16, y: H - 2, facing: Math.PI },
     exits: [
-      { tiles: [{ x: 16, y: 59 }, { x: 17, y: 59 }], to: 'brambleford', at: { x: 21, y: 1 }, facing: 0 },
+      { tiles: [{ x: 16, y: H - 1 }, { x: 17, y: H - 1 }], to: 'brambleford', at: { x: 21, y: 1 }, facing: 0 },
       { tiles: [{ x: 12, y: 0 }, { x: 13, y: 0 }], to: 'mine', at: { x: 15, y: 26 }, facing: Math.PI },
     ],
     // Monsters and where they live (see data/enemies.js).
@@ -168,6 +219,9 @@ export function buildRoute1() {
       { enemy: 'wolf', x: 28, y: 14 },
       { enemy: 'wolf', x: 30, y: 9 },
       { enemy: 'alphaWolf', x: 28, y: 9 },
+      // The wolf ridge (further east)
+      { enemy: 'wolf', x: 38, y: 7 },
+      { enemy: 'wolf', x: 41, y: 11 },
     ],
   };
 }
