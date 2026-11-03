@@ -211,6 +211,70 @@ export const ITEMS = {
     name: 'Bronze med helm', value: 24, examine: 'A medium-sized bronze helmet.',
     equip: { slot: 'head', req: { defence: 1 }, att: { magic: -1 }, def: { stab: 3, slash: 4, crush: 2, magic: -1, ranged: 3 }, look: { hat: 'helmet', hatColor: '#b07a3a' } },
   },
+  bronzeFullHelm: {
+    name: 'Bronze full helm', value: 44, examine: 'A full-face bronze helmet.',
+    equip: { slot: 'head', req: { defence: 1 }, att: { magic: -3, ranged: -1 }, def: { stab: 4, slash: 5, crush: 3, ranged: 4, magic: -1 }, look: { hat: 'helmet', hatColor: '#b07a3a' } },
+  },
+  bronzePlatebody: {
+    name: 'Bronze platebody', value: 160, examine: 'Solid bronze plates. Heavy, but very tough.',
+    equip: { slot: 'body', req: { defence: 1 }, att: { magic: -15, ranged: -7 }, def: { stab: 15, slash: 14, crush: 9, ranged: 14, magic: -6 }, look: { tunic: '#b07a3a' } },
+  },
+  bronzePlatelegs: {
+    name: 'Bronze platelegs', value: 80, examine: 'Leg armour of bronze plates.',
+    equip: { slot: 'legs', req: { defence: 1 }, att: { magic: -10, ranged: -4 }, def: { stab: 8, slash: 7, crush: 6, ranged: 7, magic: -4 }, look: { pants: '#b07a3a' } },
+  },
+  bronzeKiteshield: {
+    name: 'Bronze kiteshield', value: 68, examine: 'A large bronze shield, pointed at the bottom.',
+    equip: { slot: 'shield', req: { defence: 1 }, att: { magic: -8, ranged: -2 }, def: { stab: 6, slash: 8, crush: 7, ranged: 7, magic: -1 }, look: { shield: 'bronze' } },
+  },
+  bronzeScimitar: {
+    name: 'Bronze scimitar', value: 32, examine: 'A curved bronze sword. Fast and slashing.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 4, att: { stab: 1, slash: 7, crush: -2 }, def: { slash: 1 }, str: 6, look: { weapon: 'bronze', blade: 7 } },
+  },
+  bronzeLongsword: {
+    name: 'Bronze longsword', value: 40, examine: 'A long bronze blade. Slower, but hits harder.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 5, att: { stab: 4, slash: 8, crush: -2 }, def: { stab: 1, slash: 3 }, str: 8, look: { weapon: 'bronze', blade: 9 } },
+  },
+  bronzeMace: {
+    name: 'Bronze mace', value: 18, examine: 'A flanged bronze mace. Good against armour.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'crush', speed: 4, att: { stab: 2, slash: -2, crush: 6 }, def: { crush: 1 }, str: 5, look: { weapon: 'bronze', blade: 5 } },
+  },
+  bronzeBattleaxe: {
+    name: 'Bronze battleaxe', value: 52, examine: 'A heavy double-headed bronze axe.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 6, att: { stab: -2, slash: 8, crush: 6 }, def: { slash: 1 }, str: 10, look: { weapon: 'bronze', blade: 6 } },
+  },
+  ironFullHelm: {
+    name: 'Iron full helm', value: 154, examine: 'A full-face iron helmet.',
+    equip: { slot: 'head', req: { defence: 5 }, att: { magic: -3, ranged: -1 }, def: { stab: 6, slash: 7, crush: 5, ranged: 6, magic: -1 }, look: { hat: 'helmet', hatColor: '#8a9098' } },
+  },
+  ironPlatebody: {
+    name: 'Iron platebody', value: 560, examine: 'Solid iron plates. Heavy, but very tough.',
+    equip: { slot: 'body', req: { defence: 5 }, att: { magic: -15, ranged: -7 }, def: { stab: 21, slash: 20, crush: 12, ranged: 20, magic: -6 }, look: { tunic: '#8a9098' } },
+  },
+  ironPlatelegs: {
+    name: 'Iron platelegs', value: 280, examine: 'Leg armour of iron plates.',
+    equip: { slot: 'legs', req: { defence: 5 }, att: { magic: -10, ranged: -4 }, def: { stab: 11, slash: 10, crush: 9, ranged: 10, magic: -4 }, look: { pants: '#8a9098' } },
+  },
+  ironKiteshield: {
+    name: 'Iron kiteshield', value: 238, examine: 'A large iron shield, pointed at the bottom.',
+    equip: { slot: 'shield', req: { defence: 5 }, att: { magic: -8, ranged: -2 }, def: { stab: 9, slash: 11, crush: 10, ranged: 10, magic: -1 }, look: { shield: 'iron' } },
+  },
+  ironScimitar: {
+    name: 'Iron scimitar', value: 112, examine: 'A curved iron sword. Fast and slashing.',
+    equip: { slot: 'weapon', req: { attack: 5 }, type: 'slash', speed: 4, att: { stab: 2, slash: 10, crush: -2 }, def: { slash: 1 }, str: 9, look: { weapon: 'iron', blade: 7 } },
+  },
+  ironLongsword: {
+    name: 'Iron longsword', value: 140, examine: 'A long iron blade. Slower, but hits harder.',
+    equip: { slot: 'weapon', req: { attack: 5 }, type: 'slash', speed: 5, att: { stab: 6, slash: 11, crush: -2 }, def: { stab: 1, slash: 3 }, str: 11, look: { weapon: 'iron', blade: 9 } },
+  },
+  ironMace: {
+    name: 'Iron mace', value: 63, examine: 'A flanged iron mace. Good against armour.',
+    equip: { slot: 'weapon', req: { attack: 5 }, type: 'crush', speed: 4, att: { stab: 3, slash: -2, crush: 9 }, def: { crush: 1 }, str: 7, look: { weapon: 'iron', blade: 5 } },
+  },
+  ironBattleaxe: {
+    name: 'Iron battleaxe', value: 182, examine: 'A heavy double-headed iron axe.',
+    equip: { slot: 'weapon', req: { attack: 5 }, type: 'slash', speed: 6, att: { stab: -2, slash: 11, crush: 8 }, def: { slash: 1 }, str: 14, look: { weapon: 'iron', blade: 6 } },
+  },
   goblinMail: {
     name: 'Goblin mail', value: 5, examine: 'Armour made to fit a goblin. It might fit you if you squeeze.',
     equip: { slot: 'body', req: { defence: 1 }, def: { stab: 2, slash: 2, crush: 2, ranged: 1 }, look: { tunic: '#6f7a52' } },

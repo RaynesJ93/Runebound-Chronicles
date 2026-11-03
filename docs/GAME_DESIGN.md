@@ -401,10 +401,38 @@ Dorrin gives you a bronze pickaxe and a hammer when you ask him to teach you; Pe
 | Axe | 1 | 16 | 1 | 12.5 / 25 |
 | Pickaxe | 2 | 17 | 1 | 12.5 / 25 |
 | Med helm | 3 | 18 | 1 | 12.5 / 25 |
+| Mace | 2 | 17 | 1 | 12.5 / 25 |
 | Sword | 4 | 19 | 1 | 12.5 / 25 |
 | 15 arrowtips | 5 | 20 | 1 | 12.5 / 25 |
+| Scimitar | 5 | 20 | 2 | 25 / 50 |
+| Longsword | 6 | 21 | 2 | 25 / 50 |
+| Full helm | 7 | 22 | 2 | 25 / 50 |
 | Sq shield | 8 | 23 | 2 | 25 / 50 |
+| Battleaxe | 10 | 25 | 3 | 37.5 / 75 |
 | Chainbody | 11 | 26 | 3 | 37.5 / 75 |
+| Kiteshield | 12 | 27 | 3 | 37.5 / 75 |
+| Platelegs | 16 | 31 | 3 | 37.5 / 75 |
+| Platebody | 18 | 33 | 5 | 62.5 / 125 |
+
+**Full bronze and iron sets (v0.26.0).** The mace, scimitar, longsword, battleaxe, full helm, kiteshield, platelegs and platebody complete each metal. Iron pieces need Attack or Defence 5, like the rest of the iron gear.
+
+| Weapon | Type | Speed | Bronze: slash/crush att · str | Iron: slash/crush att · str |
+| --- | --- | --- | --- | --- |
+| Mace | crush | 4 ticks | crush +6 · str 5 | crush +9 · str 7 |
+| Scimitar | slash | 4 ticks | slash +7 · str 6 | slash +10 · str 9 |
+| Longsword | slash | 5 ticks | slash +8 · str 8 | slash +11 · str 11 |
+| Battleaxe | slash | 6 ticks | slash +8 · str 10 | slash +11 · str 14 |
+
+| Armour | Bronze defence (stab/slash/crush/ranged) | Iron |
+| --- | --- | --- |
+| Full helm | 4/5/3/4 | 6/7/5/6 |
+| Kiteshield | 6/8/7/7 | 9/11/10/10 |
+| Platelegs | 8/7/6/7 | 11/10/9/10 |
+| Platebody | 15/14/9/14 | 21/20/12/20 |
+
+Plate armour costs a lot of magic and some ranged attack. The new pieces' painted art is made from existing art in `tools/derived.py` (platebody and platelegs from the leather body and chaps in metal colours, the kiteshield and full helm reshaped from the sq shield and med helm, the scimitar and longsword from the sword, the battleaxe from the axe, the mace from the pickaxe's haft and a helm), until they get sheets of their own. The mace, scimitar, longsword and battleaxe use the sword and axe sprites in your hand. Long menus (like the anvil's) now scroll.
+
+**Planned next** (in order): coal and steel with a lower level of Copperdeep Mine, then silver and gold (with gems), then mithril.
 
 New gear: iron sword, iron med helm, bronze and iron sq shields, bronze and iron chainbodies (iron needs Attack/Defence 5), and iron arrows (ranged strength 10; Fletching 15 from iron arrowtips). Shields show their metal on your character.
 
