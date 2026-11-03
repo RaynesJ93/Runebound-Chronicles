@@ -190,15 +190,23 @@ export function buildRoute1() {
   one('caveMouth', 7, 6, { sealed: true, interact: ['Huge boulders block the mouth of a cave.', 'Cold air seeps out between them, and something deep inside is breathing.'] });
   for (const [x, y] of [[5, 8], [9, 8], [11, 9]]) one('rock', x, y);
 
-  // The old graveyard
-  clearArea(36, 84, 50, 93);
+  // The old graveyard: black iron railings, a flagstone path from the gate
+  // to a tall memorial, two rows of graves either side, and a pair of dead trees.
+  clearArea(35, 83, 51, 94);
   for (let x = 37; x <= 49; x++) for (let y = 85; y <= 92; y++) {
     const edge = x === 37 || x === 49 || y === 85 || y === 92;
-    if (edge && !(y === 85 && (x === 43 || x === 44))) one('fence', x, y);
+    if (edge && !(y === 85 && (x === 43 || x === 44))) one('fence', x, y, { style: 'iron' });
   }
-  const names = ['Here lies Old Tam. He went looking for the goblin chief.', 'Mira Thorn. Beloved. Brave. Very stubborn.', 'An old stone. The name has worn away.', '"I told you I was ill."', 'A soldier of the Goblin War.', 'Someone has left fresh flowers here.'];
+  rect(43, 86, 44, 89, GROUND.PLAZA);
+  prop('memorial', [{ x: 43, y: 90 }, { x: 44, y: 90 }], { interact: ['A tall memorial stone: "TO THE FALLEN OF THE GOBLIN WAR."', 'Below, in smaller letters: "They held the crossroads."'] });
+  const names = ['Here lies Old Tam. He went looking for the goblin chief.', 'Mira Thorn. Beloved. Brave. Very stubborn.', 'An old stone. The name has worn away.', '"I told you I was ill."',
+    'A soldier of the Goblin War.', 'Someone has left fresh flowers here.', 'Bran Hollow, farmer. "Gone to see the cows."', 'A cracked stone. Something has scratched at the earth in front of it.'];
   let nk = 0;
-  for (let x = 39; x <= 47; x += 2) for (let y = 87; y <= 90; y += 3) one('tombstone', x, y, { interact: [names[nk++ % names.length]] });
+  for (const x of [39, 41, 46, 48]) for (const y of [86, 89]) one('grave', x, y, { interact: [names[nk++ % names.length]] });
+  for (const [x, y] of [[38, 91], [48, 91]]) one('tree', x, y, { variant: 'dead', interact: ['A dead tree. Nothing grows well here.'] });
+  for (const [x, y] of [[38, 87], [40, 91], [42, 88], [45, 91], [47, 88], [42, 86], [45, 86], [38, 89]]) at('deadGrass', x, y, { blocks: false });
+  for (const [x, y] of [[40, 88], [47, 91]]) at('bones', x, y, { blocks: false });
+  for (const [x, y] of [[41, 91], [46, 87]]) at('mushrooms', x, y, { blocks: false });
   one('sign', 45, 83, { interact: ['THE OLD GRAVEYARD', 'Rest in peace.'] });
 
   // The abandoned farmstead
@@ -291,7 +299,7 @@ export function buildRoute1() {
   return {
     id: 'route1',
     name: 'Thornwood',
-    neat: [[97, 38, 103, 44]], // the shrine's paving
+    neat: [[97, 38, 103, 44], [43, 86, 44, 89]], // the shrine's paving, the graveyard path
     W, H, ground, blocked, props, buildings,
     spawn: { x: 55, y: H - 3, facing: Math.PI },
     exits: [
