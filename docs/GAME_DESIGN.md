@@ -1,6 +1,6 @@
 # RuneBound Chronicles — Game Design Document
 
-*Version 2.2 · Updated 2 November 2026 · 2D pixel art; supersedes the original creature-battler concept*
+*Version 2.3 · Updated 3 November 2026 · 2D pixel art; supersedes the original creature-battler concept*
 
 ## 1. Vision
 
@@ -434,7 +434,7 @@ Saves from before v0.18 that were standing in the old Route 1 (or left a gravest
 | Mind | 2 | 5.5 | 14, 28, 42, 56, 70, 84, 98 |
 | Water | 5 | 6 | 19, 38, 57, 76, 95 |
 
-### Crafting (shipped in v0.15.0)
+### Crafting (shipped in v0.15.0; levels lowered and hard leather set added in v0.23.0)
 
 **Hilda the Tanner**, by the cow field in Brambleford, gives you a needle and 20 thread when you ask her to teach you. Pell sells more of both.
 
@@ -443,19 +443,27 @@ Saves from before v0.18 that were standing in the old Route 1 (or left a gravest
 | Makes | Level | From | XP |
 | --- | --- | --- | --- |
 | Leather | 1 | 1 cowhide | 2 |
-| Hard leather | 10 | 1 cowhide | 4 |
+| Hard leather | 6 | 1 cowhide | 4 |
 
 **Sewing.** Tap leather (or the needle) to choose what to sew. Each piece uses 1 leather and 1 thread, needs a needle, and keeps going until you run out.
 
 | Item | Level | XP | Notes |
 | --- | --- | --- | --- |
 | Leather gloves | 1 | 13.8 | +1 ranged attack |
-| Leather boots | 7 | 16.25 | |
-| Leather cowl | 9 | 18.5 | Head; +1 ranged attack |
-| Leather vambraces | 11 | 22 | Hands; +4 ranged attack |
-| Leather body | 14 | 25 | |
-| Leather chaps | 18 | 27 | Legs; +4 ranged attack |
-| Hard leather body | 28 | 35 | From hard leather; needs Defence 10; +8 ranged attack, ranged defence +20 |
+| Leather boots | 4 | 16.25 | |
+| Leather cowl | 6 | 18.5 | Head; +1 ranged attack |
+| Leather vambraces | 8 | 22 | Hands; +4 ranged attack |
+| Leather body | 10 | 25 | |
+| Leather chaps | 13 | 27 | Legs; +4 ranged attack |
+| Hard leather gloves | 15 | 28 | From hard leather; +2 ranged attack |
+| Hard leather boots | 16 | 29.5 | From hard leather; +1 ranged attack |
+| Hard leather cowl | 18 | 31 | From hard leather; needs Defence 5; +2 ranged attack |
+| Hard leather body | 20 | 35 | From hard leather; needs Defence 10; +8 ranged attack, ranged defence +20 |
+| Hard leather chaps | 22 | 36 | From hard leather; needs Defence 5; +6 ranged attack, ranged defence +6 |
+
+The hard leather gloves, boots, cowl and chaps use the leather pieces' painted art recoloured to hard leather (`tools/derived.py`) until they get sheets of their own.
+
+**Planned expansions** (in order): spinning (flax into bowstrings, sheep's wool into thread), robes for mages (wool woven into cloth), jewellery (silver and gold, moulds at the furnace, cut gems), wolf leather. Ideas for later: studded leather (with Smithing), pottery.
 
 Animations: scraping the hide on the rack; a needle going in and out of the leather.
 

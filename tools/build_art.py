@@ -441,6 +441,11 @@ def build():
         if sat != 1: g0 = tint(g0, 1, sat)
         t = calm(shrink(seamless(g0).convert('RGBA'), w=size, h=size, outline=False, colors=32), k)
         tiles.append(('tex:' + name, 0, t, 0, 0))
+    # Recoloured copies for items with no sheet of their own (tools/derived.py).
+    from derived import derive
+    have = {}
+    for (name, k, im, ax, ay) in tiles: have.setdefault(name, []).append((k, im, ax, ay))
+    tiles += [t for t in derive(lambda n: sorted(have.get(n, []), key=lambda v: v[0])) if t[0] not in have]
     # pack into rows, tallest first
     tiles.sort(key=lambda t: -t[2].height)
     W, x, y, rowh, placed = 1024, 0, 0, 0, []

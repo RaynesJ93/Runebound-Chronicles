@@ -1,6 +1,6 @@
 # RuneBound Chronicles — Roadmap
 
-*Updated 2 November 2026 · matches [GAME_DESIGN.md](GAME_DESIGN.md) v2.2*
+*Updated 3 November 2026 · matches [GAME_DESIGN.md](GAME_DESIGN.md) v2.3*
 
 The game is built in small batches. Each batch must:
 
@@ -33,7 +33,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 1. ✅ Woodcutting (trees on the forest route) and Fletching (bows, arrows) — v0.11.0
 2. ✅ Mining (a small mine area) and Smithing (bars, bronze/iron gear) — v0.12.0
 3. ✅ Fishing and Cooking (food you make yourself) — v0.13.0
-4. ✅ Crafting (leather armour) — v0.15.0; ✅ Runecrafting (air, mind and water runes) and Whispering Vale — v0.16.0
+4. ✅ Crafting (leather armour) — v0.15.0; ✅ lower levels and a hard leather set — v0.23.0; next: spinning, robes, jewellery, wolf leather; ✅ Runecrafting (air, mind and water runes) and Whispering Vale — v0.16.0
 5. Bank tabs and search
 
 ## Phase 3 — Quests and new regions (v0.3)
@@ -62,6 +62,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Date | Change |
 | --- | --- |
+| 3 Nov 2026 | v0.23.0: Crafting, batch A — lower levels (hard leather 6; boots 4, cowl 6, vambraces 8, body 10, chaps 13) and a hard leather set: gloves 15, boots 16, cowl 18, body 20 (was 28) and chaps 22, sewn from hard leather. Hilda tells you the new levels. The new pieces use the leather art recoloured. |
 | 3 Nov 2026 | v0.22.0: painted art, part 4 (sheets 17–31) — four-frame campfires, cooking pots and fishing spots; attack, hit and fall animations for the player (slash, bow, cast) and every enemy and animal; worn gear drawn on the player again (helmets, cowl, chainbodies, leather body and chaps, boots, wolf cloak, war charm, all weapons and shields; gloves and vambraces don't show); a new Edda the Banker; painted iron, wooden and picket fences in every direction; graveyard headstones, mounds, memorial and the player's grave marker; watchtower ruins; bones; the goblin chief's hut, the hermit's hut and the boarded-up farmhouse; the free-bow board; shop and bank counters, booths, shelves, rug, plants, lamps, sack and coin chests; painted skill icons, interface icons (settings, heart, run/walk), damage splats, health bars, level-up burst and rare-drop sparkle; painted axes, pickaxes, hammer, frying pan and net while skilling; Wind and Water Strike in flight and splashing; arrows in eight directions. Art for the goblin chief, cave beast and night stalker is in the atlas for later. |
 | 3 Nov 2026 | v0.21.3: Thornwood's old graveyard made more graveyard-like — black iron railings, a flagstone path from the gate to a tall memorial to the fallen of the Goblin War, eight graves in two rows (rounded, cross, leaning mossy and carved headstones, each with a mound of earth), two dead trees, dead grass, bones and mushrooms. Every grave and the memorial can be read. |
 | 3 Nov 2026 | v0.21.2: Thornwood's stone shrine tidied: a neat square of paving with straight edges (areas can now mark paving as `neat`), the shrine in the exact middle, eight standing stones in line just outside its edges (two a side), the path coming in between the south pair, and trees cleared from around it. |
