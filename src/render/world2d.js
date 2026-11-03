@@ -48,6 +48,7 @@ function getLib() {
     ore: Object.fromEntries(['copper', 'tin', 'iron'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
     oreEmpty: [S.oreRock(null, 131), S.oreRock(null, 132)],
     furnace: S.furnace(),
+    tanningRack: S.tanningRack(),
     fishingSpot: [S.fishingSpot(0), S.fishingSpot(1)],
     cookingPit: [S.cookingPit(0), S.cookingPit(1)],
     anvil: S.anvil(),
@@ -134,6 +135,7 @@ export function createWorldView(canvasEl, area) {
         break;
       }
       case 'furnace': place(lib.furnace, f.x, f.y + 1); break;
+      case 'tanningRack': place(lib.tanningRack, f.x, f.y); break;
       // Ripples sit flat on the water, under anyone standing nearby.
       case 'fishingSpot': place(lib.fishingSpot[0], f.x, f.y - 2, { frames: lib.fishingSpot, rate: 1.6, sortY: p.y * TILE }); break;
       case 'cookingPit': place(lib.cookingPit[0], f.x, f.y, { frames: lib.cookingPit }); break;

@@ -221,11 +221,13 @@ export function buildBrambleford() {
   }
   one('crate', 57, 37, { interact: ['A trough of fresh hay.'] });
   one('sign', 43, 40, { interact: ['COW FIELD', 'Cows give beef for cooking, and hides for crafting.'] });
+  // Hilda's tanning rack, just west of the south road
+  one('tanningRack', 36, 38, { action: 'tan', interact: ['A wooden frame for stretching and tanning hides.'] });
 
   // ---- South meadow, between the pond and the river ---------------------------
   for (const [x, y] of [[6, 38], [14, 36], [20, 40], [28, 38], [33, 41], [10, 41]]) placeIfFree('bush', x, y);
   for (const [x, y] of [[4, 36], [17, 42], [35, 37], [26, 42]]) placeIfFree('rock', x, y);
-  for (const [x, y] of [[12, 38], [24, 37], [31, 35], [8, 43], [37, 42]]) placeIfFree('tree', x, y, { variant: 'oak' });
+  for (const [x, y] of [[12, 38], [24, 37], [31, 35], [8, 43], [33, 43]]) placeIfFree('tree', x, y, { variant: 'oak' });
   one('sign', 39, 34, { interact: ['SOUTH ROAD', 'River and fishing ahead. Cows to the east.'] });
 
   // ---- Decoration ---------------------------------------------------------

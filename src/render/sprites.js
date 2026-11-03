@@ -998,3 +998,24 @@ export function cowFrames(look) {
   }
   return frames;
 }
+
+// ---- Crafting ---------------------------------------------------------------------
+
+// A wooden frame with a hide stretched across it.
+export function tanningRack() {
+  const b = new Bitmap(20, 26);
+  const [d, m, l] = C.wood;
+  b.rect(2, 2, 2, 23, m); b.rect(16, 2, 2, 23, m);
+  b.rect(1, 2, 18, 2, l); b.rect(1, 15, 18, 2, m);
+  b.rect(2, 24, 3, 1, d); b.rect(15, 24, 3, 1, d);
+  // the hide, laced to the frame
+  const hide = [hex('#8a5a32'), hex('#b07a48'), hex('#d0a070')];
+  for (let y = 5; y < 15; y++) for (let x = 5; x < 15; x++) {
+    const dx = (x + 0.5 - 10) / 5.4, dy = (y + 0.5 - 9.8) / 5.2;
+    if (dx * dx + dy * dy > 1) continue;
+    b.set(x, y, dy < -0.3 ? hide[2] : dx > 0.4 ? hide[0] : hide[1]);
+  }
+  for (const [x, y] of [[4, 6], [4, 11], [15, 6], [15, 11], [9, 4], [11, 4]]) b.set(x, y, hex('#e8d8b0'));
+  b.outline();
+  return sprite(b, 10, 25);
+}

@@ -405,6 +405,31 @@ Dorrin gives you a bronze pickaxe and a hammer when you ask him to teach you; Pe
 
 New gear: iron sword, iron med helm, bronze and iron sq shields, bronze and iron chainbodies (iron needs Attack/Defence 5), and iron arrows (ranged strength 10; Fletching 15 from iron arrowtips). Shields show their metal on your character.
 
+### Crafting (shipped in v0.15.0)
+
+**Hilda the Tanner**, by the cow field in Brambleford, gives you a needle and 20 thread when you ask her to teach you. Pell sells more of both.
+
+**Tanning.** Tap Hilda's tanning rack with cowhides in your bag (every cow drops one):
+
+| Makes | Level | From | XP |
+| --- | --- | --- | --- |
+| Leather | 1 | 1 cowhide | 2 |
+| Hard leather | 10 | 1 cowhide | 4 |
+
+**Sewing.** Tap leather (or the needle) to choose what to sew. Each piece uses 1 leather and 1 thread, needs a needle, and keeps going until you run out.
+
+| Item | Level | XP | Notes |
+| --- | --- | --- | --- |
+| Leather gloves | 1 | 13.8 | +1 ranged attack |
+| Leather boots | 7 | 16.25 | |
+| Leather cowl | 9 | 18.5 | Head; +1 ranged attack |
+| Leather vambraces | 11 | 22 | Hands; +4 ranged attack |
+| Leather body | 14 | 25 | |
+| Leather chaps | 18 | 27 | Legs; +4 ranged attack |
+| Hard leather body | 28 | 35 | From hard leather; needs Defence 10; +8 ranged attack, ranged defence +20 |
+
+Animations: scraping the hide on the rack; a needle going in and out of the leather.
+
 ### Skilling animations
 
 While you skill, an animation loops for as long as you're working (`src/render/skilling.js`), and the skill's icon floats above your head:

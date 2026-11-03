@@ -230,6 +230,24 @@ const ART = {
     '.....oorryoo....',
     '......oyoo......',
   ],
+  crafting: [
+    '................',
+    '................',
+    '..............o.',
+    '.............ogo',
+    '....oooooo...ogo',
+    '...osssssso.oWo.',
+    '..ossssssssoWo..',
+    '.osssssssssWo...',
+    '.oSSSSSSSbWbo...',
+    'oSSSSSSSSWbbbo..',
+    '.oSSSSSSWbbbo...',
+    '.oSSSnSnSnbno...',
+    '..oSSSWSSbbo....',
+    '...oSWSSSbo.....',
+    '...oWooooo......',
+    '....o...........',
+  ],
 };
 ART.controlled = ART.attack;
 ART.accurate = ART.attack;

@@ -140,6 +140,11 @@ export const ITEMS = {
     name: 'Iron chainbody', value: 210, examine: 'A shirt of iron rings.',
     equip: { slot: 'body', req: { defence: 5 }, att: { magic: -4 }, def: { stab: 11, slash: 16, crush: 18, ranged: 13, magic: -1 }, look: { tunic: '#7a828b' } },
   },
+  // ---- Crafting --------------------------------------------------------------------
+  leather: { name: 'Leather', value: 15, examine: 'Soft tanned leather. Sew it with a needle and thread.' },
+  hardLeather: { name: 'Hard leather', value: 30, examine: 'Stiff, tough leather. Good for armour.' },
+  needle: { name: 'Needle', value: 1, examine: 'For sewing leather. Tap your leather to start.' },
+  thread: { name: 'Thread', stackable: true, value: 2, examine: 'Strong thread. Each leather item uses one.' },
   knife: { name: 'Knife', value: 6, examine: 'Sharp enough to carve wood. Tap your logs to fletch them.' },
   logs: { name: 'Logs', value: 4, examine: 'Freshly cut pine logs.' },
   oakLogs: { name: 'Oak logs', value: 20, examine: 'Heavy logs from an oak tree.' },
@@ -159,6 +164,22 @@ export const ITEMS = {
   leatherBody: {
     name: 'Leather body', value: 21, examine: 'Better than nothing. Good for archers.',
     equip: { slot: 'body', req: { defence: 1 }, def: { stab: 2, slash: 4, crush: 3, ranged: 3, magic: 1 }, att: { ranged: 2 }, look: { tunic: '#8a5a32' } },
+  },
+  leatherCowl: {
+    name: 'Leather cowl', value: 24, examine: 'A leather hood. Popular with archers.',
+    equip: { slot: 'head', req: { defence: 1 }, att: { ranged: 1 }, def: { stab: 1, slash: 2, crush: 2, ranged: 2, magic: 1 }, look: { hat: 'hood', hatColor: '#7a4a26' } },
+  },
+  leatherVambraces: {
+    name: 'Leather vambraces', value: 18, examine: 'Leather arm guards. They steady your aim.',
+    equip: { slot: 'hands', req: { ranged: 1 }, att: { ranged: 4 }, def: { stab: 2, slash: 2, crush: 2, ranged: 1 } },
+  },
+  leatherChaps: {
+    name: 'Leather chaps', value: 20, examine: 'Tough leather leggings.',
+    equip: { slot: 'legs', req: { defence: 1 }, att: { ranged: 4 }, def: { stab: 2, slash: 2, crush: 2, ranged: 4, magic: 1 }, look: { pants: '#7a4a26' } },
+  },
+  hardLeatherBody: {
+    name: 'Hard leather body', value: 170, examine: 'Boiled and hardened leather. Needs Defence 10.',
+    equip: { slot: 'body', req: { defence: 10 }, att: { ranged: 8, magic: -6 }, def: { stab: 12, slash: 15, crush: 18, ranged: 20, magic: 6 }, look: { tunic: '#5e3b1f' } },
   },
   leatherGloves: {
     name: 'Leather gloves', value: 6, examine: 'Keeps your hands warm and your grip firm.',

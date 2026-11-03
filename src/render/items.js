@@ -140,6 +140,24 @@ function fish(b, col, len, cooked = false) {
   if (cooked) for (const x of [cx - 1, cx + 2]) { b.set(x, cy - 1, d); b.set(x + 1, cy, d); }
 }
 
+// A tanned hide, stretched flat: the classic hide shape, a body with four
+// leg flaps and a neck flap, so it can't be mistaken for anything else.
+function hideSheet(b, c) {
+  const [d, m, l] = c;
+  // body
+  for (let y = 4; y < 12; y++) for (let x = 4; x < 12; x++) b.set(x, y, (x + y) % 6 === 0 ? l : m);
+  // leg flaps at the corners, angled outwards
+  for (const [x0, y0, dx, dy] of [[4, 4, -1, -1], [11, 4, 1, -1], [4, 11, -1, 1], [11, 11, 1, 1]]) {
+    for (let k = 1; k <= 3; k++) { b.set(x0 + dx * k, y0 + dy * k, m); b.set(x0 + dx * (k - 1), y0 + dy * k, m); }
+    b.set(x0 + dx * 3, y0 + dy * 3, d);
+  }
+  // neck and tail flaps
+  b.rect(7, 2, 2, 2, m); b.rect(7, 12, 2, 2, d);
+  // a lighter sheen and the stitched edge
+  b.rect(5, 5, 4, 1, l);
+  for (const [x, y] of [[4, 7], [4, 9], [11, 7], [11, 9]]) b.set(x, y, d);
+}
+
 // Two logs lying side by side, ends showing their rings.
 function logPair(b, bark, ring) {
   for (const [y0, x0] of [[9, 2], [5, 4]]) {
@@ -473,6 +491,54 @@ const DRAW = {
       if (y === 3 && x > 6 && x < 9) continue;
       b.set(x, y, x === 8 || (y === 9 && torso) ? c[0] : (x + y) % 5 === 0 ? c[2] : c[1]);
     }
+  },
+  leather(b) { hideSheet(b, [hex('#7a4a26'), hex('#a8703c'), hex('#c8925a')]); },
+  hardLeather(b) { hideSheet(b, [hex('#4a2c16'), hex('#6e4422'), hex('#8a5a32')]); b.set(5, 6, hex('#d8b07a')); b.set(10, 10, hex('#d8b07a')); },
+  needle(b) {
+    line(b, 3, 13, 12, 3, hex('#c0c8d0'));
+    line(b, 4, 13, 12, 4, hex('#7a828b'));
+    b.set(12, 2, hex('#7a828b')); b.set(13, 2, hex('#7a828b')); b.set(13, 3, hex('#7a828b'));
+    // a loop of thread through the eye
+    for (const [x, y] of [[13, 4], [14, 5], [14, 7], [13, 9], [11, 10], [10, 12]]) b.set(x, y, hex('#e8d8b0'));
+  },
+  thread(b) {
+    b.rect(5, 2, 6, 2, WOOD[1]); b.rect(5, 12, 6, 2, WOOD[1]);
+    for (let y = 4; y < 12; y++) b.rect(5, y, 6, 1, y % 2 ? hex('#e8d8b0') : hex('#cbb88a'));
+    line(b, 11, 6, 14, 10, hex('#e8d8b0'));
+  },
+  leatherCowl(b) {
+    const c = [hex('#4a2c16'), hex('#7a4a26'), hex('#a0703f')];
+    b.ellipse(8, 8, 5.5, 6, c[1]);
+    b.ellipse(7, 6, 3, 3, c[2]);
+    b.ellipse(8, 10, 3, 3.2, hex('#2b1d16'));
+    b.rect(3, 12, 10, 2, c[0]);
+  },
+  leatherVambraces(b) {
+    const c = [hex('#4a2c16'), hex('#7a4a26'), hex('#a0703f')];
+    for (const ox of [2, 9]) {
+      b.rect(ox, 3, 5, 10, c[1]);
+      b.rect(ox, 3, 5, 1, c[2]);
+      for (const y of [6, 9]) b.rect(ox, y, 5, 1, c[0]);
+    }
+  },
+  leatherChaps(b) {
+    const c = [hex('#4a2c16'), hex('#7a4a26'), hex('#a0703f')];
+    b.rect(3, 2, 10, 3, c[1]);
+    b.rect(3, 2, 10, 1, c[2]);
+    b.rect(3, 5, 4, 9, c[1]); b.rect(9, 5, 4, 9, c[1]);
+    b.rect(3, 13, 4, 1, c[0]); b.rect(9, 13, 4, 1, c[0]);
+    b.rect(7, 2, 2, 1, hex('#c8a030'));
+  },
+  hardLeatherBody(b) {
+    const c = [hex('#2e1a0c'), hex('#5e3b1f'), hex('#7a4f2a')];
+    for (let y = 3; y < 14; y++) for (let x = 2; x < 14; x++) {
+      const torso = x >= 4 && x <= 11;
+      const sleeve = y < 8 && (x < 4 || x > 11);
+      if (!torso && !sleeve) continue;
+      if (y === 3 && x > 6 && x < 9) continue;
+      b.set(x, y, x === 8 || y === 7 || y === 11 ? c[0] : (x + y) % 4 === 0 ? c[2] : c[1]);
+    }
+    for (const [x, y] of [[5, 5], [10, 5], [5, 9], [10, 9]]) b.set(x, y, hex('#c8a030'));
   },
   leatherGloves(b) {
     const c = [hex('#5e3b1f'), hex('#8a5a32'), hex('#a8743f')];

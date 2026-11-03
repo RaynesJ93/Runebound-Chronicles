@@ -35,6 +35,8 @@ export const SHOPS = {
       { id: 'fishingRod', base: 5 },
       { id: 'flyFishingRod', base: 3 },
       { id: 'fishingBait', base: 500 },
+      { id: 'needle', base: 5 },
+      { id: 'thread', base: 200 },
       { id: 'feather', base: 500 },
       { id: 'bronzeArrowtips', base: 300 },
     ],

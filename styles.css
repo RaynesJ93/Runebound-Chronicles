@@ -515,3 +515,11 @@ img.px { -webkit-user-drag: none; }
   .dialog { min-height: 84px; padding: 14px 44px 14px 18px; font-size: 18px; }
   .panel-body { padding-bottom: 10px; }
 }
+
+/* Short phones (iPhone SE and similar): tighter skill cards so all skills fit without scrolling. */
+@media (max-height: 700px) {
+  .skill-grid { gap: 5px; }
+  .skill { padding: 5px 8px; }
+  #skills .panel-head { padding-top: 6px; }
+  .skill-foot { margin-top: 6px; }
+}
