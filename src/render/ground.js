@@ -72,7 +72,8 @@ function textures(theme) {
 }
 const px = (tx, x, y) => { const i = (((y % tx.h) * tx.w) + (x % tx.w)) * 4; return [tx.data[i], tx.data[i + 1], tx.data[i + 2]]; };
 
-const isSoft = (g) => g === GROUND.GRASS;
+const BLEND = new Set([GROUND.GRASS, GROUND.PATH, GROUND.SAND, GROUND.DIRT]);
+const EARTH = new Set([GROUND.PATH, GROUND.SAND, GROUND.DIRT]);
 
 export function buildGround(area) {
   P = area.theme === 'vale' ? VALE : BASE;
@@ -81,6 +82,7 @@ export function buildGround(area) {
   const H = area.H * TILE;
   const frames = [new Bitmap(W, H), new Bitmap(W, H)];
   const g = (tx, ty) => (area.inBounds(tx, ty) ? area.groundAt(tx, ty) : GROUND.GRASS);
+  const kinds = new Uint8Array(W * H); // what each pixel ended up as, for the edge shading
 
   // Smooth value noise for big grass colour patches.
   const vn = (x, y, s, seed) => {
@@ -102,12 +104,17 @@ export function buildGround(area) {
       const tx = x >> 4, ty = y >> 4, lx = x & 15, ly = y & 15;
       let t = g(tx, ty);
 
-      // Ragged edges where a path, square, sand or soil meets grass.
-      if (t !== GROUND.GRASS && t !== GROUND.WATER && t !== GROUND.BRIDGE && t !== GROUND.FLOOR && t !== GROUND.WALL && t !== GROUND.CAVE && t !== GROUND.ROCKWALL) {
-        const e = 1 + (rnd(x, y, 21) < 0.5 ? 1 : 0) + (rnd(x >> 1, y >> 1, 22) < 0.3 ? 1 : 0);
-        if ((lx < e && isSoft(g(tx - 1, ty))) || (lx > 15 - e && isSoft(g(tx + 1, ty))) ||
-            (ly < e && isSoft(g(tx, ty - 1))) || (ly > 15 - e && isSoft(g(tx, ty + 1)))) t = GROUND.GRASS;
+      // Natural edges: where grass, paths, sand and soil meet, the border
+      // wanders a few pixels either way (the ground is looked up at a point
+      // nudged by smooth noise), so there are no straight tile-edge seams and
+      // the ends of paths come out rounded.
+      if (BLEND.has(t)) {
+        const wx = Math.floor(x + (vn(x, y, 7, 23) - 0.5) * 11 + (rnd(x, y, 25) - 0.5) * 1.5);
+        const wy = Math.floor(y + (vn(x, y, 7, 24) - 0.5) * 11 + (rnd(x, y, 26) - 0.5) * 1.5);
+        const t2 = g(wx >> 4, wy >> 4);
+        if (BLEND.has(t2)) t = t2;
       }
+      kinds[y * W + x] = t;
 
       let c;
       switch (t) {
@@ -192,6 +199,33 @@ export function buildGround(area) {
       }
       frames[0].set(x, y, c);
       frames[1].set(x, y, c);
+    }
+  }
+
+  // A soft shadow where grass meets bare ground: the earth darkens along the
+  // edge and the grass next to it is a little darker too, so the two blend.
+  for (let y = 1; y < H - 1; y++) {
+    for (let x = 1; x < W - 1; x++) {
+      const k = kinds[y * W + x];
+      const grassNear = (kinds[y * W + x - 1] === GROUND.GRASS) + (kinds[y * W + x + 1] === GROUND.GRASS) + (kinds[(y - 1) * W + x] === GROUND.GRASS) + (kinds[(y + 1) * W + x] === GROUND.GRASS);
+      let f = 1;
+      const P2 = GROUND.PLAZA;
+      const at = (dx, dy) => kinds[(y + dy) * W + x + dx];
+      if (k === P2) {
+        // paved squares get a kerb: a dark edge stone, a lighter one inside it
+        const ring = (d) => x >= d && y >= d && x < W - d && y < H - d && (at(-d, 0) !== P2 || at(d, 0) !== P2 || at(0, -d) !== P2 || at(0, d) !== P2);
+        if (ring(1)) f = 0.5;
+        else if (ring(2)) f = 0.7;
+        else if (ring(3)) f = 1.15;
+      } else if (k !== P2 && BLEND.has(k) && (at(-1, 0) === P2 || at(1, 0) === P2 || at(0, -1) === P2 || at(0, 1) === P2)) f = 0.8;
+      else if (EARTH.has(k) && grassNear) f = 0.8;
+      else if (k === GROUND.GRASS) {
+        const earthNear = EARTH.has(kinds[y * W + x - 1]) || EARTH.has(kinds[y * W + x + 1]) || EARTH.has(kinds[(y - 1) * W + x]) || EARTH.has(kinds[(y + 1) * W + x]);
+        if (earthNear) f = 0.85;
+      }
+      if (f === 1) continue;
+      const i = (y * W + x) * 4;
+      for (const fr of frames) for (let c = 0; c < 3; c++) fr.data[i + c] = Math.min(255, fr.data[i + c] * f);
     }
   }
 
