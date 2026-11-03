@@ -1,5 +1,6 @@
 import { GROUND } from '../world/area.js';
 import { TILE, Bitmap, rnd, dither, hex } from './pixel.js';
+import { texture } from './art.js';
 
 // Pre-renders the whole ground of an area into big canvases, once.
 // Two frames are made so water can shimmer.
@@ -58,10 +59,24 @@ const VALE = {
 
 let P = BASE;
 
+// Painted ground textures from the art atlas (64 x 64, repeating). Any that
+// are missing fall back to the code-drawn ground below.
+const TEX = {};
+function textures(theme) {
+  if (TEX[theme]) return TEX[theme];
+  const t = (n) => texture(n);
+  TEX[theme] = theme === 'vale'
+    ? { grass: t('valeGrass'), path: t('valePath'), sand: t('valePath'), water: [t('valeWater0'), t('valeWater1')], cave: t('cave'), rockwall: t('rockwall'), bridge: t('bridge'), floor: t('floor') }
+    : { grass: t('grass'), path: t('path'), plaza: t('plaza'), sand: t('sand'), dirt: t('dirt'), water: [t('water0'), t('water1')], bridge: t('bridge'), floor: t('floor'), cave: t('cave'), rockwall: t('rockwall') };
+  return TEX[theme];
+}
+const px = (tx, x, y) => { const i = (((y % tx.h) * tx.w) + (x % tx.w)) * 4; return [tx.data[i], tx.data[i + 1], tx.data[i + 2]]; };
+
 const isSoft = (g) => g === GROUND.GRASS;
 
 export function buildGround(area) {
   P = area.theme === 'vale' ? VALE : BASE;
+  const T = textures(area.theme === 'vale' ? 'vale' : 'base');
   const W = area.W * TILE;
   const H = area.H * TILE;
   const frames = [new Bitmap(W, H), new Bitmap(W, H)];
@@ -96,14 +111,16 @@ export function buildGround(area) {
 
       let c;
       switch (t) {
-        case GROUND.GRASS: c = grassPixel(x, y); break;
+        case GROUND.GRASS: c = T.grass ? px(T.grass, x, y) : grassPixel(x, y); break;
         case GROUND.PATH: {
+          if (T.path) { c = px(T.path, x, y); break; }
           const n = rnd(x, y, 31);
           const k = Math.max(0, Math.min(2, Math.floor(vn(x, y, 6, 32) * 3 + (dither(x, y) - 0.5) * 0.6)));
           c = n < 0.07 ? P.pathDark : n > 0.97 ? P.pebble : P.path[k];
           break;
         }
         case GROUND.PLAZA: {
+          if (T.plaza) { c = px(T.plaza, x, y); break; }
           const row = Math.floor(y / 6);
           const bx = (x + (row % 2) * 4) % 8;
           const by = y % 6;
@@ -116,11 +133,13 @@ export function buildGround(area) {
           break;
         }
         case GROUND.SAND: {
+          if (T.sand) { c = px(T.sand, x, y); break; }
           const n = rnd(x, y, 51) + (dither(x, y) - 0.5) * 0.3;
           c = P.sand[n < 0.3 ? 0 : n < 0.85 ? 1 : 2];
           break;
         }
         case GROUND.DIRT: {
+          if (T.dirt) { c = px(T.dirt, x, y); break; }
           c = (y % 4 === 3) ? P.furrow : P.dirt[Math.floor(rnd(x, y, 61) * 2.2 + (y % 4 === 0 ? 0.9 : 0)) % 3];
           break;
         }
@@ -129,11 +148,13 @@ export function buildGround(area) {
           const railL = g(tx - 1, ty) === GROUND.WATER && lx < 2;
           const railR = g(tx + 1, ty) === GROUND.WATER && lx > 13;
           if (railL || railR) c = (lx === 0 || lx === 15) ? P.plankDark : P.rail;
+          else if (T.bridge) c = px(T.bridge, x, y);
           else if (y % 4 === 3) c = P.plankDark;
           else c = P.plank[Math.floor(rnd(Math.floor((x + (Math.floor(y / 4) % 2) * 5) / 9), Math.floor(y / 4), 91) * 3)];
           break;
         }
         case GROUND.FLOOR: {
+          if (T.floor) { c = px(T.floor, x, y); break; }
           // floorboards running across the room
           const board = Math.floor(y / 5);
           const seam = (x + board * 7) % 23 === 0;
@@ -149,6 +170,7 @@ export function buildGround(area) {
           break;
         }
         case GROUND.CAVE: {
+          if (T.cave) { c = px(T.cave, x, y); break; }
           // packed earth and grit on the mine floor
           const r = rnd(x, y, 97);
           c = r < 0.05 ? P.caveDark : r > 0.97 ? P.caveHi : P.cave[Math.floor(rnd(x >> 2, y >> 2, 98) * 3)];
@@ -161,6 +183,7 @@ export function buildGround(area) {
           const row = Math.floor(y / 4);
           const facet = rnd(Math.floor((x + (row % 2) * 3) / 6), row, 99);
           if (below !== GROUND.ROCKWALL && ly >= 12) c = ly >= 14 ? P.rockwallTop : P.rockwallHi;
+          else if (T.rockwall) c = px(T.rockwall, x, y);
           else if (rnd(x, y, 100) < 0.035 || y % 4 === 3 && rnd(x >> 1, row, 101) < 0.5) c = P.rockwallTop;
           else c = P.rockwall[Math.floor(facet * 3)];
           break;
@@ -175,7 +198,7 @@ export function buildGround(area) {
   // Grass tufts: little "v" shapes scattered over grass tiles.
   for (let ty = 0; ty < area.H; ty++) {
     for (let tx = 0; tx < area.W; tx++) {
-      if (g(tx, ty) !== GROUND.GRASS) continue;
+      if (g(tx, ty) !== GROUND.GRASS || T.grass) continue;
       const n = Math.floor(rnd(tx, ty, 71) * 4);
       for (let k = 0; k < n; k++) {
         const x = tx * TILE + 2 + Math.floor(rnd(tx, ty, 72 + k) * 11);
@@ -211,10 +234,11 @@ export function buildGround(area) {
             if (d <= 1) c = rnd(x, y, 81) < 0.75 ? P.shore : P.sand[0];
             else if (d === 2) c = P.foam;
             else if (d === 3) c = P.water[2];
+            else if (T.water[f]) c = px(T.water[f], x, y);
             else c = (rnd(x >> 2, y >> 1, 82) + dither(x, y) * 0.3) < 0.55 ? P.water[1] : P.water[0];
             // glints: short horizontal lines that drift between frames
             const gx = x - f * 3;
-            if (d > 3 && rnd(Math.floor(gx / 5), y, 83 + (y % 2)) < 0.06 && y % 3 === 0) c = P.waterHi;
+            if (d > 3 && !T.water[f] && rnd(Math.floor(gx / 5), y, 83 + (y % 2)) < 0.06 && y % 3 === 0) c = P.waterHi;
             frames[f].set(x, y, c);
           }
         }

@@ -36,7 +36,7 @@ There are no turn-based battles, no battle screens and no creature catching. You
 
 ## Status
 
-**v0.18.0 — Phase 2 in progress.** The first playable version (Brambleford, Thornwood, real-time combat with melee, bows and magic, six combat skills to 99, loot, inventory, equipment, bank, shop, food, potions and gravestones) plus **Woodcutting**, **Fletching**, **Mining**, **Smithing**, **Fishing**, **Cooking**, **Crafting** and **Runecrafting**, Copperdeep Mine, Whispering Vale and Wyn's chicken pen. All XP is 5× the base rates.
+**v0.19.0 — Phase 2 in progress.** The first playable version (Brambleford, Thornwood, real-time combat with melee, bows and magic, six combat skills to 99, loot, inventory, equipment, bank, shop, food, potions and gravestones) plus **Woodcutting**, **Fletching**, **Mining**, **Smithing**, **Fishing**, **Cooking**, **Crafting** and **Runecrafting**, Copperdeep Mine, Whispering Vale and Wyn's chicken pen. All XP is 5× the base rates.
 
 Next: bank tabs and search, then Phase 3 (quests and new regions) (see the [roadmap](docs/ROADMAP.md)).
 
@@ -63,7 +63,7 @@ node tests/inventory.test.mjs
 | --- | --- |
 | `src/core` | Game tick (0.6 s), game state, saving with versions, migrations and repair |
 | `src/world` | Tile grid, collision and pathfinding |
-| `src/render` | Pixel-art sprites drawn in code, ground, buildings, camera and depth sorting |
+| `src/render` | Pixel-art sprites (painted atlas + code-drawn fallbacks), ground, buildings, camera and depth sorting |
 | `src/entities` | The player's movement, villagers (NPCs) and enemies |
 | `src/combat` | Combat formulas and the tick-based fighting system |
 | `src/skills` | XP curve, levels, attack styles, skill list |
@@ -88,6 +88,6 @@ node tests/inventory.test.mjs
 
 ## Stack
 
-HTML canvas and plain JavaScript modules — no libraries — hosted on GitHub Pages. All art is drawn in code. Saves are stored locally in the browser, with export/import for backups.
+HTML canvas and plain JavaScript modules — no libraries — hosted on GitHub Pages. Art is a painted pixel-art atlas (`assets/art.png`, built from sprite sheets by `tools/build_art.py`), with code-drawn fallbacks. Saves are stored locally in the browser, with export/import for backups.
 
 All art, names and content are original. This project is not affiliated with Nintendo, Game Freak, The Pokémon Company or Jagex.
