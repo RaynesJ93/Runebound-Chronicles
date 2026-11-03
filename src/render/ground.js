@@ -90,8 +90,34 @@ function flowerMasks(list) {
 }
 const px = (tx, x, y) => { const i = (((y % tx.h) * tx.w) + (x % tx.w)) * 4; return [tx.data[i], tx.data[i + 1], tx.data[i + 2]]; };
 
-const BLEND = new Set([GROUND.GRASS, GROUND.PATH, GROUND.SAND, GROUND.DIRT]);
+const BLEND = new Set([GROUND.GRASS, GROUND.PATH, GROUND.SAND, GROUND.DIRT, GROUND.PLAZA]);
 const EARTH = new Set([GROUND.PATH, GROUND.SAND, GROUND.DIRT]);
+
+function roundPaving(kinds, W, H, vn) {
+  const R = 10;
+  const sum = new Float32Array((W + 1) * (H + 1)); // summed-area table of the paving
+  for (let y = 0; y < H; y++) {
+    let row = 0;
+    for (let x = 0; x < W; x++) {
+      row += kinds[y * W + x] === GROUND.PLAZA ? 1 : 0;
+      sum[(y + 1) * (W + 1) + x + 1] = sum[y * (W + 1) + x + 1] + row;
+    }
+  }
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const k = kinds[y * W + x];
+      if (!BLEND.has(k)) continue;
+      const x0 = Math.max(0, x - R), y0 = Math.max(0, y - R), x1 = Math.min(W, x + R + 1), y1 = Math.min(H, y + R + 1);
+      const n = (x1 - x0) * (y1 - y0);
+      if (n === 0) continue;
+      const a = (sum[y1 * (W + 1) + x1] - sum[y0 * (W + 1) + x1] - sum[y1 * (W + 1) + x0] + sum[y0 * (W + 1) + x0]) / n;
+      if (a === 0 || a === 1) continue;
+      const paved = a + (vn(x, y, 9, 151) - 0.5) * 0.35 > 0.5;
+      if (paved && k !== GROUND.PLAZA && a > 0.3) kinds[y * W + x] = GROUND.PLAZA;
+      else if (!paved && k === GROUND.PLAZA) kinds[y * W + x] = GROUND.GRASS;
+    }
+  }
+}
 
 export function buildGround(area) {
   P = area.theme === 'vale' ? VALE : BASE;
@@ -117,9 +143,20 @@ export function buildGround(area) {
     return P.grass[n < 0.3 ? 0 : n < 0.5 ? 1 : n < 0.7 ? 2 : 3];
   };
 
+  // Smooth noise doesn't change much from pixel to pixel, so it's worked out
+  // once per small block and looked up (much faster to build big maps).
+  const blockNoise = (shift, scale, seed) => {
+    const bw = (W >> shift) + 2, bh = (H >> shift) + 2;
+    const out = new Float32Array(bw * bh);
+    for (let by = 0; by < bh; by++) for (let bx = 0; bx < bw; bx++) out[by * bw + bx] = vn(bx << shift, by << shift, scale, seed);
+    return (x, y) => out[(y >> shift) * bw + (x >> shift)];
+  };
+  const wobX = blockNoise(1, 7, 23), wobY = blockNoise(1, 7, 24);
+  const meadow = [blockNoise(3, 56, 140), blockNoise(3, 56, 141)];
+
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
-      const tx = x >> 4, ty = y >> 4, lx = x & 15, ly = y & 15;
+      const tx = x >> 4, ty = y >> 4;
       let t = g(tx, ty);
 
       // Natural edges: where grass, paths, sand and soil meet, the border
@@ -127,12 +164,24 @@ export function buildGround(area) {
       // nudged by smooth noise), so there are no straight tile-edge seams and
       // the ends of paths come out rounded.
       if (BLEND.has(t)) {
-        const wx = Math.floor(x + (vn(x, y, 7, 23) - 0.5) * 11 + (rnd(x, y, 25) - 0.5) * 1.5);
-        const wy = Math.floor(y + (vn(x, y, 7, 24) - 0.5) * 11 + (rnd(x, y, 26) - 0.5) * 1.5);
+        const wx = Math.floor(x + (wobX(x, y) - 0.5) * 11 + (rnd(x, y, 25) - 0.5) * 1.5);
+        const wy = Math.floor(y + (wobY(x, y) - 0.5) * 11 + (rnd(x, y, 26) - 0.5) * 1.5);
         const t2 = g(wx >> 4, wy >> 4);
         if (BLEND.has(t2)) t = t2;
       }
       kinds[y * W + x] = t;
+    }
+  }
+
+  // Paved squares get rounded, uneven outlines instead of hard rectangles:
+  // the paving is smoothed with a wide blur (which rounds the corners) and
+  // its edge nudged by noise, and anything trimmed off becomes grass.
+  roundPaving(kinds, W, H, vn);
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const tx = x >> 4, ty = y >> 4, lx = x & 15, ly = y & 15;
+      const t = kinds[y * W + x];
 
       let c;
       switch (t) {
@@ -140,7 +189,7 @@ export function buildGround(area) {
           c = T.grass ? px(T.grass, x, y) : grassPixel(x, y);
           // flower meadows here and there
           for (let k = 0; k < T.flowers.length; k++) {
-            if (vn(x, y, 56, 140 + k) < 0.72) continue;
+            if (meadow[k](x, y) < 0.72) continue;
             const F = T.flowers[k];
             const fx = (x + 17 * k) % F.tx.w, fy = (y + 29 * k) % F.tx.h;
             if (F.mask[fy * F.tx.w + fx]) { c = px(F.tx, fx, fy); break; }
@@ -243,9 +292,8 @@ export function buildGround(area) {
       if (k === P2) {
         // paved squares get a kerb: a dark edge stone, a lighter one inside it
         const ring = (d) => x >= d && y >= d && x < W - d && y < H - d && (at(-d, 0) !== P2 || at(d, 0) !== P2 || at(0, -d) !== P2 || at(0, d) !== P2);
-        if (ring(1)) f = 0.5;
-        else if (ring(2)) f = 0.7;
-        else if (ring(3)) f = 1.15;
+        if (ring(1)) f = 0.62;
+        else if (ring(2)) f = 0.85;
       } else if (k !== P2 && BLEND.has(k) && (at(-1, 0) === P2 || at(1, 0) === P2 || at(0, -1) === P2 || at(0, 1) === P2)) f = 0.8;
       else if (EARTH.has(k) && grassNear) f = 0.8;
       else if (k === GROUND.GRASS) {
@@ -276,35 +324,84 @@ export function buildGround(area) {
     }
   }
 
-  // Water: depth shading, foam at the shore, and moving glints.
-  const waterDist = (x, y) => {
-    let best = 9;
-    for (let dy = -3; dy <= 3; dy++) for (let dx = -3; dx <= 3; dx++) {
-      const gx = (x + dx) >> 4, gy = (y + dy) >> 4;
-      if (g(gx, gy) !== GROUND.WATER) best = Math.min(best, Math.max(Math.abs(dx), Math.abs(dy)));
+  // Water: depth shading, foam at the shore, and moving glints. The water's
+  // outline is smoothed (a wide blur of the water tiles, nudged by noise), so
+  // ponds and streams have rounded banks instead of stair-step tile corners.
+  const wet = new Uint8Array(W * H);
+  {
+    const R = 13;
+    const sum = new Float32Array((W + 1) * (H + 1));
+    for (let y = 0; y < H; y++) {
+      let row = 0;
+      for (let x = 0; x < W; x++) {
+        row += g(x >> 4, y >> 4) === GROUND.WATER ? 1 : 0;
+        sum[(y + 1) * (W + 1) + x + 1] = sum[y * (W + 1) + x + 1] + row;
+      }
     }
-    return best;
-  };
-  for (let ty = 0; ty < area.H; ty++) {
-    for (let tx = 0; tx < area.W; tx++) {
+    // only pixels within a tile of some water can change
+    const nearW = new Uint8Array(area.W * area.H);
+    for (let ty = 0; ty < area.H; ty++) for (let tx = 0; tx < area.W; tx++) {
       if (g(tx, ty) !== GROUND.WATER) continue;
-      for (let ly = 0; ly < TILE; ly++) {
-        for (let lx = 0; lx < TILE; lx++) {
-          const x = tx * TILE + lx, y = ty * TILE + ly;
-          const d = waterDist(x, y);
-          for (let f = 0; f < 2; f++) {
-            let c;
-            if (d <= 1) c = rnd(x, y, 81) < 0.75 ? P.shore : P.sand[0];
-            else if (d === 2) c = P.foam;
-            else if (d === 3) c = P.water[2];
-            else if (T.water[f]) c = px(T.water[f], x, y);
-            else c = (rnd(x >> 2, y >> 1, 82) + dither(x, y) * 0.3) < 0.55 ? P.water[1] : P.water[0];
-            // glints: short horizontal lines that drift between frames
-            const gx = x - f * 3;
-            if (d > 3 && !T.water[f] && rnd(Math.floor(gx / 5), y, 83 + (y % 2)) < 0.06 && y % 3 === 0) c = P.waterHi;
-            frames[f].set(x, y, c);
-          }
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (area.inBounds(tx + dx, ty + dy)) nearW[(ty + dy) * area.W + tx + dx] = 1;
+    }
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      if (!nearW[(y >> 4) * area.W + (x >> 4)]) continue;
+      const tile = g(x >> 4, y >> 4);
+      const k = kinds[y * W + x];
+      const x0 = Math.max(0, x - R), y0 = Math.max(0, y - R), x1 = Math.min(W, x + R + 1), y1 = Math.min(H, y + R + 1);
+      const a = (sum[y1 * (W + 1) + x1] - sum[y0 * (W + 1) + x1] - sum[y1 * (W + 1) + x0] + sum[y0 * (W + 1) + x0]) / ((x1 - x0) * (y1 - y0));
+      if (a === 0) continue;
+      const v = a + (vn(x, y, 10, 161) - 0.5) * 0.25;
+      if (tile === GROUND.WATER) {
+        // keep water straight where it meets a bridge or a wall
+        const hard = [[-1, 0], [1, 0], [0, -1], [0, 1]].some(([dx, dy]) => { const n = g((x >> 4) + dx, (y >> 4) + dy); return n !== GROUND.WATER && !BLEND.has(n); });
+        if (v > 0.45 || hard || a === 1) wet[y * W + x] = 1;
+      } else if (v > 0.52 && (k === GROUND.GRASS || k === GROUND.SAND || k === GROUND.DIRT)) wet[y * W + x] = 1;
+    }
+  }
+  // Distance from each water pixel to the bank (0-3, or 9 for open water),
+  // worked out in three passes instead of searching around every pixel.
+  const dist = new Uint8Array(W * H);
+  for (let k = 0; k < W * H; k++) dist[k] = wet[k] ? 9 : 0;
+  for (let step = 1; step <= 3; step++) {
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const k = y * W + x;
+      if (dist[k] !== 9) continue;
+      let near = x === 0 || y === 0 || x === W - 1 || y === H - 1 ? g(x >> 4, y >> 4) !== GROUND.WATER : false;
+      for (let dy = -1; dy <= 1 && !near; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const xx = x + dx, yy = y + dy;
+        if (xx >= 0 && yy >= 0 && xx < W && yy < H && dist[yy * W + xx] === step - 1 && (step > 1 || !wet[yy * W + xx])) { near = true; break; }
+      }
+      if (near) dist[k] = 100 + step; // marked; fixed up below so this pass doesn't chain
+    }
+    for (let k = 0; k < W * H; k++) if (dist[k] > 100) dist[k] -= 100;
+  }
+  const waterDist = (x, y) => dist[y * W + x];
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const tileWater = g(x >> 4, y >> 4) === GROUND.WATER;
+      if (!wet[y * W + x]) {
+        // a water tile's corner that was rounded off becomes shore
+        if (tileWater) {
+          const tx = x >> 4, ty = y >> 4;
+          const sandy = [[-1, 0], [1, 0], [0, -1], [0, 1]].some(([dx, dy]) => g(tx + dx, ty + dy) === GROUND.SAND);
+          const c = sandy ? (T.sand ? px(T.sand, x, y) : P.sand[1]) : (T.grass ? px(T.grass, x, y) : grassPixel(x, y));
+          for (const fr of frames) fr.set(x, y, c);
         }
+        continue;
+      }
+      const d = waterDist(x, y);
+      for (let f = 0; f < 2; f++) {
+        let c;
+        if (d <= 1) c = rnd(x, y, 81) < 0.75 ? P.shore : P.sand[0];
+        else if (d === 2) c = P.foam;
+        else if (d === 3) c = P.water[2];
+        else if (T.water[f]) c = px(T.water[f], x, y);
+        else c = (rnd(x >> 2, y >> 1, 82) + dither(x, y) * 0.3) < 0.55 ? P.water[1] : P.water[0];
+        // glints: short horizontal lines that drift between frames
+        const gx = x - f * 3;
+        if (d > 3 && !T.water[f] && rnd(Math.floor(gx / 5), y, 83 + (y % 2)) < 0.06 && y % 3 === 0) c = P.waterHi;
+        frames[f].set(x, y, c);
       }
     }
   }

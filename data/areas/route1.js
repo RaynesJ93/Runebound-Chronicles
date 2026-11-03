@@ -78,7 +78,8 @@ export function buildRoute1() {
   road([[43, 83], [43, 85]]);                               // into the graveyard
   road([[44, 28], [44, 30], [40, 34]]);                     // the watchtower, off the mine road
   road([[99, 44], [99, 47]]);                               // into the shrine
-  rect(52, 46, 59, 53, GROUND.PLAZA);                       // the crossroads square
+  // a small, round cobbled patch where the roads meet
+  for (let y = 45; y <= 54; y++) for (let x = 51; x <= 60; x++) if ((x + 0.5 - 56) ** 2 + (y + 0.5 - 50) ** 2 <= 10.5) paint(x, y, GROUND.PLAZA);
   clearArea(49, 43, 62, 57);
 
   // ---- The stream, winding across the south, with a bridge on the road ------------------
@@ -98,9 +99,9 @@ export function buildRoute1() {
   }
 
   // ---- Crossroads ---------------------------------------------------------------------------
-  one('sign', 58, 46, { interact: ['THE CROSSROADS', 'North-west: Copperdeep Mine.  East: Whispering Vale.', 'West: goblin camp (danger!).  South: Brambleford.'] });
-  for (const [x, y] of [[52, 46], [59, 53]]) one('lamp', x, y);
-  one('well', 52, 52, { interact: ['An old stone well at the crossroads. Travellers have scratched their names into it.'] });
+  one('sign', 59, 47, { interact: ['THE CROSSROADS', 'North-west: Copperdeep Mine.  East: Whispering Vale.', 'West: goblin camp (danger!).  South: Brambleford.'] });
+  for (const [x, y] of [[52, 47], [59, 53]]) one('lamp', x, y);
+  one('well', 52, 53, { interact: ['An old stone well at the crossroads. Travellers have scratched their names into it.'] });
 
   // ---- Goblin territory (west) ------------------------------------------------------------
   clearArea(4, 29, 36, 64);
