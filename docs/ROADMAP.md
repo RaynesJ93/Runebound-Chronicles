@@ -62,6 +62,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Date | Change |
 | --- | --- |
+| 3 Nov 2026 | v0.13.1: continuous skilling animations — axe and pickaxe swings with wood chips and rock chips/sparks, a fishing rod with line and bobbing float (or a net dipping in and out), a pan over the fire with steam, furnace embers, hammer and sparks at the anvil, knife and shavings for fletching; you lean into each swing, and the skill's icon floats above your head while you work. |
 | 2 Nov 2026 | v0.13.0: Phase 2.3 shipped — Fishing (net, bait and lure spots on Brambleford's pond and the Route 1 stream; shrimps, anchovies, sardines, herring, trout, salmon) and Cooking (cooking pit by the pond and the goblin campfire; food burns less as you level). Old Finn teaches fishing and gives a net, rod and bait; Pell sells rods, nets and bait. Raw chicken can now be cooked. |
 | 2 Nov 2026 | v0.12.2: Wyn's chicken pen in Brambleford (south of the lower lane, west of the farm) with 5 chickens (level 1, 3 HP, respawn in 9 s). Every kill drops bones; raw chicken (1/2) and 5–15 feathers (1/2) are rolled separately. New `each` loot table type for independent drops; new raw chicken item (for Cooking). |
 | 2 Nov 2026 | v0.12.1: XP rates increased 5× for every skill (combat, Hitpoints and skilling), with one multiplier, `XP_RATE`. Existing XP is kept as it is. |

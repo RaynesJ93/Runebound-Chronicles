@@ -413,6 +413,7 @@ function boot() {
   // or tapping somewhere else stops it.
   let activity = null;
   let skillLungeAt = -99;
+  let lastStation = null; // the furnace, anvil or fire you last used
   const stopActivity = () => { if (activity) { activity = null; save(); } };
   let marker = null;
   let goal = null; // what we're walking towards, so we can re-plan if blocked
@@ -852,7 +853,7 @@ function boot() {
     }
     if (prop.grave) { graveMenu(); return; }
     if (prop.type === 'tree' || prop.type === 'ore' || prop.type === 'fishingSpot') { startGather(prop); return; }
-    if (prop.action) { runAction(prop.action); return; }
+    if (prop.action) { lastStation = prop; runAction(prop.action); return; }
     if (prop.interact) hud.showDialog(prop.interact);
   };
   player.onRunEmpty = () => hud.message("You're out of run energy.");
@@ -941,7 +942,7 @@ function boot() {
     if (!inventory.room(g.item(d), 1)) { hud.message(fullBag(g)); return; }
     combat.stop();
     player.faceTowards(trunk(prop).x, trunk(prop).y);
-    activity = { kind: 'gather', prop, g, d, next: ticker.count + 2 };
+    activity = { kind: 'gather', prop, g, d, next: ticker.count + 2, since: time };
     hud.message(g.perSpot ? d.start : g.start);
   };
 
@@ -952,7 +953,6 @@ function boot() {
     if (!tool || prop.depleted) { activity = null; return; }
     player.faceTowards(trunk(prop).x, trunk(prop).y);
     if (g.perSpot) { fishStep(a); return; }
-    skillLungeAt = time;
     const chance = Math.min(0.9, d.chance + (book.level(g.skill) - d.level) * 0.012 + tool.bonus);
     if (rng() >= chance) return;
     const item = g.item(d);
@@ -1071,7 +1071,9 @@ function boot() {
     }
     combat.stop();
     player.stop();
-    activity = { kind: 'make', recipe: r, next: ticker.count + 1, made: 0 };
+    const station = r.station && lastStation ? lastStation : null;
+    if (station) player.faceTowards(station.tiles[0].x, station.tiles[0].y);
+    activity = { kind: 'make', recipe: r, next: ticker.count + 1, made: 0, since: time, station };
   };
 
   const makeStep = (a) => {
@@ -1088,7 +1090,6 @@ function boot() {
     for (const [id, q] of Object.entries(r.gives)) need += ITEMS[id].stackable ? (inventory.count(id) ? 0 : 1) : q * k;
     if (need > free) { hud.message("You don't have enough inventory space."); stopActivity(); return; }
     for (const [id, q] of Object.entries(r.uses)) inventory.remove(id, q * k);
-    skillLungeAt = time;
     a.next = ticker.count + r.ticks;
     // Some makes can fail (impure iron): the materials are used up anyway.
     if (r.success && rng() >= r.success(book.level(skillOf(r)))) {
@@ -1122,6 +1123,23 @@ function boot() {
     if (a.kind === 'gather') gatherStep(a);
     else makeStep(a);
   });
+
+  // What the renderer needs to animate the skill you're doing.
+  const METAL_OF = { bronzeAxe: 'bronze', ironAxe: 'iron', bronzePickaxe: 'bronze', ironPickaxe: 'iron' };
+  const skillingView = () => {
+    const a = activity;
+    if (!a) return null;
+    if (a.kind === 'gather') {
+      const t = a.prop.tiles[0];
+      if (a.g.perSpot) return { anim: a.d.tool === 'smallNet' ? 'net' : 'rod', skill: 'fishing', target: t, since: a.since, fly: a.d.tool === 'flyFishingRod' };
+      const tool = bestTool(a.g, a.d);
+      return { anim: a.g.skill === 'woodcutting' ? 'chop' : 'mine', skill: a.g.skill, target: t, since: a.since, metal: METAL_OF[tool?.id] || 'bronze' };
+    }
+    const r = a.recipe;
+    const t = a.station?.tiles[0] || null;
+    const anim = r.station === 'fire' ? 'cook' : r.station === 'furnace' ? 'smelt' : r.station === 'anvil' ? 'smith' : 'fletch';
+    return { anim, skill: r.skill || 'fletching', target: t, since: a.since, metal: r.bar === 'ironBar' ? 'iron' : 'bronze' };
+  };
 
   // ---- Frame loop -------------------------------------------------------------
   let zoomAcc = 0;
@@ -1160,7 +1178,7 @@ function boot() {
     for (const npc of npcs) npc.update(dt);
     for (const e of enemies) e.update(dt);
 
-    view.render(player, { skillLungeAt, time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list, playerLook: playerLook || currentLook(),
+    view.render(player, { skilling: skillingView(), skillLungeAt, time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list, playerLook: playerLook || currentLook(),
       grave: state.grave && state.grave.area === area.id ? state.grave : null });
     if (state.grave) {
       const left = Math.max(0, GRAVE_SECONDS - (state.stats.playTimeSec - state.grave.createdAt));
