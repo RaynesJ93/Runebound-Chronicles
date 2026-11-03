@@ -454,7 +454,9 @@ Plate armour costs a lot of magic and some ranged attack. The new pieces' painte
 
 The **steel pickaxe** (Mining 10) and **steel axe** (Woodcutting 10) work 20% faster than bronze; Pell stocks a couple of each. **Steel arrows** (Fletching 30, ranged strength 16) are made from steel arrowtips like the others. Cave beasts drop coal, iron ore, steel bars and the odd piece of steel gear. Coal and steel art is recoloured from the existing art (`tools/derived.py`: steel from iron, coal rocks from copper rocks); cave beasts use their painted sheet.
 
-**Planned next** (in order): silver and gold (with gems), then mithril.
+**Silver, gold and gems (v0.28.0).** Copperdeep Depths also has silver rocks (Mining 20, 40 XP) and gold rocks (Mining 40, 65 XP). Smelt silver bars at Smithing 20 and gold bars at Smithing 40 (one ore each, never fail). Every ore you mine (not essence) has a small chance of an uncut gem as well: about 1 in 80, rising to 1 in 40 at level 99 (sapphire 55%, emerald 28%, ruby 13%, diamond 4%). Cave beasts drop uncut gems too.
+
+**Planned next:** mithril.
 
 New gear: iron sword, iron med helm, bronze and iron sq shields, bronze and iron chainbodies (iron needs Attack/Defence 5), and iron arrows (ranged strength 10; Fletching 15 from iron arrowtips). Shields show their metal on your character.
 
@@ -513,7 +515,23 @@ Saves from before v0.18 that were standing in the old Route 1 (or left a gravest
 
 The hard leather gloves, boots, cowl and chaps use the leather pieces' painted art recoloured to hard leather (`tools/derived.py`) until they get sheets of their own.
 
-**Planned expansions** (in order): spinning (flax into bowstrings, sheep's wool into thread), robes for mages (wool woven into cloth), jewellery (silver and gold, moulds at the furnace, cut gems), wolf leather. Ideas for later: studded leather (with Smithing), pottery.
+**Jewellery (v0.28.0).** Pell sells a chisel, a ring mould and an amulet mould.
+
+*Gem cutting* — tap an uncut gem (or the chisel): sapphire 20 (50 XP), emerald 27 (67.5), ruby 34 (85), diamond 43 (107.5).
+
+*Casting* — at a furnace, with a silver or gold bar and a mould in your bag, the furnace offers "Cast jewellery". Silver and gold both make plain rings and amulets and ones set with any of the four gems; silver is easier, gold gives twice the bonus. Rings go in the ring slot and amulets in the neck slot.
+
+| Piece | Silver ring / amulet | Gold ring / amulet | Bonus (silver amulet → gold amulet; rings half) |
+| --- | --- | --- | --- |
+| Plain | 8 / 12 | 20 / 24 | stab/slash/crush defence +2 → +4 |
+| Sapphire | 22 / 24 | 26 / 29 | magic attack +4 → +8, magic defence +2 → +4 |
+| Emerald | 28 / 30 | 32 / 35 | ranged attack +4 → +8, ranged defence +2 → +4 |
+| Ruby | 35 / 37 | 38 / 42 | melee strength +2 → +4 |
+| Diamond | 44 / 46 | 47 / 50 | every attack and defence +2 → +4, strength +1 → +2 |
+
+XP: silver ring 15, amulet 20; gold ring 25, amulet 30; plus 25 / 35 / 45 / 60 for a sapphire / emerald / ruby / diamond. Ores, bars and gems are recoloured from existing art; gems, rings, amulets, moulds and the chisel are drawn in code in the painted style (`tools/jewel_art.py`). Amulets show round your neck.
+
+**Planned expansions** (in order): spinning (flax into bowstrings, sheep's wool into thread), robes for mages (wool woven into cloth), wolf leather; later, silver tiaras and holy symbols once Prayer arrives. Ideas for later: studded leather (with Smithing), pottery.
 
 Animations: scraping the hide on the rack; a needle going in and out of the leather.
 
