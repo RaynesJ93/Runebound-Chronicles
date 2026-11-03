@@ -1,3 +1,3 @@
 // Shown in Settings. Bump with every batch.
-export const GAME_VERSION = '0.16.2';
-export const BUILD_NAME = 'Phase 2.5 — Runecrafting and Whispering Vale';
+export const GAME_VERSION = '0.17.0';
+export const BUILD_NAME = 'Stacks and unlimited running';

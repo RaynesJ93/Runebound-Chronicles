@@ -15,7 +15,7 @@ There are no turn-based battles, no battle screens and no creature catching. You
 
 **https://raynesj93.github.io/Runebound-Chronicles/**
 
-- **Desktop:** click to walk, or use WASD / arrow keys. R toggles run. Mouse wheel or + / − zooms.
+- **Desktop:** click to walk, or use WASD / arrow keys. R toggles run and walk (running never runs out). Mouse wheel or + / − zooms.
 - **iPhone:** tap to walk, or use the on-screen joystick. Pinch to zoom. For full-screen play, open the link in Safari, tap Share, then **Add to Home Screen**.
 - Tap or click people to talk to them, and signs, doors and other objects to look at them. Number keys pick answers on desktop.
 - **Long-press** (iPhone) or **right-click** (desktop) anything — monsters, people, loot, doors, your items — for all its options: attack, talk, examine, take, walk here, drop.
@@ -31,7 +31,7 @@ There are no turn-based battles, no battle screens and no creature catching. You
 - Head to the top of Route 1 for **Copperdeep Mine**. Ask **Dorrin** to teach you: he'll give you a pickaxe and a hammer. Mine copper and tin, smelt them into bronze bars at the furnace, then hammer bars into daggers, swords, helmets, shields, chainbodies and arrowtips at the anvil. Iron needs Mining 15 and Smithing 15.
 - Ask **Old Finn** by Brambleford's pond to teach you fishing: he'll give you a net, a rod and some bait. Tap the ripples to fish, then cook your catch (and Wyn's chickens) on the cooking pit. Trout and salmon live in the Route 1 stream: you'll need a fly fishing rod and feathers.
 - By the cow field, **Hilda the Tanner** teaches crafting: tan cowhides into leather at her rack, then tap the leather to sew gloves, boots, a cowl, vambraces, a body and chaps (a ranged armour set you make yourself).
-- Follow the trail east past Route 1's oak grove to **Whispering Vale**: mine rune essence in the quarry, then take it to the **Air**, **Mind** or **Water** altar to turn it into runes. Aldric the Runekeeper explains it all, and the camp's supply chest opens your bank. Essence golems roam the vale: they drop runes and **noted** essence, which turns back into real essence when you bank it.
+- Follow the trail east past Route 1's oak grove to **Whispering Vale**: mine rune essence in the quarry, then take it to the **Air**, **Mind** or **Water** altar to turn it into runes. Aldric the Runekeeper explains it all, and the camp's supply chest opens your bank. Essence golems roam the vale: they drop runes and essence.
 - If you die you keep your 3 most valuable items; the rest wait in a gravestone where you fell for 15 minutes (free to reclaim for the first 5).
 
 ## Status
@@ -54,6 +54,7 @@ To check that saves from every earlier version still load:
 
 ```
 node tests/save.test.mjs
+node tests/inventory.test.mjs
 ```
 
 ## Code layout
