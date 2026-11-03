@@ -77,7 +77,7 @@ export function buildRoute1() {
   road([[86, 84], [92, 84], [92, 81]]);                     // up to the farmhouse door
   road([[43, 83], [43, 85]]);                               // into the graveyard
   road([[44, 28], [44, 30], [40, 34]]);                     // the watchtower, off the mine road
-  road([[99, 44], [99, 47]]);                               // into the shrine
+  rect(99, 45, 101, 47, GROUND.PATH);                       // into the shrine
   // a small, round cobbled patch where the roads meet
   for (let y = 45; y <= 54; y++) for (let x = 51; x <= 60; x++) if ((x + 0.5 - 56) ** 2 + (y + 0.5 - 50) ** 2 <= 10.5) paint(x, y, GROUND.PLAZA);
   clearArea(49, 43, 62, 57);
@@ -212,14 +212,13 @@ export function buildRoute1() {
   one('well', 86, 79, { interact: ['The farm well. The rope has been cut.'] });
 
   // The stone shrine
-  clearArea(92, 36, 108, 46);
-  rect(97, 39, 102, 43, GROUND.PLAZA);
-  for (let k = 0; k < 8; k++) {
-    const a = (k / 8) * Math.PI * 2;
-    if (k === 2) continue; // gap facing the road
-    one('standingStone', Math.round(99.5 + Math.cos(a) * 5), Math.round(41 + Math.sin(a) * 3.5));
-  }
-  one('shrine', 99, 41, { interact: ['A worn stone altar. Carvings of a great tree circle its base.', "There's a hollow in the top, as if something used to sit there."] });
+  clearArea(92, 34, 108, 49);
+  // An odd-sized square of paving, so the shrine sits right in the middle,
+  // with eight stones standing in line just outside its edges (two a side)
+  // and the path coming in between the two on the south side.
+  rect(97, 38, 103, 44, GROUND.PLAZA);
+  for (const [x, y] of [[98, 37], [102, 37], [104, 39], [104, 43], [96, 39], [96, 43], [98, 45], [102, 45]]) one('standingStone', x, y);
+  one('shrine', 100, 42, { interact: ['A worn stone altar. Carvings of a great tree circle its base.', "There's a hollow in the top, as if something used to sit there."] });
 
   // The wrecked merchant's cart, on the mine road
   clearArea(36, 33, 42, 38);
@@ -292,6 +291,7 @@ export function buildRoute1() {
   return {
     id: 'route1',
     name: 'Thornwood',
+    neat: [[97, 38, 103, 44]], // the shrine's paving
     W, H, ground, blocked, props, buildings,
     spawn: { x: 55, y: H - 3, facing: Math.PI },
     exits: [

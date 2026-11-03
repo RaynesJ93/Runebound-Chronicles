@@ -93,7 +93,7 @@ const px = (tx, x, y) => { const i = (((y % tx.h) * tx.w) + (x % tx.w)) * 4; ret
 const BLEND = new Set([GROUND.GRASS, GROUND.PATH, GROUND.SAND, GROUND.DIRT, GROUND.PLAZA]);
 const EARTH = new Set([GROUND.PATH, GROUND.SAND, GROUND.DIRT]);
 
-function roundPaving(kinds, W, H, vn) {
+function roundPaving(kinds, W, H, vn, isNeat) {
   const R = 10;
   const sum = new Float32Array((W + 1) * (H + 1)); // summed-area table of the paving
   for (let y = 0; y < H; y++) {
@@ -106,7 +106,7 @@ function roundPaving(kinds, W, H, vn) {
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
       const k = kinds[y * W + x];
-      if (!BLEND.has(k)) continue;
+      if (!BLEND.has(k) || isNeat(x, y)) continue;
       const x0 = Math.max(0, x - R), y0 = Math.max(0, y - R), x1 = Math.min(W, x + R + 1), y1 = Math.min(H, y + R + 1);
       const n = (x1 - x0) * (y1 - y0);
       if (n === 0) continue;
@@ -127,6 +127,10 @@ export function buildGround(area) {
   const frames = [new Bitmap(W, H), new Bitmap(W, H)];
   const g = (tx, ty) => (area.inBounds(tx, ty) ? area.groundAt(tx, ty) : GROUND.GRASS);
   const kinds = new Uint8Array(W * H); // what each pixel ended up as, for the edge shading
+  // Tiles in and around a "neat" square keep straight edges (no wobble or rounding).
+  const neat = new Uint8Array(area.W * area.H);
+  for (const [x0, y0, x1, y1] of area.neat) for (let y = y0 - 1; y <= y1 + 1; y++) for (let x = x0 - 1; x <= x1 + 1; x++) if (area.inBounds(x, y)) neat[y * area.W + x] = 1;
+  const isNeat = (x, y) => neat[(y >> 4) * area.W + (x >> 4)] === 1;
 
   // Smooth value noise for big grass colour patches.
   const vn = (x, y, s, seed) => {
@@ -163,11 +167,11 @@ export function buildGround(area) {
       // wanders a few pixels either way (the ground is looked up at a point
       // nudged by smooth noise), so there are no straight tile-edge seams and
       // the ends of paths come out rounded.
-      if (BLEND.has(t)) {
+      if (BLEND.has(t) && !isNeat(x, y)) {
         const wx = Math.floor(x + (wobX(x, y) - 0.5) * 11 + (rnd(x, y, 25) - 0.5) * 1.5);
         const wy = Math.floor(y + (wobY(x, y) - 0.5) * 11 + (rnd(x, y, 26) - 0.5) * 1.5);
         const t2 = g(wx >> 4, wy >> 4);
-        if (BLEND.has(t2)) t = t2;
+        if (BLEND.has(t2) && !isNeat(wx, wy)) t = t2;
       }
       kinds[y * W + x] = t;
     }
@@ -176,7 +180,7 @@ export function buildGround(area) {
   // Paved squares get rounded, uneven outlines instead of hard rectangles:
   // the paving is smoothed with a wide blur (which rounds the corners) and
   // its edge nudged by noise, and anything trimmed off becomes grass.
-  roundPaving(kinds, W, H, vn);
+  roundPaving(kinds, W, H, vn, isNeat);
 
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
