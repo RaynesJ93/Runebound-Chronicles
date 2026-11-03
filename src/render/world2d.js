@@ -50,6 +50,13 @@ function getLib() {
     altar: Object.fromEntries(['air', 'mind', 'water'].map((v) => [v, [S.altar(v, 0), S.altar(v, 1)]])),
     standingStone: [S.standingStone(1), S.standingStone(2.5), S.standingStone(4)],
     campChest: S.campChest(),
+    deadTree: Array.from({ length: VARIANTS }, (_, i) => S.deadTree(i + 151)),
+    gloomTree: Array.from({ length: VARIANTS }, (_, i) => S.gloomTree(i + 161)),
+    thornBush: [S.thornBush(171), S.thornBush(172), S.thornBush(173)],
+    glowShrooms: [S.glowShrooms(181), S.glowShrooms(182), S.glowShrooms(183)],
+    glowFlowers: Array.from({ length: VARIANTS }, (_, i) => S.glowFlowers(i + 191)),
+    crystalShard: [S.crystalShard(201), S.crystalShard(202), S.crystalShard(203)],
+    deadGrass: Array.from({ length: VARIANTS }, (_, i) => S.deadGrass(i + 211)),
     oreEmpty: [S.oreRock(null, 131), S.oreRock(null, 132)],
     furnace: S.furnace(),
     tanningRack: S.tanningRack(),
@@ -100,7 +107,7 @@ export function createWorldView(canvasEl, area) {
     const f = footOf(p);
     switch (p.type) {
       case 'tree': {
-        const spr = pick(p.variant === 'oak' ? lib.oak : lib.pine, p);
+        const spr = pick(p.variant === 'oak' ? lib.oak : p.variant === 'dead' ? lib.deadTree : p.variant === 'gloom' ? lib.gloomTree : lib.pine, p);
         shadows.push({ spr: lib.treeShadow, x: f.x, y: f.y, prop: p });
         place(spr, f.x, f.y, { fade: true, prop: p, fx: f.x, fy: f.y });
         break;
@@ -126,7 +133,11 @@ export function createWorldView(canvasEl, area) {
       case 'tent': place(pick(lib.tent, p), f.x, f.y); break;
       case 'campfire': place(lib.campfire[0], f.x, f.y, { frames: lib.campfire }); break;
       // Tall grass is drawn just in front of anyone standing in it, hiding their feet.
-      case 'tallGrass': place(pick(lib.tallGrass, p), f.x, f.y, { sortY: (p.y + 1) * TILE + 1 }); break;
+      case 'tallGrass': place(pick(area.theme === 'vale' ? lib.deadGrass : lib.tallGrass, p), f.x, f.y, { sortY: (p.y + 1) * TILE + 1 }); break;
+      case 'thornBush': place(pick(lib.thornBush, p), f.x, f.y); break;
+      case 'crystalShard': place(pick(lib.crystalShard, p), f.x, f.y); break;
+      case 'glowShrooms': { const spr = pick(lib.glowShrooms, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
+      case 'glowFlowers': { const spr = pick(lib.glowFlowers, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
       case 'counter': place(S.counter(p.tiles.length), f.x, f.y); break;
       case 'bankBooth': place(S.counter(p.tiles.length, true), f.x, f.y); break;
       case 'shelf': place(pick(lib.shelf, p), f.x, f.y + 2); break;
@@ -157,6 +168,94 @@ export function createWorldView(canvasEl, area) {
   for (const b of area.buildings) {
     const s = buildingSprite(b);
     objects.push({ img: s.img, x: s.x, y: s.y, w: s.img.width, h: s.img.height, sortY: s.sortY });
+  }
+
+  // ---- Lights (for dark areas) ------------------------------------------------------
+  // Everything outside a light is in deep shadow. Glowing things light up the
+  // ground around them; altars and fires also cast coloured light.
+  const LIGHT = {
+    altar: { air: ['#d8ecff', 84], mind: ['#ff9a3a', 84], water: ['#6fb8ff', 84] },
+    campfire: ['#ff9a3a', 64, true], cookingPit: ['#ff9a3a', 64, true], lamp: ['#ffd890', 52, true], campChest: ['#ffd890', 30, true],
+    ore: ['#8ab8ff', 32], crystalShard: ['#8ab8ff', 16], glowShrooms: ['#5fd8ff', 18], glowFlowers: ['#c8b8ff', 12],
+  };
+  const lights = [];
+  if (area.dark) {
+    for (const p of area.props) {
+      let def = LIGHT[p.type];
+      if (p.type === 'altar') def = LIGHT.altar[p.variant];
+      if (p.type === 'ore' && p.variant !== 'essence') def = null;
+      if (!def) continue;
+      const cxw = (p.tiles.reduce((a, t) => a + t.x, 0) / p.tiles.length + 0.5) * TILE;
+      const cyw = (p.tiles[0].y + 0.3) * TILE;
+      lights.push({ x: cxw, y: cyw, colour: def[0], r: def[1], flicker: !!def[2], glow: def[1] >= 30, strength: p.type === 'altar' ? 0.42 : 0.22 });
+    }
+  }
+  // Drifting wisps of light.
+  const wisps = area.dark ? Array.from({ length: Math.round((area.W * area.H) / 140) }, (_, k) => ({
+    x: ((k * 7919) % (area.W * 13)) / 13 * TILE, y: ((k * 104729) % (area.H * 11)) / 11 * TILE, ph: k * 1.7,
+  })) : [];
+  const rgb = (hx) => [1, 3, 5].map((k) => parseInt(hx.slice(k, k + 2), 16));
+  // The light map is soft, so it's worked out at a quarter of the screen's
+  // resolution and stretched to fit: it looks the same and costs far less.
+  const LQ = 4;
+  let shade = null, shadeCtx = null, glow = null, glowCtx = null;
+
+  function drawDarkness(time, extra) {
+    const W = canvasEl.width, H = canvasEl.height;
+    const w = Math.ceil(W / LQ), h = Math.ceil(H / LQ);
+    if (!shade || shade.width !== w || shade.height !== h) {
+      shade = document.createElement('canvas'); shade.width = w; shade.height = h; shadeCtx = shade.getContext('2d');
+      glow = document.createElement('canvas'); glow.width = w; glow.height = h; glowCtx = glow.getContext('2d');
+    }
+    const g = shadeCtx, gl = glowCtx;
+    g.globalCompositeOperation = 'source-over';
+    g.clearRect(0, 0, w, h);
+    g.fillStyle = 'rgba(5, 4, 14, 0.8)';
+    g.fillRect(0, 0, w, h);
+    g.globalCompositeOperation = 'destination-out';
+    gl.clearRect(0, 0, w, h);
+    gl.globalCompositeOperation = 'lighter';
+    const all = extra.length ? lights.concat(extra) : lights;
+    const k = scale / LQ;
+    for (const L of all) {
+      const wob = L.flicker ? Math.sin(time * 9 + L.x) * 2 + Math.sin(time * 13 + L.y) * 1.5 : 0;
+      const r = (L.r + wob) * k;
+      const sx = (L.x - cam.x) * k, sy = (L.y - cam.y) * k;
+      if (sx + r < 0 || sy + r < 0 || sx - r > w || sy - r > h) continue;
+      const grd = g.createRadialGradient(sx, sy, 0, sx, sy, r);
+      grd.addColorStop(0, 'rgba(0,0,0,0.95)');
+      grd.addColorStop(0.45, 'rgba(0,0,0,0.6)');
+      grd.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = grd;
+      g.fillRect(sx - r, sy - r, r * 2, r * 2);
+      if (L.glow && L.colour) {
+        // coloured light from altars, fires and lamps
+        const [cr, cg, cb] = rgb(L.colour);
+        const cg2 = gl.createRadialGradient(sx, sy, 0, sx, sy, r * 0.75);
+        cg2.addColorStop(0, `rgba(${cr},${cg},${cb},${L.strength ?? 0.22})`);
+        cg2.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
+        gl.fillStyle = cg2;
+        gl.fillRect(sx - r, sy - r, r * 2, r * 2);
+      }
+    }
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(shade, 0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.drawImage(glow, 0, 0, W, H);
+    ctx.restore();
+    ctx.imageSmoothingEnabled = false;
+    // wisps drifting through the dark
+    for (const wsp of wisps) {
+      const x = wsp.x + Math.sin(time * 0.3 + wsp.ph) * 24;
+      const y = wsp.y + Math.cos(time * 0.23 + wsp.ph) * 14;
+      if (x < cam.x - 4 || y < cam.y - 4 || x > cam.x + W / scale + 4 || y > cam.y + H / scale + 4) continue;
+      ctx.globalAlpha = 0.35 + 0.35 * Math.sin(time * 1.3 + wsp.ph);
+      ctx.fillStyle = wsp.ph % 2 > 1 ? '#bfe0ff' : '#d8c8ff';
+      ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
+    }
+    ctx.globalAlpha = 1;
   }
 
   // ---- Camera and scale -------------------------------------------------------------
@@ -267,7 +366,7 @@ export function createWorldView(canvasEl, area) {
     const vh = canvasEl.height / scale;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = area.indoors ? '#120c08' : '#2c5a2a';
+    ctx.fillStyle = area.indoors ? '#120c08' : area.theme === 'vale' ? '#0c1012' : '#2c5a2a';
     ctx.fillRect(0, 0, canvasEl.width, canvasEl.height);
     ctx.setTransform(scale, 0, 0, scale, -cam.x * scale, -cam.y * scale);
 
@@ -345,6 +444,13 @@ export function createWorldView(canvasEl, area) {
       if (o.alpha !== undefined) ctx.globalAlpha = o.alpha;
       ctx.drawImage(o.img, o.x, o.y);
       ctx.globalAlpha = 1;
+    }
+
+    // Night in dark areas: shadow everywhere except around lights.
+    if (area.dark) {
+      const extra = [{ x: pObj.fx, y: pObj.fy - 8, r: 50 }];
+      for (const o of foes) if (!o.enemy.dead && o.enemy.def.sprite === 'golem') extra.push({ x: o.fx, y: o.fy - 12, r: 22, colour: '#a8d0ff', glow: false });
+      drawDarkness(time, extra);
     }
 
     // Skilling: the tool in your hands, chips, sparks, steam, the float on the water.

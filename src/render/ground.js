@@ -4,7 +4,7 @@ import { TILE, Bitmap, rnd, dither, hex } from './pixel.js';
 // Pre-renders the whole ground of an area into big canvases, once.
 // Two frames are made so water can shimmer.
 
-const P = {
+const BASE = {
   grass: [hex('#4b9533'), hex('#5aa63b'), hex('#68b444'), hex('#7ac450')],
   tuftDark: hex('#3c7f2a'),
   tuftLight: hex('#8ccf5c'),
@@ -37,9 +37,31 @@ const P = {
   rockwallTop: hex('#1c1815'),
 };
 
+// Whispering Vale: dead blue-green grass, grey-violet earth, cold stone, murky water.
+const VALE = {
+  ...BASE,
+  grass: [hex('#1f2c2a'), hex('#253430'), hex('#2b3c37'), hex('#33463f')],
+  tuftDark: hex('#17221f'),
+  tuftLight: hex('#40584f'),
+  path: [hex('#3e3946'), hex('#46404e'), hex('#4e4757')],
+  pathDark: hex('#2f2b36'),
+  pebble: hex('#625a6e'),
+  stone: [hex('#454a58'), hex('#4f5462'), hex('#595e6c')],
+  stoneHi: hex('#6a7080'),
+  mortar: hex('#2c2e36'),
+  sand: [hex('#4a4740'), hex('#524f46'), hex('#5a564c')],
+  water: [hex('#141f30'), hex('#18263a'), hex('#1d2d44')],
+  waterHi: hex('#4a6e90'),
+  foam: hex('#7a9ab8'),
+  shore: hex('#3a3a34'),
+};
+
+let P = BASE;
+
 const isSoft = (g) => g === GROUND.GRASS;
 
 export function buildGround(area) {
+  P = area.theme === 'vale' ? VALE : BASE;
   const W = area.W * TILE;
   const H = area.H * TILE;
   const frames = [new Bitmap(W, H), new Bitmap(W, H)];
