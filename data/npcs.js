@@ -392,4 +392,45 @@ export const NPCS = [
       },
     },
   },
+
+  // ---- Whispering Vale -----------------------------------------------------------
+  {
+    examine: 'An old runekeeper in a starry blue robe. His fingers are stained with ink.',
+    id: 'aldric', name: 'Aldric the Runekeeper', short: 'Aldric', area: 'vale', x: 28, y: 26, radius: 2, wander: 0.12,
+    look: { hair: '#d8d4cc', tunic: '#2f3f7a', pants: '#2f3f7a', robe: true, beard: '#e4e0d8', hat: 'hood', hatColor: '#24326a' },
+    talk: {
+      start: (c) => (c.flags.metAldric ? 'again' : 'intro'),
+      nodes: {
+        intro: {
+          say: ['Welcome to Whispering Vale, traveller. Listen. Can you hear it?', "That's the old magic. I'm Aldric. I keep watch over the altars."],
+          set: { metAldric: true },
+          next: 'menu',
+        },
+        again: { say: 'The altars are quiet today. Good for crafting.', next: 'menu' },
+        menu: { say: [], choices: [
+          { text: 'How do I make runes?', next: 'how' },
+          { text: 'Tell me about the altars.', next: 'altars' },
+          { text: 'What is that chest?', next: 'chest' },
+          { text: 'Farewell, Aldric.', next: 'bye' },
+        ] },
+        how: {
+          say: ['First, mine essence in the quarry to the north-west. Any pickaxe will do, and the crystals never run dry.',
+            'Then carry it to an altar and touch the altar. Every piece of essence in your bag becomes a rune at once.',
+            'The better you get, the more runes each essence gives. Air runes double at Runecrafting 11.'],
+          next: 'menu',
+        },
+        altars: {
+          say: ['The Air altar stands on the windy hill to the north-east. Anyone can use it.',
+            'The Mind altar is in the stone ring to the south-east. You need Runecrafting 2.',
+            'And the Water altar is by the lake to the south-west, at Runecrafting 5.'],
+          next: 'menu',
+        },
+        chest: {
+          say: ["That's our supply chest. We runekeepers can't be walking to Brambleford every day.", 'It is bound to the bank there. Put things in here, take them out there. Handy, no?'],
+          next: 'menu',
+        },
+        bye: { say: 'May the wind carry you.' },
+      },
+    },
+  },
 ];

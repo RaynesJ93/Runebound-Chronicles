@@ -248,6 +248,24 @@ const ART = {
     '...oWooooo......',
     '....o...........',
   ],
+  runecrafting: [
+    '................',
+    '.....oooooo.....',
+    '....oWwwwwwo....',
+    '...oWWwwwwwwo...',
+    '..oWWWwwBwwwwo..',
+    '.oWWWWwwBwwwwwo.',
+    '.owwwwBwBwBwwgo.',
+    '.owwwwwBBBwwggo.',
+    '.owwwwwwBwwgggo.',
+    '.owwwwwBBBggggo.',
+    '.owwwwBwBgBgggo.',
+    '..owwwwwBggggo..',
+    '...owwwgggggo...',
+    '....owgggggo....',
+    '.....oooooo.....',
+    '................',
+  ],
 };
 ART.controlled = ART.attack;
 ART.accurate = ART.attack;

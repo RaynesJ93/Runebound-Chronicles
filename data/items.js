@@ -140,6 +140,8 @@ export const ITEMS = {
     name: 'Iron chainbody', value: 210, examine: 'A shirt of iron rings.',
     equip: { slot: 'body', req: { defence: 5 }, att: { magic: -4 }, def: { stab: 11, slash: 16, crush: 18, ranged: 13, magic: -1 }, look: { tunic: '#7a828b' } },
   },
+  // ---- Runecrafting ----------------------------------------------------------------
+  runeEssence: { name: 'Rune essence', value: 4, examine: 'Pure magical essence. Take it to an altar to bind it into runes.' },
   // ---- Crafting --------------------------------------------------------------------
   leather: { name: 'Leather', value: 15, examine: 'Soft tanned leather. Sew it with a needle and thread.' },
   hardLeather: { name: 'Hard leather', value: 30, examine: 'Stiff, tough leather. Good for armour.' },

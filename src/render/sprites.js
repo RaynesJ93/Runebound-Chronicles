@@ -1019,3 +1019,156 @@ export function tanningRack() {
   b.outline();
   return sprite(b, 10, 25);
 }
+
+// ---- Whispering Vale: altars, standing stones, essence, the supply chest -------------
+
+// Each altar is a landmark, drawn in its own style (wider than its two tiles).
+// Two frames each, so the wind swirls, the eye glows and the water flows.
+export function altar(variant, frame) {
+  const b = new Bitmap(50, 48);
+  const f = frame;
+  const cx = 25;
+  if (variant === 'air') {
+    // a pale pedestal on a round stone dais; a great swirl of wind above it
+    const st = [hex('#8a9096'), hex('#b4bac0'), hex('#d8dee2'), hex('#ffffff')];
+    b.ellipse(cx, 43, 22, 4.5, st[0]);
+    b.ellipse(cx, 42, 21, 3.8, st[1]);
+    b.ellipse(cx, 41.5, 17, 2.6, st[2]);
+    // pedestal: wider at the foot and the top
+    b.rect(15, 38, 20, 3, st[1]);
+    b.rect(18, 24, 14, 15, st[1]);
+    b.rect(18, 24, 4, 15, st[2]);
+    b.rect(29, 24, 3, 15, st[0]);
+    b.rect(14, 21, 22, 4, st[2]);
+    b.rect(14, 21, 22, 1, st[3]);
+    b.rect(14, 24, 22, 1, st[0]);
+    // the air sign carved on the front: three flowing lines
+    for (let k = 0; k < 3; k++) for (let x = 20; x < 30; x++) b.set(x, 27 + k * 4 + Math.round(Math.sin((x + f * 3) * 0.8) * 0.8), hex('#6fa8d8'));
+    // the swirl: a spiral of white and pale blue
+    for (let a = 0; a < 46; a++) {
+      const t = (a / 46) * Math.PI * 3.6 + f * 0.8;
+      const r = 1 + a * 0.24;
+      const x = Math.round(cx + Math.cos(t) * r), y = Math.round(10 + Math.sin(t) * r * 0.55);
+      b.set(x, y, a % 3 ? hex('#ffffff') : hex('#bfe0ff'));
+      if (a > 30) b.set(x, y + 1, hex('#dff0ff'));
+    }
+    // ribbons of wind curling round the pedestal
+    for (let k = 0; k < 14; k++) {
+      const t = k / 14;
+      const y = Math.round(36 - t * 18);
+      b.set(Math.round(10 + Math.sin(t * 6 + f) * 3), y, hex('#e8f4ff'));
+      b.set(Math.round(40 + Math.sin(t * 6 + f + 2) * 3), y - 2, hex('#e8f4ff'));
+    }
+    // a feather caught in the wind
+    const fx = f ? 8 : 41, fy = f ? 14 : 6;
+    b.set(fx, fy, hex('#ffffff')); b.set(fx + 1, fy - 1, hex('#ffffff')); b.set(fx + 2, fy - 1, hex('#d8dee2'));
+  } else if (variant === 'mind') {
+    // a ring of glowing runes on the ground, and a dark stone with a burning eye
+    const glow = f ? [hex('#ffe08a'), hex('#ff9a3a'), hex('#c8501e')] : [hex('#fff2b0'), hex('#ffb347'), hex('#e0681e')];
+    b.ellipse(cx, 42, 23, 5, hex('#3a2e24'));
+    for (let a = 0; a < 28; a++) {
+      const t = (a / 28) * Math.PI * 2;
+      if (a % 2) b.set(Math.round(cx + Math.cos(t) * 21), Math.round(42 + Math.sin(t) * 4.2), glow[(a + f) % 3]);
+    }
+    const st = [hex('#241c30'), hex('#3a2f4e'), hex('#54466c'), hex('#7a6c9c')];
+    for (let y = 14; y < 43; y++) for (let x = 8; x < 43; x++) {
+      const dx = (x + 0.5 - cx) / 16, dy = (y + 0.5 - 30) / 14;
+      if (dx * dx + dy * dy > 1) continue;
+      b.set(x, y, dx < -0.45 ? st[2] : dy < -0.55 ? st[3] : dx > 0.55 ? st[0] : st[1]);
+    }
+    // the eye
+    b.ellipse(cx, 27, 9, 5.5, glow[2]);
+    b.ellipse(cx, 27, 7, 4, glow[1]);
+    b.ellipse(cx, 27, 3.4, 3.4, glow[0]);
+    b.ellipse(cx, 27, 1.6, 2.2, hex('#241c30'));
+    b.set(cx - 2, 25, hex('#ffffff'));
+    // runes carved round the stone
+    for (const [x, y] of [[13, 34], [17, 38], [33, 38], [37, 34], [cx, 39]]) { b.set(x, y, glow[1]); b.set(x, y - 1, glow[2]); b.set(x + 1, y - 1, glow[1]); }
+    // motes rising
+    for (const [x, y] of f ? [[15, 10], [34, 6], [cx, 3], [29, 12]] : [[17, 6], [32, 11], [22, 8], [cx + 6, 2]]) b.set(x, y, glow[0]);
+  } else {
+    // water: a pool, a pillar of blue stone, a wide basin and a tall spout
+    const w = [hex('#e8f8ff'), hex('#8fd0ff'), hex('#4f9ee8'), hex('#2f6fd0')];
+    b.ellipse(cx, 43, 22, 4.6, w[3]);
+    b.ellipse(cx, 42.5, 19, 3.4, w[2]);
+    for (let a = 0; a < 20; a++) { const t = (a / 20) * Math.PI * 2 + f * 0.3; if (a % 3 === 0) b.set(Math.round(cx + Math.cos(t) * 15), Math.round(42.5 + Math.sin(t) * 2.6), w[0]); }
+    const st = [hex('#1f3f6e'), hex('#2f5f9a'), hex('#4a80c0'), hex('#7fb0e0')];
+    b.rect(20, 28, 10, 14, st[1]);
+    b.rect(20, 28, 3, 14, st[2]);
+    b.rect(28, 28, 2, 14, st[0]);
+    for (let x = 21; x < 29; x++) b.set(x, 35 + Math.round(Math.sin(x + f) * 0.8), w[0]); // a wave carved on it
+    b.ellipse(cx, 24, 17, 5, st[1]);
+    b.ellipse(cx, 23, 16, 4, st[3]);
+    b.ellipse(cx, 23, 13.5, 2.8, w[1]);
+    b.ellipse(cx, 22.6, 9, 1.6, w[0]);
+    // the spout, and water arcing over into the pool
+    const h = f ? 20 : 17;
+    for (let y = 23 - h; y < 23; y++) { b.set(cx, y, w[(y + f) % 2 ? 0 : 1]); b.set(cx - 1, y, w[1]); if (y > 23 - h + 3) b.set(cx + 1, y, w[2]); }
+    for (let k = 0; k < 9; k++) {
+      const t = k / 8;
+      b.set(Math.round(cx - t * 13), Math.round(23 - h + 2 + t * t * 18), w[k % 2 ? 1 : 0]);
+      b.set(Math.round(cx + t * 13), Math.round(23 - h + 2 + t * t * 18), w[k % 2 ? 0 : 1]);
+    }
+    // spilling over the basin's rim
+    for (const x of [9, 41]) for (let y = 24; y < 32 + f * 2; y++) b.set(x, y, w[y % 2 ? 1 : 2]);
+    for (const [x, y] of f ? [[16, 6], [35, 4], [12, 12]] : [[18, 3], [33, 8], [38, 13]]) b.set(x, y, w[0]);
+  }
+  b.outline();
+  return sprite(b, cx, 45);
+}
+
+// One of the mind altar's ring of standing stones.
+export function standingStone(seed) {
+  const b = new Bitmap(12, 26);
+  const st = [hex('#4a4450'), hex('#6a6272'), hex('#8a8294'), hex('#a8a0b4')];
+  for (let y = 2; y < 25; y++) {
+    const w = 4 + Math.round(Math.sin(y * 0.3 + seed) * 0.8);
+    for (let x = 6 - w; x < 6 + w; x++) b.set(x, y, x < 6 - w + 2 ? st[2] : x > 6 + w - 3 ? st[0] : st[1]);
+  }
+  b.rect(3, 2, 6, 2, st[3]);
+  b.set(5, 12, hex('#ff9a3a')); b.set(6, 13, hex('#ff9a3a')); b.set(5, 14, hex('#ff9a3a')); // a faint carved rune
+  for (const [x, y] of [[3, 20], [8, 17]]) b.set(x, y, hex('#5e8a3e')); // moss
+  b.outline();
+  return sprite(b, 6, 25);
+}
+
+// A crystal of rune essence: a cluster of pale, glowing facets.
+export function essenceRock(seed) {
+  const b = new Bitmap(22, 22);
+  const c = [hex('#6a8aa8'), hex('#a8c8e0'), hex('#d8ecfa'), hex('#ffffff')];
+  b.ellipse(11, 18, 9, 3, hex('#4a4a52'));
+  const spikes = [[11, 3, 4], [6, 8, 3], [16, 7, 3], [8, 12, 3.5], [14, 12, 3.5]];
+  for (const [cx, top, w] of spikes) {
+    for (let y = top; y < 19; y++) {
+      const half = Math.min(w, (y - top) * 0.9 + 0.5);
+      for (let x = Math.round(cx - half); x <= Math.round(cx + half); x++) b.set(x, y, x < cx - half / 3 ? c[2] : x > cx + half / 2 ? c[0] : c[1]);
+    }
+    b.set(Math.round(cx), top, c[3]);
+  }
+  b.set(9, 9, c[3]); b.set(13, 13, c[3]);
+  b.outline();
+  return sprite(b, 11, 20);
+}
+
+// The runekeepers' supply chest: an old iron-banded trunk on a plank, with a
+// lantern on top and a bedroll beside it, so it belongs at the camp.
+export function campChest() {
+  const b = new Bitmap(24, 22);
+  const [d, m, l] = C.wood;
+  const ir = [hex('#3a3632'), hex('#5e5a54'), hex('#8a857c')];
+  b.rect(0, 19, 24, 2, d); // the plank it sits on
+  b.rect(2, 10, 17, 9, m);
+  b.rect(2, 7, 17, 4, l);
+  b.rect(2, 10, 17, 1, d);
+  for (const x of [4, 15]) b.rect(x, 7, 2, 12, ir[1]);
+  b.rect(9, 10, 3, 3, ir[2]); b.set(10, 12, ir[0]); // lock
+  // the lantern on the lid
+  b.rect(6, 2, 3, 5, hex('#2e3236'));
+  b.rect(7, 3, 1, 3, hex('#ffe08a'));
+  b.set(7, 1, hex('#2e3236'));
+  // a rolled-up blanket beside it
+  b.ellipse(21, 16, 2.6, 3, hex('#5a7a4a'));
+  b.ellipse(21, 16, 1.2, 1.4, hex('#7a9a5a'));
+  b.outline();
+  return sprite(b, 11, 21);
+}

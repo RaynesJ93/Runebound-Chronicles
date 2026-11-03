@@ -96,6 +96,7 @@ export function buildRoute1() {
 
   // ---- The east: an oak grove and a wolf ridge ---------------------------------------
   rect(24, 42, 37, 42, GROUND.PATH); // trail from the road to the grove
+  rect(37, 42, W - 1, 42, GROUND.PATH); // ...and on east to Whispering Vale
   clear(36, 34, 48, 47);
   clear(32, 3, 45, 15); // the ridge, joining the wolf den
 
@@ -160,7 +161,7 @@ export function buildRoute1() {
   one('sign', 14, 45, { interact: ['DANGER! Goblin camp to the west.', 'Signed, the Brambleford Watch.'] });
   one('sign', 14, 16, { interact: ['Wolf den to the east. Travel in daylight.'] });
   one('sign', 24, 42, { interact: ["Bram's Woodcutting — logs, kindling and advice.", 'New to adventuring? Ask Bram for a FREE bow and arrows!'] });
-  one('sign', 35, 42, { interact: ['THE OAK GROVE', 'Old oaks, good timber. Woodcutting 15.'] });
+  one('sign', 35, 41, { interact: ['THE OAK GROVE', 'Old oaks, good timber. Woodcutting 15.', 'EAST: Whispering Vale.'] });
   one('sign', 19, 63, { interact: ["HUNTER'S CAMP", 'Cook your catch at the fire. The lake has fish too.'] });
   one('sign', 18, 74, { interact: ['ROUTE 1 — Thornwood Forest.', 'North: Copperdeep Mine.  South: Brambleford.'] });
   one('sign', 14, 9, { interact: ['Copperdeep Mine — just ahead. Open again!', 'Miners wanted: see Dorrin inside.'] });
@@ -205,6 +206,7 @@ export function buildRoute1() {
     exits: [
       { tiles: [{ x: 16, y: H - 1 }, { x: 17, y: H - 1 }], to: 'brambleford', at: { x: 21, y: 1 }, facing: 0 },
       { tiles: [{ x: 12, y: 0 }, { x: 13, y: 0 }], to: 'mine', at: { x: 15, y: 26 }, facing: Math.PI },
+      { tiles: [{ x: W - 1, y: 42 }], to: 'vale', at: { x: 2, y: 29 }, facing: Math.PI / 2 },
     ],
     // Monsters and where they live (see data/enemies.js).
     spawns: [

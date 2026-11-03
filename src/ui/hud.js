@@ -271,7 +271,7 @@ export class Hud {
     this.$('trade-grid').innerHTML = top.length
       ? top.map((t) => `<button class="slot full ${t.qty <= 0 ? 'empty-stock' : ''}" data-take="${t.id}" title="${ITEMS[t.id]?.name}${t.price ? ` — ${t.price} coins` : ''}">
           ${cell(t.id, t.qty, t.price ? `<span class="price">${t.price}</span>` : '')}</button>`).join('')
-      : '<p class="muted">Your bank is empty. Tap items in your bag to store them.</p>';
+      : '<p class="muted" style="grid-column: 1 / -1; margin: 6px 4px; color: #e8d8b0">Your bank is empty. Tap items in your bag to store them.</p>';
     this.$('trade-inv').innerHTML = bag.map((s, i) => {
       if (!s) return '<div class="slot"></div>';
       const p = sell ? sell(s.id) : null;

@@ -405,6 +405,23 @@ Dorrin gives you a bronze pickaxe and a hammer when you ask him to teach you; Pe
 
 New gear: iron sword, iron med helm, bronze and iron sq shields, bronze and iron chainbodies (iron needs Attack/Defence 5), and iron arrows (ranged strength 10; Fletching 15 from iron arrowtips). Shields show their metal on your character.
 
+### Runecrafting and Whispering Vale (shipped in v0.16.0)
+
+**Whispering Vale** (72 × 60 tiles) lies east of Thornwood: follow the trail past the oak grove on Route 1 to the map's east edge. It's quiet, with no monsters:
+- **Essence quarry** (north-west): a rocky pit of essence crystals. Mine them with any pickaxe for rune essence (Mining 1, 5 XP, 60% a swing); they never run dry.
+- **Runekeeper's camp** (middle): Aldric the Runekeeper, a tent, a cooking fire, and the runekeepers' **supply chest**, an iron-banded camp trunk that opens your bank.
+- **Air altar** (north-east): a pale pedestal on a windswept stone dais, with a great swirl of wind above it.
+- **Mind altar** (south-east): a dark stone with a burning orange eye, on a ring of glowing runes, inside a circle of standing stones.
+- **Water altar** (south-west): a blue stone fountain on a platform by a lake.
+
+**Runecrafting.** Tap an altar with essence in your bag: after a moment, every piece of essence becomes runes at once (an animation shows streams of rune-coloured light flowing into the altar).
+
+| Altar | Level | XP per essence | Extra rune per essence at |
+| --- | --- | --- | --- |
+| Air | 1 | 5 | 11, 22, 33, 44, 55, 66, 77, 88, 99 |
+| Mind | 2 | 5.5 | 14, 28, 42, 56, 70, 84, 98 |
+| Water | 5 | 6 | 19, 38, 57, 76, 95 |
+
 ### Crafting (shipped in v0.15.0)
 
 **Hilda the Tanner**, by the cow field in Brambleford, gives you a needle and 20 thread when you ask her to teach you. Pell sells more of both.
