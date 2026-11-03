@@ -142,8 +142,6 @@ export const ITEMS = {
   },
   // ---- Runecrafting ----------------------------------------------------------------
   runeEssence: { name: 'Rune essence', value: 4, examine: 'Pure magical essence. Take it to an altar to bind it into runes.' },
-  runeEssenceNoted: { name: 'Rune essence (noted)', stackable: true, noted: 'runeEssence', value: 4,
-    examine: 'A bank note for rune essence. Put it in a bank (or the supply chest) to turn it back into essence.' },
   // ---- Crafting --------------------------------------------------------------------
   leather: { name: 'Leather', value: 15, examine: 'Soft tanned leather. Sew it with a needle and thread.' },
   hardLeather: { name: 'Hard leather', value: 30, examine: 'Stiff, tough leather. Good for armour.' },
@@ -219,5 +217,20 @@ for (const [skill, name, value] of [['attack', 'Attack', 60], ['strength', 'Stre
     };
   }
 }
+
+// ---- Stacks ------------------------------------------------------------------
+// How many fit in one bag slot:
+// - skilling materials, food, hides and leather: 20
+// - arrows, runes and other small things that already stack: 999
+// - coins: no limit
+// - weapons, armour, tools and potions: 1 (they don't stack)
+// The bank stacks everything without limit.
+const STACK_20 = /^(logs|oakLogs|copperOre|tinOre|ironOre|bronzeBar|ironBar|runeEssence|cowhide|wolfPelt|leather|hardLeather|raw[A-Z]\w*|burnt[A-Z]\w*)$/;
+for (const [id, it] of Object.entries(ITEMS)) {
+  if (STACK_20.test(id) || it.food) { it.stackable = true; it.stack = 20; }
+  else if (it.stackable) it.stack = id === 'coins' ? Infinity : 999;
+}
+
+export const maxStack = (id) => (ITEMS[id]?.stackable ? ITEMS[id].stack ?? 999 : 1);
 
 export const itemName = (id) => ITEMS[id]?.name ?? id;

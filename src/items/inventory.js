@@ -1,10 +1,10 @@
 // The 28-slot inventory, saved in state.inventory as [{ id, qty } | null] x 28.
-// Stackable items (coins, runes, arrows) share one slot; others take a slot each.
+// Stackable items fill a slot up to their stack size (20 for materials and food,
+// 999 for arrows and runes, no limit for coins), then start a new slot.
 
-import { ITEMS } from '../../data/items.js';
+import { ITEMS, maxStack } from '../../data/items.js';
 
 export const INVENTORY_SIZE = 28;
-const MAX_STACK = 2_147_483_647;
 
 export class Inventory {
   constructor(state) {
@@ -24,27 +24,45 @@ export class Inventory {
 
   // How many of this item would fit right now.
   room(id, qty) {
-    if (ITEMS[id]?.stackable) {
-      const stack = this.slots.find((s) => s && s.id === id);
-      if (stack) return Math.min(qty, MAX_STACK - stack.qty);
-      return this.freeSlots ? qty : 0;
-    }
-    return Math.min(qty, this.freeSlots);
+    const max = maxStack(id);
+    if (max === 1) return Math.min(qty, this.freeSlots);
+    if (max === Infinity) return this.slots.some((s) => s && s.id === id) || this.freeSlots ? qty : 0;
+    let space = this.freeSlots * max;
+    for (const s of this.slots) if (s && s.id === id) space += Math.max(0, max - s.qty);
+    return Math.min(qty, space);
   }
 
-  // Adds up to qty; returns how many were actually added.
+  // Adds up to qty (topping up existing stacks first); returns how many were added.
   add(id, qty = 1) {
     const n = this.room(id, qty);
     if (n <= 0) return 0;
     const slots = this.slots;
-    if (ITEMS[id]?.stackable) {
-      const stack = slots.find((s) => s && s.id === id);
-      if (stack) stack.qty += n;
-      else slots[slots.indexOf(null)] = { id, qty: n };
-    } else {
-      for (let k = 0; k < n; k++) slots[slots.indexOf(null)] = { id, qty: 1 };
+    const max = maxStack(id);
+    let left = n;
+    if (max > 1) {
+      for (const s of slots) {
+        if (!left) break;
+        if (!s || s.id !== id || s.qty >= max) continue;
+        const take = Math.min(left, max - s.qty);
+        s.qty += take;
+        left -= take;
+      }
+    }
+    while (left > 0) {
+      const take = Math.min(left, max);
+      slots[slots.indexOf(null)] = { id, qty: take };
+      left -= take;
     }
     return n;
+  }
+
+  // Takes one item from a slot (eating one fish from a stack of 20).
+  takeOne(i) {
+    const s = this.slots[i];
+    if (!s) return null;
+    s.qty -= 1;
+    if (s.qty <= 0) this.slots[i] = null;
+    return { id: s.id, qty: 1 };
   }
 
   // Takes the item out of a slot (the whole stack). Returns what was removed.

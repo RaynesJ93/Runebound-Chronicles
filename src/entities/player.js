@@ -6,7 +6,6 @@
 
 const WALK_STEP = 0.6;
 const RUN_STEP = 0.3;
-const RUN_COST_PER_TILE = 0.55; // ~180 tiles of running from full energy
 
 export class PlayerController {
   constructor(area, state) {
@@ -47,7 +46,7 @@ export class PlayerController {
   }
 
   get canRun() {
-    return this.state.run.on && this.state.run.energy >= 1;
+    return this.state.run.on; // running never runs out
   }
 
   // Where the next path starts: the tile we're stepping into, or where we stand.
@@ -144,13 +143,6 @@ export class PlayerController {
     s.player.y = this.tile.y;
     s.player.facing = this.targetFacing;
     s.stats.tilesWalked++;
-    if (this.stepRunning) {
-      s.run.energy = Math.max(0, s.run.energy - RUN_COST_PER_TILE);
-      if (s.run.energy < 1 && s.run.on) {
-        s.run.on = false;
-        this.onRunEmpty?.();
-      }
-    }
     this.onStep?.(this.tile);
   }
 
@@ -165,11 +157,8 @@ export class PlayerController {
     this.onInteract?.(prop);
   }
 
-  // Ticks: run energy comes back while you aren't running.
-  onTick() {
-    const r = this.state.run;
-    if (!(this.moving && this.stepRunning)) r.energy = Math.min(100, r.energy + 0.45);
-  }
+  // Ticks: nothing to do any more (there used to be run energy).
+  onTick() {}
 
   // Smooth position between tiles, in world units (tile centres).
   worldPosition() {

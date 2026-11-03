@@ -115,8 +115,7 @@ export class Hud {
         </div>
         <button class="run-orb ui" id="run-orb" aria-label="Toggle run">
           <span class="run-icon">${BOOT_SVG}</span>
-          <span class="run-bar"><span class="run-fill"></span></span>
-          <span class="run-val" id="run-val">100</span>
+          <span class="run-val" id="run-val">Run</span>
         </button>
       </div>
       <div class="dpad ui hidden" id="dpad" aria-label="Movement joystick">
@@ -557,13 +556,13 @@ export class Hud {
   }
 
   // These run every frame, so they only touch the page when something changed.
-  setRun(on, energy) {
-    const key = `${on}|${Math.floor(energy)}`;
-    if (key === this.runKey) return;
-    this.runKey = key;
+  // The run button: running never runs out, it just toggles run / walk.
+  setRun(on) {
+    if (on === this.runOn) return;
+    this.runOn = on;
     this.el.runOrb.classList.toggle('on', on);
-    this.el.runOrb.style.setProperty('--pct', Math.floor(energy));
-    this.el.runVal.textContent = String(Math.floor(energy));
+    this.el.runVal.textContent = on ? 'Run' : 'Walk';
+    this.el.runOrb.setAttribute('aria-pressed', String(on));
   }
 
   setHp(hp, max) {

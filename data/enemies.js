@@ -22,7 +22,7 @@ export const ENEMIES = {
     look: {},
     examine: 'Living stone, held together by rune essence. It hums as it walks.',
     loot: {
-      always: [{ item: 'runeEssenceNoted', min: 4, max: 12 }],
+      always: [{ item: 'runeEssence', min: 4, max: 12 }],
       each: [
         { item: 'airRune', min: 8, max: 20, chance: 1 / 2 },
         { item: 'mindRune', min: 5, max: 15, chance: 1 / 3 },

@@ -234,7 +234,7 @@ Enemy names show their combat level, coloured green (weaker), yellow (similar) o
 
 | Enemy | Level | HP | Behaviour | Where |
 | --- | --- | --- | --- | --- |
-| Essence golem | 12 | 24 | Passive; six spread thinly across Whispering Vale; 4–12 noted rune essence every kill, air runes (8–20) 1/2, mind runes (5–15) 1/3, water runes (4–12) 1/3, rolled separately | Whispering Vale |
+| Essence golem | 12 | 24 | Passive; six spread thinly across Whispering Vale; 4–12 rune essence every kill, air runes (8–20) 1/2, mind runes (5–15) 1/3, water runes (4–12) 1/3, rolled separately | Whispering Vale |
 | Cow | 2 | 8 | Passive, stays in its field; bones and cowhide every kill, raw beef 1/2 | Cow field, Brambleford |
 | Chicken | 1 | 3 | Passive, stays in its pen; bones every kill, raw chicken 1/2 and 5–15 feathers 1/2, rolled separately | Wyn's chicken pen, Brambleford |
 | Goblin | 2 | 5 | Passive, roams in groups of 3–5 | Village outskirts, Route 1 |
@@ -277,7 +277,7 @@ Example — Goblin:
 ### Inventory
 
 - **28 slots** in a 4 × 7 grid.
-- Stackable items (coins, runes, arrows) use one slot.
+- **Stacks** (changed in v0.17.0): logs, ores, bars, essence, raw and cooked food, burnt food, hides and leather stack to **20** per slot; arrows, runes, arrowtips, arrow shafts, feathers, bait and thread stack to **999** per slot; coins stack without limit. Weapons, armour, tools, bones and potions don't stack. More than a stack's worth starts a new slot. Eating takes one item from a stack. The bank stacks everything without limit.
 - Actions: Use, Equip/Wield, Eat/Drink, Drop, Examine. Drag to reorder.
 - Tapping (or left-clicking) an item does its main action: eat, drink, wield or wear. Long-press (or right-click) shows every option. A setting makes every tap open the menu instead.
 
@@ -310,7 +310,7 @@ Ranged gear follows the same idea (leather → hide armour, shortbow → oak →
 
 ### Bank
 
-- **Bank notes:** some drops come as notes (e.g. noted rune essence from essence golems). A stack of notes takes one bag slot and can't be used directly; putting notes in a bank (or the vale's supply chest) turns them back into the real item, which you then withdraw as normal.
+- **Bank notes** were removed in v0.17.0, replaced by stacks: essence golems drop normal essence, and any notes in old saves turned into real essence (anything that didn't fit went to the bank).
 
 - Found in every town. Opened by talking to the banker or clicking the bank booth.
 - Hundreds of slots, every item stacks in the bank.

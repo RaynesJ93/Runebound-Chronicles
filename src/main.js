@@ -720,10 +720,7 @@ function boot() {
     hud.showMenu(sx, sy, title, opts);
   };
 
-  const toggleRun = () => {
-    if (!state.run.on && state.run.energy < 1) { hud.message('You have no run energy left.'); return; }
-    state.run.on = !state.run.on;
-  };
+  const toggleRun = () => { state.run.on = !state.run.on; };
   hud.el.runOrb.addEventListener('click', toggleRun);
 
   input.onKey = (e) => {
@@ -794,7 +791,7 @@ function boot() {
     if (ticker.count - lastEatTick < 3) return; // still chewing
     lastEatTick = ticker.count;
     if (def.food) {
-      inventory.removeSlot(i);
+      inventory.takeOne(i);
       const before = state.player.hp;
       state.player.hp = Math.min(combat.maxHp, state.player.hp + def.food.heal);
       hud.message(`You eat the ${def.name.toLowerCase()}.${state.player.hp > before ? ' It heals some health.' : ''}`);
@@ -872,7 +869,6 @@ function boot() {
     if (prop.action) { lastStation = prop; runAction(prop.action); return; }
     if (prop.interact) hud.showDialog(prop.interact);
   };
-  player.onRunEmpty = () => hud.message("You're out of run energy.");
   player.onStep = (tile) => {
     if (!player.path.length) { marker = null; if (!player.interact) goal = null; }
     const exit = area.exitAt.get(area.idx(tile.x, tile.y));
@@ -1002,7 +998,9 @@ function boot() {
     hud.message(/s$/.test(name) ? `You catch some ${name}.` : `You catch ${/^[aeiou]/.test(name) ? 'an' : 'a'} ${name}.`);
     book.add('fishing', c.xp);
     refreshInventory();
-    if (!inventory.freeSlots) { hud.message(fullBag(a.g)); stopActivity(); }
+    // stop once none of the fish you can catch here would fit
+    const lvl = book.level('fishing');
+    if (!d.catches.some((x) => lvl >= x.level && inventory.room(x.item, 1))) { hud.message(fullBag(a.g)); stopActivity(); }
   };
 
   // ---- Runecrafting -----------------------------------------------------------------
@@ -1013,7 +1011,7 @@ function boot() {
     const lvl = book.level('runecrafting');
     if (lvl < alt.level) { hud.message(`You need a Runecrafting level of ${alt.level} to use the ${alt.name.toLowerCase()}.`); return; }
     if (!inventory.count('runeEssence')) {
-      hud.message(inventory.count('runeEssenceNoted') ? "Noted essence won't work. Bank it at the supply chest to turn it back into essence." : 'You need rune essence to craft runes. Mine it in the quarry to the north-west.');
+      hud.message('You need rune essence to craft runes. Mine it in the quarry to the north-west, or take it from the golems.');
       return;
     }
     combat.stop();
@@ -1151,15 +1149,11 @@ function boot() {
     const r = a.recipe;
     const k = makeCount(r);
     if (k <= 0 || (r.tool && !inventory.count(r.tool))) { stopActivity(); return; }
-    // Room for what we make, counting the slots the materials will free up.
-    let free = inventory.freeSlots;
-    for (const [id, q] of Object.entries(r.uses)) {
-      if (!ITEMS[id].stackable) free += q * k;
-      else if (inventory.count(id) === q * k) free += 1;
-    }
-    let need = 0;
-    for (const [id, q] of Object.entries(r.gives)) need += ITEMS[id].stackable ? (inventory.count(id) ? 0 : 1) : q * k;
-    if (need > free) { hud.message("You don't have enough inventory space."); stopActivity(); return; }
+    // Will what we make fit, once the materials are used up? Try it on a copy.
+    const trial = new Inventory({ inventory: inventory.slots.map((x) => x && { ...x }) });
+    for (const [id, q] of Object.entries(r.uses)) trial.remove(id, q * k);
+    const outs = Object.entries(r.success ? { ...r.gives, ...(r.failGives || {}) } : r.gives);
+    if (outs.some(([id, q]) => trial.room(id, q * k) < q * k)) { hud.message("You don't have enough inventory space."); stopActivity(); return; }
     for (const [id, q] of Object.entries(r.uses)) inventory.remove(id, q * k);
     a.next = ticker.count + r.ticks;
     // Some makes can fail (impure iron): the materials are used up anyway.
@@ -1264,7 +1258,7 @@ function boot() {
     } else hud.setGraveTimer(null);
     hud.setHp(state.player.hp, combat.maxHp);
     hud.setTarget(combat.target || enemies.find((e) => !e.dead && e.state === 'fight') || null, combat.level);
-    hud.setRun(state.run.on, state.run.energy);
+    hud.setRun(state.run.on);
     requestAnimationFrame(frame);
   };
 
