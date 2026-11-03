@@ -3,6 +3,7 @@ import { buildGround } from './ground.js';
 import { buildingSprite } from './buildings.js';
 import * as S from './sprites.js';
 import { itemIcon } from './items.js';
+import { drawSkilling, skillLean } from './skilling.js';
 
 // Draws an area in 2D pixel art.
 //
@@ -245,6 +246,10 @@ export function createWorldView(canvasEl, area) {
     if (playerLook !== lastLook) { lastLook = playerLook; lastLookKey = playerLook ? `player:${JSON.stringify(playerLook)}` : null; }
     const pFrames = lastLookKey ? framesFor(lib, playerLook, lastLookKey) : lib.player;
     const pObj = personObj(pFrames, player, steps, { player: true }, time, Math.max(combat?.playerLungeAt ?? -99, opts.skillLungeAt ?? -99));
+    // Leaning into each swing while skilling.
+    const lean = skillLean(opts.skilling, time, { fx: pObj.fx, fy: pObj.fy, facing: player.facing });
+    pObj.x += lean.x;
+    pObj.y += lean.y;
     const footX = pObj.fx;
     const footY = pObj.fy;
     follow(footX, footY - 8);
@@ -332,6 +337,9 @@ export function createWorldView(canvasEl, area) {
       ctx.drawImage(o.img, o.x, o.y);
       ctx.globalAlpha = 1;
     }
+
+    // Skilling: the tool in your hands, chips, sparks, steam, the float on the water.
+    if (opts.skilling) drawSkilling(ctx, opts.skilling, { fx: pObj.fx + lean.x, fy: pObj.fy + lean.y, facing: player.facing }, time);
 
     // Arrows and spells in flight.
     if (combat) {

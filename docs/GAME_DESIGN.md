@@ -404,6 +404,16 @@ Dorrin gives you a bronze pickaxe and a hammer when you ask him to teach you; Pe
 
 New gear: iron sword, iron med helm, bronze and iron sq shields, bronze and iron chainbodies (iron needs Attack/Defence 5), and iron arrows (ranged strength 10; Fletching 15 from iron arrowtips). Shields show their metal on your character.
 
+### Skilling animations
+
+While you skill, an animation loops for as long as you're working (`src/render/skilling.js`), and the skill's icon floats above your head:
+- **Woodcutting / Mining:** the axe or pickaxe (in its metal's colour) swings back and strikes, with wood chips or rock chips and sparks flying.
+- **Smithing:** a hammer on the anvil, with sparks.
+- **Fishing:** a rod with a line and a bobbing float (yellow fly for lure fishing), or a net dipping in and out of the water; ripples spread.
+- **Cooking:** a pan held over the fire, steam rising.
+- **Smelting:** embers and smoke rise from the furnace; a glowing bar in your hands.
+- **Fletching:** a knife whittling a stick, shavings falling.
+
 ### Fishing and Cooking (shipped in v0.13.0)
 
 **Fishing.** Tap a fishing spot (ripples on the water) to fish from the bank until your bag is full. An attempt every 5 ticks (3 s). Each spot is fished one way:
