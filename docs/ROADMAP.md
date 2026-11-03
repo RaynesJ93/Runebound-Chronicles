@@ -31,7 +31,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 ## Phase 2 — Skilling (v0.2)
 
 1. ✅ Woodcutting (trees on the forest route) and Fletching (bows, arrows) — v0.11.0
-2. ✅ Mining (a small mine area) and Smithing (bars, bronze/iron gear) — v0.12.0
+2. ✅ Mining (a small mine area) and Smithing (bars, bronze/iron gear) — v0.12.0; ✅ full bronze and iron sets — v0.26.0; next: coal and steel (lower mine), silver and gold, mithril
 3. ✅ Fishing and Cooking (food you make yourself) — v0.13.0
 4. ✅ Crafting (leather armour) — v0.15.0; ✅ lower levels and a hard leather set — v0.23.0; next: spinning, robes, jewellery, wolf leather; ✅ Runecrafting (air, mind and water runes) and Whispering Vale — v0.16.0
 5. Bank tabs and search
@@ -62,6 +62,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Date | Change |
 | --- | --- |
+| 3 Nov 2026 | v0.26.0: Smithing, batch A — full bronze and iron sets: mace, scimitar, longsword, battleaxe, full helm, kiteshield, platelegs and platebody for each metal (bronze levels 2–18, iron 17–33), with painted art made from the existing art. Long menus such as the anvil's now scroll. |
 | 3 Nov 2026 | v0.25.0: map — a new map button (or M) shows the area you're in with you marked, place names, villagers and monsters where they are now, ways out, and icons for the bank, shop and every skilling spot; tabs show the other areas (inside a building it shows the outside with you at the door); zoom up to 4x; tap any marker to see what it is. |
 | 3 Nov 2026 | v0.24.0: skill guides — tap a skill in the skills panel to see everything it unlocks by level (items you can make or wear, trees, rocks, fish, spells, altars), with what each needs and its XP; locked rows are greyed, and the header shows your next unlock. Built from the data files so it stays up to date. |
 | 3 Nov 2026 | v0.23.0: Crafting, batch A — lower levels (hard leather 6; boots 4, cowl 6, vambraces 8, body 10, chaps 13) and a hard leather set: gloves 15, boots 16, cowl 18, body 20 (was 28) and chaps 22, sewn from hard leather. Hilda tells you the new levels. The new pieces use the leather art recoloured. |

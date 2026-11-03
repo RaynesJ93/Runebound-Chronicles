@@ -580,6 +580,17 @@ const DRAW = {
   },
 };
 
+// New metal pieces without a drawing of their own fall back to the nearest one.
+for (const m of ['bronze', 'iron']) {
+  const like = { FullHelm: 'MedHelm', Platebody: 'Chainbody', Kiteshield: 'SqShield', Scimitar: 'Sword', Longsword: 'Sword', Mace: 'Pickaxe', Battleaxe: 'Axe' };
+  for (const [part, base] of Object.entries(like)) DRAW[`${m}${part}`] ||= (b) => DRAW[`${m}${base}`](b);
+  DRAW[`${m}Platelegs`] ||= (b) => {
+    DRAW.leatherChaps(b);
+    const tint = m === 'iron' ? [0.62, 0.68, 0.78] : [1.25, 0.95, 0.6];
+    for (let i = 0; i < b.data.length; i += 4) if (b.data[i + 3]) for (let c = 0; c < 3; c++) b.data[i + c] = Math.min(255, b.data[i + c] * tint[c] + (m === 'iron' ? 40 : 10));
+  };
+}
+
 // Hard leather pieces: the leather drawing in darker, redder leather.
 for (const part of ['Gloves', 'Boots', 'Cowl', 'Chaps']) {
   DRAW[`hardLeather${part}`] = (b) => {
