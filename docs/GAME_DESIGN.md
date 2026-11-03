@@ -532,7 +532,8 @@ Every skill uses the same XP curve and goes to 99. Resources respawn after a tim
 - **Original 2D pixel art** in a cosy farming-RPG style: 16 × 16 px tiles, a 3/4 top-down view, warm saturated colours, and a 1 px dark outline around every sprite so things read clearly on grass.
 - Trees, bushes and rocks are built from clusters of shaded blobs lit from the top-left; ground has textured grass with tufts, ragged path edges, cobbled squares and shimmering water.
 - Characters are small chibi sprites (16 × 24 px) with 4-direction walking animations.
-- All art is drawn in code, in one consistent style. No assets, names or designs are copied from OSRS, Pokémon or any other game.
+- Art is moving to a painted pixel-art set (v0.19+): original sprite sheets made for this game, on magenta backgrounds, which `tools/cut_sheets.py` cuts into separate sprites and `tools/build_art.py` shrinks to game scale (16 px tiles, limited palette, dark outline) and packs into one atlas, `assets/art.png` + `art.json` (about 160 KB). The game loads it before it starts; anything not in the atlas, or everything if the atlas fails to load, is still drawn in code. No assets, names or designs are copied from OSRS, Pokémon or any other game.
+- Painted so far: trees (oak, pine), bushes, flowers, tall grass, mushrooms, rocks, stumps, log piles, well, market stall, lamps, signposts, scarecrows, crops, tanning rack, cooking pot, campfires, tents, crates, barrels, chests, fence posts and rails; ground textures for grass, paths, cobbles, sand, farm soil, water (two frames), bridges, floors, cave floor and rock walls, with darker ones for Whispering Vale. Ground textures are made seamless and toned down so sprites stand out. Still drawn in code: characters, enemies, animals, buildings, altars, mine props, the vale's plants, and item icons (next batches).
 - Readable silhouettes: each enemy type is recognisable at the default zoom.
 - UI: wood-framed parchment panels with a pixel font (Pixelify Sans), a virtual joystick on touch screens, and an Emerald-style dialogue box.
 
@@ -581,7 +582,7 @@ Controls (joystick, what tapping an item does), gameplay (auto retaliate, text s
   core/state.js      — single game-state object
   core/save.js       — save/load, versioning, migrations
   world/             — tile maps, collision, pathfinding, area transitions
-  render/            — pixel-art sprites drawn in code, ground, buildings, camera, depth sorting, hitsplats, health bars
+  render/            — pixel-art sprites (painted atlas in art.js, code-drawn fallbacks), ground, buildings, camera, depth sorting, hitsplats, health bars
   entities/          — player, NPCs, enemies, ground items
   combat/            — formulas, attack cycle, styles, projectiles, AI
   skills/            — XP curve, levels, combat level

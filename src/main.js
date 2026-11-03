@@ -8,6 +8,7 @@ import { NPCS } from '../data/npcs.js';
 import { Npc } from './entities/npc.js';
 import { mulberry32 } from './core/rng.js';
 import { createWorldView } from './render/world2d.js';
+import { loadArt } from './render/art.js';
 import { PlayerController } from './entities/player.js';
 import { Input } from './input/input.js';
 import { Hud } from './ui/hud.js';
@@ -1284,6 +1285,7 @@ function boot() {
   };
 }
 
+await loadArt(GAME_VERSION);
 try {
   boot();
 } catch (err) {

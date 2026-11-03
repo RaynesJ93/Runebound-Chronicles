@@ -2,6 +2,7 @@ import { TILE } from './pixel.js';
 import { buildGround } from './ground.js';
 import { buildingSprite } from './buildings.js';
 import * as S from './sprites.js';
+import { art } from './art.js';
 import { itemIcon } from './items.js';
 import { drawSkilling, skillLean } from './skilling.js';
 
@@ -19,29 +20,29 @@ let LIB = null;
 function getLib() {
   if (LIB) return LIB;
   LIB = {
-    oak: Array.from({ length: VARIANTS }, (_, i) => S.oakTree(i + 1)),
-    pine: Array.from({ length: VARIANTS }, (_, i) => S.pineTree(i + 11)),
-    bush: Array.from({ length: VARIANTS }, (_, i) => S.bush(i + 21)),
-    rock: Array.from({ length: VARIANTS }, (_, i) => S.rock(i + 31)),
-    flowers: Array.from({ length: 8 }, (_, i) => S.flowers(i + 41)),
-    tallGrass: Array.from({ length: VARIANTS }, (_, i) => S.tallGrass(i + 61)),
-    stump: Array.from({ length: 2 }, (_, i) => S.stump(i + 71)),
-    mushrooms: Array.from({ length: 3 }, (_, i) => S.mushrooms(i + 81)),
-    tent: [S.tent(1), S.tent(2)],
-    campfire: [S.campfire(0), S.campfire(1)],
-    crop: [S.crop(false, 51), S.crop(true, 52)],
-    lamp: S.lamp(),
-    sign: S.sign(),
-    well: S.well(),
-    stall: S.stall(),
+    oak: art('oak') || Array.from({ length: VARIANTS }, (_, i) => S.oakTree(i + 1)),
+    pine: art('pine') || Array.from({ length: VARIANTS }, (_, i) => S.pineTree(i + 11)),
+    bush: art('bush') || Array.from({ length: VARIANTS }, (_, i) => S.bush(i + 21)),
+    rock: art('rock') || Array.from({ length: VARIANTS }, (_, i) => S.rock(i + 31)),
+    flowers: art('flowers') || Array.from({ length: 8 }, (_, i) => S.flowers(i + 41)),
+    tallGrass: art('tallGrass') || Array.from({ length: VARIANTS }, (_, i) => S.tallGrass(i + 61)),
+    stump: art('stump') || Array.from({ length: 2 }, (_, i) => S.stump(i + 71)),
+    mushrooms: art('mushrooms') || Array.from({ length: 3 }, (_, i) => S.mushrooms(i + 81)),
+    tent: art('tent') || [S.tent(1), S.tent(2)],
+    campfire: art('campfire') || [S.campfire(0), S.campfire(1)],
+    crop: art('crop') || [S.crop(false, 51), S.crop(true, 52)],
+    lamp: art('lamp')?.[0] || S.lamp(),
+    sign: art('sign')?.[0] || S.sign(),
+    well: art('well')?.[0] || S.well(),
+    stall: art('stall')?.[0] || S.stall(),
     fallenTree: S.fallenTree(),
-    scarecrow: S.scarecrow(),
-    logPile: S.logPile(),
-    crate: S.crate(),
+    scarecrow: art('scarecrow')?.[0] || S.scarecrow(),
+    logPile: art('logPile')?.[0] || S.logPile(),
+    crate: art('crate')?.[0] || S.crate(),
     bones: S.bones(),
     shelf: [S.shelf(1), S.shelf(2), S.shelf(3)],
-    barrel: S.barrel(),
-    chest: S.chest(),
+    barrel: art('barrel')?.[0] || S.barrel(),
+    chest: art('chest')?.[0] || S.chest(),
     rug: S.rug(),
     plant: S.plant(),
     gravestone: S.gravestone(),
@@ -49,7 +50,7 @@ function getLib() {
       essence: [S.essenceRock(1), S.essenceRock(2)] },
     altar: Object.fromEntries(['air', 'mind', 'water'].map((v) => [v, [S.altar(v, 0), S.altar(v, 1)]])),
     standingStone: [S.standingStone(1), S.standingStone(2.5), S.standingStone(4)],
-    campChest: S.campChest(),
+    campChest: art('campChest')?.[0] || S.campChest(),
     ruinWall: [S.ruinWall(1), S.ruinWall(2), S.ruinWall(3), S.ruinWall(4)],
     caveMouth: [S.caveMouth(false), S.caveMouth(true)],
     tombstone: [S.tombstone(1), S.tombstone(2), S.tombstone(3)],
@@ -62,9 +63,9 @@ function getLib() {
     deadGrass: Array.from({ length: VARIANTS }, (_, i) => S.deadGrass(i + 211)),
     oreEmpty: [S.oreRock(null, 131), S.oreRock(null, 132)],
     furnace: S.furnace(),
-    tanningRack: S.tanningRack(),
+    tanningRack: art('tanningRack')?.[0] || S.tanningRack(),
     fishingSpot: [S.fishingSpot(0), S.fishingSpot(1)],
-    cookingPit: [S.cookingPit(0), S.cookingPit(1)],
+    cookingPit: art('cookingPit') || [S.cookingPit(0), S.cookingPit(1)],
     anvil: S.anvil(),
     rubble: [S.rubble(141), S.rubble(142), S.rubble(143)],
     treeShadow: S.shadow(15, 4),
@@ -81,6 +82,21 @@ function framesFor(lib, look, key, kind = 'person') {
   return lib.people.get(key);
 }
 
+// A fence piece from the painted art: a post, rails to the east, and (drawn in
+// code, as the art has no side-on fence) rails running south.
+function paintedFence(east, south) {
+  const post = art('fencePost')?.[0], rail = art('fenceRail')?.[0];
+  if (!post || !rail) return null;
+  const base = S.fence(false, south); // 28 x 32, post at x 6-9, anchor (8, 17)
+  const c = document.createElement('canvas');
+  c.width = base.w; c.height = base.h;
+  const g = c.getContext('2d');
+  if (south) g.drawImage(base.img, 0, 0);
+  if (east) g.drawImage(rail.img, 9, 18 - rail.h - 2);
+  g.drawImage(post.img, 8 - post.ax, 18 - post.ay);
+  return { img: c, ax: base.ax, ay: base.ay, w: base.w, h: base.h };
+}
+
 export function createWorldView(canvasEl, area) {
   const ctx = canvasEl.getContext('2d', { alpha: false });
   const grounds = buildGround(area);
@@ -89,7 +105,7 @@ export function createWorldView(canvasEl, area) {
 
   const lib = getLib();
   const fences = {};
-  const fenceSprite = (e, s) => (fences[`${e}${s}`] ||= S.fence(e, s));
+  const fenceSprite = (e, s) => (fences[`${e}${s}`] ||= paintedFence(e, s) || S.fence(e, s));
 
   // ---- Place everything -------------------------------------------------------------
   const decals = []; // drawn flat on the ground, under everything else
