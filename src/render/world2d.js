@@ -20,6 +20,10 @@ let LIB = null;
 function getLib() {
   if (LIB) return LIB;
   LIB = {
+    birch: art('birch'), oldOak: art('oldOak'), sapling: art('sapling'), hollowLog: art('hollowLog'),
+    reeds: art('reeds'), lilyPads: art('lilyPads'), crateStack: art('crateStack')?.[0], openBarrel: art('openBarrel')?.[0],
+    coop: art('coop')?.[0], mineEntrance: art('mineEntrance')?.[0], shrine: art('shrine')?.[0], runeStone: art('runeStone')?.[0],
+    skeleton: art('skeleton'),
     oak: art('oak') || Array.from({ length: VARIANTS }, (_, i) => S.oakTree(i + 1)),
     pine: art('pine') || Array.from({ length: VARIANTS }, (_, i) => S.pineTree(i + 11)),
     bush: art('bush') || Array.from({ length: VARIANTS }, (_, i) => S.bush(i + 21)),
@@ -73,6 +77,7 @@ function getLib() {
     treeShadow: S.shadow(15, 4),
     smallShadow: S.shadow(6, 2),
     player: S.playerFrames(),
+    paintedPlayer: paintedFrames('player'),
     people: new Map(),
   };
   for (const v of ['copper', 'tin', 'iron']) if (art('ore:' + v)) LIB.ore[v] = art('ore:' + v);
@@ -95,8 +100,8 @@ function framesFor(lib, look, key, kind = 'person') {
 
 // A fence piece from the painted art: a post, rails to the east, and (drawn in
 // code, as the art has no side-on fence) rails running south.
-function paintedFence(east, south) {
-  const post = art('fencePost')?.[0], rail = art('fenceRail')?.[0];
+function paintedFence(east, south, picket = false) {
+  const post = art(picket ? 'picketPost' : 'fencePost')?.[0], rail = art(picket ? 'picketRail' : 'fenceRail')?.[0];
   if (!post || !rail) return null;
   const base = S.fence(false, south); // 28 x 32, post at x 6-9, anchor (8, 17)
   const c = document.createElement('canvas');
@@ -116,7 +121,7 @@ export function createWorldView(canvasEl, area) {
 
   const lib = getLib();
   const fences = {};
-  const fenceSprite = (e, s) => (fences[`${e}${s}`] ||= paintedFence(e, s) || S.fence(e, s));
+  const fenceSprite = (e, s, k = false) => (fences[`${e}${s}${k}`] ||= paintedFence(e, s, k) || S.fence(e, s));
 
   // ---- Place everything -------------------------------------------------------------
   const decals = []; // drawn flat on the ground, under everything else
@@ -139,20 +144,32 @@ export function createWorldView(canvasEl, area) {
     const f = footOf(p);
     switch (p.type) {
       case 'tree': {
-        const spr = pick(p.variant === 'oak' ? lib.oak : p.variant === 'dead' ? lib.deadTree : p.variant === 'gloom' ? lib.gloomTree : lib.pine, p);
+        const spr = pick(p.variant === 'oak' ? lib.oak : p.variant === 'dead' ? lib.deadTree : p.variant === 'gloom' ? lib.gloomTree
+          : p.variant === 'birch' ? lib.birch || lib.oak : p.variant === 'oldOak' ? lib.oldOak || lib.oak : lib.pine, p);
         shadows.push({ spr: lib.treeShadow, x: f.x, y: f.y, prop: p });
         place(spr, f.x, f.y, { fade: true, prop: p, fx: f.x, fy: f.y });
         break;
       }
       case 'bush': place(pick(lib.bush, p), f.x, f.y); break;
+      case 'sapling': place(pick(lib.sapling || lib.bush, p), f.x, f.y); break;
+      case 'hollowLog': if (lib.hollowLog) place(pick(lib.hollowLog, p), f.x, f.y); else place(lib.logPile, f.x, f.y); break;
+      case 'reeds': if (lib.reeds) place(pick(lib.reeds, p), f.x + jit(p, 9) / 2, f.y + 1); break;
+      case 'lilyPads': if (lib.lilyPads) { const spr = pick(lib.lilyPads, p); decals.push({ img: spr.img, x: p.x * TILE + jit(p, 10) / 2, y: p.y * TILE + jit(p, 11) / 2 }); } break;
+      case 'crateStack': place(lib.crateStack || lib.crate, f.x, f.y); break;
+      case 'openBarrel': place(lib.openBarrel || lib.barrel, f.x, f.y); break;
+      case 'coop': place(lib.coop || lib.crate, f.x, f.y); break;
+      case 'mineEntrance': if (lib.mineEntrance) place(lib.mineEntrance, f.x, f.y, { sortY: f.y - 12 }); break;
+      case 'shrine': place(lib.shrine || lib.ruinWall[0], f.x, f.y); break;
+      case 'runeStone': place(lib.runeStone || lib.standingStone[0], f.x, f.y); break;
+      case 'skeleton': if (lib.skeleton) { const spr = pick(lib.skeleton, p); decals.push({ img: spr.img, x: Math.round(f.x - spr.ax + jit(p, 12)), y: Math.round(f.y - spr.ay) }); } break;
       case 'rock': place(pick(lib.rock, p), f.x, f.y); break;
       case 'flowers': {
         const spr = pick(lib.flowers, p);
         decals.push({ img: spr.img, x: p.x * TILE + jit(p, 1), y: p.y * TILE + jit(p, 2) });
         break;
       }
-      case 'crop': place(lib.crop[p.ripe ? 1 : 0], f.x, f.y); break;
-      case 'fence': place(fenceSprite(isFence.has(`${p.x + 1},${p.y}`), isFence.has(`${p.x},${p.y + 1}`)), f.x, f.y - 2); break;
+      case 'crop': place(lib.crop[p.ripe ? 1 : lib.crop[2] && (p.x + p.y * 3) % 3 === 0 ? 2 : 0], f.x, f.y); break;
+      case 'fence': place(fenceSprite(isFence.has(`${p.x + 1},${p.y}`), isFence.has(`${p.x},${p.y + 1}`), p.style === 'picket'), f.x, f.y - 2); break;
       case 'lamp': place(area.id === 'mine' && lib.mineLamp ? lib.mineLamp : lib.lamp, f.x, f.y); break;
       case 'sign': place(lib.sign, f.x, f.y); break;
       case 'well': place(lib.well, f.x, f.y + 1); break;
@@ -387,7 +404,7 @@ export function createWorldView(canvasEl, area) {
     const { time, steps, marker, characters = [], enemies = [], combat = null, ground: groundItems = [], playerLook = null } = opts;
     // Your character, dressed in whatever you're wearing.
     if (playerLook !== lastLook) { lastLook = playerLook; lastLookKey = playerLook ? `player:${JSON.stringify(playerLook)}` : null; }
-    const pFrames = lastLookKey ? framesFor(lib, playerLook, lastLookKey) : lib.player;
+    const pFrames = lib.paintedPlayer || (lastLookKey ? framesFor(lib, playerLook, lastLookKey) : lib.player);
     const pObj = personObj(pFrames, player, steps, { player: true }, time, Math.max(combat?.playerLungeAt ?? -99, opts.skillLungeAt ?? -99));
     // Leaning into each swing while skilling.
     const lean = skillLean(opts.skilling, time, { fx: pObj.fx, fy: pObj.fy, facing: player.facing });

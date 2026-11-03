@@ -172,7 +172,7 @@ export function buildBrambleford() {
   // ---- Farm fence with a gate gap at (30, 28) -----------------------------
   for (let x = 28; x <= 38; x++) for (let y = 28; y <= 33; y++) {
     const edge = x === 28 || x === 38 || y === 28 || y === 33;
-    if (edge && !(x === 30 && y === 28)) one('fence', x, y);
+    if (edge && !(x === 30 && y === 28)) one('fence', x, y, { style: 'picket' });
   }
   for (let x = 29; x <= 37; x++) for (let y = 29; y <= 32; y++) if ((y - 29) % 2 === 0) one('crop', x, y, { blocks: false, ripe: x % 3 === 0 });
   one('scarecrow', 35, 30, { interact: ['A scarecrow in a battered hat. The crows seem unimpressed.'] });
@@ -183,7 +183,7 @@ export function buildBrambleford() {
     if (edge && !(x === 22 && y === 27)) one('fence', x, y);
   }
   rect(22, 28, 22, 28, GROUND.DIRT);
-  one('crate', 25, 28, { interact: ['A chicken coop made from an old crate. There is straw and a feather inside.'] });
+  prop('coop', [{ x: 24, y: 28 }, { x: 25, y: 28 }], { interact: ["Wyn's chicken coop. There is straw and a warm egg inside."] });
   one('sign', 23, 26, { interact: ["WYN'S CHICKENS", 'Too many hens! Help yourself, but mind the cabbages.'] });
 
   // ---- Old Finn's fishing corner by the pond --------------------------------
