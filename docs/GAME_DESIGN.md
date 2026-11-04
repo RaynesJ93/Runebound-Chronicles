@@ -203,9 +203,9 @@ XP(L) = floor( (1/4) × Σ from n=1 to L−1 of floor( n + 300 × 2^(n/7) ) )
 
 This is the OSRS curve: level 2 needs 83 XP, level 50 needs about 101,000, level 92 needs about 6.5 million (half of 99), and level 99 needs about 13.03 million. Max XP per skill is capped at 200 million.
 
-### XP rate: 5×
+### XP rate: 12×
 
-*Changed 2 Nov 2026:* all XP in the game is multiplied by **5** (`XP_RATE` in `src/skills/skills.js`). The XP figures in this document and in the data files are the base rates before the multiplier; for example a pine log gives 25 × 5 = 125 Woodcutting XP, and each point of melee damage gives 4 × 5 = 20 XP.
+*Changed 4 Nov 2026 (was 5× from 2 Nov):* all XP in the game is multiplied by **12** (`XP_RATE` in `src/skills/skills.js`). The XP figures in this document and in the data files are the base rates before the multiplier; for example a pine log gives 25 × 12 = 300 Woodcutting XP, and each point of melee damage gives 4 × 12 = 48 XP. The skill guides show XP with the multiplier applied.
 
 ### Combat XP rates
 
