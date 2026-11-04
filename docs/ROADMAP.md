@@ -62,6 +62,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Date | Change |
 | --- | --- |
+| 4 Nov 2026 | v0.29.4: XP rate raised from 5× to 12× for every skill (combat, Hitpoints and skilling). Existing XP is kept as it is. |
 | 4 Nov 2026 | v0.29.3: smelting iron bars never fails any more — one iron ore always makes one iron bar. Dorrin's advice updated. |
 | 4 Nov 2026 | v0.29.2: iron, coal and mithril rocks last longer — iron gives 1–5 ores before it empties, coal and mithril 2–8, rolled at random each time the rock refills; "The rock is mined out for now" when one empties. |
 | 4 Nov 2026 | v0.29.1: a miners' supply chest in Copperdeep Mine's entrance hall, beside the furnace and anvil. Like the runekeepers' chest in Whispering Vale, it opens your bank. It shows on the map. |

@@ -10,7 +10,7 @@ export const MAX_XP = 200_000_000;
 
 // Every bit of XP in the game (combat, Hitpoints and every skill) is multiplied
 // by this. The XP numbers in the data files are the base rates.
-export const XP_RATE = 5;
+export const XP_RATE = 12;
 
 export const XP_TABLE = (() => {
   const t = [0, 0]; // t[L] = XP needed for level L (index 0 unused)
