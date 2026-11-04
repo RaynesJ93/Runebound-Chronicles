@@ -71,7 +71,7 @@ export function buildVale() {
   prop('tent', [{ x: 26, y: 23 }, { x: 27, y: 23 }], { interact: ["Aldric's tent. Star charts and rune sketches are pinned inside."] });
   // The supply chest: an old iron-banded trunk under the tent's awning, where
   // the runekeepers keep their things. It works like a bank.
-  one('campChest', 29, 23, { action: 'bank', interact: ["The runekeepers' supply chest. It's linked to the Bank of Brambleford, somehow."] });
+  one('campChest', 29, 23, { action: 'bank', title: "Runekeepers' supply chest", interact: ["The runekeepers' supply chest. It's linked to the Bank of Brambleford, somehow."] });
   one('campfire', 31, 26, { action: 'cook', interact: ['A small cooking fire.'] });
   for (const [x, y] of [[33, 24], [25, 27]]) one('crate', x, y);
   one('barrel', 33, 25);
