@@ -17,6 +17,8 @@ export function defaultState() {
     bank: [],
     boosts: {},
     grave: null,
+    star: null, // the shooting star that's down right now (see data/stars.js)
+    nextStarAt: 0, // play time (seconds) when the next star falls
     stats: { playTimeSec: 0, tilesWalked: 0, deaths: 0, kills: 0 },
     flags: { seenMoveHint: false },
     createdAt: Date.now(),

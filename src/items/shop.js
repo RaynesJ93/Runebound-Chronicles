@@ -7,21 +7,29 @@ const SELL_RATE = 0.35; // the shop pays about a third
 const STEP = 0.03; // each item above/below normal stock shifts the price 3%
 
 export class Shop {
+  // def.currency: what you pay with (default coins). def.buyOnly: the shop
+  // buys nothing back. def.unlimited: stock never runs out. A stock entry's
+  // price, if given, is fixed.
   constructor(def) {
     this.name = def.name;
-    this.stock = def.stock.map((s) => ({ id: s.id, base: s.base, qty: s.base }));
+    this.currency = def.currency || 'coins';
+    this.buyOnly = !!def.buyOnly;
+    this.unlimited = !!def.unlimited;
+    this.stock = def.stock.map((s) => ({ id: s.id, base: s.base ?? 1, qty: s.base ?? 1, price: s.price }));
   }
 
   entry(id) { return this.stock.find((s) => s.id === id); }
 
   buyPrice(id) {
     const s = this.entry(id);
+    if (s?.price) return s.price;
     const v = ITEMS[id].value;
     const shift = s ? Math.max(-0.3, Math.min(0.5, (s.base - s.qty) * STEP)) : 0;
     return Math.max(1, Math.round(v * BUY_MARKUP * (1 + shift)));
   }
 
   sellPrice(id) {
+    if (this.buyOnly) return null;
     if (id === 'coins') return 0;
     const s = this.entry(id);
     const v = ITEMS[id].value;
@@ -32,16 +40,16 @@ export class Shop {
   // Buy up to qty: limited by stock, coins and bag space. Returns { n, cost }.
   buy(id, qty, inv) {
     const s = this.entry(id);
-    if (!s || s.qty <= 0) return { n: 0, cost: 0, why: 'out of stock' };
+    if (!s || (!this.unlimited && s.qty <= 0)) return { n: 0, cost: 0, why: 'out of stock' };
     let n = 0;
     let cost = 0;
-    while (n < qty && s.qty > 0) {
+    while (n < qty && (this.unlimited || s.qty > 0)) {
       const p = this.buyPrice(id);
-      if (inv.count('coins') < p) { if (!n) return { n: 0, cost: 0, why: 'coins' }; break; }
+      if (inv.count(this.currency) < p) { if (!n) return { n: 0, cost: 0, why: 'coins' }; break; }
       if (inv.room(id, 1) < 1) { if (!n) return { n: 0, cost: 0, why: 'space' }; break; }
-      inv.remove('coins', p);
+      inv.remove(this.currency, p);
       inv.add(id, 1);
-      s.qty--;
+      if (!this.unlimited) s.qty--;
       n++;
       cost += p;
     }
@@ -50,6 +58,7 @@ export class Shop {
 
   // Sell up to qty of the item in bag slot i. Returns { n, earned }.
   sell(i, qty, inv) {
+    if (this.buyOnly) return { n: 0, earned: 0, why: 'buyOnly' };
     const slot = inv.slots[i];
     if (!slot || slot.id === 'coins') return { n: 0, earned: 0 };
     const id = slot.id;
@@ -70,6 +79,7 @@ export class Shop {
 
   // Called every so often: stock drifts back towards normal.
   restock() {
+    if (this.unlimited) return;
     for (const s of this.stock) {
       if (s.qty < s.base) s.qty++;
       else if (s.qty > s.base) s.qty--;

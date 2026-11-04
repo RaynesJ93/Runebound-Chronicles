@@ -465,6 +465,95 @@ def studded_with(ref_key):
     return fn
 
 
+# ---- Batch G: shooting stars, stardust, bags, prospector outfit, gem rocks --------
+
+STAR = ['#5e4a1a', '#c8a040', '#ffe890', '#ffffff']
+
+
+def gem_veins(im, get=None):
+    """Copper's orange veins -> glittering gems of every colour; the grey rock stays."""
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.float32)
+    h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
+    vein = (rgba[..., 3] > 0) & (s > 90) & ((h < 34) | (h > 235))
+    out = rgba.copy()
+    names = list(J.GEM)
+    yy, xx = np.mgrid[0:vein.shape[0], 0:vein.shape[1]]
+    pick = ((xx // 3) * 7 + (yy // 3) * 3) % len(names)
+    t = np.clip((v / 255 - 0.2) / 0.8, 0, 1)
+    for k, g in enumerate(names):
+        m = vein & (pick == k)
+        out[m, :3] = J.ramp(J.GEM[g], t * 1.05)[m]
+    return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
+def star_rock(scale, bright=1.0):
+    """The glowing essence crystal, in star colours, at a size."""
+    def fn(im, get=None):
+        st = lum_to(STAR)(im)
+        if bright != 1.0:
+            a = np.array(st).astype(np.float32)
+            a[..., :3] = np.clip(a[..., :3] * bright + 18, 0, 255)
+            st = Image.fromarray(a.astype(np.uint8), 'RGBA')
+        w, h = st.size
+        return st.resize((max(1, round(w * scale)), max(1, round(h * scale))), Image.NEAREST)
+    return fn
+
+
+def stardust_icon(im=None, get=None):
+    """A little heap of glittering dust, drawn big and shrunk."""
+    from PIL import ImageDraw
+    S = 128
+    big = Image.new('RGBA', (S, S))
+    d = ImageDraw.Draw(big)
+    col = lambda t: tuple(int(c) for c in J.ramp(STAR, np.array(t)))
+    d.ellipse((18, 64, 110, 112), fill=col(0.35))
+    d.ellipse((26, 58, 100, 100), fill=col(0.55))
+    d.ellipse((40, 52, 86, 86), fill=col(0.75))
+    rnd = np.random.default_rng(7)
+    for _ in range(70):
+        x, y = rnd.uniform(24, 104), rnd.uniform(54, 106)
+        r = rnd.uniform(1.5, 4)
+        d.ellipse((x - r, y - r, x + r, y + r), fill=col(rnd.uniform(0.7, 1.0)))
+    for cx, cy, r in ((40, 34, 22), (92, 26, 16), (72, 50, 12)):  # sparkles
+        d.polygon([(cx, cy - r), (cx + r * 0.25, cy - r * 0.25), (cx + r, cy), (cx + r * 0.25, cy + r * 0.25),
+                   (cx, cy + r), (cx - r * 0.25, cy + r * 0.25), (cx - r, cy), (cx - r * 0.25, cy - r * 0.25)], fill=col(1.0))
+    return shrink(big, w=28, h=28)
+
+
+def bag_of(colours, inner_key):
+    """Pell's bag icon recoloured, with a little of what's inside peeking out."""
+    def fn(im, get):
+        bag = lum_to(colours)(im)
+        inner = get(inner_key)[0][1]
+        c = inner.crop(inner.getbbox())
+        c = c.resize((max(1, round(c.width * 0.5)), max(1, round(c.height * 0.5))), Image.NEAREST)
+        o = bag.copy()
+        o.alpha_composite(c, (o.width - c.width - 2, 1))
+        return o
+    return fn
+
+
+def hard_hat(im, get=None):
+    """A med helm as a yellow miner's hard hat with a lamp on the front."""
+    out = lum_to(['#4a2a08', '#9a6410', '#d89a20', '#f8d878'])(im)
+    a = np.array(out)
+    ys, xs = np.where(a[..., 3] > 0)
+    cx, cy = int((xs.min() + xs.max()) / 2), int(ys.min() + (ys.max() - ys.min()) * 0.38)
+    r = max(1, (xs.max() - xs.min()) // 6)
+    for y in range(cy - r, cy + r + 1):
+        for x in range(cx - r, cx + r + 1):
+            if (x - cx) ** 2 + (y - cy) ** 2 <= r * r + 0.5 and 0 <= y < a.shape[0] and 0 <= x < a.shape[1]:
+                a[y, x, :3] = (255, 255, 230) if (x - cx) <= 0 and (y - cy) <= 0 else (255, 220, 120)
+                a[y, x, 3] = 255
+    return Image.fromarray(a, 'RGBA')
+
+
+CANVAS = ['#3a2a14', '#7a5a30', '#b08a50', '#ead4a4']
+CANVAS_DARK = ['#2a2014', '#5a4630', '#86704e', '#bca880']
+BOOT_LEATHER = ['#1e1410', '#4a3022', '#74503a', '#a8805e']
+
+
 # ---- What to make ------------------------------------------------------------------
 # new item: icon=(source item, fn), gear=(source item, fn) or None,
 #           small=(source item, fn), or None to shrink the new 32 px icon down.
@@ -547,6 +636,15 @@ DERIVED['steelStuds'] = dict(icon=('ironArrowtips', studs_of('icon:steelSqShield
 DERIVED['studdedBody'] = dict(icon=('leatherBody', studded_with('icon:steelSqShield')), small=('leatherBody', studded_with('icon:steelSqShield')), gear=('leatherBody', studded_with('icon:steelSqShield')))
 DERIVED['studdedChaps'] = dict(icon=('leatherChaps', studded_with('icon:steelSqShield')), small=('leatherChaps', studded_with('icon:steelSqShield')), gear=('leatherChaps', studded_with('icon:steelSqShield')))
 
+# Batch G
+DERIVED['stardust'] = dict(icon=('runeEssence', stardust_icon))
+DERIVED['coalBag'] = dict(icon=('bag', bag_of(['#141216', '#36343c', '#5a5862', '#8a8894'], 'icon:coal')))
+DERIVED['gemBag'] = dict(icon=('bag', bag_of(['#2a1240', '#5a2a8a', '#8a54c0', '#c8a0f0'], 'icon:sapphire')))
+DERIVED['prospectorHelmet'] = dict(icon=('bronzeMedHelm', hard_hat), small=('bronzeMedHelm', hard_hat), gear=('bronzeMedHelm', hard_hat))
+DERIVED['prospectorJacket'] = dict(icon=('leatherBody', lum_to(CANVAS)), small=('leatherBody', lum_to(CANVAS)), gear=('leatherBody', lum_to(CANVAS)))
+DERIVED['prospectorLegs'] = dict(icon=('leatherChaps', lum_to(CANVAS_DARK)), small=('leatherChaps', lum_to(CANVAS_DARK)), gear=('leatherChaps', lum_to(CANVAS_DARK)))
+DERIVED['prospectorBoots'] = dict(icon=('leatherBoots', lum_to(BOOT_LEATHER)), small=('leatherBoots', lum_to(BOOT_LEATHER)), gear=('leatherBoots', lum_to(BOOT_LEATHER)))
+
 # Other sprites: new key <- source key, every frame.
 EXTRA = [
     ('ore:coal', 'ore:copper', coal),
@@ -557,6 +655,7 @@ EXTRA = [
     ('ore:mithril', 'ore:copper', veins_to(MITHRIL)),
     ('tool:mithrilAxe', 'tool:steelAxe', mithril),
     ('tool:mithrilPickaxe', 'tool:steelPickaxe', mithril),
+    ('ore:gem', 'ore:copper', gem_veins),
 ]
 
 # Side-on shields stay as they are (a kite shape only reads from the front or back).
@@ -610,6 +709,12 @@ def derive(get0):
     for new, src, fn in EXTRA:
         for k, im, ax, ay in get(src):
             emit((new, k, fn(im, get), ax, ay))
+    for size, scale in ((1, 0.62), (2, 0.78), (3, 0.95), (4, 1.12), (5, 1.3)):
+        src = get('oreEssence')
+        if not src: break
+        k0, im, ax, ay = src[0]
+        for k, bright in ((0, 1.0), (1, 1.18)):
+            emit((f'star:{size}', k, star_rock(scale, bright)(im), round(ax * scale), round(ay * scale)))
     return out
 
 

@@ -67,6 +67,7 @@ export function buildHollow() {
   for (const [x, y] of [[6, 7], [12, 6], [8, 12], [20, 10], [27, 11], [24, 9], [34, 5], [39, 9], [37, 25], [7, 24]]) ore('mithril', x, y);
   for (const [x, y] of [[13, 10], [5, 21], [21, 15], [28, 15], [33, 21], [38, 22]]) ore('coal', x, y);
   for (const [x, y] of [[33, 7], [11, 24]]) ore('gold', x, y);
+  for (const [x, y] of [[14, 8], [30, 25]]) ore('gem', x, y);
 
   for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
     if (!isFloor(x, y) || (x >= 20 && x <= 24 && y >= 28)) continue;

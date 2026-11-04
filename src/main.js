@@ -22,7 +22,7 @@ import { Inventory } from './items/inventory.js';
 import { Equipment, verb } from './items/equipment.js';
 import { GroundItems } from './items/ground.js';
 import { rollLoot } from './items/loot.js';
-import { ITEMS, itemName } from '../data/items.js';
+import { ITEMS, itemName, SETS } from '../data/items.js';
 import { itemIcon } from './render/items.js';
 import { Bank } from './items/bank.js';
 import { Shop } from './items/shop.js';
@@ -31,6 +31,8 @@ import { splitOnDeath, graveFee, reclaim, GRAVE_SECONDS, FREE_SECONDS } from './
 import { TREES, AXES, SWING_TICKS } from '../data/woodcutting.js';
 import { RECIPES, GROUP_OF } from '../data/fletching.js';
 import { ROCKS, PICKAXES, MINE_TICKS, gemChance, rollGem } from '../data/mining.js';
+import { STAR_SITES, DUST_PER_SIZE, FIRST_STAR, NEXT_STAR, STAR_LIFETIME, rollSize } from '../data/stars.js';
+import { MAP_NAME } from '../data/mapLabels.js';
 import { SMELTING, SMITHING } from '../data/smithing.js';
 import { SPOTS, FISH_TICKS, spotLevel } from '../data/fishing.js';
 import { COOKING } from '../data/cooking.js';
@@ -119,6 +121,19 @@ function boot() {
 
   const inventory = new Inventory(state);
   const equipment = new Equipment(state, book, inventory);
+  // Outfits like the prospector's give a little extra XP (and more for the full set).
+  book.bonus = (skill) => {
+    let b = 1;
+    const sets = {};
+    for (const slot of Object.keys(equipment.slots)) {
+      const e = equipment.item(slot)?.equip;
+      if (!e) continue;
+      b += e.xpBonus?.[skill] || 0;
+      if (e.set) sets[e.set] = (sets[e.set] || 0) + 1;
+    }
+    for (const [id, n] of Object.entries(sets)) if (SETS[id]?.skill === skill && n >= SETS[id].pieces) b += SETS[id].bonus;
+    return b;
+  };
 
   // ---- Combat ----------------------------------------------------------------
   const combat = new Combat({
@@ -277,6 +292,7 @@ function boot() {
   let mapRefreshAt = 0;
   const refreshMap = () => {
     const here = mapPlace(area.id, state.player.x, state.player.y);
+    hud.mapStar = state.star;
     hud.setMapHere(here, here.id === area.id ? { npcs, enemies } : null);
   };
   hud.onMapOpen = () => refreshMap();
@@ -328,6 +344,7 @@ function boot() {
     if (/^raw/.test(id)) return () => hud.message('Cook this on a fire: the cooking pit by the pond, or the goblins\' campfire.');
     if (CUT_FROM[id] || id === 'chisel') return () => cutMenu(x, y);
     if (id === 'steelStuds') return () => studMenu(x, y);
+    if (id === 'coalBag' || id === 'gemBag') return () => openBag(i);
     if (/Mould$/.test(id)) return () => hud.message('Use a mould at a furnace, with a silver or gold bar, to cast jewellery.');
     if (id === 'silverBar' || id === 'goldBar') return () => hud.message('Cast it into rings and amulets at a furnace, with a ring or amulet mould.');
     if (id === 'knife') return () => fletchMenu(inventory.count('logs') ? 'logs' : inventory.count('oakLogs') ? 'oakLogs' : null, x, y);
@@ -348,6 +365,7 @@ function boot() {
     if (CRAFT_GROUP[s.id]) options.push({ label: 'Sew', fn: () => sewMenu(CRAFT_GROUP[s.id], x, y) });
     if (CUT_FROM[s.id] || s.id === 'chisel') options.push({ label: 'Cut', fn: () => cutMenu(x, y) });
     if (s.id === 'steelStuds') options.push({ label: 'Stud leather', fn: () => studMenu(x, y) });
+    if (s.id === 'coalBag' || s.id === 'gemBag') options.push({ label: 'Open', fn: () => openBag(i) });
     if (def.food) options.push({ label: 'Eat', fn: () => eat(i) });
     if (def.potion) options.push({ label: 'Drink', fn: () => eat(i) });
     if (def.equip) {
@@ -563,6 +581,7 @@ function boot() {
       world = loadWorld(START_AREA);
       ({ area, view, npcs, enemies, lookup, ground } = world);
       combat.setWorld(area, enemies);
+      syncStar();
       view.resize();
       applySettings();
       const s = area.spawn;
@@ -596,6 +615,7 @@ function boot() {
       world = loadWorld(exit.to);
       ({ area, view, npcs, enemies, lookup, ground } = world);
       combat.setWorld(area, enemies);
+      syncStar();
       view.resize();
       applySettings();
       player.teleport(area, exit.at.x + exit.offset, exit.at.y, exit.facing ?? player.facing);
@@ -755,18 +775,20 @@ function boot() {
 
   // ---- Bank and shop ------------------------------------------------------------
   const bank = new Bank(state);
-  const shop = new Shop(SHOPS.generalStore);
+  const shops = Object.fromEntries(Object.entries(SHOPS).map(([id, d]) => [id, new Shop(d)]));
+  let shop = shops.generalStore; // the one that's open
 
   const refreshTrade = () => {
     if (!hud.tradeOpen) return;
     if (hud.tradeMode === 'bank') hud.renderTrade(bank.items, inventory.slots);
-    else hud.renderTrade(shop.stock.filter((x) => x.base > 0 || x.qty > 0).map((x) => ({ id: x.id, qty: x.qty, price: shop.buyPrice(x.id) })), inventory.slots, (id) => shop.sellPrice(id));
+    else hud.renderTrade(shop.stock.filter((x) => x.base > 0 || x.qty > 0).map((x) => ({ id: x.id, qty: shop.unlimited ? null : x.qty, price: shop.buyPrice(x.id), currency: itemName(shop.currency).toLowerCase() })), inventory.slots, (id) => shop.sellPrice(id));
   };
   const runAction = (name) => {
     combat.stop();
     if (name === 'smelt' || name === 'smith' || name === 'cook' || name === 'tan') { stationMenu(name); return; }
     if (name === 'bank') hud.openTrade('bank', lastStation?.type === 'campChest' ? lastStation.title || 'Supply chest' : 'Bank of Brambleford');
-    else if (name === 'shop') hud.openTrade('shop', shop.name);
+    else if (name === 'shop') { shop = shops.generalStore; hud.openTrade('shop', shop.name); }
+    else if (name === 'starShop') { shop = shops.starShop; hud.openTrade('shop', shop.name, 'Tap a reward to buy it with stardust. Lyra doesn\'t buy anything.'); }
     refreshTrade();
   };
   hud.onTradeClose = () => { refreshInventory(); save(); };
@@ -778,8 +800,9 @@ function boot() {
       else hud.tradeStatus(`Withdrew ${itemName(id)} × ${n}.`);
     } else {
       const r = shop.buy(id, q === Infinity ? 1000 : q, inventory);
-      if (!r.n) hud.tradeStatus(r.why === 'coins' ? "You don't have enough coins." : r.why === 'space' ? 'Your bag is full.' : "That's out of stock.");
-      else hud.tradeStatus(`Bought ${itemName(id)} × ${r.n} for ${r.cost} coins.`);
+      const cur = itemName(shop.currency).toLowerCase();
+      if (!r.n) hud.tradeStatus(r.why === 'coins' ? `You don't have enough ${cur}.` : r.why === 'space' ? 'Your bag is full.' : "That's out of stock.");
+      else hud.tradeStatus(`Bought ${itemName(id)} × ${r.n} for ${r.cost} ${cur}.`);
     }
     refreshTrade();
   };
@@ -792,6 +815,7 @@ function boot() {
       const real = ITEMS[slot.id].noted;
       hud.tradeStatus(real ? `Deposited ${n} notes: they turn back into ${itemName(real).toLowerCase()} in the bank.` : `Deposited ${itemName(slot.id)} × ${n}.`);
     } else {
+      if (shop.buyOnly) { hud.tradeStatus("Lyra doesn't buy anything. She only trades stardust for rewards."); return; }
       if (slot.id === 'coins') { hud.tradeStatus("You can't sell coins!"); return; }
       const r = shop.sell(i, q, inventory);
       hud.tradeStatus(`Sold ${itemName(slot.id)} × ${r.n} for ${r.earned} coins.`);
@@ -876,7 +900,7 @@ function boot() {
       player.faceTowards(npc.standTile.x, npc.standTile.y);
       talkTarget = null;
       npc.busy = true;
-      hud.startConversation({ name: npc.name, ...npc.def.talk }, { flags: state.flags, give: giveItems(npc), action: runAction }, () => {
+      hud.startConversation({ name: npc.name, ...npc.def.talk }, { flags: state.flags, give: giveItems(npc), action: runAction, starNews }, () => {
         npc.busy = false;
         save();
       });
@@ -907,7 +931,8 @@ function boot() {
       }
       refreshSkills();
     }
-    if (n % 25 === 0) { shop.restock(); refreshTrade(); }
+    if (n % 25 === 0) { for (const sh of Object.values(shops)) sh.restock(); refreshTrade(); }
+    starTick();
     if (state.grave && state.stats.playTimeSec - state.grave.createdAt > GRAVE_SECONDS) {
       state.grave = null;
       hud.message('Your gravestone has crumbled. The items in it are gone.');
@@ -919,6 +944,89 @@ function boot() {
     state.stats.playTimeSec += 0.6;
     if (n % AUTOSAVE_TICKS === 0) save();
   });
+
+  // ---- Shooting stars ------------------------------------------------------------------
+  // One star at a time, saved in state.star: { area, x, y, size, dust, landedAt }.
+  // While it exists it blocks its tile and can be tapped and mined like a rock.
+  const starObj = { type: 'ore', variant: 'star1', tiles: [{ x: 0, y: 0 }], x: 0, y: 0, star: true };
+  const siteOf = (st) => STAR_SITES.find((p) => p.area === st.area && p.x === st.x && p.y === st.y);
+  const syncStar = () => {
+    const st = state.star;
+    for (const w of worlds.values()) {
+      const here = st && st.area === w.id;
+      const idx = w.area.idx(starObj.x, starObj.y);
+      if (w.lookup.get(idx) === starObj && (!here || st.x !== starObj.x || st.y !== starObj.y)) { w.lookup.delete(idx); w.area.blocked[idx] = 0; }
+    }
+    if (!st) return;
+    Object.assign(starObj, { variant: `star${st.size}`, x: st.x, y: st.y, tiles: [{ x: st.x, y: st.y }] });
+    const w = worlds.get(st.area);
+    if (w) { const idx = w.area.idx(st.x, st.y); w.lookup.set(idx, starObj); w.area.blocked[idx] = 1; }
+  };
+  const between = ([lo, hi]) => lo + rng() * (hi - lo);
+  const removeStar = (msg) => {
+    if (activity?.prop === starObj) stopActivity();
+    state.star = null;
+    state.nextStarAt = state.stats.playTimeSec + between(NEXT_STAR);
+    syncStar();
+    if (msg) hud.message(msg);
+    save();
+  };
+  const starTick = () => {
+    const now = state.stats.playTimeSec;
+    if (state.star) {
+      if (now - state.star.landedAt > STAR_LIFETIME) removeStar(`The shooting star near ${siteOf(state.star)?.near || 'here'} has faded away.`);
+      return;
+    }
+    if (!(state.nextStarAt > 0)) state.nextStarAt = now + between(FIRST_STAR);
+    if (now < state.nextStarAt) return;
+    const free = STAR_SITES.filter((p) => !(p.area === area.id && p.x === player.tile.x && p.y === player.tile.y));
+    const site = free[Math.floor(rng() * free.length)];
+    state.star = { area: site.area, x: site.x, y: site.y, size: rollSize(rng), dust: DUST_PER_SIZE, landedAt: now };
+    syncStar();
+    hud.message(`A shooting star has crashed in ${MAP_NAME[site.area] || site.area}, near ${site.near}!`);
+    hud.toast?.('A shooting star has fallen!');
+    save();
+  };
+  // Called after each stardust is mined: the star shrinks every DUST_PER_SIZE.
+  const starMined = (a) => {
+    const st = state.star;
+    if (!st) { stopActivity(); return; }
+    if (--st.dust > 0) return;
+    if (st.size <= 1) { removeStar('The star crumbles away to nothing.'); return; }
+    st.size--;
+    st.dust = DUST_PER_SIZE;
+    syncStar();
+    a.d = ROCKS[starObj.variant];
+    hud.message(`The star shrinks to size ${st.size}.`);
+  };
+  // What Lyra says about the current star.
+  const starNews = () => {
+    const st = state.star;
+    if (!st) return null;
+    const need = ROCKS[`star${st.size}`].level;
+    return [`There's one down in ${MAP_NAME[st.area] || st.area}, near ${siteOf(st)?.near || 'somewhere'}. Size ${st.size}: you'll need Mining ${need} to work it.`];
+  };
+
+  // Coal and gem bags from Lyra: open one for a random handful.
+  const openBag = (i) => {
+    const s = inventory.slots[i];
+    if (!s || (s.id !== 'coalBag' && s.id !== 'gemBag')) return;
+    const got = {};
+    if (s.id === 'coalBag') got.coal = 20 + Math.floor(rng() * 41);
+    else for (let k = 3 + Math.floor(rng() * 8); k > 0; k--) { const gem = rollGem(rng); got[gem] = (got[gem] || 0) + 1; }
+    inventory.remove(s.id, 1);
+    let dropped = false;
+    for (const [id, n] of Object.entries(got)) {
+      const put = inventory.add(id, n);
+      if (put < n) { ground.add(id, n - put, player.tile.x, player.tile.y, time); dropped = true; }
+    }
+    const what = Object.entries(got).map(([id, n]) => `${n} ${itemName(id).toLowerCase()}${n > 1 && !/s$/.test(itemName(id)) && id !== 'coal' ? 's' : ''}`).join(', ');
+    hud.message(`You open the ${itemName(s.id).toLowerCase()}: ${what}.${dropped ? ' Some of it falls on the ground.' : ''}`);
+    refreshInventory();
+    save();
+  };
+
+  syncStar(); // a star saved in the last session
 
   // ---- Gathering: woodcutting and mining --------------------------------------------
   // Trees and ore rocks work the same way: tap one, walk up, and swing away with
@@ -986,12 +1094,13 @@ function boot() {
     if (g.perSpot) { fishStep(a); return; }
     const chance = Math.min(0.9, d.chance + (book.level(g.skill) - d.level) * 0.012 + tool.bonus);
     if (rng() >= chance) return;
-    const item = g.item(d);
+    const item = d.gems ? rollGem(rng) : g.item(d);
     if (!inventory.add(item, 1)) { hud.message(fullBag(g)); stopActivity(); return; }
-    hud.message(g.got(d));
+    hud.message(d.gems ? `You find an ${itemName(item).toLowerCase()}!` : g.got(d));
     book.add(g.skill, d.xp);
+    if (prop.star) { refreshInventory(); starMined(a); return; }
     // Mining sometimes turns up a gem too.
-    if (g.skill === 'mining' && d.ore !== 'runeEssence' && rng() < gemChance(book.level('mining'))) {
+    if (g.skill === 'mining' && d.ore !== 'runeEssence' && !d.gems && rng() < gemChance(book.level('mining'))) {
       const gem = rollGem(rng);
       if (inventory.add(gem, 1)) hud.message(`You find an ${itemName(gem).toLowerCase()}!`);
     }
@@ -1325,7 +1434,7 @@ function boot() {
     if (hud.mapOpen && time >= mapRefreshAt) { mapRefreshAt = time + 0.5; refreshMap(); }
 
     view.render(player, { skilling: skillingView(), skillLungeAt, time, steps: state.stats.tilesWalked, marker, characters: npcs, enemies, combat, levelUpAt, ground: ground.list, playerLook: playerLook || currentLook(), playerGear: equipment.slots,
-      grave: state.grave && state.grave.area === area.id ? state.grave : null });
+      grave: state.grave && state.grave.area === area.id ? state.grave : null, star: state.star && state.star.area === area.id ? state.star : null });
     if (state.grave) {
       const left = Math.max(0, GRAVE_SECONDS - (state.stats.playTimeSec - state.grave.createdAt));
       const freeLeft = FREE_SECONDS - (state.stats.playTimeSec - state.grave.createdAt);

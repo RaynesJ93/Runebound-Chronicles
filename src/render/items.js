@@ -660,6 +660,15 @@ for (const metal of ['silver', 'gold']) {
   DRAW.studdedChaps ||= (b) => { DRAW.leatherChaps(b); for (let y = 4; y < 13; y += 3) for (const x of [5, 10]) if (b.alpha(x, y)) b.set(x, y, hex('#e2e8ec')); };
 }
 
+// Batch G items, from the nearest drawing (the painted art covers them normally).
+DRAW.stardust ||= (b) => { b.ellipse(8, 11, 5.5, 3, hex('#c8a040')); b.ellipse(8, 10, 3.5, 2, hex('#ffe890')); b.set(5, 5, hex('#ffffff')); b.set(11, 4, hex('#ffffff')); };
+DRAW.coalBag ||= (b) => { DRAW.bag(b); b.ellipse(11, 4, 2.5, 2, hex('#2a2830')); };
+DRAW.gemBag ||= (b) => { DRAW.bag(b); b.ellipse(11, 4, 2, 2, hex('#5f8cf4')); };
+DRAW.prospectorHelmet ||= (b) => DRAW.bronzeMedHelm(b);
+DRAW.prospectorJacket ||= (b) => DRAW.leatherBody(b);
+DRAW.prospectorLegs ||= (b) => DRAW.leatherChaps(b);
+DRAW.prospectorBoots ||= (b) => DRAW.leatherBoots(b);
+
 // Hard leather pieces: the leather drawing in darker, redder leather.
 for (const part of ['Gloves', 'Boots', 'Cowl', 'Chaps']) {
   DRAW[`hardLeather${part}`] = (b) => {

@@ -107,7 +107,8 @@ export class SkillBook {
   // Adds XP (kept to one decimal place). Returns levels gained.
   add(id, base) {
     if (!(base > 0)) return 0;
-    const amount = base * XP_RATE;
+    // this.bonus (set by the game): extra XP from outfits, e.g. 1.06 for +6%.
+    const amount = base * XP_RATE * (this.bonus?.(id) || 1);
     const rec = this.state.skills[id] || (this.state.skills[id] = { xp: 0 });
     const before = levelForXp(rec.xp);
     rec.xp = Math.min(MAX_XP, Math.round((rec.xp + amount) * 10) / 10);

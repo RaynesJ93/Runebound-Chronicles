@@ -50,7 +50,7 @@ function getLib() {
     rug: art('rug')?.[0] || S.rug(),
     plant: art('plant')?.[0] || S.plant(),
     gravestone: art('gravestone')?.[0] || S.gravestone(),
-    ore: { ...Object.fromEntries(['copper', 'tin', 'iron', 'coal', 'silver', 'gold', 'mithril'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
+    ore: { ...Object.fromEntries(['copper', 'tin', 'iron', 'coal', 'silver', 'gold', 'mithril', 'gem'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
       essence: [S.essenceRock(1), S.essenceRock(2)] },
     // painted ore rocks replace the drawn ones where the atlas has them
     altar: Object.fromEntries(['air', 'mind', 'water'].map((v) => [v, art('altar:' + v) || [S.altar(v, 0), S.altar(v, 1)]])),
@@ -58,6 +58,8 @@ function getLib() {
     campChest: art('campChest')?.[0] || S.campChest(),
     ruinWall: art('ruinWall') || [S.ruinWall(1), S.ruinWall(2), S.ruinWall(3), S.ruinWall(4)],
     caveMouth: art('caveMouth') || [S.caveMouth(false), S.caveMouth(true)],
+    // shooting stars, by size (two frames each, so they twinkle)
+    star: Object.fromEntries([1, 2, 3, 4, 5].map((n) => [n, art('star:' + n) || [S.essenceRock(1), S.essenceRock(2)]])),
     tombstone: [S.tombstone(1), S.tombstone(2), S.tombstone(3)],
     graveStone: art('graveStone') || [0, 1, 2, 3].map((k) => S.graveStone(k)),
     graveMound: art('graveMound') || [S.graveMound(1), S.graveMound(2), S.graveMound(3)],
@@ -87,7 +89,7 @@ function getLib() {
     paintedPlayer: paintedFrames('player'),
     people: new Map(),
   };
-  for (const v of ['copper', 'tin', 'iron', 'coal', 'silver', 'gold', 'mithril']) if (art('ore:' + v)) LIB.ore[v] = art('ore:' + v);
+  for (const v of ['copper', 'tin', 'iron', 'coal', 'silver', 'gold', 'mithril', 'gem']) if (art('ore:' + v)) LIB.ore[v] = art('ore:' + v);
   if (art('oreEssence')) LIB.ore.essence = art('oreEssence');
   return LIB;
 }
@@ -550,6 +552,12 @@ export function createWorldView(canvasEl, area) {
     for (const p of people) if (!(p.alpha < 1)) ctx.drawImage(lib.smallShadow.img, p.fx - lib.smallShadow.ax, p.fy - lib.smallShadow.ay);
 
     const list = objects.filter((o) => inView(o.x, o.y, o.w, o.h));
+    if (opts.star) {
+      const fr = lib.star[opts.star.size] || lib.star[3];
+      const g = fr[Math.floor(time * 2.5) % fr.length];
+      const fx = (opts.star.x + 0.5) * TILE, fy = (opts.star.y + 1) * TILE - 2;
+      list.push({ img: g.img, x: fx - g.ax, y: fy - g.ay, w: g.w, h: g.h, sortY: fy });
+    }
     if (opts.grave) {
       const g = lib.gravestone;
       const fx = (opts.grave.x + 0.5) * TILE, fy = (opts.grave.y + 1) * TILE - 2;
@@ -579,6 +587,7 @@ export function createWorldView(canvasEl, area) {
     // Night in dark areas: shadow everywhere except around lights.
     if (area.dark) {
       const extra = [{ x: pObj.fx, y: pObj.fy - 8, r: 50 }];
+      if (opts.star) extra.push({ x: (opts.star.x + 0.5) * TILE, y: (opts.star.y + 0.5) * TILE, r: 40 + opts.star.size * 4, colour: '#fff0b0' });
       for (const o of foes) if (!o.enemy.dead && o.enemy.def.sprite === 'golem') extra.push({ x: o.fx, y: o.fy - 12, r: 22, colour: '#a8d0ff', glow: false });
       drawDarkness(time, extra);
     }

@@ -22,7 +22,17 @@ export const ROCKS = {
     examine: 'A rock glinting with veins of gold.' },
   mithril: { name: 'Mithril rock', level: 55, xp: 80, ore: 'mithrilOre', chance: 0.16, lasts: [2, 8], respawn: [80, 130],
     examine: 'A rock shot through with faintly glowing blue mithril.' },
+  // Gem rocks give an uncut gem every time (rolled like the gems you find while mining).
+  gem: { name: 'Gem rock', level: 40, xp: 65, ore: 'uncutSapphire', gems: true, chance: 0.2, deplete: 1, respawn: [60, 100],
+    examine: 'A rock studded with glittering crystals of every colour.' },
 };
+
+// Shooting stars (see stars.js): one rock per size. They never empty on their
+// own; the game shrinks them as their stardust runs out.
+for (const [size, level, xp] of [[1, 10, 12], [2, 20, 22], [3, 30, 26], [4, 40, 32], [5, 50, 47]]) {
+  ROCKS[`star${size}`] = { name: `Shooting star (size ${size})`, level, xp, ore: 'stardust', chance: 0.32, deplete: 0, respawn: [1, 1], star: size,
+    examine: 'A star that fell from the sky. It glitters with stardust.' };
+}
 
 // Best first. A pickaxe works from your bag or in your hand.
 export const PICKAXES = [

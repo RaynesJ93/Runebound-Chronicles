@@ -72,6 +72,7 @@ export function buildDepths() {
   for (const [x, y] of [[12, 11], [21, 9], [33, 9], [6, 13]]) ore('iron', x, y);
   for (const [x, y] of [[7, 10], [17, 6], [31, 9], [36, 14]]) ore('silver', x, y);
   for (const [x, y] of [[21, 4], [5, 17], [34, 17]]) ore('gold', x, y);
+  for (const [x, y] of [[13, 14], [30, 13]]) ore('gem', x, y);
   for (const [x, y] of [[9, 20], [31, 21], [20, 11]]) one('lamp', x, y);
 
   for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {

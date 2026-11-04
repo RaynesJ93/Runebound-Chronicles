@@ -569,6 +569,25 @@ export const ITEMS = {
     name: 'Studded chaps', value: 750, examine: 'Leather chaps reinforced with steel studs. Needs Ranged 15 and Defence 15.',
     equip: { slot: 'legs', req: { ranged: 15, defence: 15 }, att: { ranged: 8, magic: -5 }, def: { stab: 7, slash: 7, crush: 7, ranged: 10, magic: 3 }, look: { pants: '#6a4a2e' } },
   },
+  stardust: { name: 'Stardust', stackable: true, value: 0, examine: 'Glittering dust from a fallen star. Lyra the Stargazer trades it for rewards.' },
+  coalBag: { name: 'Coal bag', stackable: true, value: 0, examine: 'A heavy sack from Lyra. Open it for a random 20 to 60 coal.' },
+  gemBag: { name: 'Gem bag', stackable: true, value: 0, examine: 'A little pouch from Lyra. Open it for a handful of uncut gems.' },
+  prospectorHelmet: {
+    name: 'Prospector helmet', value: 0, examine: 'A miner\'s hard hat with a lamp. +1% Mining XP, and more for the full outfit.',
+    equip: { slot: 'head', req: {}, def: { stab: 1, slash: 1, crush: 1 }, xpBonus: { mining: 0.01 }, set: 'prospector', look: { hat: 'helmet', hatColor: '#c8a030' } },
+  },
+  prospectorJacket: {
+    name: 'Prospector jacket', value: 0, examine: 'A tough canvas jacket. +2% Mining XP, and more for the full outfit.',
+    equip: { slot: 'body', req: {}, def: { stab: 1, slash: 1, crush: 1 }, xpBonus: { mining: 0.02 }, set: 'prospector', look: { tunic: '#8a6a3a' } },
+  },
+  prospectorLegs: {
+    name: 'Prospector legs', value: 0, examine: 'Hard-wearing canvas trousers. +1.5% Mining XP, and more for the full outfit.',
+    equip: { slot: 'legs', req: {}, def: { stab: 1, slash: 1, crush: 1 }, xpBonus: { mining: 0.015 }, set: 'prospector', look: { pants: '#5a4a32' } },
+  },
+  prospectorBoots: {
+    name: 'Prospector boots', value: 0, examine: 'Steel-toed boots. +0.5% Mining XP, and more for the full outfit.',
+    equip: { slot: 'feet', req: {}, def: { stab: 1, slash: 1, crush: 1 }, xpBonus: { mining: 0.005 }, set: 'prospector' },
+  },
   silverRing: {
     name: 'Silver ring', value: 130, examine: 'A silver ring. Plain, but it helps a little.',
     equip: { slot: 'ring', req: {}, def: { stab: 1, slash: 1, crush: 1 } },
@@ -688,3 +707,8 @@ for (const [id, it] of Object.entries(ITEMS)) {
 export const maxStack = (id) => (ITEMS[id]?.stackable ? ITEMS[id].stack ?? 999 : 1);
 
 export const itemName = (id) => ITEMS[id]?.name ?? id;
+
+// Outfits that give a little extra XP when every piece is worn.
+export const SETS = {
+  prospector: { pieces: 4, skill: 'mining', bonus: 0.01 },
+};
