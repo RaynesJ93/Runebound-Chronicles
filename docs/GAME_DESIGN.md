@@ -462,11 +462,20 @@ The **steel pickaxe** (Mining 10) and **steel axe** (Woodcutting 10) work 20% fa
 | --- | --- | --- | --- | --- | --- |
 | Mithril | 55 | 80 | 16% | 2–8 (random) | 48–78 s |
 
-**Mithril bars** (furnace, Smithing 50): 1 mithril ore + 2 coal, 30 XP, never fail. **Mithril items** (anvil, 50 XP a bar; mithril gear needs Attack or Defence 20): dagger 50, axe 51, mace 52, pickaxe 52, med helm 53, sword 54, 15 arrowtips 55, scimitar 55, longsword 56, full helm 57, sq shield 58, battleaxe 60, chainbody 61, kiteshield 62, platelegs 66, platebody 68 (same bar counts as the other metals).
+**Mithril bars** (furnace, Smithing 50): 1 mithril ore + 1 coal (2 coal until v0.29.5), 30 XP, never fail. **Mithril items** (anvil, 50 XP a bar; mithril gear needs Attack or Defence 20): dagger 50, axe 51, mace 52, pickaxe 52, med helm 53, sword 54, 15 arrowtips 55, scimitar 55, longsword 56, full helm 57, sq shield 58, battleaxe 60, chainbody 61, kiteshield 62, platelegs 66, platebody 68 (same bar counts as the other metals).
 
 The **mithril pickaxe** (Mining 20) and **mithril axe** (Woodcutting 20) work 30% faster than bronze. **Mithril arrows**: Fletching 45, ranged strength 22. Night stalkers drop mithril ore, coal, mithril bars and arrowtips, gems and the odd piece of mithril gear. Mithril art is recoloured from the steel art in a dark blue; night stalkers use their painted sheet.
 
-**Planned next:** adamant and rune come with the endgame areas (Phase 5).
+### Mining and Smithing, part 2 (planned)
+
+Rules for everything below: **every bar that needs coal takes exactly one** (iron ore + 1 coal = steel, mithril ore + 1 coal = mithril, adamantite ore + 1 coal = adamant, runite ore + 1 coal = rune). **No golden nuggets** and **no blast furnace**. The prospector outfit can **only** be bought with stardust.
+
+- **Batch E — adamant and rune.** A new area beyond Copperdeep Hollow with adamantite rocks (Mining 70) and runite rocks (Mining 85), a tougher monster and a mini-boss. Adamant and rune bars (1 ore + 1 coal each), full sets, pickaxes, axes and arrows.
+- **Batch F — more to smith,** for every metal: boots and gauntlets (feet and hands have only leather now), two-handed swords, warhammers and spears, thrown weapons (darts, throwing knives, javelins), and nails or studs for studded leather.
+- **Batch G — mining features.** A coal bag and a gem bag (hold 27 outside the bag); **shooting stars** that crash somewhere in the world every so often and are mined for **stardust**; a stardust shop with the **prospector outfit** (hat, top, legs and boots, bonus Mining XP) and other rewards; gem rocks that only give gems.
+- **Batch H — smithing features.** A chance to save a bar at higher Smithing levels, and a quest for Dorrin to fix the mine's old forge, rewarding a smithing outfit (bonus Smithing XP).
+
+Suggested order: F, G, E, H.
 
 New gear: iron sword, iron med helm, bronze and iron sq shields, bronze and iron chainbodies (iron needs Attack/Defence 5), and iron arrows (ranged strength 10; Fletching 15 from iron arrowtips). Shields show their metal on your character.
 
