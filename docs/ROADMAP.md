@@ -62,6 +62,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Date | Change |
 | --- | --- |
+| 4 Nov 2026 | v0.29.2: iron, coal and mithril rocks last longer — iron gives 1–5 ores before it empties, coal and mithril 2–8, rolled at random each time the rock refills; "The rock is mined out for now" when one empties. |
 | 4 Nov 2026 | v0.29.1: a miners' supply chest in Copperdeep Mine's entrance hall, beside the furnace and anvil. Like the runekeepers' chest in Whispering Vale, it opens your bank. It shows on the map. |
 | 3 Nov 2026 | v0.29.0: Batch D — Copperdeep Hollow, a pitch-dark cave below the Depths lit by lamps and glowing mithril, with night stalkers (level 35). Mithril rocks (Mining 55), mithril bars (Smithing 50, 1 mithril ore + 2 coal), the full mithril set (Smithing 50–68), mithril pickaxe and axe (level 20, 30% faster; Pell stocks one of each) and mithril arrows (Fletching 45). Map tab for the Hollow. |
 | 3 Nov 2026 | v0.28.0: Batch C — silver rocks (Mining 20) and gold rocks (Mining 40) in Copperdeep Depths; silver and gold bars; uncut gems while mining (and from cave beasts); gem cutting with a chisel; silver and gold rings and amulets, plain or set with a sapphire, emerald, ruby or diamond, cast at a furnace with a mould. Pell sells the chisel and moulds. |

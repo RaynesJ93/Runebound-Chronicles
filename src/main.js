@@ -932,7 +932,7 @@ function boot() {
       start: 'You swing your pickaxe at the rock.', noTool: 'You need a pickaxe to mine this rock. Dorrin might lend you one.',
       levelMsg: (d) => `You need a Mining level of ${d.level} to mine this rock.`, gone: 'There is no ore left in this rock right now.',
       got: (d) => `You manage to mine some ${itemName(d.ore).toLowerCase().replace(' ore', '')}.`,
-      fell: () => null },
+      fell: (d) => (d.lasts ? 'The rock is mined out for now.' : null) },
     // Fishing: each spot has its own tool (and bait), and several fish.
     fishingSpot: { skill: 'fishing', defs: SPOTS, ticks: FISH_TICKS, tool: 'fishing gear', perSpot: true,
       item: (d) => d.catches.at(-1).item, levelMsg: (d) => `You need a Fishing level of ${spotLevel(d)} to fish here.`,
@@ -994,7 +994,15 @@ function boot() {
       if (inventory.add(gem, 1)) hud.message(`You find an ${itemName(gem).toLowerCase()}!`);
     }
     refreshInventory();
-    if (rng() < d.deplete) {
+    // Some rocks give several ores before they empty (a random number each refill).
+    let empty;
+    if (d.lasts) {
+      const [lo, hi] = d.lasts;
+      prop.left ??= lo + Math.floor(rng() * (hi - lo + 1));
+      empty = --prop.left <= 0;
+      if (empty) delete prop.left;
+    } else empty = rng() < d.deplete;
+    if (empty) {
       prop.depleted = true;
       const [lo, hi] = d.respawn;
       prop.growsAt = ticker.count + lo + Math.floor(rng() * (hi - lo + 1));

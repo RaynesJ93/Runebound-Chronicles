@@ -378,13 +378,13 @@ Feathers and bronze arrowtips come from Pell; goblins also drop feathers. Longbo
 
 Dorrin gives you a bronze pickaxe and a hammer when you ask him to teach you; Pell sells both, plus an iron pickaxe.
 
-**Mining** works like woodcutting: tap a rock, swing every 4 ticks, and the chance per swing rises with level (+1.2% a level) and pickaxe (iron +10%, needs Mining 5). A rock empties after every ore and refills shortly after.
+**Mining** works like woodcutting: tap a rock, swing every 4 ticks, and the chance per swing rises with level (+1.2% a level) and pickaxe (iron +10%, needs Mining 5). Copper and tin empty after every ore; iron, coal and mithril give a random number of ores before they empty (rolled again each time they refill, v0.29.2), so you can mine them for longer. Every rock refills after a while.
 
-| Rock | Level | XP | Base chance | Refills in |
-| --- | --- | --- | --- | --- |
-| Copper | 1 | 17.5 | 38% | 2.4–4.2 s |
-| Tin | 1 | 17.5 | 38% | 2.4–4.2 s |
-| Iron | 15 | 35 | 30% | 5.4–9 s |
+| Rock | Level | XP | Base chance | Ores before it empties | Refills in |
+| --- | --- | --- | --- | --- | --- |
+| Copper | 1 | 17.5 | 38% | 1 | 2.4–4.2 s |
+| Tin | 1 | 17.5 | 38% | 1 | 2.4–4.2 s |
+| Iron | 15 | 35 | 30% | 1–5 (random) | 5.4–9 s |
 
 **Smelting** at the furnace (4 ticks each, keeps going until you run out):
 
@@ -434,9 +434,9 @@ Plate armour costs a lot of magic and some ranged attack. The new pieces' painte
 
 **Copperdeep Depths, coal and steel (v0.27.0).** A tunnel at the back of the iron gallery leads down to **Copperdeep Depths**, a deeper cave with coal rocks, more iron, and **cave beasts** (level 20, hard-hitting, attack if you get close). A tunnel leads back up.
 
-| Rock | Level | XP | Base chance | Refills in |
-| --- | --- | --- | --- | --- |
-| Coal | 30 | 50 | 25% | 12–21 s |
+| Rock | Level | XP | Base chance | Ores before it empties | Refills in |
+| --- | --- | --- | --- | --- | --- |
+| Coal | 30 | 50 | 25% | 2–8 (random) | 12–21 s |
 
 **Steel bars** (furnace, Smithing 30): 1 iron ore + 1 coal, 17.5 XP, never fail. **Steel items** (anvil, 37.5 XP a bar; steel gear needs Attack or Defence 10):
 
@@ -458,9 +458,9 @@ The **steel pickaxe** (Mining 10) and **steel axe** (Woodcutting 10) work 20% fa
 
 **Copperdeep Hollow and mithril (v0.29.0).** A tunnel at the top of the Depths' north cavern leads down to **Copperdeep Hollow**: pitch dark except for lamps and the faint blue glow of mithril. Night stalkers (level 35, fast, aggressive) hunt there. It has mithril rocks, coal and a little gold.
 
-| Rock | Level | XP | Base chance | Refills in |
-| --- | --- | --- | --- | --- |
-| Mithril | 55 | 80 | 16% | 48–78 s |
+| Rock | Level | XP | Base chance | Ores before it empties | Refills in |
+| --- | --- | --- | --- | --- | --- |
+| Mithril | 55 | 80 | 16% | 2–8 (random) | 48–78 s |
 
 **Mithril bars** (furnace, Smithing 50): 1 mithril ore + 2 coal, 30 XP, never fail. **Mithril items** (anvil, 50 XP a bar; mithril gear needs Attack or Defence 20): dagger 50, axe 51, mace 52, pickaxe 52, med helm 53, sword 54, 15 arrowtips 55, scimitar 55, longsword 56, full helm 57, sq shield 58, battleaxe 60, chainbody 61, kiteshield 62, platelegs 66, platebody 68 (same bar counts as the other metals).
 
