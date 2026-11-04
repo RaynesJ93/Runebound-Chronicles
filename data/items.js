@@ -108,7 +108,7 @@ export const ITEMS = {
   hammer: { name: 'Hammer', value: 1, examine: 'For smithing at an anvil.' },
   copperOre: { name: 'Copper ore', value: 5, examine: 'Smelt it with tin ore to make bronze.' },
   tinOre: { name: 'Tin ore', value: 5, examine: 'Smelt it with copper ore to make bronze.' },
-  ironOre: { name: 'Iron ore', value: 17, examine: 'Smelt it into an iron bar. (Not every bit is pure enough.)' },
+  ironOre: { name: 'Iron ore', value: 17, examine: 'Smelt it into an iron bar.' },
   bronzeBar: { name: 'Bronze bar', value: 8, examine: 'Hammer it into shape at an anvil.' },
   ironBar: { name: 'Iron bar', value: 28, examine: 'Hammer it into shape at an anvil.' },
   ironArrowtips: { name: 'Iron arrowtips', stackable: true, value: 2, examine: 'Fix these onto headless arrows. Needs Fletching 15.' },

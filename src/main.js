@@ -1217,7 +1217,7 @@ function boot() {
     if (outs.some(([id, q]) => trial.room(id, q * k) < q * k)) { hud.message("You don't have enough inventory space."); stopActivity(); return; }
     for (const [id, q] of Object.entries(r.uses)) inventory.remove(id, q * k);
     a.next = ticker.count + r.ticks;
-    // Some makes can fail (impure iron): the materials are used up anyway.
+    // Some makes can fail (burnt food): the materials are used up anyway.
     if (r.success && rng() >= r.success(book.level(skillOf(r)))) {
       for (const [id, q] of Object.entries(r.failGives || {})) inventory.add(id, q * k);
       hud.message(r.fail || 'You fail.');

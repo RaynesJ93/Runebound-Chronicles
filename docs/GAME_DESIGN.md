@@ -391,7 +391,7 @@ Dorrin gives you a bronze pickaxe and a hammer when you ask him to teach you; Pe
 | Bar | Level | Ore | XP |
 | --- | --- | --- | --- |
 | Bronze | 1 | 1 copper + 1 tin | 6.2 |
-| Iron | 15 | 1 iron | 12.5 — succeeds 50% of the time at level 15, +1% a level, up to 80%; the ore is lost on a failure |
+| Iron | 15 | 1 iron | 12.5 — always works (it could fail until v0.29.3) |
 
 **Smithing** at the anvil needs a hammer. With both kinds of bar, the anvil asks which metal first.
 

@@ -4,12 +4,11 @@
 //   station: 'furnace' or 'anvil' — opened by tapping one
 //   bar:     which bar this anvil recipe is made from (groups the anvil menu)
 //   success: (level) => chance the make works; on a failure the materials are used up
+//            (no smelting recipe uses this now; every bar always works)
 
 export const SMELTING = [
   { id: 'bronzeBar', name: 'Bronze bar', level: 1, xp: 6.2, uses: { copperOre: 1, tinOre: 1 }, gives: { bronzeBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
-  { id: 'ironBar', name: 'Iron bar', level: 15, xp: 12.5, uses: { ironOre: 1 }, gives: { ironBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace',
-    success: (lvl) => Math.min(0.8, 0.5 + (lvl - 15) * 0.01), fail: 'The iron is too impure, and crumbles away.' },
-  // Coal burns the impurities out, so steel never fails.
+  { id: 'ironBar', name: 'Iron bar', level: 15, xp: 12.5, uses: { ironOre: 1 }, gives: { ironBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
   { id: 'steelBar', name: 'Steel bar', level: 30, xp: 17.5, uses: { ironOre: 1, coal: 1 }, gives: { steelBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
   { id: 'mithrilBar', name: 'Mithril bar', level: 50, xp: 30, uses: { mithrilOre: 1, coal: 2 }, gives: { mithrilBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
   { id: 'silverBar', name: 'Silver bar', level: 20, xp: 13.7, uses: { silverOre: 1 }, gives: { silverBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
