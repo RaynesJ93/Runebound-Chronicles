@@ -13,6 +13,7 @@ import { AREAS, START_AREA } from '../../data/areas/index.js';
 import { SLOTS } from '../items/equipment.js';
 import { SKILLS } from '../skills/skills.js';
 import { defaultState } from './state.js';
+import { STAR_SITES, DUST_PER_SIZE } from '../../data/stars.js';
 
 const INV_SIZE = 28;
 
@@ -118,5 +119,12 @@ export function sanitize(state) {
   state.stats.playTimeSec = num(state.stats.playTimeSec, 0, 0);
   for (const k of ['tilesWalked', 'deaths', 'kills']) state.stats[k] = Math.floor(num(state.stats[k], 0, 0));
   if (state.flags === null || typeof state.flags !== 'object') state.flags = def.flags;
+  // The shooting star: only a real landing site, size 1-5 and some dust left.
+  const st = state.star;
+  const site = st && typeof st === 'object' && STAR_SITES.some((p) => p.area === st.area && p.x === st.x && p.y === st.y);
+  state.star = site && [1, 2, 3, 4, 5].includes(st.size) && num(st.dust, 0) > 0
+    ? { area: st.area, x: st.x, y: st.y, size: st.size, dust: Math.min(DUST_PER_SIZE, Math.ceil(st.dust)), landedAt: num(st.landedAt, 0) } : null;
+  state.nextStarAt = num(state.nextStarAt, 0, 0);
+
   return state;
 }

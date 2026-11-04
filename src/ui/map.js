@@ -98,7 +98,7 @@ export function drawArea(id) {
 // Everything to put on top of the map, in tiles. `live` (optional) has the
 // current npcs and enemies, so they show where they are right now; otherwise
 // they show at home.
-export function markers(id, live) {
+export function markers(id, live, star = null) {
   const a = areaFor(id);
   const out = [];
   // Skilling spots: one icon per cluster of the same kind.
@@ -128,5 +128,6 @@ export function markers(id, live) {
     : (a.spawns || []).map((s) => ({ name: ENEMIES[s.enemy]?.name || s.enemy, boss: ENEMIES[s.enemy]?.boss, x: s.x, y: s.y }));
   for (const f of foes) out.push({ type: 'enemy', x: f.x + 0.5, y: f.y + 0.5, name: f.name, boss: !!f.boss });
   for (const l of LABELS[id] || []) out.push({ type: 'label', x: l.x + 0.5, y: l.y + 0.5, name: l.text });
+  if (star && star.area === id) out.push({ type: 'spot', kind: 'star', x: star.x + 0.5, y: star.y + 0.5, icon: itemIcon('stardust').url, name: `Shooting star (size ${star.size})` });
   return { W: a.W, H: a.H, name: MAP_NAME[id] || a.name, dark: a.dark, list: out };
 }

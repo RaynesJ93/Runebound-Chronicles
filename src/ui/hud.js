@@ -107,7 +107,7 @@ export class Hud {
               <span><img class="px" src="${itemIcon('coins').url}" alt="">Bank</span><span><img class="px" src="${itemIcon('bag').url}" alt="">Shop</span>
               <span><img class="px" src="${iconUrl('fishing')}" alt="">Fishing</span><span><img class="px" src="${iconUrl('mining')}" alt="">Mining</span>
               <span><img class="px" src="${iconUrl('smithing')}" alt="">Smithing</span><span><img class="px" src="${iconUrl('cooking')}" alt="">Cooking</span>
-              <span><img class="px" src="${iconUrl('crafting')}" alt="">Tanning</span><span><img class="px" src="${iconUrl('runecrafting')}" alt="">Altar</span>
+              <span><img class="px" src="${iconUrl('crafting')}" alt="">Tanning</span><span><img class="px" src="${iconUrl('runecrafting')}" alt="">Altar</span><span><img class="px" src="${itemIcon('stardust').url}" alt="">Shooting star</span>
             </div>
           </div>
         </div>
@@ -289,13 +289,13 @@ export class Hud {
   // tapping one in your bag gives it (deposit/sell). Quantity from the 1/5/10/All chips.
   get tradeOpen() { return !this.el.trade.classList.contains('hidden'); }
 
-  openTrade(mode, title) {
+  openTrade(mode, title, help = null) {
     this.tradeMode = mode;
     this.$('trade-title').textContent = title;
     this.$('trade-actions').classList.toggle('hidden', mode !== 'bank');
     this.$('trade-help').textContent = mode === 'bank'
       ? 'Tap an item in the bank to take it out, or in your bag to put it in. Choose how many with the buttons above.'
-      : 'Tap an item to buy it, or one of your own to sell it. Prices are in coins.';
+      : help || 'Tap an item to buy it, or one of your own to sell it. Prices are in coins.';
     this.$('trade-status').textContent = '';
     this.el.trade.classList.remove('hidden');
   }
@@ -310,12 +310,12 @@ export class Hud {
   // top: [{ id, qty, price? }], bag: inventory slots, sell: (id) => price (shop only)
   renderTrade(top, bag, sell = null) {
     const cell = (id, qty, extra) => {
-      const lab = qty > 1 || ITEMS[id]?.stackable ? stackLabel(qty) : null;
+      const lab = qty !== null && (qty > 1 || ITEMS[id]?.stackable) ? stackLabel(qty) : null;
       return `<img class="px" src="${itemIcon(id).url}" alt="${ITEMS[id]?.name ?? ''}" draggable="false">
         ${lab ? `<span class="qty ${lab.cls}">${lab.text}</span>` : ''}${extra || ''}`;
     };
     this.$('trade-grid').innerHTML = top.length
-      ? top.map((t) => `<button class="slot full ${t.qty <= 0 ? 'empty-stock' : ''}" data-take="${t.id}" title="${ITEMS[t.id]?.name}${t.price ? ` — ${t.price} coins` : ''}">
+      ? top.map((t) => `<button class="slot full ${t.qty !== null && t.qty <= 0 ? 'empty-stock' : ''}" data-take="${t.id}" title="${ITEMS[t.id]?.name}${t.price ? ` — ${t.price} ${t.currency || 'coins'}` : ''}">
           ${cell(t.id, t.qty, t.price ? `<span class="price">${t.price}</span>` : '')}</button>`).join('')
       : '<p class="muted" style="grid-column: 1 / -1; margin: 6px 4px; color: #e8d8b0">Your bank is empty. Tap items in your bag to store them.</p>';
     this.$('trade-inv').innerHTML = bag.map((s, i) => {
@@ -523,8 +523,8 @@ export class Hud {
     if (!here) return;
     const id = this.mapShown || here.id;
     const onIt = id === here.id;
-    this.$('map-areas').innerHTML = MAP_AREAS.map((a) => `<button class="chip ${a === id ? 'on' : ''}" data-map="${a}">${MAP_TAB[a]}${a === here.id ? ' •' : ''}</button>`).join('');
-    const m = markers(id, onIt ? this.mapLive : null);
+    this.$('map-areas').innerHTML = MAP_AREAS.map((a) => `<button class="chip ${a === id ? 'on' : ''}" data-map="${a}">${MAP_TAB[a]}${a === here.id ? ' •' : ''}${this.mapStar?.area === a ? ' ★' : ''}</button>`).join('');
+    const m = markers(id, onIt ? this.mapLive : null, this.mapStar);
     const pct = (x, y) => `left:${(x / m.W) * 100}%;top:${(y / m.H) * 100}%`;
     const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const mk = m.list.map((k) => {
@@ -821,7 +821,8 @@ export class Hud {
     if (node.give && this.ctx.give && !this.ctx.give(node.give) && node.giveFail) { this.goto(node.giveFail); return; }
     this.node = node;
     if (node.set) Object.assign(this.ctx.flags, node.set);
-    const say = Array.isArray(node.say) ? node.say : node.say ? [node.say] : [];
+    const said = typeof node.say === 'function' ? node.say(this.ctx || {}) : node.say;
+    const say = Array.isArray(said) ? said : said ? [said] : [];
     this.dialogLines = say.map((l) => (typeof l === 'function' ? l(this.ctx) : l));
     this.hideChoices();
     if (this.dialogLines.length) this.typeLine(this.dialogLines.shift());

@@ -801,6 +801,7 @@ const ORE_COLOUR = {
   silver: [hex('#8e98a2'), hex('#cdd5dc'), hex('#ffffff')],
   gold: [hex('#bf8a22'), hex('#efc444'), hex('#fff3b8')],
   mithril: [hex('#2e3a6e'), hex('#5a6ec0'), hex('#a8c0ff')],
+  gem: [hex('#a8182e'), hex('#2a48b8'), hex('#52d483')],
 };
 
 // A rock with veins of ore. With no `variant` it's a mined-out rock.

@@ -491,12 +491,31 @@ Rules for everything below: **every bar that needs coal takes exactly one** (iro
   **Steel studs** (Smithing 36, 1 steel bar makes 5) and **studded leather** (Crafting): tap the studs with a leather body (Crafting 26) or leather chaps (Crafting 29) in your bag. Studded body and chaps need Ranged 15 and Defence 15 and sit between hard leather and the next tier.
 
   A wielded two-handed sword takes your shield off (it goes to your bag); wearing a shield takes a 2h sword off.
-- **Batch G — mining features.** **Shooting stars** crash somewhere in the world every so often and are mined for **stardust**. Stardust is spent at a stardust shop on:
-  - the **prospector outfit** (hat, top, legs and boots, bonus Mining XP) — stardust only;
-  - **coal bags** — open one for a random 20–60 coal;
-  - **gem bags** — open one for a random handful of uncut gems, rolled at the usual rarities (sapphire most often, diamond rarely). Suggested 3–10 gems a bag, since gems are worth far more than coal.
+- **Batch G — shooting stars and stardust (v0.31.0).**
+  - **Shooting stars.** The first star crashes 2–5 minutes into a session; after one is gone, the next comes 10–20 minutes of play later. It lands at one of 20 spots across Brambleford, Thornwood and Whispering Vale, and a message says where ("A shooting star has crashed in Thornwood, near the oak grove!"). It shows on the map and glows in the dark. A star left unmined fades after 30 minutes.
+  - **Mining a star.** Stars come in sizes 1–5 (size 3 most often). Each size needs a Mining level and gives stardust and XP per swing; after 25 stardust it shrinks a size, and size 1 crumbles away. You can only mine a star once it is down to a size you can handle.
 
-  Both bags are used up when opened (not storage bags). Also in this batch: gem rocks that only give gems.
+    | Size | Mining | XP per stardust |
+    | --- | --- | --- |
+    | 1 | 10 | 12 |
+    | 2 | 20 | 22 |
+    | 3 | 30 | 26 |
+    | 4 | 40 | 32 |
+    | 5 | 50 | 47 |
+
+  - **Lyra the Stargazer** stands by Brambleford's square. She tells you where the current star is, and runs a shop that takes **only stardust** (she doesn't buy anything):
+
+    | Reward | Stardust |
+    | --- | --- |
+    | Prospector helmet (+1% Mining XP) | 80 |
+    | Prospector jacket (+2%) | 120 |
+    | Prospector legs (+1.5%) | 100 |
+    | Prospector boots (+0.5%) | 60 |
+    | Coal bag — open for a random 20–60 coal | 15 |
+    | Gem bag — open for 3–10 uncut gems at the usual rarities | 40 |
+
+    The full prospector outfit gives +1% more, 6% in all. The outfit is only available from Lyra. Bags are used up when opened; coal or gems that don't fit in your bag go on the ground.
+  - **Gem rocks** (Mining 40, 65 XP) give an uncut gem every time you mine them (sapphire most often, diamond rarely). Two in Copperdeep Depths, two in Copperdeep Hollow.
 - **Batch H — smithing features.** A chance to save a bar at higher Smithing levels, and a quest for Dorrin to fix the mine's old forge, rewarding a smithing outfit (bonus Smithing XP).
 
 Suggested order: F, G, E, H.

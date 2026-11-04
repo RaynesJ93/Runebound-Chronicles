@@ -3,6 +3,18 @@
 // Stock drifts back to normal over time.
 
 export const SHOPS = {
+  // Lyra's star shop: priced in stardust, fixed prices, never runs out, buys nothing.
+  starShop: {
+    name: "Lyra's star shop", currency: 'stardust', buyOnly: true, unlimited: true,
+    stock: [
+      { id: 'prospectorHelmet', price: 80 },
+      { id: 'prospectorJacket', price: 120 },
+      { id: 'prospectorLegs', price: 100 },
+      { id: 'prospectorBoots', price: 60 },
+      { id: 'coalBag', price: 15 },
+      { id: 'gemBag', price: 40 },
+    ],
+  },
   generalStore: {
     name: "Pell's General Store",
     stock: [

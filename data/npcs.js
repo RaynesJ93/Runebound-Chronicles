@@ -258,6 +258,36 @@ export const NPCS = [
     },
   },
 
+  {
+    examine: 'She has a telescope under one arm and stardust on her sleeves.',
+    id: 'lyra', name: 'Lyra the Stargazer', short: 'Lyra', area: 'brambleford', x: 25, y: 18, radius: 1, wander: 0.1,
+    look: { hair: '#e8e0f0', tunic: '#3a3a7a', pants: '#2a2a5a', belt: '#c8a030', hat: 'hood', hatColor: '#3a3a7a' },
+    talk: {
+      start: (c) => (c.flags.metLyra ? 'again' : 'intro'),
+      nodes: {
+        intro: {
+          say: ['Oh! Hello. Lyra, stargazer. I watch the sky for falling stars.', 'They crash all over the place: the village, Thornwood, even the Vale. Mine one with a pickaxe and you get stardust.'],
+          set: { metLyra: true },
+          next: 'menu',
+        },
+        again: { say: 'Seen any stars come down?', next: 'menu' },
+        menu: { say: [], choices: [
+          { text: 'Where is the star now?', next: 'where' },
+          { text: "Let's trade stardust.", action: 'starShop' },
+          { text: 'How do stars work?', next: 'how' },
+          { text: 'Bye, Lyra.', next: 'bye' },
+        ] },
+        where: { say: (c) => c.starNews?.() || "Nothing's come down for a while. Keep an eye on the sky.", next: 'menu' },
+        how: {
+          say: ['A star can be size 1 to 5. The bigger it is, the higher the Mining level you need.', 'Every 25 stardust, it shrinks a size. So if a big one is too hard for you, wait for someone... well, wait for it to shrink.',
+            'Bring me the dust. I trade it for the prospector outfit, which helps you learn faster, and for bags of coal and gems.'],
+          next: 'menu',
+        },
+        bye: { say: 'Clear skies!' },
+      },
+    },
+  },
+
   // ---- Thornwood -----------------------------------------------------------------
   {
     examine: 'A big, bearded woodcutter. He smells of pine.',
