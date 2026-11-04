@@ -28,11 +28,18 @@ export const RECIPES = [
   { id: 'steelJavelins', name: 'Steel javelins', level: 32, xp: 5, uses: { steelJavelinHeads: 1, arrowShaft: 1 }, gives: { steelJavelin: 1 }, batch: 5, ticks: 2, group: 'thrown' },
   { id: 'mithrilDarts', name: 'Mithril darts', level: 52, xp: 11.2, uses: { mithrilDartTip: 1, feather: 1 }, gives: { mithrilDart: 1 }, batch: 10, ticks: 2, group: 'thrown' },
   { id: 'mithrilJavelins', name: 'Mithril javelins', level: 47, xp: 8, uses: { mithrilJavelinHeads: 1, arrowShaft: 1 }, gives: { mithrilJavelin: 1 }, batch: 5, ticks: 2, group: 'thrown' },
+  { id: 'adamantArrows', name: 'Adamant arrows', level: 60, xp: 10, uses: { headlessArrow: 1, adamantArrowtips: 1 }, gives: { adamantArrow: 1 }, batch: 15, ticks: 2, group: 'arrows' },
+  { id: 'adamantDarts', name: 'Adamant darts', level: 67, xp: 15, uses: { adamantDartTip: 1, feather: 1 }, gives: { adamantDart: 1 }, batch: 10, ticks: 2, group: 'thrown' },
+  { id: 'adamantJavelins', name: 'Adamant javelins', level: 62, xp: 10, uses: { adamantJavelinHeads: 1, arrowShaft: 1 }, gives: { adamantJavelin: 1 }, batch: 5, ticks: 2, group: 'thrown' },
+  { id: 'runeArrows', name: 'Rune arrows', level: 75, xp: 12.5, uses: { headlessArrow: 1, runeArrowtips: 1 }, gives: { runeArrow: 1 }, batch: 15, ticks: 2, group: 'arrows' },
+  { id: 'runeDarts', name: 'Rune darts', level: 81, xp: 18.8, uses: { runeDartTip: 1, feather: 1 }, gives: { runeDart: 1 }, batch: 10, ticks: 2, group: 'thrown' },
+  { id: 'runeJavelins', name: 'Rune javelins', level: 77, xp: 12.4, uses: { runeJavelinHeads: 1, arrowShaft: 1 }, gives: { runeJavelin: 1 }, batch: 5, ticks: 2, group: 'thrown' },
 ];
 
 // Which recipe group an item belongs to when you tap it.
 export const GROUP_OF = {
   logs: 'logs', oakLogs: 'oakLogs',
   arrowShaft: 'arrows', feather: 'arrows', headlessArrow: 'arrows', bronzeArrowtips: 'arrows', ironArrowtips: 'arrows', steelArrowtips: 'arrows', mithrilArrowtips: 'arrows',
+  adamantArrowtips: 'arrows', runeArrowtips: 'arrows', adamantDartTip: 'thrown', adamantJavelinHeads: 'thrown', runeDartTip: 'thrown', runeJavelinHeads: 'thrown',
   bronzeDartTip: 'thrown', bronzeJavelinHeads: 'thrown', ironDartTip: 'thrown', ironJavelinHeads: 'thrown', steelDartTip: 'thrown', steelJavelinHeads: 'thrown', mithrilDartTip: 'thrown', mithrilJavelinHeads: 'thrown',
 };

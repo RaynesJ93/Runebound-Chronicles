@@ -129,6 +129,10 @@ export const ITEMS = {
   uncutDiamond: { name: 'Uncut diamond', value: 800, examine: 'A rough diamond. Cut it with a chisel.' },
   diamond: { name: 'Diamond', value: 1200, examine: 'A cut diamond. Set it in a ring or amulet at a furnace.' },
   steelBar: { name: 'Steel bar', value: 60, examine: 'Hammer it into shape at an anvil. Tougher than iron.' },
+  adamantiteOre: { name: 'Adamantite ore', value: 400, examine: 'A heavy green-black ore. Smelt it with a lump of coal.' },
+  adamantBar: { name: 'Adamant bar', value: 750, examine: 'Hammer it into shape at an anvil. Hard as anything.' },
+  runiteOre: { name: 'Runite ore', value: 1200, examine: 'A rare blue ore that hums faintly. Smelt it with a lump of coal.' },
+  runeBar: { name: 'Rune bar', value: 2250, examine: 'Hammer it into shape at an anvil. The finest metal there is.' },
   mithrilOre: { name: 'Mithril ore', value: 160, examine: 'A light, blue-tinged ore. Smelt it with a lump of coal.' },
   mithrilBar: { name: 'Mithril bar', value: 300, examine: 'Hammer it into shape at an anvil. Light and very strong.' },
   mithrilArrowtips: { name: 'Mithril arrowtips', stackable: true, value: 10, examine: 'Fix these onto headless arrows. Needs Fletching 45.' },
@@ -569,6 +573,216 @@ export const ITEMS = {
     name: 'Studded chaps', value: 750, examine: 'Leather chaps reinforced with steel studs. Needs Ranged 15 and Defence 15.',
     equip: { slot: 'legs', req: { ranged: 15, defence: 15 }, att: { ranged: 8, magic: -5 }, def: { stab: 7, slash: 7, crush: 7, ranged: 10, magic: 3 }, look: { pants: '#6a4a2e' } },
   },
+  adamantArrowtips: {
+    name: 'Adamant arrowtips', stackable: true, value: 25, examine: 'Fix these onto headless arrows. Needs Fletching 45.',
+  },
+  adamantArrow: {
+    name: 'Adamant arrow', stackable: true, value: 35, examine: 'Arrows with adamant heads. They hit harder than mithril.',
+    equip: { slot: 'ammo', req: {}, rangedStr: 31, ammo: 'arrow' },
+  },
+  adamantDagger: {
+    name: 'Adamant dagger', value: 813, examine: 'A sturdy adamant dagger.',
+    equip: { slot: 'weapon', req: { attack: 30 }, type: 'stab', speed: 4, att: { stab: 16, slash: 7, crush: -4, magic: 1 }, def: { magic: 1 }, str: 12, look: { weapon: 'adamant', blade: 4 } },
+  },
+  adamantAxe: {
+    name: 'Adamant axe', value: 1300, tool: { woodcutting: 30 }, examine: 'An adamant axe. Chops very fast. Needs Woodcutting 30.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 5, att: { stab: -2, slash: 16, crush: 7 }, str: 12, look: { weapon: 'adamant', blade: 5 } },
+  },
+  adamantPickaxe: {
+    name: 'Adamant pickaxe', value: 1300, tool: { mining: 30 }, examine: 'An adamant pickaxe. Mines very fast. Needs Mining 30.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'stab', speed: 5, att: { stab: 16, slash: -2, crush: 7 }, str: 12, look: { weapon: 'adamant', blade: 5 } },
+  },
+  adamantMace: {
+    name: 'Adamant mace', value: 1463, examine: 'A flanged adamant mace. Good against armour.',
+    equip: { slot: 'weapon', req: { attack: 30 }, type: 'crush', speed: 4, att: { stab: 7, slash: -2, crush: 23 }, def: { crush: 1 }, str: 18, look: { weapon: 'adamant', blade: 5 } },
+  },
+  adamantMedHelm: {
+    name: 'Adamant med helm', value: 1950, examine: 'A medium-sized adamant helmet.',
+    equip: { slot: 'head', req: { defence: 30 }, att: { magic: -1 }, def: { stab: 10, slash: 12, crush: 7, magic: -1, ranged: 10 }, look: { hat: 'helmet', hatColor: '#3a6a40' } },
+  },
+  adamantSword: {
+    name: 'Adamant sword', value: 2113, examine: 'A well-made adamant sword.',
+    equip: { slot: 'weapon', req: { attack: 30 }, type: 'slash', speed: 4, att: { stab: 16, slash: 21, crush: -2 }, def: { slash: 5, stab: 1 }, str: 18, look: { weapon: 'adamant', blade: 7 } },
+  },
+  adamantScimitar: {
+    name: 'Adamant scimitar', value: 2600, examine: 'A curved adamant sword. Fast and slashing.',
+    equip: { slot: 'weapon', req: { attack: 30 }, type: 'slash', speed: 4, att: { stab: 5, slash: 26, crush: -2 }, def: { slash: 1 }, str: 23, look: { weapon: 'adamant', blade: 7 } },
+  },
+  adamantLongsword: {
+    name: 'Adamant longsword', value: 3250, examine: 'A long adamant blade. Slower, but hits harder.',
+    equip: { slot: 'weapon', req: { attack: 30 }, type: 'slash', speed: 5, att: { stab: 16, slash: 29, crush: -2 }, def: { stab: 1, slash: 7 }, str: 29, look: { weapon: 'adamant', blade: 9 } },
+  },
+  adamantFullHelm: {
+    name: 'Adamant full helm', value: 3575, examine: 'A full-face adamant helmet.',
+    equip: { slot: 'head', req: { defence: 30 }, att: { magic: -3, ranged: -1 }, def: { stab: 16, slash: 18, crush: 12, ranged: 16, magic: -1 }, look: { hat: 'helmet', hatColor: '#3a6a40' } },
+  },
+  adamantSqShield: {
+    name: 'Adamant sq shield', value: 3900, examine: 'A square adamant shield.',
+    equip: { slot: 'shield', req: { defence: 30 }, att: { magic: -1 }, def: { stab: 21, slash: 23, crush: 18, ranged: 21, magic: -1 }, look: { shield: 'adamant' } },
+  },
+  adamantBattleaxe: {
+    name: 'Adamant battleaxe', value: 4225, examine: 'A heavy double-headed adamant axe.',
+    equip: { slot: 'weapon', req: { attack: 30 }, type: 'slash', speed: 6, att: { stab: -2, slash: 29, crush: 21 }, def: { slash: 1 }, str: 35, look: { weapon: 'adamant', blade: 6 } },
+  },
+  adamantChainbody: {
+    name: 'Adamant chainbody', value: 4875, examine: 'A shirt of adamant rings.',
+    equip: { slot: 'body', req: { defence: 30 }, att: { magic: -4 }, def: { stab: 29, slash: 40, crush: 46, ranged: 34, magic: -1 }, look: { tunic: '#3a6a40' } },
+  },
+  adamantKiteshield: {
+    name: 'Adamant kiteshield', value: 5525, examine: 'A large adamant shield, pointed at the bottom.',
+    equip: { slot: 'shield', req: { defence: 30 }, att: { magic: -8, ranged: -2 }, def: { stab: 23, slash: 29, crush: 26, ranged: 26, magic: -1 }, look: { shield: 'adamant' } },
+  },
+  adamantPlatelegs: {
+    name: 'Adamant platelegs', value: 6500, examine: 'Leg armour of adamant plates.',
+    equip: { slot: 'legs', req: { defence: 30 }, att: { magic: -10, ranged: -4 }, def: { stab: 29, slash: 26, crush: 23, ranged: 26, magic: -4 }, look: { pants: '#3a6a40' } },
+  },
+  adamantPlatebody: {
+    name: 'Adamant platebody', value: 13000, examine: 'Solid adamant plates. Heavy, but very tough.',
+    equip: { slot: 'body', req: { defence: 30 }, att: { magic: -15, ranged: -7 }, def: { stab: 53, slash: 51, crush: 30, ranged: 51, magic: -6 }, look: { tunic: '#3a6a40' } },
+  },
+  adamantBoots: {
+    name: 'Adamant boots', value: 1365, examine: 'Sturdy adamant boots.',
+    equip: { slot: 'feet', req: { defence: 30 }, att: { magic: -2 }, def: { stab: 8, slash: 8, crush: 8, ranged: 5, magic: -1 } },
+  },
+  adamantGauntlets: {
+    name: 'Adamant gauntlets', value: 1138, examine: 'Armoured adamant gloves.',
+    equip: { slot: 'hands', req: { defence: 30 }, att: { stab: 3, slash: 3, crush: 3, magic: -2 }, def: { stab: 5, slash: 5, crush: 5, ranged: 5 } },
+  },
+  adamantSpear: {
+    name: 'Adamant spear', value: 1820, examine: 'A long adamant-headed spear. Good at stabbing, slashing and smashing alike.',
+    equip: { slot: 'weapon', req: { attack: 30 }, type: 'stab', speed: 5, att: { stab: 23, slash: 23, crush: 23 }, def: { stab: 3, slash: 3, crush: 3 }, str: 23, look: { weapon: 'adamant', blade: 8 } },
+  },
+  adamantWarhammer: {
+    name: 'Adamant warhammer', value: 4550, examine: 'A heavy adamant warhammer. Slow, but it hits like a falling rock.',
+    equip: { slot: 'weapon', req: { attack: 30 }, type: 'crush', speed: 6, att: { stab: -4, slash: -4, crush: 33 }, str: 40, look: { weapon: 'adamant', blade: 5 } },
+  },
+  adamant2hSword: {
+    name: 'Adamant 2h sword', value: 5460, examine: 'A huge adamant sword, wielded with both hands.',
+    equip: { slot: 'weapon', req: { attack: 30 }, twoHanded: true, type: 'slash', speed: 7, att: { stab: -4, slash: 40, crush: 31 }, str: 46, look: { weapon: 'adamant', blade: 10 } },
+  },
+  adamantDart: {
+    name: 'Adamant dart', stackable: true, value: 90, examine: 'A small adamant dart. Throw it from your weapon slot.',
+    equip: { slot: 'weapon', req: { ranged: 30 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 16 }, rangedStr: 16, look: {  } },
+  },
+  adamantThrowingKnife: {
+    name: 'Adamant throwing knife', stackable: true, value: 138, examine: 'A balanced adamant knife, made for throwing.',
+    equip: { slot: 'weapon', req: { ranged: 30 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 21 }, rangedStr: 21, look: {  } },
+  },
+  adamantJavelin: {
+    name: 'Adamant javelin', stackable: true, value: 205, examine: 'An adamant-tipped javelin. Slow to throw, but it hits hard.',
+    equip: { slot: 'weapon', req: { ranged: 30 }, style: 'ranged', thrown: true, range: 6, type: 'ranged', speed: 5, att: { ranged: 26 }, rangedStr: 35, look: {  } },
+  },
+  adamantDartTip: {
+    name: 'Adamant dart tip', stackable: true, value: 45, examine: 'Fletch it with a feather to make a dart.',
+  },
+  adamantJavelinHeads: {
+    name: 'Adamant javelin heads', stackable: true, value: 90, examine: 'Fletch them onto arrow shafts to make javelins.',
+  },
+  runeArrowtips: {
+    name: 'Rune arrowtips', stackable: true, value: 75, examine: 'Fix these onto headless arrows. Needs Fletching 45.',
+  },
+  runeArrow: {
+    name: 'Rune arrow', stackable: true, value: 105, examine: 'Arrows with rune heads. They hit harder than adamant.',
+    equip: { slot: 'ammo', req: {}, rangedStr: 49, ammo: 'arrow' },
+  },
+  runeDagger: {
+    name: 'Rune dagger', value: 2438, examine: 'A sturdy rune dagger.',
+    equip: { slot: 'weapon', req: { attack: 40 }, type: 'stab', speed: 4, att: { stab: 20, slash: 8, crush: -4, magic: 2 }, def: { magic: 2 }, str: 15, look: { weapon: 'rune', blade: 4 } },
+  },
+  runeAxe: {
+    name: 'Rune axe', value: 3900, tool: { woodcutting: 40 }, examine: 'A rune axe. Chops very fast. Needs Woodcutting 40.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 5, att: { stab: -2, slash: 20, crush: 8 }, str: 15, look: { weapon: 'rune', blade: 5 } },
+  },
+  runePickaxe: {
+    name: 'Rune pickaxe', value: 3900, tool: { mining: 40 }, examine: 'A rune pickaxe. Mines very fast. Needs Mining 40.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'stab', speed: 5, att: { stab: 20, slash: -2, crush: 8 }, str: 15, look: { weapon: 'rune', blade: 5 } },
+  },
+  runeMace: {
+    name: 'Rune mace', value: 4388, examine: 'A flanged rune mace. Good against armour.',
+    equip: { slot: 'weapon', req: { attack: 40 }, type: 'crush', speed: 4, att: { stab: 8, slash: -2, crush: 30 }, def: { crush: 2 }, str: 23, look: { weapon: 'rune', blade: 5 } },
+  },
+  runeMedHelm: {
+    name: 'Rune med helm', value: 5850, examine: 'A medium-sized rune helmet.',
+    equip: { slot: 'head', req: { defence: 40 }, att: { magic: -1 }, def: { stab: 13, slash: 15, crush: 8, magic: -1, ranged: 13 }, look: { hat: 'helmet', hatColor: '#2a7a9a' } },
+  },
+  runeSword: {
+    name: 'Rune sword', value: 6338, examine: 'A well-made rune sword.',
+    equip: { slot: 'weapon', req: { attack: 40 }, type: 'slash', speed: 4, att: { stab: 20, slash: 26, crush: -2 }, def: { slash: 7, stab: 2 }, str: 23, look: { weapon: 'rune', blade: 7 } },
+  },
+  runeScimitar: {
+    name: 'Rune scimitar', value: 7800, examine: 'A curved rune sword. Fast and slashing.',
+    equip: { slot: 'weapon', req: { attack: 40 }, type: 'slash', speed: 4, att: { stab: 7, slash: 33, crush: -2 }, def: { slash: 2 }, str: 30, look: { weapon: 'rune', blade: 7 } },
+  },
+  runeLongsword: {
+    name: 'Rune longsword', value: 9750, examine: 'A long rune blade. Slower, but hits harder.',
+    equip: { slot: 'weapon', req: { attack: 40 }, type: 'slash', speed: 5, att: { stab: 20, slash: 36, crush: -2 }, def: { stab: 2, slash: 8 }, str: 36, look: { weapon: 'rune', blade: 9 } },
+  },
+  runeFullHelm: {
+    name: 'Rune full helm', value: 10725, examine: 'A full-face rune helmet.',
+    equip: { slot: 'head', req: { defence: 40 }, att: { magic: -3, ranged: -1 }, def: { stab: 20, slash: 23, crush: 15, ranged: 20, magic: -1 }, look: { hat: 'helmet', hatColor: '#2a7a9a' } },
+  },
+  runeSqShield: {
+    name: 'Rune sq shield', value: 11700, examine: 'A square rune shield.',
+    equip: { slot: 'shield', req: { defence: 40 }, att: { magic: -1 }, def: { stab: 26, slash: 30, crush: 23, ranged: 26, magic: -1 }, look: { shield: 'rune' } },
+  },
+  runeBattleaxe: {
+    name: 'Rune battleaxe', value: 12675, examine: 'A heavy double-headed rune axe.',
+    equip: { slot: 'weapon', req: { attack: 40 }, type: 'slash', speed: 6, att: { stab: -2, slash: 36, crush: 26 }, def: { slash: 2 }, str: 45, look: { weapon: 'rune', blade: 6 } },
+  },
+  runeChainbody: {
+    name: 'Rune chainbody', value: 14625, examine: 'A shirt of rune rings.',
+    equip: { slot: 'body', req: { defence: 40 }, att: { magic: -4 }, def: { stab: 36, slash: 51, crush: 58, ranged: 43, magic: -1 }, look: { tunic: '#2a7a9a' } },
+  },
+  runeKiteshield: {
+    name: 'Rune kiteshield', value: 16575, examine: 'A large rune shield, pointed at the bottom.',
+    equip: { slot: 'shield', req: { defence: 40 }, att: { magic: -8, ranged: -2 }, def: { stab: 30, slash: 36, crush: 33, ranged: 33, magic: -1 }, look: { shield: 'rune' } },
+  },
+  runePlatelegs: {
+    name: 'Rune platelegs', value: 19500, examine: 'Leg armour of rune plates.',
+    equip: { slot: 'legs', req: { defence: 40 }, att: { magic: -10, ranged: -4 }, def: { stab: 36, slash: 33, crush: 30, ranged: 33, magic: -4 }, look: { pants: '#2a7a9a' } },
+  },
+  runePlatebody: {
+    name: 'Rune platebody', value: 39000, examine: 'Solid rune plates. Heavy, but very tough.',
+    equip: { slot: 'body', req: { defence: 40 }, att: { magic: -15, ranged: -7 }, def: { stab: 68, slash: 64, crush: 38, ranged: 64, magic: -6 }, look: { tunic: '#2a7a9a' } },
+  },
+  runeBoots: {
+    name: 'Rune boots', value: 4095, examine: 'Sturdy rune boots.',
+    equip: { slot: 'feet', req: { defence: 40 }, att: { magic: -2 }, def: { stab: 10, slash: 10, crush: 10, ranged: 7, magic: -1 } },
+  },
+  runeGauntlets: {
+    name: 'Rune gauntlets', value: 3413, examine: 'Armoured rune gloves.',
+    equip: { slot: 'hands', req: { defence: 40 }, att: { stab: 3, slash: 3, crush: 3, magic: -2 }, def: { stab: 7, slash: 7, crush: 7, ranged: 7 } },
+  },
+  runeSpear: {
+    name: 'Rune spear', value: 5460, examine: 'A long rune-headed spear. Good at stabbing, slashing and smashing alike.',
+    equip: { slot: 'weapon', req: { attack: 40 }, type: 'stab', speed: 5, att: { stab: 30, slash: 30, crush: 30 }, def: { stab: 3, slash: 3, crush: 3 }, str: 30, look: { weapon: 'rune', blade: 8 } },
+  },
+  runeWarhammer: {
+    name: 'Rune warhammer', value: 13650, examine: 'A heavy rune warhammer. Slow, but it hits like a falling rock.',
+    equip: { slot: 'weapon', req: { attack: 40 }, type: 'crush', speed: 6, att: { stab: -4, slash: -4, crush: 41 }, str: 51, look: { weapon: 'rune', blade: 5 } },
+  },
+  rune2hSword: {
+    name: 'Rune 2h sword', value: 16380, examine: 'A huge rune sword, wielded with both hands.',
+    equip: { slot: 'weapon', req: { attack: 40 }, twoHanded: true, type: 'slash', speed: 7, att: { stab: -4, slash: 51, crush: 40 }, str: 58, look: { weapon: 'rune', blade: 10 } },
+  },
+  runeDart: {
+    name: 'Rune dart', stackable: true, value: 270, examine: 'A small rune dart. Throw it from your weapon slot.',
+    equip: { slot: 'weapon', req: { ranged: 40 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 20 }, rangedStr: 20, look: {  } },
+  },
+  runeThrowingKnife: {
+    name: 'Rune throwing knife', stackable: true, value: 413, examine: 'A balanced rune knife, made for throwing.',
+    equip: { slot: 'weapon', req: { ranged: 40 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 26 }, rangedStr: 26, look: {  } },
+  },
+  runeJavelin: {
+    name: 'Rune javelin', stackable: true, value: 615, examine: 'A rune-tipped javelin. Slow to throw, but it hits hard.',
+    equip: { slot: 'weapon', req: { ranged: 40 }, style: 'ranged', thrown: true, range: 6, type: 'ranged', speed: 5, att: { ranged: 33 }, rangedStr: 45, look: {  } },
+  },
+  runeDartTip: {
+    name: 'Rune dart tip', stackable: true, value: 135, examine: 'Fletch it with a feather to make a dart.',
+  },
+  runeJavelinHeads: {
+    name: 'Rune javelin heads', stackable: true, value: 270, examine: 'Fletch them onto arrow shafts to make javelins.',
+  },
   stardust: { name: 'Stardust', stackable: true, value: 0, examine: 'Glittering dust from a fallen star. Lyra the Stargazer trades it for rewards.' },
   coalBag: { name: 'Coal bag', stackable: true, value: 0, examine: 'A heavy sack from Lyra. Open it for a random 20 to 60 coal.' },
   gemBag: { name: 'Gem bag', stackable: true, value: 0, examine: 'A little pouch from Lyra. Open it for a handful of uncut gems.' },
@@ -698,7 +912,7 @@ for (const [skill, name, value] of [['attack', 'Attack', 60], ['strength', 'Stre
 // - coins: no limit
 // - weapons, armour, tools and potions: 1 (they don't stack)
 // The bank stacks everything without limit.
-const STACK_20 = /^(logs|oakLogs|copperOre|tinOre|ironOre|coal|silverOre|goldOre|mithrilOre|bronzeBar|ironBar|steelBar|mithrilBar|silverBar|goldBar|uncut[A-Z]\w*|sapphire|emerald|ruby|diamond|runeEssence|cowhide|wolfPelt|leather|hardLeather|raw[A-Z]\w*|burnt[A-Z]\w*)$/;
+const STACK_20 = /^(logs|oakLogs|copperOre|tinOre|ironOre|coal|silverOre|goldOre|mithrilOre|adamantiteOre|runiteOre|bronzeBar|ironBar|steelBar|mithrilBar|adamantBar|runeBar|silverBar|goldBar|uncut[A-Z]\w*|sapphire|emerald|ruby|diamond|runeEssence|cowhide|wolfPelt|leather|hardLeather|raw[A-Z]\w*|burnt[A-Z]\w*)$/;
 for (const [id, it] of Object.entries(ITEMS)) {
   if (STACK_20.test(id) || it.food) { it.stackable = true; it.stack = 20; }
   else if (it.stackable) it.stack = id === 'coins' ? Infinity : 999;

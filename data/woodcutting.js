@@ -16,6 +16,8 @@ export const TREES = {
 
 // Best first. An axe works from your bag or in your hand.
 export const AXES = [
+  { id: 'runeAxe', level: 40, bonus: 0.5 },
+  { id: 'adamantAxe', level: 30, bonus: 0.4 },
   { id: 'mithrilAxe', level: 20, bonus: 0.3 },
   { id: 'steelAxe', level: 10, bonus: 0.2 },
   { id: 'ironAxe', level: 5, bonus: 0.1 },

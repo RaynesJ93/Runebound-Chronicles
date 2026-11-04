@@ -1,3 +1,3 @@
 // Shown in Settings. Bump with every batch.
-export const GAME_VERSION = '0.31.0';
-export const BUILD_NAME = 'Shooting stars';
+export const GAME_VERSION = '0.32.0';
+export const BUILD_NAME = 'Adamant and rune';

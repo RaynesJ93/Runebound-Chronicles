@@ -15,6 +15,8 @@ const METAL = {
   iron: ['#4a4f56', '#7a828b', '#a8b0b8', '#dfe5ea'],
   steel: ['#5e666e', '#959ea6', '#c4ccd2', '#f2f6f8'],
   mithril: ['#1e2850', '#3a4a8a', '#6a7ed0', '#b8c8ff'],
+  adamant: ['#123018', '#2a5a30', '#4e8a50', '#a8d8a0'],
+  rune: ['#0e2a3a', '#1e5a78', '#3aa0c0', '#b0f0ff'],
 };
 const WOOD = ['#4a2c16', '#7a4a26', '#a0703f'];
 

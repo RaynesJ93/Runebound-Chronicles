@@ -50,7 +50,7 @@ function getLib() {
     rug: art('rug')?.[0] || S.rug(),
     plant: art('plant')?.[0] || S.plant(),
     gravestone: art('gravestone')?.[0] || S.gravestone(),
-    ore: { ...Object.fromEntries(['copper', 'tin', 'iron', 'coal', 'silver', 'gold', 'mithril', 'gem'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
+    ore: { ...Object.fromEntries(['copper', 'tin', 'iron', 'coal', 'silver', 'gold', 'mithril', 'gem', 'adamantite', 'runite'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
       essence: [S.essenceRock(1), S.essenceRock(2)] },
     // painted ore rocks replace the drawn ones where the atlas has them
     altar: Object.fromEntries(['air', 'mind', 'water'].map((v) => [v, art('altar:' + v) || [S.altar(v, 0), S.altar(v, 1)]])),
@@ -89,7 +89,7 @@ function getLib() {
     paintedPlayer: paintedFrames('player'),
     people: new Map(),
   };
-  for (const v of ['copper', 'tin', 'iron', 'coal', 'silver', 'gold', 'mithril', 'gem']) if (art('ore:' + v)) LIB.ore[v] = art('ore:' + v);
+  for (const v of ['copper', 'tin', 'iron', 'coal', 'silver', 'gold', 'mithril', 'gem', 'adamantite', 'runite']) if (art('ore:' + v)) LIB.ore[v] = art('ore:' + v);
   if (art('oreEssence')) LIB.ore.essence = art('oreEssence');
   return LIB;
 }
@@ -178,7 +178,7 @@ export function createWorldView(canvasEl, area) {
       }
       case 'crop': place(lib.crop[p.ripe ? 1 : lib.crop[2] && (p.x + p.y * 3) % 3 === 0 ? 2 : 0], f.x, f.y); break;
       case 'fence': place(fenceSprite(isFence.has(`${p.x + 1},${p.y}`), isFence.has(`${p.x},${p.y + 1}`), p.style || 'wood'), f.x, f.y - 2); break;
-      case 'lamp': place((area.id === 'mine' || area.id === 'depths' || area.id === 'hollow') && lib.mineLamp ? lib.mineLamp : lib.lamp, f.x, f.y); break;
+      case 'lamp': place((area.id === 'mine' || area.id === 'depths' || area.id === 'hollow' || area.id === 'forge') && lib.mineLamp ? lib.mineLamp : lib.lamp, f.x, f.y); break;
       case 'sign': place(lib.sign, f.x, f.y); break;
       case 'well': place(lib.well, f.x, f.y + 1); break;
       case 'stall': place(lib.stall, f.x, f.y); break;
@@ -268,12 +268,13 @@ export function createWorldView(canvasEl, area) {
     campfire: ['#ff9a3a', 64, true], cookingPit: ['#ff9a3a', 64, true], lamp: ['#ffd890', 52, true], campChest: ['#ffd890', 30, true],
     ore: ['#8ab8ff', 32], crystalShard: ['#8ab8ff', 16], glowShrooms: ['#5fd8ff', 18], glowFlowers: ['#c8b8ff', 12],
   };
+  const ORE_GLOW = { mithril: ['#6f8cff', 30], adamantite: ['#5fd07a', 30], runite: ['#5fd8ff', 34] };
   const lights = [];
   if (area.dark) {
     for (const p of area.props) {
       let def = LIGHT[p.type];
       if (p.type === 'altar') def = LIGHT.altar[p.variant];
-      if (p.type === 'ore' && p.variant === 'mithril') def = ['#6f8cff', 30];
+      if (p.type === 'ore' && ORE_GLOW[p.variant]) def = ORE_GLOW[p.variant];
       else if (p.type === 'ore' && p.variant !== 'essence') def = null;
       if (!def) continue;
       const cxw = (p.tiles.reduce((a, t) => a + t.x, 0) / p.tiles.length + 0.5) * TILE;
@@ -588,7 +589,7 @@ export function createWorldView(canvasEl, area) {
     if (area.dark) {
       const extra = [{ x: pObj.fx, y: pObj.fy - 8, r: 50 }];
       if (opts.star) extra.push({ x: (opts.star.x + 0.5) * TILE, y: (opts.star.y + 0.5) * TILE, r: 40 + opts.star.size * 4, colour: '#fff0b0' });
-      for (const o of foes) if (!o.enemy.dead && o.enemy.def.sprite === 'golem') extra.push({ x: o.fx, y: o.fy - 12, r: 22, colour: '#a8d0ff', glow: false });
+      for (const o of foes) if (!o.enemy.dead && (o.enemy.def.glow || o.enemy.def.sprite === 'golem')) extra.push({ x: o.fx, y: o.fy - 12, r: 22, colour: o.enemy.def.glow || '#a8d0ff', glow: false });
       drawDarkness(time, extra);
     }
 
