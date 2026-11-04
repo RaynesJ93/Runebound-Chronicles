@@ -323,7 +323,7 @@ function boot() {
       const group = CRAFT_GROUP[id] || (inventory.count('leather') ? 'leather' : inventory.count('hardLeather') ? 'hardLeather' : null);
       return () => sewMenu(group, x, y);
     }
-    if (ITEMS[id]?.noted) return () => hud.message(`These are bank notes. Put them in a bank, or the supply chest in Whispering Vale, to turn them back into ${itemName(ITEMS[id].noted).toLowerCase()}.`);
+    if (ITEMS[id]?.noted) return () => hud.message(`These are bank notes. Put them in a bank, or a supply chest (Copperdeep Mine or Whispering Vale), to turn them back into ${itemName(ITEMS[id].noted).toLowerCase()}.`);
     if (id === 'cowhide') return () => hud.message("Tan cowhides into leather at Hilda's tanning rack, by the cow field.");
     if (/^raw/.test(id)) return () => hud.message('Cook this on a fire: the cooking pit by the pond, or the goblins\' campfire.');
     if (CUT_FROM[id] || id === 'chisel') return () => cutMenu(x, y);
@@ -763,7 +763,7 @@ function boot() {
   const runAction = (name) => {
     combat.stop();
     if (name === 'smelt' || name === 'smith' || name === 'cook' || name === 'tan') { stationMenu(name); return; }
-    if (name === 'bank') hud.openTrade('bank', lastStation?.type === 'campChest' ? "Runekeepers' supply chest" : 'Bank of Brambleford');
+    if (name === 'bank') hud.openTrade('bank', lastStation?.type === 'campChest' ? lastStation.title || 'Supply chest' : 'Bank of Brambleford');
     else if (name === 'shop') hud.openTrade('shop', shop.name);
     refreshTrade();
   };

@@ -1,7 +1,7 @@
 // Copperdeep Mine — reached from the north-west road through Thornwood, now the rockslide
 // has been cleared.
 //
-// Entrance hall (south) with the miners' furnace and anvil; a west gallery of
+// Entrance hall (south) with the miners' furnace, anvil and supply chest (a bank); a west gallery of
 // copper and tin rocks; a deeper east gallery of iron, where tunnel goblins
 // have moved in. A tunnel at the back of the iron gallery leads down to
 // Copperdeep Depths (depths.js).
@@ -56,7 +56,9 @@ export function buildMine() {
   // ---- Entrance hall: the miners' camp ---------------------------------------------------
   prop('furnace', [{ x: 11, y: 19 }], { action: 'smelt', interact: ['A stone furnace, glowing hot.'] });
   prop('anvil', [{ x: 13, y: 19 }], { action: 'smith', interact: ['A heavy iron anvil.'] });
-  one('sign', 18, 22, { interact: ['COPPERDEEP MINE — open again!', 'West: copper and tin.  East: iron (beware the tunnel goblins).'] });
+  // The miners' supply chest, bound to the Bank of Brambleford like the runekeepers' one.
+  one('campChest', 15, 19, { action: 'bank', title: "Miners' supply chest", interact: ["The miners' supply chest. It's linked to the Bank of Brambleford, somehow."] });
+  one('sign', 18, 22, { interact: ['COPPERDEEP MINE — open again!', 'West: copper and tin.  East: iron (beware the tunnel goblins).', 'The supply chest by the anvil is linked to the bank.'] });
   for (const [x, y] of [[20, 19], [21, 20]]) one('crate', x, y);
   one('barrel', 10, 22);
   for (const [x, y] of [[12, 23], [19, 23]]) one('lamp', x, y);

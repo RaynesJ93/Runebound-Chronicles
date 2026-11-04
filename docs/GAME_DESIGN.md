@@ -372,7 +372,7 @@ Feathers and bronze arrowtips come from Pell; goblins also drop feathers. Longbo
 ### Mining and Smithing (shipped in v0.12.0)
 
 **Copperdeep Mine** opens at the end of Thornwood's north-west road now the rockslide is cleared. It has three parts:
-- an entrance hall with the miners' furnace and anvil, and Dorrin the Miner
+- an entrance hall with the miners' furnace and anvil, a supply chest linked to the bank (v0.29.1), and Dorrin the Miner
 - a west gallery of copper and tin
 - an east gallery of iron, where tunnel goblins (level 4) have moved in
 
