@@ -472,7 +472,12 @@ Rules for everything below: **every bar that needs coal takes exactly one** (iro
 
 - **Batch E — adamant and rune.** A new area beyond Copperdeep Hollow with adamantite rocks (Mining 70) and runite rocks (Mining 85), a tougher monster and a mini-boss. Adamant and rune bars (1 ore + 1 coal each), full sets, pickaxes, axes and arrows.
 - **Batch F — more to smith,** for every metal: boots and gauntlets (feet and hands have only leather now), two-handed swords, warhammers and spears, thrown weapons (darts, throwing knives, javelins), and nails or studs for studded leather.
-- **Batch G — mining features.** A coal bag and a gem bag (hold 27 outside the bag); **shooting stars** that crash somewhere in the world every so often and are mined for **stardust**; a stardust shop with the **prospector outfit** (hat, top, legs and boots, bonus Mining XP) and other rewards; gem rocks that only give gems.
+- **Batch G — mining features.** **Shooting stars** crash somewhere in the world every so often and are mined for **stardust**. Stardust is spent at a stardust shop on:
+  - the **prospector outfit** (hat, top, legs and boots, bonus Mining XP) — stardust only;
+  - **coal bags** — open one for a random 20–60 coal;
+  - **gem bags** — open one for a random handful of uncut gems, rolled at the usual rarities (sapphire most often, diamond rarely). Suggested 3–10 gems a bag, since gems are worth far more than coal.
+
+  Both bags are used up when opened (not storage bags). Also in this batch: gem rocks that only give gems.
 - **Batch H — smithing features.** A chance to save a bar at higher Smithing levels, and a quest for Dorrin to fix the mine's old forge, rewarding a smithing outfit (bonus Smithing XP).
 
 Suggested order: F, G, E, H.
