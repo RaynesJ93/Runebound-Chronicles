@@ -35,7 +35,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 3. ✅ Fishing and Cooking (food you make yourself) — v0.13.0
 4. ✅ Crafting (leather armour) — v0.15.0; ✅ lower levels and a hard leather set — v0.23.0; next: spinning, robes, jewellery, wolf leather; ✅ Runecrafting (air, mind and water runes) and Whispering Vale — v0.16.0
 5. Bank tabs and search
-6. Mining and Smithing, part 2 (see GAME_DESIGN): F more to smith (boots, gauntlets, 2h swords, warhammers, spears, thrown weapons, nails); G coal and gem bags, shooting stars and stardust, prospector outfit (stardust only), gem rocks; E adamant and rune (1 ore + 1 coal each); H save-a-bar and Dorrin's forge quest. No golden nuggets, no blast furnace.
+6. Mining and Smithing, part 2 (see GAME_DESIGN): F more to smith (boots, gauntlets, 2h swords, warhammers, spears, thrown weapons, nails); G shooting stars and stardust, a stardust shop selling the prospector outfit, coal bags (open for 20–60 coal) and gem bags (open for random uncut gems), gem rocks; E adamant and rune (1 ore + 1 coal each); H save-a-bar and Dorrin's forge quest. No golden nuggets, no blast furnace.
 
 ## Phase 3 — Quests and new regions (v0.3)
 
