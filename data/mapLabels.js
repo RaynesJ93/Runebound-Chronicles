@@ -5,7 +5,7 @@
 // Tiles are (x, y) in the area's own grid. Keep labels short.
 
 // The outdoor maps, in the order of the map's tabs.
-export const MAP_AREAS = ['brambleford', 'route1', 'mine', 'depths', 'hollow', 'vale'];
+export const MAP_AREAS = ['brambleford', 'route1', 'mine', 'depths', 'hollow', 'forge', 'vale'];
 
 // Short names for the tabs and for "To ..." exit labels.
 export const MAP_NAME = {
@@ -14,11 +14,12 @@ export const MAP_NAME = {
   mine: 'Copperdeep Mine',
   depths: 'Copperdeep Depths',
   hollow: 'Copperdeep Hollow',
+  forge: 'The Sunken Forge',
   vale: 'Whispering Vale',
 };
 
 // Even shorter names for the map's tabs.
-export const MAP_TAB = { brambleford: 'Brambleford', route1: 'Thornwood', mine: 'Mine', depths: 'Depths', hollow: 'Hollow', vale: 'Vale' };
+export const MAP_TAB = { brambleford: 'Brambleford', route1: 'Thornwood', mine: 'Mine', depths: 'Depths', hollow: 'Hollow', forge: 'Forge', vale: 'Vale' };
 
 // Rooms you walk into from another map. Inside them the map shows the
 // outside, with you at the door.
@@ -68,6 +69,13 @@ export const LABELS = {
     { x: 9, y: 3, text: 'North-west hollow' },
     { x: 36, y: 2, text: 'North-east hollow' },
     { x: 22, y: 23, text: 'Landing' },
+  ],
+  forge: [
+    { x: 23, y: 7, text: 'The great forge' },
+    { x: 9, y: 14, text: 'Adamantite' },
+    { x: 37, y: 15, text: 'Runite' },
+    { x: 39, y: 1, text: "Molten beast's lair" },
+    { x: 23, y: 26, text: 'Landing' },
   ],
   vale: [
     { x: 9, y: 2, text: 'Essence quarry' },

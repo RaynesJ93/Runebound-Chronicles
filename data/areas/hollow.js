@@ -3,7 +3,8 @@
 //
 // Pitch dark except for the miners' lamps and the faint blue glow of mithril.
 // A landing at the south (the way back up), a winding gallery of mithril and
-// coal, and night stalkers hunting in the dark.
+// coal, and night stalkers hunting in the dark. A tunnel at the top of the
+// north-east cavern leads down to the Sunken Forge (forge.js).
 
 import { GROUND } from '../../src/world/area.js';
 import { mulberry32 } from '../../src/core/rng.js';
@@ -49,6 +50,7 @@ export function buildHollow() {
   tunnel(27, 26, 32, 24);
   tunnel(35, 19, 35, 13);
   tunnel(22, 24, 23, 18);
+  for (let y = 1; y <= 4; y++) dig(37, y); // down to the Sunken Forge
 
   const prop = (type, tiles, extra = {}) => {
     props.push({ type, tiles, x: tiles[0].x, y: tiles[0].y, ...extra });
@@ -59,6 +61,8 @@ export function buildHollow() {
 
   // ---- The landing -----------------------------------------------------------------------
   one('caveMouth', 22, 32, { blocks: false });
+  one('caveMouth', 37, 1, { blocks: false });
+  one('sign', 38, 3, { interact: ['DOWN: THE SUNKEN FORGE', 'Adamantite and runite. The dwarves left in a hurry.'] });
   one('sign', 25, 29, { interact: ['COPPERDEEP HOLLOW', 'Mithril glows faintly in the dark. So do their eyes.', 'Up: back to the Depths.'] });
   for (const [x, y] of [[18, 27], [26, 26], [22, 16], [10, 21], [35, 22], [11, 9], [36, 9]]) one('lamp', x, y);
 
@@ -83,6 +87,7 @@ export function buildHollow() {
     spawn: { x: 22, y: 30, facing: Math.PI },
     exits: [
       { tiles: [{ x: 22, y: 32 }], to: 'depths', at: { x: 24, y: 3 }, facing: 0 },
+      { tiles: [{ x: 37, y: 1 }], to: 'forge', at: { x: 23, y: 34 }, facing: Math.PI },
     ],
     spawns: [
       { enemy: 'nightStalker', x: 10, y: 9 },

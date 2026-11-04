@@ -174,7 +174,51 @@ export const ENEMIES = {
       ],
       rare: { chance: 1 / 128, table: [{ item: 'warCharm', qty: 1 }, { item: 'uncutRuby', qty: 1 }, { item: 'uncutDiamond', qty: 1 }] },
     },
-  },  nightStalker: {
+  },  forgeGolem: {
+    id: 'forgeGolem', name: 'Forge golem', level: 48, hp: 70, sprite: 'golem', glow: '#ff8a3a',
+    attack: 40, strength: 44, defence: 40,
+    attackBonus: 15, strengthBonus: 15, defenceBonus: 40, maxHit: 8,
+    speed: 6, attackType: 'crush', aggressive: true, aggroRange: 3, wander: 3, leash: 7, respawn: 50,
+    look: {},
+    examine: 'Iron and slag, still hot from the forge. The dwarves built it to guard their work.',
+    loot: {
+      always: [{ item: 'bones', qty: 1 }],
+      main: [
+        { item: 'coins', min: 60, max: 220, chance: 1 / 3 },
+        { item: 'coal', min: 3, max: 6, chance: 1 / 4 },
+        { item: 'adamantiteOre', qty: 1, chance: 1 / 8 },
+        { item: 'adamantBar', qty: 1, chance: 1 / 16 },
+        { item: 'mithrilBar', min: 1, max: 2, chance: 1 / 10 },
+        { item: 'adamantArrowtips', min: 5, max: 15, chance: 1 / 16 },
+        { item: 'uncutEmerald', qty: 1, chance: 1 / 24 },
+        { item: 'adamantMedHelm', qty: 1, chance: 1 / 48 },
+      ],
+      rare: { chance: 1 / 128, table: [{ item: 'runiteOre', qty: 1 }, { item: 'uncutRuby', qty: 1 }, { item: 'adamantKiteshield', qty: 1 }] },
+    },
+  },
+  moltenBeast: {
+    id: 'moltenBeast', name: 'Molten beast', level: 70, hp: 160, sprite: 'wolf', boss: true, glow: '#ff6a2a',
+    attack: 62, strength: 64, defence: 55,
+    attackBonus: 25, strengthBonus: 25, defenceBonus: 45, maxHit: 13,
+    speed: 5, attackType: 'slash', aggressive: true, aggroRange: 4, wander: 2, leash: 6, respawn: 300,
+    look: { fur: '#2a1a14', dark: '#120a08', light: '#ff8a3a', eyes: '#ffd23a', big: true },
+    examine: 'A great beast with a hide like cooling lava. The heat coming off it is unbearable.',
+    loot: {
+      always: [{ item: 'bones', qty: 1 }, { item: 'coins', min: 400, max: 1200 }, { item: 'coal', min: 8, max: 16 }],
+      main: [
+        { item: 'runiteOre', min: 1, max: 3, chance: 1 / 3 },
+        { item: 'adamantBar', min: 2, max: 4, chance: 1 / 3 },
+        { item: 'runeBar', qty: 1, chance: 1 / 6 },
+        { item: 'runeArrowtips', min: 10, max: 30, chance: 1 / 8 },
+      ],
+      each: [
+        { item: 'uncutRuby', qty: 1, chance: 1 / 6 },
+        { item: 'uncutDiamond', qty: 1, chance: 1 / 12 },
+      ],
+      rare: { chance: 1 / 16, table: [{ item: 'runeFullHelm', qty: 1 }, { item: 'runeScimitar', qty: 1 }, { item: 'runeKiteshield', qty: 1 }, { item: 'rune2hSword', qty: 1 }] },
+    },
+  },
+  nightStalker: {
     id: 'nightStalker', name: 'Night stalker', level: 35, hp: 45,
     attack: 30, strength: 28, defence: 24,
     attackBonus: 10, strengthBonus: 8, defenceBonus: 12, maxHit: 6,

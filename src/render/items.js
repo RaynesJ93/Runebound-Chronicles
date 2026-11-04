@@ -610,6 +610,17 @@ for (const part of ['Dagger', 'Axe', 'Pickaxe', 'Mace', 'MedHelm', 'Sword', 'Sci
     if (grey) { const l = (d[i] + d[i + 1] + d[i + 2]) / 765; d[i] = 26 + 150 * l; d[i + 1] = 34 + 170 * l; d[i + 2] = 80 + 175 * l; }
   });
 }
+for (const [metal, [r0, g0, b0, kr, kg, kb]] of Object.entries({ adamant: [18, 48, 24, 140, 190, 140], rune: [14, 42, 58, 160, 220, 200] })) {
+  for (const part of ['Dagger', 'Axe', 'Pickaxe', 'Mace', 'MedHelm', 'Sword', 'Scimitar', 'Longsword', 'FullHelm', 'SqShield',
+    'Battleaxe', 'Chainbody', 'Kiteshield', 'Platelegs', 'Platebody', 'Arrowtips', 'Arrow', 'Bar']) {
+    DRAW[`${metal}${part}`] ||= recolour(`iron${part}`, (d, i) => {
+      if (Math.max(d[i], d[i + 1], d[i + 2]) - Math.min(d[i], d[i + 1], d[i + 2]) >= 40) return;
+      const l = (d[i] + d[i + 1] + d[i + 2]) / 765; d[i] = r0 + kr * l; d[i + 1] = g0 + kg * l; d[i + 2] = b0 + kb * l;
+    });
+  }
+}
+DRAW.adamantiteOre ||= (b) => DRAW.adamantBar(b);
+DRAW.runiteOre ||= (b) => DRAW.runeBar(b);
 DRAW.coal ||= recolour('ironOre', (d, i) => { const l = (d[i] + d[i + 1] + d[i + 2]) / 3; d[i] = d[i + 1] = l * 0.3; d[i + 2] = l * 0.36; });
 
 // Silver, gold, gems and jewellery, drawn simply (the painted art covers them normally).
@@ -646,7 +657,7 @@ for (const metal of ['silver', 'gold']) {
 
 // Batch F pieces, drawn from the nearest existing drawing.
 {
-  const TONES = { bronze: ['#6e4320', '#c07a38', '#f2c48a'], iron: ['#4a4f56', '#9aa2aa', '#e2e8ec'], steel: ['#5e666e', '#c4ccd2', '#ffffff'], mithril: ['#1e2850', '#4a5a9a', '#a8b8f4'] };
+  const TONES = { bronze: ['#6e4320', '#c07a38', '#f2c48a'], iron: ['#4a4f56', '#9aa2aa', '#e2e8ec'], steel: ['#5e666e', '#c4ccd2', '#ffffff'], mithril: ['#1e2850', '#4a5a9a', '#a8b8f4'], adamant: ['#123018', '#4e8a50', '#a8d8a0'], rune: ['#0e2a3a', '#3aa0c0', '#b0f0ff'] };
   for (const [m, tones] of Object.entries(TONES)) {
     const [d0, m0, l0] = tones.map(hex);
     const inMetal = (base) => recolour(base, (d, i) => { const l = (d[i] + d[i + 1] + d[i + 2]) / 765; const c = l < 0.35 ? d0 : l < 0.65 ? m0 : l0; d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; });

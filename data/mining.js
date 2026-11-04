@@ -22,6 +22,10 @@ export const ROCKS = {
     examine: 'A rock glinting with veins of gold.' },
   mithril: { name: 'Mithril rock', level: 55, xp: 80, ore: 'mithrilOre', chance: 0.16, lasts: [2, 8], respawn: [80, 130],
     examine: 'A rock shot through with faintly glowing blue mithril.' },
+  adamantite: { name: 'Adamantite rock', level: 70, xp: 95, ore: 'adamantiteOre', chance: 0.12, lasts: [2, 6], respawn: [150, 240],
+    examine: 'A rock veined with dark green adamantite.' },
+  runite: { name: 'Runite rock', level: 85, xp: 125, ore: 'runiteOre', chance: 0.08, lasts: [1, 3], respawn: [300, 500],
+    examine: 'A rock with seams of glowing blue runite. Very rare.' },
   // Gem rocks give an uncut gem every time (rolled like the gems you find while mining).
   gem: { name: 'Gem rock', level: 40, xp: 65, ore: 'uncutSapphire', gems: true, chance: 0.2, deplete: 1, respawn: [60, 100],
     examine: 'A rock studded with glittering crystals of every colour.' },
@@ -36,6 +40,8 @@ for (const [size, level, xp] of [[1, 10, 12], [2, 20, 22], [3, 30, 26], [4, 40, 
 
 // Best first. A pickaxe works from your bag or in your hand.
 export const PICKAXES = [
+  { id: 'runePickaxe', level: 40, bonus: 0.5 },
+  { id: 'adamantPickaxe', level: 30, bonus: 0.4 },
   { id: 'mithrilPickaxe', level: 20, bonus: 0.3 },
   { id: 'steelPickaxe', level: 10, bonus: 0.2 },
   { id: 'ironPickaxe', level: 5, bonus: 0.1 },

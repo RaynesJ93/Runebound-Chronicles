@@ -470,7 +470,15 @@ The **mithril pickaxe** (Mining 20) and **mithril axe** (Woodcutting 20) work 30
 
 Rules for everything below: **every bar that needs coal takes exactly one** (iron ore + 1 coal = steel, mithril ore + 1 coal = mithril, adamantite ore + 1 coal = adamant, runite ore + 1 coal = rune). **No golden nuggets** and **no blast furnace**. The prospector outfit can **only** be bought with stardust.
 
-- **Batch E — adamant and rune.** A new area beyond Copperdeep Hollow with adamantite rocks (Mining 70) and runite rocks (Mining 85), a tougher monster and a mini-boss. Adamant and rune bars (1 ore + 1 coal each), full sets, pickaxes, axes and arrows.
+- **Batch E — adamant, rune and the Sunken Forge (v0.32.0).**
+  - **The Sunken Forge** lies down a tunnel at the top of Copperdeep Hollow's north-east cavern: an old dwarven forge hall, pitch dark but for braziers and the glow of the ore. It has a supply chest (your bank), adamantite, runite and coal rocks, and the dwarves' great furnace, which has gone cold (fixing it is Dorrin's quest in Batch H).
+  - **Forge golems** (level 48, slow, hit hard, aggressive) guard the halls. The **Molten beast** (level 70 mini-boss, respawns after 3 minutes) lairs in the deepest hall.
+  - **Rocks:** adamantite (Mining 70, 95 XP, 2–6 ores before it empties) and runite (Mining 85, 125 XP, 1–3 ores, slow to refill).
+  - **Bars:** adamant (Smithing 70) and rune (Smithing 85), each **1 ore + 1 coal**, never fail (XP 37.5 and 50).
+  - **Items:** everything bronze to mithril has, in adamant (bronze level + 70) and rune (bronze level + 85, capped at 99): weapons, armour, boots, gauntlets, 2h swords, warhammers, spears, arrowtips, dart tips, javelin heads and throwing knives. XP per bar 62.5 (adamant) and 75 (rune). Adamant gear needs Attack/Defence/Ranged 30, rune 40.
+  - **Tools:** adamant pickaxe and axe (level 30, 40% faster than bronze), rune pickaxe and axe (level 40, 50% faster). Not sold anywhere: smith them or find them.
+  - **Fletching:** adamant arrows 60 and rune arrows 75 (ranged strength 31 and 49); adamant / rune darts 67 / 81, javelins 62 / 77.
+  - **Art:** adamant is the steel art recoloured dark green, rune a deep cyan; forge golems are the essence golem in dark iron with molten cracks; the Molten beast is the cave beast in charcoal and lava.
 - **Batch F — more to smith (v0.30.0).** For bronze, iron, steel and mithril. Levels below are bronze; iron is +15, steel +30, mithril +50. XP per bar as for the other anvil items (12.5 / 25 / 37.5 / 50).
 
   | Item | Bronze level | Bars | Makes | Notes |

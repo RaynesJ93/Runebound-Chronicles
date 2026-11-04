@@ -35,7 +35,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 3. ✅ Fishing and Cooking (food you make yourself) — v0.13.0
 4. ✅ Crafting (leather armour) — v0.15.0; ✅ lower levels and a hard leather set — v0.23.0; next: spinning, robes, jewellery, wolf leather; ✅ Runecrafting (air, mind and water runes) and Whispering Vale — v0.16.0
 5. Bank tabs and search
-6. Mining and Smithing, part 2 (see GAME_DESIGN): ✅ F more to smith — v0.30.0 (boots, gauntlets, 2h swords, warhammers, spears, thrown weapons, nails); ✅ G shooting stars and stardust — v0.31.0: a stardust shop selling the prospector outfit, coal bags (open for 20–60 coal) and gem bags (open for random uncut gems), gem rocks; E adamant and rune (1 ore + 1 coal each); H save-a-bar and Dorrin's forge quest. No golden nuggets, no blast furnace.
+6. Mining and Smithing, part 2 (see GAME_DESIGN): ✅ F more to smith — v0.30.0 (boots, gauntlets, 2h swords, warhammers, spears, thrown weapons, nails); ✅ G shooting stars and stardust — v0.31.0: a stardust shop selling the prospector outfit, coal bags (open for 20–60 coal) and gem bags (open for random uncut gems), gem rocks; ✅ E adamant, rune and the Sunken Forge — v0.32.0; H save-a-bar and Dorrin's forge quest. No golden nuggets, no blast furnace.
 
 ## Phase 3 — Quests and new regions (v0.3)
 
@@ -63,6 +63,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Date | Change |
 | --- | --- |
+| 4 Nov 2026 | v0.32.0: Batch E — the Sunken Forge, an old dwarven forge hall below Copperdeep Hollow, with a supply chest, working dwarven anvils, a cold great furnace (for Dorrin's quest later), forge golems (level 48) and the Molten beast mini-boss (level 70). Adamantite (Mining 70) and runite (Mining 85) rocks; adamant and rune bars (Smithing 70 and 85, 1 ore + 1 coal); everything bronze–mithril has, in adamant and rune (up to Smithing 99); adamant and rune pickaxes and axes; adamant and rune arrows, darts and javelins. Map tab for the Forge. |
 | 4 Nov 2026 | v0.31.0: Batch G — shooting stars crash at 20 spots across Brambleford, Thornwood and Whispering Vale (first one 2–5 minutes in, then every 10–20 minutes of play); mine them for stardust (sizes 1–5, Mining 10–50, shrinking every 25 dust). Lyra the Stargazer by the village square says where the star is and sells, for stardust only, the prospector outfit (+6% Mining XP for the full set), coal bags (20–60 coal) and gem bags (3–10 uncut gems). Gem rocks (Mining 40) in Copperdeep Depths and Hollow. Stars show on the map, with a ★ on their area's tab. |
 | 4 Nov 2026 | v0.30.0: Batch F — more to smith, for bronze, iron, steel and mithril: boots and gauntlets, spears, warhammers and two-handed swords (which take your shield off), and thrown weapons — darts (smith dart tips, fletch with feathers), throwing knives and javelins (smith javelin heads, fletch onto arrow shafts) — that sit in the weapon slot and use one per throw. Steel studs (Smithing 36) and studded body and chaps (Crafting 26 and 29). All with painted art made from the existing art. |
 | 4 Nov 2026 | v0.29.5: mithril bars take 1 coal instead of 2 — every bar that needs coal now takes just one. Planned Mining and Smithing part 2 (batches E–H) added to the design doc and roadmap. |

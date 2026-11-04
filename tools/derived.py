@@ -554,6 +554,56 @@ CANVAS_DARK = ['#2a2014', '#5a4630', '#86704e', '#bca880']
 BOOT_LEATHER = ['#1e1410', '#4a3022', '#74503a', '#a8805e']
 
 
+# ---- Batch E: adamant, rune and the Sunken Forge's monsters ----------------------
+
+ADAMANT = ['#0e2614', '#24502a', '#4a8a4e', '#b0e0a8']
+RUNE = ['#0a2232', '#18546e', '#34a0c4', '#b8f4ff']
+
+
+def metal_ramp(pal):
+    """Like mithril(): the grey metal takes a ramp by brightness; wood and leather stay."""
+    def fn(im, get=None):
+        rgba = np.array(im.convert('RGBA')).astype(np.float32)
+        hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.float32)
+        h, s = hsv[..., 0], hsv[..., 1]
+        m = rgba[..., 3] > 0
+        metal = m & ((s < 70) | ((h > 120) & (h < 190) & (s < 110)))
+        if not metal.any(): return im.copy()
+        l = lum(rgba[..., :3]) / 255
+        lo, hi = np.percentile(l[metal], 3), np.percentile(l[metal], 99)
+        t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+        out = rgba.copy()
+        out[metal, :3] = J.ramp(pal, t)[metal]
+        return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+    return fn
+
+
+def molten(body, glow, glow_test, lo_t=0.45, span=0.6):
+    """Recolour a creature: its glowing parts (picked by glow_test on HSV) take
+    the glow ramp, everything else the body ramp."""
+    def fn(im, get=None):
+        rgba = np.array(im.convert('RGBA')).astype(np.float32)
+        hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.float32)
+        m = rgba[..., 3] > 0
+        g = m & glow_test(hsv)
+        l = lum(rgba[..., :3]) / 255
+        lo, hi = np.percentile(l[m], 3), np.percentile(l[m], 99)
+        t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+        out = rgba.copy()
+        out[m, :3] = J.ramp(body, t)[m]
+        out[g, :3] = J.ramp(glow, np.clip(lo_t + t * span, 0, 1))[g]
+        return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+    return fn
+
+
+IRON_BODY = ['#141214', '#2e2a2c', '#58504c', '#8a7c70']
+LAVA = ['#6a1a06', '#d4501a', '#ff9a3a', '#fff0a0']
+CHARCOAL = ['#060404', '#16100e', '#2c201c', '#4a342c']
+# the essence golem's blue crystal glow; the cave beast's lightest fur (muzzle, claws, belly)
+golem_glow = lambda hsv: (hsv[..., 0] > 110) & (hsv[..., 0] < 190) & (hsv[..., 1] > 60) & (hsv[..., 2] > 120)
+beast_glow = lambda hsv: hsv[..., 2] > 135
+
+
 # ---- What to make ------------------------------------------------------------------
 # new item: icon=(source item, fn), gear=(source item, fn) or None,
 #           small=(source item, fn), or None to shrink the new 32 px icon down.
@@ -631,6 +681,13 @@ for part in STEEL:
     DERIVED[f'mithril{part}'] = dict(icon=(f'steel{part}', mithril), small=(f'steel{part}', mithril), gear=(f'steel{part}', mithril))
 DERIVED['mithrilOre'] = dict(icon=('ironOre', lum_to(MITHRIL)), small=('ironOre', lum_to(MITHRIL)))
 
+# Adamant and rune: every steel item, recoloured, plus the ores.
+for part in STEEL:
+    DERIVED[f'adamant{part}'] = dict(icon=(f'steel{part}', metal_ramp(ADAMANT)), small=(f'steel{part}', metal_ramp(ADAMANT)), gear=(f'steel{part}', metal_ramp(ADAMANT)))
+    DERIVED[f'rune{part}'] = dict(icon=(f'steel{part}', metal_ramp(RUNE)), small=(f'steel{part}', metal_ramp(RUNE)), gear=(f'steel{part}', metal_ramp(RUNE)))
+DERIVED['adamantiteOre'] = dict(icon=('ironOre', lum_to(ADAMANT)), small=('ironOre', lum_to(ADAMANT)))
+DERIVED['runiteOre'] = dict(icon=('ironOre', lum_to(RUNE)), small=('ironOre', lum_to(RUNE)))
+
 # Steel studs and studded leather (after steel, so the studs are steel-coloured).
 DERIVED['steelStuds'] = dict(icon=('ironArrowtips', studs_of('icon:steelSqShield')))
 DERIVED['studdedBody'] = dict(icon=('leatherBody', studded_with('icon:steelSqShield')), small=('leatherBody', studded_with('icon:steelSqShield')), gear=('leatherBody', studded_with('icon:steelSqShield')))
@@ -656,6 +713,24 @@ EXTRA = [
     ('tool:mithrilAxe', 'tool:steelAxe', mithril),
     ('tool:mithrilPickaxe', 'tool:steelPickaxe', mithril),
     ('ore:gem', 'ore:copper', gem_veins),
+    ('ore:adamantite', 'ore:copper', veins_to(ADAMANT)),
+    ('ore:runite', 'ore:copper', veins_to(RUNE)),
+    ('tool:adamantAxe', 'tool:steelAxe', metal_ramp(ADAMANT)),
+    ('tool:adamantPickaxe', 'tool:steelPickaxe', metal_ramp(ADAMANT)),
+    ('tool:runeAxe', 'tool:steelAxe', metal_ramp(RUNE)),
+    ('tool:runePickaxe', 'tool:steelPickaxe', metal_ramp(RUNE)),
+    ('chars:enemy:forgeGolem', 'chars:enemy:essenceGolem', molten(IRON_BODY, LAVA, golem_glow)),
+    ('chars:enemy:moltenBeast', 'chars:enemy:caveBeast', molten(CHARCOAL, LAVA, beast_glow, 0.2, 0.55)),
+    ('anim:forgeGolem:attack:down', 'anim:essenceGolem:attack:down', molten(IRON_BODY, LAVA, golem_glow)),
+    ('anim:moltenBeast:attack:down', 'anim:caveBeast:attack:down', molten(CHARCOAL, LAVA, beast_glow, 0.2, 0.55)),
+    ('anim:forgeGolem:attack:up', 'anim:essenceGolem:attack:up', molten(IRON_BODY, LAVA, golem_glow)),
+    ('anim:moltenBeast:attack:up', 'anim:caveBeast:attack:up', molten(CHARCOAL, LAVA, beast_glow, 0.2, 0.55)),
+    ('anim:forgeGolem:attack:left', 'anim:essenceGolem:attack:left', molten(IRON_BODY, LAVA, golem_glow)),
+    ('anim:moltenBeast:attack:left', 'anim:caveBeast:attack:left', molten(CHARCOAL, LAVA, beast_glow, 0.2, 0.55)),
+    ('anim:forgeGolem:attack:right', 'anim:essenceGolem:attack:right', molten(IRON_BODY, LAVA, golem_glow)),
+    ('anim:moltenBeast:attack:right', 'anim:caveBeast:attack:right', molten(CHARCOAL, LAVA, beast_glow, 0.2, 0.55)),
+    ('anim:forgeGolem:fall', 'anim:essenceGolem:fall', molten(IRON_BODY, LAVA, golem_glow)),
+    ('anim:forgeGolem:hit', 'anim:essenceGolem:hit', molten(IRON_BODY, LAVA, golem_glow)),
 ]
 
 # Side-on shields stay as they are (a kite shape only reads from the front or back).
