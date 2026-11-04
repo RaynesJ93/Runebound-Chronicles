@@ -380,7 +380,7 @@ export const NPCS = [
         },
         smith: {
           say: ['Take one copper ore and one tin ore to the furnace there, and out comes a bronze bar.',
-            'Iron bars need Smithing 15, and half the time the ore\'s too impure. Gets better as you learn.',
+            'Iron bars need Smithing 15. One ore makes one bar.',
             'Then take your bars to the anvil with a hammer. Daggers, swords, helmets, shields, even arrowtips.'],
           next: 'menu',
         },
