@@ -13,7 +13,7 @@ import { ROCKS, PICKAXES } from '../../data/mining.js';
 import { SMELTING, SMITHING } from '../../data/smithing.js';
 import { SPOTS } from '../../data/fishing.js';
 import { COOKING } from '../../data/cooking.js';
-import { TANNING, SEWING, CUTTING, JEWELLERY } from '../../data/crafting.js';
+import { TANNING, SEWING, CUTTING, JEWELLERY, STUDDING } from '../../data/crafting.js';
 import { ALTARS } from '../../data/runecrafting.js';
 import { SPELLS } from '../../data/spells.js';
 import { SKILLS, XP_RATE } from './skills.js';
@@ -65,7 +65,7 @@ const BUILD = {
     { title: 'Trees', rows: byLevel(Object.values(TREES).map((t) => ({ level: t.level, icon: t.log, name: t.name, sub: `${name(t.log)} · ${xp(t.xp)}` }))) },
     { title: 'Axes', rows: tools(AXES, 'Chops') },
   ],
-  fletching: () => [{ title: 'Bows and arrows', rows: recipes(FLETCHING, (r) => {
+  fletching: () => [{ title: 'Bows, arrows, darts and javelins', rows: recipes(FLETCHING, (r) => {
     const n = Object.values(r.gives)[0];
     return n > 1 ? `makes ${n}` : '';
   }) }],
@@ -90,6 +90,7 @@ const BUILD = {
     { title: 'Tanning (tanning rack)', rows: recipes(TANNING) },
     { title: 'Leather (needle and thread)', rows: recipes(SEWING.filter((r) => r.group === 'leather')) },
     { title: 'Hard leather (needle and thread)', rows: recipes(SEWING.filter((r) => r.group === 'hardLeather')) },
+    { title: 'Studded leather (steel studs)', rows: recipes(STUDDING) },
     { title: 'Gem cutting (chisel)', rows: recipes(CUTTING) },
     { title: 'Silver jewellery (furnace and mould)', rows: recipes(JEWELLERY.filter((r) => r.metal === 'silverBar')) },
     { title: 'Gold jewellery (furnace and mould)', rows: recipes(JEWELLERY.filter((r) => r.metal === 'goldBar')) },

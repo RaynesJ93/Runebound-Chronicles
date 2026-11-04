@@ -289,6 +289,182 @@ def same(im, get=None):
     return im.copy()
 
 
+# ---- Batch F shapes (boots, gauntlets, spears, warhammers, 2h swords, thrown
+# weapons, studs and studded leather) --------------------------------------------
+
+def _ramp_of(ref):
+    r = np.array(ref.convert('RGBA')).astype(float)
+    rc = r[r[..., 3] > 0][:, :3]
+    return rc[np.argsort(lum(rc))]
+
+
+def _axis2(w, h):
+    yy, xx = np.mgrid[0:h, 0:w]
+    return (xx + (h - 1 - yy)) / (w + h - 2), np.abs(xx - (h - 1 - yy)) / np.sqrt(2)
+
+
+def metal_parts(ref_key):
+    """Recolour only the grey (metal) parts to a metal's colours; wood stays."""
+    def fn(im, get):
+        rc = _ramp_of(get(ref_key)[0][1])
+        h = np.array(im.convert('RGBA')).astype(float)
+        hsv = np.array(im.convert('RGB').convert('HSV')).astype(float)
+        metal = (h[..., 3] > 0) & (hsv[..., 1] < 70)
+        v = lum(h[..., :3])[metal]
+        ranks = np.argsort(np.argsort(v)) / max(1, len(v) - 1)
+        out = h.copy()
+        out[metal, :3] = rc[(ranks * (len(rc) - 1)).round().astype(int)]
+        return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+    return fn
+
+
+def spear_of(dagger_key):
+    """A long haft corner to corner (in the pickaxe's wood), with the dagger's blade for a point."""
+    def fn(pick, get):
+        dagger = get(dagger_key)[0][1]
+        w, h = pick.size
+        p = np.array(pick.convert('RGBA'))
+        al, off = _axis2(w, h)
+        hsv = np.array(pick.convert('RGB').convert('HSV')).astype(float)
+        wood = (p[..., 3] > 0) & (hsv[..., 1] > 80) & (hsv[..., 0] < 40)
+        cols = p[wood][:, :3]
+        cols = cols[np.argsort(lum(cols.astype(float)))]
+        out = np.zeros_like(p)
+        m = (off < 1.25) & (al < 0.74) & (al > 0.04)
+        yy, xx = np.mgrid[0:h, 0:w]
+        t = np.clip(0.5 - (xx - (h - 1 - yy)) * 0.35, 0, 1)
+        out[m, :3] = cols[(t[m] * (len(cols) - 1)).astype(int)]
+        out[m, 3] = 255
+        o = Image.fromarray(out, 'RGBA')
+        d = np.array(dagger.convert('RGBA'))
+        dal, _ = _axis2(*dagger.size)
+        d[dal < 0.5] = 0
+        b = Image.fromarray(d, 'RGBA')
+        b = b.crop(b.getbbox())
+        b = b.resize((round(b.width * 0.78), round(b.height * 0.78)), Image.NEAREST)
+        o.alpha_composite(b, (w - b.width - 1, 1))
+        return o
+    return fn
+
+
+def two_hander(sword, get=None):
+    """Sword -> 2h sword: bigger and broader, with a longer blade."""
+    w, h = sword.size
+    big = sword.resize((round(w * 1.3), round(h * 1.3)), Image.NEAREST)
+    big = big.crop((0, big.height - h, w, big.height))  # keep the grip corner
+    return longsword(big, k=1.35, fit=0.86)
+
+
+def _fan(im, n, scale, step):
+    w, h = im.size
+    c = im.crop(im.getbbox())
+    c = c.resize((max(1, round(c.width * scale)), max(1, round(c.height * scale))), Image.NEAREST)
+    o = Image.new('RGBA', (w, h))
+    x0 = (w - c.width - abs(step[0]) * (n - 1)) // 2
+    y0 = (h - c.height - abs(step[1]) * (n - 1)) // 2
+    for k in range(n): o.alpha_composite(c, (x0 + step[0] * k, y0 + step[1] * k))
+    return o
+
+
+def knives(dagger, get=None):
+    """Three small daggers side by side."""
+    return _fan(dagger, 3, 0.56, (7, 7))
+
+
+def javelins_of(dagger_key):
+    def fn(pick, get):
+        one = spear_of(dagger_key)(pick, get)
+        w, h = pick.size
+        small = one.resize((round(w * 0.85), round(h * 0.85)), Image.NEAREST)
+        o = Image.new('RGBA', (w, h))
+        o.alpha_composite(small, (0, h - small.height - 4))
+        o.alpha_composite(small, (4, h - small.height))
+        return o
+    return fn
+
+
+def small_heads(im, get=None):
+    """Arrowtips -> a smaller handful (dart tips)."""
+    return _fan(im, 1, 0.72, (0, 0))
+
+
+def blade_tips(dagger, get=None):
+    """Two loose spear points (javelin heads)."""
+    d = np.array(dagger.convert('RGBA'))
+    dal, _ = _axis2(*dagger.size)
+    d[dal < 0.62] = 0
+    b = Image.fromarray(d, 'RGBA')
+    b = b.crop(b.getbbox())
+    o = Image.new('RGBA', dagger.size)
+    for k in range(2): o.alpha_composite(b, (6 + k * 7, 12 + k * 4))
+    return o
+
+
+def darts_of(ref_key):
+    """Little darts, drawn big and shrunk like the painted icons: a metal point
+    and barrel with feather fins at the back; tips to the top-right."""
+    from PIL import ImageDraw
+    def fn(im, get):
+        mc = _ramp_of(get(ref_key)[0][1])
+        fc = _ramp_of(get('icon:feather')[0][1])
+        pick = lambda cs, t: tuple(int(v) for v in cs[int((len(cs) - 1) * t)])
+        S = 128
+        big = Image.new('RGBA', (S, S))
+        d = ImageDraw.Draw(big)
+        u = np.array([1, -1]) / np.sqrt(2)   # back -> tip
+        n = np.array([1, 1]) / np.sqrt(2)    # across the dart
+        P = lambda c: tuple(float(v) for v in c)
+        for k in range(3):
+            back = np.array([18.0, 96.0]) + n * (k * 26 - 22) + u * (k * 6)
+            L = 74
+            tip = back + u * L
+            # fins: a V-shaped tail, one fin each side of the barrel
+            fin = lambda side, t: d.polygon([P(back + u * 20), P(back + n * side * 15 - u * 2), P(back + u * 2)], fill=pick(fc, t))
+            fin(-1, 0.55); fin(1, 0.25)
+            d.line([P(back - u * 2), P(back + u * 20)], fill=pick(fc, 0.1), width=4)
+            # barrel and point
+            b0, b1 = back + u * 14, back + u * 52
+            d.polygon([P(b0 - n * 7), P(b1 - n * 8), P(b1 + n * 8), P(b0 + n * 7)], fill=pick(mc, 0.4))
+            d.polygon([P(b0 - n * 7), P(b1 - n * 8), P(b1), P(b0)], fill=pick(mc, 0.78))
+            d.polygon([P(b1 - n * 8), P(tip), P(b1 + n * 8)], fill=pick(mc, 0.6))
+            d.polygon([P(b1 - n * 8), P(tip), P(b1)], fill=pick(mc, 0.95))
+        return shrink(big, w=30, h=30)
+    return fn
+
+
+def studs_of(ref_key):
+    def fn(im, get):
+        mc = _ramp_of(get(ref_key)[0][1])
+        size = 32
+        yy, xx = np.mgrid[0:size, 0:size] + 0.5
+        rgb = np.zeros((size, size, 3)); a = np.zeros((size, size), np.uint8)
+        for cx, cy in ((10, 11), (21, 9), (12, 22), (23, 21), (16.5, 16)):
+            m = np.hypot(xx - cx, yy - cy) < 4.2
+            t = np.clip(0.85 - ((xx - cx + 1.6) ** 2 + (yy - cy + 1.6) ** 2) / 30, 0, 1)
+            rgb[m] = mc[(t[m] * (len(mc) - 1)).astype(int)]; a[m] = 255
+        return J.outline(rgb, a)
+    return fn
+
+
+def studded_with(ref_key):
+    """Leather with a grid of steel studs."""
+    def fn(im, get):
+        mc = _ramp_of(get(ref_key)[0][1])
+        s = np.array(im.convert('RGBA')).copy()
+        h, w = s.shape[:2]
+        m = s[..., 3] > 0
+        inner = m.copy()
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)): inner &= np.roll(np.roll(m, dy, 0), dx, 1)
+        step = 4 if w > 20 else 3
+        for y in range(1, h - 1, step):
+            for x in range(1 + (y // step % 2) * (step // 2), w - 1, step):
+                if inner[y, x]:
+                    s[y, x, :3] = mc[-2]
+                    if y + 1 < h: s[y + 1, x, :3] = mc[len(mc) // 3]
+        return Image.fromarray(s, 'RGBA')
+    return fn
+
+
 # ---- What to make ------------------------------------------------------------------
 # new item: icon=(source item, fn), gear=(source item, fn) or None,
 #           small=(source item, fn), or None to shrink the new 32 px icon down.
@@ -310,10 +486,28 @@ for metal in ('bronze', 'iron'):
         f'{metal}Battleaxe': dict(icon=(f'{metal}Axe', battleaxe), gear=(f'{metal}Axe', same)),
         f'{metal}Mace': dict(icon=(f'{metal}Pickaxe', mace_of(f'icon:{metal}MedHelm')), gear=(f'{metal}Axe', same)),
     })
+# Batch F: new pieces for bronze and iron (steel and mithril follow below).
+for metal in ('bronze', 'iron'):
+    ref = f'icon:{metal}SqShield'
+    tint = metal_of(ref)
+    DERIVED.update({
+        f'{metal}Boots': dict(icon=('leatherBoots', tint), small=('leatherBoots', tint), gear=('leatherBoots', tint)),
+        f'{metal}Gauntlets': dict(icon=('leatherGloves', tint), small=('leatherGloves', tint)),
+        f'{metal}Spear': dict(icon=(f'{metal}Pickaxe', spear_of(f'icon:{metal}Dagger')), gear=(f'{metal}Sword', same)),
+        f'{metal}Warhammer': dict(icon=('hammer', metal_parts(ref)), gear=(f'{metal}Axe', same)),
+        f'{metal}2hSword': dict(icon=(f'{metal}Sword', two_hander), gear=(f'{metal}Sword', same)),
+        f'{metal}Dart': dict(icon=(f'{metal}Dagger', darts_of(ref))),
+        f'{metal}DartTip': dict(icon=(f'{metal}Arrowtips', small_heads)),
+        f'{metal}ThrowingKnife': dict(icon=(f'{metal}Dagger', knives)),
+        f'{metal}Javelin': dict(icon=(f'{metal}Pickaxe', javelins_of(f'icon:{metal}Dagger'))),
+        f'{metal}JavelinHeads': dict(icon=(f'{metal}Dagger', blade_tips)),
+    })
+
 # Steel: every iron item, recoloured (made after the iron ones above, so the
 # new iron pieces are included).
 STEEL = ['Dagger', 'Axe', 'Pickaxe', 'Mace', 'MedHelm', 'Sword', 'Scimitar', 'Longsword', 'FullHelm', 'SqShield',
-         'Battleaxe', 'Chainbody', 'Kiteshield', 'Platelegs', 'Platebody', 'Arrowtips', 'Arrow', 'Bar']
+         'Battleaxe', 'Chainbody', 'Kiteshield', 'Platelegs', 'Platebody', 'Arrowtips', 'Arrow', 'Bar',
+         'Boots', 'Gauntlets', 'Spear', 'Warhammer', '2hSword', 'Dart', 'DartTip', 'ThrowingKnife', 'Javelin', 'JavelinHeads']
 for part in STEEL:
     DERIVED[f'steel{part}'] = dict(icon=(f'iron{part}', steel), small=(f'iron{part}', steel), gear=(f'iron{part}', steel))
 DERIVED['coal'] = dict(icon=('ironOre', coal_lump), small=('ironOre', coal_lump))
@@ -347,6 +541,11 @@ for metal in ('silver', 'gold'):
 for part in STEEL:
     DERIVED[f'mithril{part}'] = dict(icon=(f'steel{part}', mithril), small=(f'steel{part}', mithril), gear=(f'steel{part}', mithril))
 DERIVED['mithrilOre'] = dict(icon=('ironOre', lum_to(MITHRIL)), small=('ironOre', lum_to(MITHRIL)))
+
+# Steel studs and studded leather (after steel, so the studs are steel-coloured).
+DERIVED['steelStuds'] = dict(icon=('ironArrowtips', studs_of('icon:steelSqShield')))
+DERIVED['studdedBody'] = dict(icon=('leatherBody', studded_with('icon:steelSqShield')), small=('leatherBody', studded_with('icon:steelSqShield')), gear=('leatherBody', studded_with('icon:steelSqShield')))
+DERIVED['studdedChaps'] = dict(icon=('leatherChaps', studded_with('icon:steelSqShield')), small=('leatherChaps', studded_with('icon:steelSqShield')), gear=('leatherChaps', studded_with('icon:steelSqShield')))
 
 # Other sprites: new key <- source key, every frame.
 EXTRA = [

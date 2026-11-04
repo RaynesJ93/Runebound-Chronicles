@@ -1,3 +1,3 @@
 // Shown in Settings. Bump with every batch.
-export const GAME_VERSION = '0.29.5';
-export const BUILD_NAME = 'One coal per bar';
+export const GAME_VERSION = '0.30.0';
+export const BUILD_NAME = 'More to smith';
