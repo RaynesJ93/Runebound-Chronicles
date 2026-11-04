@@ -65,7 +65,7 @@ const BUILD = {
     { title: 'Trees', rows: byLevel(Object.values(TREES).map((t) => ({ level: t.level, icon: t.log, name: t.name, sub: `${name(t.log)} · ${xp(t.xp)}` }))) },
     { title: 'Axes', rows: tools(AXES, 'Chops') },
   ],
-  fletching: () => [{ title: 'Bows and arrows', rows: recipes(FLETCHING, (r) => {
+  fletching: () => [{ title: 'Bows, arrows, darts and javelins', rows: recipes(FLETCHING, (r) => {
     const n = Object.values(r.gives)[0];
     return n > 1 ? `makes ${n}` : '';
   }) }],
