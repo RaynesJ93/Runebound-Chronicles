@@ -129,7 +129,7 @@ export const ITEMS = {
   uncutDiamond: { name: 'Uncut diamond', value: 800, examine: 'A rough diamond. Cut it with a chisel.' },
   diamond: { name: 'Diamond', value: 1200, examine: 'A cut diamond. Set it in a ring or amulet at a furnace.' },
   steelBar: { name: 'Steel bar', value: 60, examine: 'Hammer it into shape at an anvil. Tougher than iron.' },
-  mithrilOre: { name: 'Mithril ore', value: 160, examine: 'A light, blue-tinged ore. Smelt it with two coal.' },
+  mithrilOre: { name: 'Mithril ore', value: 160, examine: 'A light, blue-tinged ore. Smelt it with a lump of coal.' },
   mithrilBar: { name: 'Mithril bar', value: 300, examine: 'Hammer it into shape at an anvil. Light and very strong.' },
   mithrilArrowtips: { name: 'Mithril arrowtips', stackable: true, value: 10, examine: 'Fix these onto headless arrows. Needs Fletching 45.' },
   mithrilArrow: {
