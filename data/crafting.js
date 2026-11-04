@@ -68,3 +68,9 @@ export const JEWELLERY = [
   jewel('gold', 'ruby', 'ring', 38, 25), jewel('gold', 'ruby', 'amulet', 42, 30),
   jewel('gold', 'diamond', 'ring', 47, 25), jewel('gold', 'diamond', 'amulet', 50, 30),
 ];
+
+// Studding: tap steel studs with a leather body or chaps in your bag.
+export const STUDDING = [
+  { id: 'studdedBody', name: 'Studded body', level: 26, xp: 40, uses: { leatherBody: 1, steelStuds: 1 }, gives: { studdedBody: 1 }, ticks: 3, skill: 'crafting', msg: 'You fix the studs to the leather body.' },
+  { id: 'studdedChaps', name: 'Studded chaps', level: 29, xp: 42, uses: { leatherChaps: 1, steelStuds: 1 }, gives: { studdedChaps: 1 }, ticks: 3, skill: 'crafting', msg: 'You fix the studs to the leather chaps.' },
+];

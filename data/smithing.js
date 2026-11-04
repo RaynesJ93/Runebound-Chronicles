@@ -17,12 +17,20 @@ export const SMELTING = [
   { id: 'goldBar', name: 'Gold bar', level: 40, xp: 22.5, uses: { goldOre: 1 }, gives: { goldBar: 1 }, ticks: 4, skill: 'smithing', station: 'furnace' },
 ];
 
-const anvil = (bar, list) => list.map(([item, name, level, bars, xp, qty = 1]) => ({
+const anvil = (bar, list) => [...list].sort((a, b) => a[2] - b[2]).map(([item, name, level, bars, xp, qty = 1]) => ({
   id: item, name, level, xp, uses: { [bar]: bars }, gives: { [item]: qty }, tool: 'hammer', ticks: 4, skill: 'smithing', station: 'anvil', bar,
 }));
 
 export const SMITHING = [
   ...anvil('bronzeBar', [
+    ['bronzeGauntlets', 'Bronze gauntlets', 3, 1, 12.5],
+    ['bronzeDartTip', 'Bronze dart tips', 4, 1, 12.5, 10],
+    ['bronzeSpear', 'Bronze spear', 5, 1, 12.5],
+    ['bronzeJavelinHeads', 'Bronze javelin heads', 6, 1, 12.5, 5],
+    ['bronzeBoots', 'Bronze boots', 6, 1, 12.5],
+    ['bronzeThrowingKnife', 'Bronze throwing knives', 7, 1, 12.5, 5],
+    ['bronzeWarhammer', 'Bronze warhammer', 9, 3, 37.5],
+    ['bronze2hSword', 'Bronze 2h sword', 14, 3, 37.5],
     ['bronzeDagger', 'Bronze dagger', 1, 1, 12.5],
     ['bronzeAxe', 'Bronze axe', 1, 1, 12.5],
     ['bronzePickaxe', 'Bronze pickaxe', 2, 1, 12.5],
@@ -41,6 +49,14 @@ export const SMITHING = [
     ['bronzePlatebody', 'Bronze platebody', 18, 5, 62.5],
   ]),
   ...anvil('ironBar', [
+    ['ironGauntlets', 'Iron gauntlets', 18, 1, 25],
+    ['ironDartTip', 'Iron dart tips', 19, 1, 25, 10],
+    ['ironSpear', 'Iron spear', 20, 1, 25],
+    ['ironJavelinHeads', 'Iron javelin heads', 21, 1, 25, 5],
+    ['ironBoots', 'Iron boots', 21, 1, 25],
+    ['ironThrowingKnife', 'Iron throwing knives', 22, 1, 25, 5],
+    ['ironWarhammer', 'Iron warhammer', 24, 3, 75],
+    ['iron2hSword', 'Iron 2h sword', 29, 3, 75],
     ['ironDagger', 'Iron dagger', 15, 1, 25],
     ['ironAxe', 'Iron axe', 16, 1, 25],
     ['ironPickaxe', 'Iron pickaxe', 17, 1, 25],
@@ -59,6 +75,15 @@ export const SMITHING = [
     ['ironPlatebody', 'Iron platebody', 33, 5, 125],
   ]),
   ...anvil('steelBar', [
+    ['steelGauntlets', 'Steel gauntlets', 33, 1, 37.5],
+    ['steelDartTip', 'Steel dart tips', 34, 1, 37.5, 10],
+    ['steelSpear', 'Steel spear', 35, 1, 37.5],
+    ['steelJavelinHeads', 'Steel javelin heads', 36, 1, 37.5, 5],
+    ['steelBoots', 'Steel boots', 36, 1, 37.5],
+    ['steelThrowingKnife', 'Steel throwing knives', 37, 1, 37.5, 5],
+    ['steelWarhammer', 'Steel warhammer', 39, 3, 112.5],
+    ['steel2hSword', 'Steel 2h sword', 44, 3, 112.5],
+    ['steelStuds', 'Steel studs', 36, 1, 37.5, 5],
     ['steelDagger', 'Steel dagger', 30, 1, 37.5],
     ['steelAxe', 'Steel axe', 31, 1, 37.5],
     ['steelMace', 'Steel mace', 32, 1, 37.5],
@@ -77,6 +102,14 @@ export const SMITHING = [
     ['steelPlatebody', 'Steel platebody', 48, 5, 187.5],
   ]),
   ...anvil('mithrilBar', [
+    ['mithrilGauntlets', 'Mithril gauntlets', 53, 1, 50],
+    ['mithrilDartTip', 'Mithril dart tips', 54, 1, 50, 10],
+    ['mithrilSpear', 'Mithril spear', 55, 1, 50],
+    ['mithrilJavelinHeads', 'Mithril javelin heads', 56, 1, 50, 5],
+    ['mithrilBoots', 'Mithril boots', 56, 1, 50],
+    ['mithrilThrowingKnife', 'Mithril throwing knives', 57, 1, 50, 5],
+    ['mithrilWarhammer', 'Mithril warhammer', 59, 3, 150],
+    ['mithril2hSword', 'Mithril 2h sword', 64, 3, 150],
     ['mithrilDagger', 'Mithril dagger', 50, 1, 50],
     ['mithrilAxe', 'Mithril axe', 51, 1, 50],
     ['mithrilMace', 'Mithril mace', 52, 1, 50],

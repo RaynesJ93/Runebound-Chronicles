@@ -46,15 +46,18 @@ export class Equipment {
       style: w?.style ?? 'melee', // melee | ranged | magic
       range: w?.range ?? 1,
       ammo: w?.ammo ?? null,
+      thrown: !!w?.thrown, // darts, knives, javelins: the weapon is its own ammo
     };
   }
 
   bonuses() {
     const b = { att: {}, def: {}, str: 0, rangedStr: 0, magicDmg: 0 };
     for (const t of TYPES) { b.att[t] = 0; b.def[t] = 0; }
+    const thrown = !!this.item('weapon')?.equip?.thrown;
     for (const slot of SLOTS) {
       const e = this.item(slot)?.equip;
       if (!e) continue;
+      if (thrown && slot === 'ammo') continue; // arrows don't help a thrown weapon
       for (const t of TYPES) { b.att[t] += e.att?.[t] || 0; b.def[t] += e.def?.[t] || 0; }
       b.str += e.str || 0;
       b.rangedStr += e.rangedStr || 0;
@@ -91,8 +94,18 @@ export class Equipment {
       this.inv.slots[i] = null;
       return { ok: true, slot };
     }
+    // Two-handed weapons and shields can't be worn together: the other one
+    // comes off into your bag.
+    const clash = slot === 'weapon' && def.equip.twoHanded ? 'shield'
+      : slot === 'shield' && this.item('weapon')?.equip?.twoHanded ? 'weapon' : null;
+    const off = clash && this.slots[clash];
+    if (off && old && this.inv.room(off.id, off.qty) < off.qty) return { ok: false, msg: "You don't have enough inventory space to do that." };
     this.inv.slots[i] = old;
     this.slots[slot] = { id: s.id, qty: s.qty };
+    if (off) {
+      if (!this.inv.slots[i]) this.inv.slots[i] = off; else this.inv.add(off.id, off.qty);
+      this.slots[clash] = null;
+    }
     return { ok: true, slot };
   }
 

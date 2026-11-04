@@ -471,7 +471,26 @@ The **mithril pickaxe** (Mining 20) and **mithril axe** (Woodcutting 20) work 30
 Rules for everything below: **every bar that needs coal takes exactly one** (iron ore + 1 coal = steel, mithril ore + 1 coal = mithril, adamantite ore + 1 coal = adamant, runite ore + 1 coal = rune). **No golden nuggets** and **no blast furnace**. The prospector outfit can **only** be bought with stardust.
 
 - **Batch E — adamant and rune.** A new area beyond Copperdeep Hollow with adamantite rocks (Mining 70) and runite rocks (Mining 85), a tougher monster and a mini-boss. Adamant and rune bars (1 ore + 1 coal each), full sets, pickaxes, axes and arrows.
-- **Batch F — more to smith,** for every metal: boots and gauntlets (feet and hands have only leather now), two-handed swords, warhammers and spears, thrown weapons (darts, throwing knives, javelins), and nails or studs for studded leather.
+- **Batch F — more to smith (v0.30.0).** For bronze, iron, steel and mithril. Levels below are bronze; iron is +15, steel +30, mithril +50. XP per bar as for the other anvil items (12.5 / 25 / 37.5 / 50).
+
+  | Item | Bronze level | Bars | Makes | Notes |
+  | --- | --- | --- | --- | --- |
+  | Gauntlets | 3 | 1 | 1 | Hands. Small melee attack and defence |
+  | Dart tips | 4 | 1 | 10 | Fletch with feathers into darts |
+  | Spear | 5 | 1 | 1 | Stab, 5 ticks, equal stab/slash/crush attack |
+  | Javelin heads | 6 | 1 | 5 | Fletch with arrow shafts into javelins |
+  | Boots | 6 | 1 | 1 | Feet. Melee defence |
+  | Throwing knives | 7 | 1 | 5 | Thrown weapon, ready to use |
+  | Warhammer | 9 | 3 | 1 | Crush, 6 ticks, hits hard |
+  | 2h sword | 14 | 3 | 1 | Slash, 7 ticks, hits hardest; **two-handed** (no shield) |
+
+  **Thrown weapons** go in the weapon slot as a stack and are their own ammo: each throw uses one, and most can be picked up where they land, like arrows. Darts: range 4, 3 ticks. Throwing knives: range 4, 3 ticks, a bit stronger. Javelins: range 6, 5 ticks, strongest. They need Ranged 1 / 5 / 10 / 20 by metal, and any arrows in your ammo slot don't add to them.
+
+  **Fletching:** darts (dart tip + feather, up to 10 at once) at Fletching 10 / 22 / 37 / 52; javelins (javelin heads + arrow shaft, up to 5 at once) at 3 / 17 / 32 / 47.
+
+  **Steel studs** (Smithing 36, 1 steel bar makes 5) and **studded leather** (Crafting): tap the studs with a leather body (Crafting 26) or leather chaps (Crafting 29) in your bag. Studded body and chaps need Ranged 15 and Defence 15 and sit between hard leather and the next tier.
+
+  A wielded two-handed sword takes your shield off (it goes to your bag); wearing a shield takes a 2h sword off.
 - **Batch G — mining features.** **Shooting stars** crash somewhere in the world every so often and are mined for **stardust**. Stardust is spent at a stardust shop on:
   - the **prospector outfit** (hat, top, legs and boots, bonus Mining XP) — stardust only;
   - **coal bags** — open one for a random 20–60 coal;

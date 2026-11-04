@@ -424,6 +424,151 @@ export const ITEMS = {
     name: 'Mithril platebody', value: 5200, examine: 'Solid mithril plates. Heavy, but very tough.',
     equip: { slot: 'body', req: { defence: 20 }, att: { magic: -15, ranged: -7 }, def: { stab: 41, slash: 39, crush: 23, ranged: 39, magic: -6 }, look: { tunic: '#4a5a9a' } },
   },
+  bronzeBoots: {
+    name: 'Bronze boots', value: 17, examine: 'Sturdy bronze boots.',
+    equip: { slot: 'feet', req: { defence: 1 }, att: { magic: -2 }, def: { stab: 2, slash: 2, crush: 2, ranged: 1, magic: -1 } },
+  },
+  bronzeGauntlets: {
+    name: 'Bronze gauntlets', value: 14, examine: 'Armoured bronze gloves.',
+    equip: { slot: 'hands', req: { defence: 1 }, att: { stab: 1, slash: 1, crush: 1, magic: -2 }, def: { stab: 1, slash: 1, crush: 1, ranged: 1 } },
+  },
+  bronzeSpear: {
+    name: 'Bronze spear', value: 23, examine: 'A long bronze-headed spear. Good at stabbing, slashing and smashing alike.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'stab', speed: 5, att: { stab: 6, slash: 6, crush: 6 }, def: { stab: 1, slash: 1, crush: 1 }, str: 6, look: { weapon: 'bronze', blade: 8 } },
+  },
+  bronzeWarhammer: {
+    name: 'Bronze warhammer', value: 57, examine: 'A heavy bronze warhammer. Slow, but it hits like a falling rock.',
+    equip: { slot: 'weapon', req: { attack: 1 }, type: 'crush', speed: 6, att: { stab: -4, slash: -4, crush: 8 }, str: 10, look: { weapon: 'bronze', blade: 5 } },
+  },
+  bronze2hSword: {
+    name: 'Bronze 2h sword', value: 69, examine: 'A huge bronze sword, wielded with both hands.',
+    equip: { slot: 'weapon', req: { attack: 1 }, twoHanded: true, type: 'slash', speed: 7, att: { stab: -4, slash: 10, crush: 8 }, str: 12, look: { weapon: 'bronze', blade: 10 } },
+  },
+  bronzeDart: {
+    name: 'Bronze dart', stackable: true, value: 1, examine: 'A small bronze dart. Throw it from your weapon slot.',
+    equip: { slot: 'weapon', req: { ranged: 1 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 4 }, rangedStr: 4, look: {} },
+  },
+  bronzeThrowingKnife: {
+    name: 'Bronze throwing knife', stackable: true, value: 2, examine: 'A balanced bronze knife, made for throwing.',
+    equip: { slot: 'weapon', req: { ranged: 1 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 5 }, rangedStr: 5, look: {} },
+  },
+  bronzeJavelin: {
+    name: 'Bronze javelin', stackable: true, value: 3, examine: 'A bronze-tipped javelin. Slow to throw, but it hits hard.',
+    equip: { slot: 'weapon', req: { ranged: 1 }, style: 'ranged', thrown: true, range: 6, type: 'ranged', speed: 5, att: { ranged: 6 }, rangedStr: 9, look: {} },
+  },
+  bronzeDartTip: { name: 'Bronze dart tip', stackable: true, value: 1, examine: 'Fletch it with a feather to make a dart.' },
+  bronzeJavelinHeads: { name: 'Bronze javelin heads', stackable: true, value: 1, examine: 'Fletch them onto arrow shafts to make javelins.' },
+  ironBoots: {
+    name: 'Iron boots', value: 60, examine: 'Sturdy iron boots.',
+    equip: { slot: 'feet', req: { defence: 5 }, att: { magic: -2 }, def: { stab: 3, slash: 3, crush: 3, ranged: 2, magic: -1 } },
+  },
+  ironGauntlets: {
+    name: 'Iron gauntlets', value: 50, examine: 'Armoured iron gloves.',
+    equip: { slot: 'hands', req: { defence: 5 }, att: { stab: 1, slash: 1, crush: 1, magic: -2 }, def: { stab: 2, slash: 2, crush: 2, ranged: 2 } },
+  },
+  ironSpear: {
+    name: 'Iron spear', value: 80, examine: 'A long iron-headed spear. Good at stabbing, slashing and smashing alike.',
+    equip: { slot: 'weapon', req: { attack: 5 }, type: 'stab', speed: 5, att: { stab: 9, slash: 9, crush: 9 }, def: { stab: 1, slash: 1, crush: 1 }, str: 9, look: { weapon: 'iron', blade: 8 } },
+  },
+  ironWarhammer: {
+    name: 'Iron warhammer', value: 200, examine: 'A heavy iron warhammer. Slow, but it hits like a falling rock.',
+    equip: { slot: 'weapon', req: { attack: 5 }, type: 'crush', speed: 6, att: { stab: -4, slash: -4, crush: 13 }, str: 16, look: { weapon: 'iron', blade: 5 } },
+  },
+  iron2hSword: {
+    name: 'Iron 2h sword', value: 240, examine: 'A huge iron sword, wielded with both hands.',
+    equip: { slot: 'weapon', req: { attack: 5 }, twoHanded: true, type: 'slash', speed: 7, att: { stab: -4, slash: 16, crush: 12 }, str: 18, look: { weapon: 'iron', blade: 10 } },
+  },
+  ironDart: {
+    name: 'Iron dart', stackable: true, value: 4, examine: 'A small iron dart. Throw it from your weapon slot.',
+    equip: { slot: 'weapon', req: { ranged: 5 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 6 }, rangedStr: 6, look: {} },
+  },
+  ironThrowingKnife: {
+    name: 'Iron throwing knife', stackable: true, value: 6, examine: 'A balanced iron knife, made for throwing.',
+    equip: { slot: 'weapon', req: { ranged: 5 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 8 }, rangedStr: 8, look: {} },
+  },
+  ironJavelin: {
+    name: 'Iron javelin', stackable: true, value: 9, examine: 'A iron-tipped javelin. Slow to throw, but it hits hard.',
+    equip: { slot: 'weapon', req: { ranged: 5 }, style: 'ranged', thrown: true, range: 6, type: 'ranged', speed: 5, att: { ranged: 10 }, rangedStr: 14, look: {} },
+  },
+  ironDartTip: { name: 'Iron dart tip', stackable: true, value: 2, examine: 'Fletch it with a feather to make a dart.' },
+  ironJavelinHeads: { name: 'Iron javelin heads', stackable: true, value: 4, examine: 'Fletch them onto arrow shafts to make javelins.' },
+  steelBoots: {
+    name: 'Steel boots', value: 210, examine: 'Sturdy steel boots.',
+    equip: { slot: 'feet', req: { defence: 10 }, att: { magic: -2 }, def: { stab: 4, slash: 4, crush: 4, ranged: 3, magic: -1 } },
+  },
+  steelGauntlets: {
+    name: 'Steel gauntlets', value: 175, examine: 'Armoured steel gloves.',
+    equip: { slot: 'hands', req: { defence: 10 }, att: { stab: 1, slash: 1, crush: 1, magic: -2 }, def: { stab: 3, slash: 3, crush: 3, ranged: 3 } },
+  },
+  steelSpear: {
+    name: 'Steel spear', value: 280, examine: 'A long steel-headed spear. Good at stabbing, slashing and smashing alike.',
+    equip: { slot: 'weapon', req: { attack: 10 }, type: 'stab', speed: 5, att: { stab: 13, slash: 13, crush: 13 }, def: { stab: 1, slash: 1, crush: 1 }, str: 13, look: { weapon: 'steel', blade: 8 } },
+  },
+  steelWarhammer: {
+    name: 'Steel warhammer', value: 700, examine: 'A heavy steel warhammer. Slow, but it hits like a falling rock.',
+    equip: { slot: 'weapon', req: { attack: 10 }, type: 'crush', speed: 6, att: { stab: -4, slash: -4, crush: 19 }, str: 23, look: { weapon: 'steel', blade: 5 } },
+  },
+  steel2hSword: {
+    name: 'Steel 2h sword', value: 840, examine: 'A huge steel sword, wielded with both hands.',
+    equip: { slot: 'weapon', req: { attack: 10 }, twoHanded: true, type: 'slash', speed: 7, att: { stab: -4, slash: 23, crush: 17 }, str: 26, look: { weapon: 'steel', blade: 10 } },
+  },
+  steelDart: {
+    name: 'Steel dart', stackable: true, value: 14, examine: 'A small steel dart. Throw it from your weapon slot.',
+    equip: { slot: 'weapon', req: { ranged: 10 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 9 }, rangedStr: 9, look: {} },
+  },
+  steelThrowingKnife: {
+    name: 'Steel throwing knife', stackable: true, value: 21, examine: 'A balanced steel knife, made for throwing.',
+    equip: { slot: 'weapon', req: { ranged: 10 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 12 }, rangedStr: 12, look: {} },
+  },
+  steelJavelin: {
+    name: 'Steel javelin', stackable: true, value: 32, examine: 'A steel-tipped javelin. Slow to throw, but it hits hard.',
+    equip: { slot: 'weapon', req: { ranged: 10 }, style: 'ranged', thrown: true, range: 6, type: 'ranged', speed: 5, att: { ranged: 14 }, rangedStr: 20, look: {} },
+  },
+  steelDartTip: { name: 'Steel dart tip', stackable: true, value: 7, examine: 'Fletch it with a feather to make a dart.' },
+  steelJavelinHeads: { name: 'Steel javelin heads', stackable: true, value: 14, examine: 'Fletch them onto arrow shafts to make javelins.' },
+  mithrilBoots: {
+    name: 'Mithril boots', value: 546, examine: 'Sturdy mithril boots.',
+    equip: { slot: 'feet', req: { defence: 20 }, att: { magic: -2 }, def: { stab: 6, slash: 6, crush: 6, ranged: 4, magic: -1 } },
+  },
+  mithrilGauntlets: {
+    name: 'Mithril gauntlets', value: 455, examine: 'Armoured mithril gloves.',
+    equip: { slot: 'hands', req: { defence: 20 }, att: { stab: 2, slash: 2, crush: 2, magic: -2 }, def: { stab: 4, slash: 4, crush: 4, ranged: 4 } },
+  },
+  mithrilSpear: {
+    name: 'Mithril spear', value: 728, examine: 'A long mithril-headed spear. Good at stabbing, slashing and smashing alike.',
+    equip: { slot: 'weapon', req: { attack: 20 }, type: 'stab', speed: 5, att: { stab: 18, slash: 18, crush: 18 }, def: { stab: 2, slash: 2, crush: 2 }, str: 18, look: { weapon: 'mithril', blade: 8 } },
+  },
+  mithrilWarhammer: {
+    name: 'Mithril warhammer', value: 1820, examine: 'A heavy mithril warhammer. Slow, but it hits like a falling rock.',
+    equip: { slot: 'weapon', req: { attack: 20 }, type: 'crush', speed: 6, att: { stab: -4, slash: -4, crush: 25 }, str: 31, look: { weapon: 'mithril', blade: 5 } },
+  },
+  mithril2hSword: {
+    name: 'Mithril 2h sword', value: 2184, examine: 'A huge mithril sword, wielded with both hands.',
+    equip: { slot: 'weapon', req: { attack: 20 }, twoHanded: true, type: 'slash', speed: 7, att: { stab: -4, slash: 31, crush: 24 }, str: 35, look: { weapon: 'mithril', blade: 10 } },
+  },
+  mithrilDart: {
+    name: 'Mithril dart', stackable: true, value: 36, examine: 'A small mithril dart. Throw it from your weapon slot.',
+    equip: { slot: 'weapon', req: { ranged: 20 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 12 }, rangedStr: 12, look: {} },
+  },
+  mithrilThrowingKnife: {
+    name: 'Mithril throwing knife', stackable: true, value: 55, examine: 'A balanced mithril knife, made for throwing.',
+    equip: { slot: 'weapon', req: { ranged: 20 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 16 }, rangedStr: 16, look: {} },
+  },
+  mithrilJavelin: {
+    name: 'Mithril javelin', stackable: true, value: 82, examine: 'A mithril-tipped javelin. Slow to throw, but it hits hard.',
+    equip: { slot: 'weapon', req: { ranged: 20 }, style: 'ranged', thrown: true, range: 6, type: 'ranged', speed: 5, att: { ranged: 20 }, rangedStr: 27, look: {} },
+  },
+  mithrilDartTip: { name: 'Mithril dart tip', stackable: true, value: 18, examine: 'Fletch it with a feather to make a dart.' },
+  mithrilJavelinHeads: { name: 'Mithril javelin heads', stackable: true, value: 36, examine: 'Fletch them onto arrow shafts to make javelins.' },
+  steelStuds: { name: 'Steel studs', stackable: true, value: 12, examine: 'Tap them with a leather body or chaps in your bag to stud the leather.' },
+  studdedBody: {
+    name: 'Studded body', value: 850, examine: 'Leather armour reinforced with steel studs. Needs Ranged 15 and Defence 15.',
+    equip: { slot: 'body', req: { ranged: 15, defence: 15 }, att: { ranged: 8, magic: -4 }, def: { stab: 18, slash: 25, crush: 22, ranged: 26, magic: 8 }, look: { tunic: '#6a4a2e' } },
+  },
+  studdedChaps: {
+    name: 'Studded chaps', value: 750, examine: 'Leather chaps reinforced with steel studs. Needs Ranged 15 and Defence 15.',
+    equip: { slot: 'legs', req: { ranged: 15, defence: 15 }, att: { ranged: 8, magic: -5 }, def: { stab: 7, slash: 7, crush: 7, ranged: 10, magic: 3 }, look: { pants: '#6a4a2e' } },
+  },
   silverRing: {
     name: 'Silver ring', value: 130, examine: 'A silver ring. Plain, but it helps a little.',
     equip: { slot: 'ring', req: {}, def: { stab: 1, slash: 1, crush: 1 } },

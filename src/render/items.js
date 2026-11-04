@@ -644,6 +644,22 @@ for (const metal of ['silver', 'gold']) {
   }
 }
 
+// Batch F pieces, drawn from the nearest existing drawing.
+{
+  const TONES = { bronze: ['#6e4320', '#c07a38', '#f2c48a'], iron: ['#4a4f56', '#9aa2aa', '#e2e8ec'], steel: ['#5e666e', '#c4ccd2', '#ffffff'], mithril: ['#1e2850', '#4a5a9a', '#a8b8f4'] };
+  for (const [m, tones] of Object.entries(TONES)) {
+    const [d0, m0, l0] = tones.map(hex);
+    const inMetal = (base) => recolour(base, (d, i) => { const l = (d[i] + d[i + 1] + d[i + 2]) / 765; const c = l < 0.35 ? d0 : l < 0.65 ? m0 : l0; d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; });
+    DRAW[`${m}Boots`] ||= inMetal('leatherBoots');
+    DRAW[`${m}Gauntlets`] ||= inMetal('leatherGloves');
+    const like = { Spear: 'Sword', Warhammer: 'Mace', '2hSword': 'Sword', Dart: 'Arrowtips', DartTip: 'Arrowtips', JavelinHeads: 'Arrowtips', ThrowingKnife: 'Dagger', Javelin: 'Arrow' };
+    for (const [part, base] of Object.entries(like)) DRAW[`${m}${part}`] ||= (b) => (DRAW[`${m}${base}`] || DRAW[`iron${base}`])(b);
+  }
+  DRAW.steelStuds ||= (b) => { for (const [x, y] of [[5, 5], [10, 4], [6, 10], [11, 10], [8, 7]]) { b.ellipse(x, y, 1.8, 1.8, hex('#9aa2aa')); b.set(x - 1, y - 1, hex('#ffffff')); } };
+  DRAW.studdedBody ||= (b) => { DRAW.leatherBody(b); for (let y = 5; y < 13; y += 3) for (let x = 5; x < 12; x += 3) if (b.alpha(x, y)) b.set(x, y, hex('#e2e8ec')); };
+  DRAW.studdedChaps ||= (b) => { DRAW.leatherChaps(b); for (let y = 4; y < 13; y += 3) for (const x of [5, 10]) if (b.alpha(x, y)) b.set(x, y, hex('#e2e8ec')); };
+}
+
 // Hard leather pieces: the leather drawing in darker, redder leather.
 for (const part of ['Gloves', 'Boots', 'Cowl', 'Chaps']) {
   DRAW[`hardLeather${part}`] = (b) => {

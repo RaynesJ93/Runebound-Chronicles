@@ -34,7 +34,7 @@ import { ROCKS, PICKAXES, MINE_TICKS, gemChance, rollGem } from '../data/mining.
 import { SMELTING, SMITHING } from '../data/smithing.js';
 import { SPOTS, FISH_TICKS, spotLevel } from '../data/fishing.js';
 import { COOKING } from '../data/cooking.js';
-import { TANNING, SEWING, CRAFT_GROUP, CUTTING, JEWELLERY } from '../data/crafting.js';
+import { TANNING, SEWING, CRAFT_GROUP, CUTTING, JEWELLERY, STUDDING } from '../data/crafting.js';
 import { ALTARS, runesPerEssence } from '../data/runecrafting.js';
 import { mapPlace } from './ui/map.js';
 
@@ -327,6 +327,7 @@ function boot() {
     if (id === 'cowhide') return () => hud.message("Tan cowhides into leather at Hilda's tanning rack, by the cow field.");
     if (/^raw/.test(id)) return () => hud.message('Cook this on a fire: the cooking pit by the pond, or the goblins\' campfire.');
     if (CUT_FROM[id] || id === 'chisel') return () => cutMenu(x, y);
+    if (id === 'steelStuds') return () => studMenu(x, y);
     if (/Mould$/.test(id)) return () => hud.message('Use a mould at a furnace, with a silver or gold bar, to cast jewellery.');
     if (id === 'silverBar' || id === 'goldBar') return () => hud.message('Cast it into rings and amulets at a furnace, with a ring or amulet mould.');
     if (id === 'knife') return () => fletchMenu(inventory.count('logs') ? 'logs' : inventory.count('oakLogs') ? 'oakLogs' : null, x, y);
@@ -346,6 +347,7 @@ function boot() {
     if (GROUP_OF[s.id]) options.push({ label: 'Fletch', fn: () => fletchMenu(GROUP_OF[s.id], x, y) });
     if (CRAFT_GROUP[s.id]) options.push({ label: 'Sew', fn: () => sewMenu(CRAFT_GROUP[s.id], x, y) });
     if (CUT_FROM[s.id] || s.id === 'chisel') options.push({ label: 'Cut', fn: () => cutMenu(x, y) });
+    if (s.id === 'steelStuds') options.push({ label: 'Stud leather', fn: () => studMenu(x, y) });
     if (def.food) options.push({ label: 'Eat', fn: () => eat(i) });
     if (def.potion) options.push({ label: 'Drink', fn: () => eat(i) });
     if (def.equip) {
@@ -1171,6 +1173,17 @@ function boot() {
         icon: itemIcon(r.id).url,
         fn: () => startMake(r),
       })),
+      { label: 'Cancel', fn: () => {} },
+    ]);
+  };
+
+  // Studding: tap steel studs with a leather body or chaps in your bag.
+  const studMenu = (x, y) => {
+    const have = STUDDING.filter((r) => Object.keys(r.uses).every((id) => inventory.count(id)));
+    if (!have.length) { hud.message('Tap the studs with a leather body or leather chaps in your bag.'); return; }
+    const lvl = book.level('crafting');
+    hud.showMenu(x, y, 'Stud leather', [
+      ...have.map((r) => ({ label: `${r.name}${lvl < r.level ? ` — needs level ${r.level}` : ''}`, icon: itemIcon(r.id).url, fn: () => startMake(r) })),
       { label: 'Cancel', fn: () => {} },
     ]);
   };

@@ -205,16 +205,21 @@ export class Combat {
   }
 
   // Fire one arrow from the ammo slot. Returns false if you can't.
+  // Thrown weapons (darts, knives, javelins) use one from the stack in your hand.
   shoot(e) {
-    const ammo = this.gear.slots.ammo;
+    const thrown = this.weapon.thrown;
+    const ammo = thrown ? this.gear.slots.weapon : this.gear.slots.ammo;
     const def = ammo && ITEMS[ammo.id]?.equip;
-    if (!ammo || def?.ammo !== this.weapon.ammo) {
+    if (!ammo || (!thrown && def?.ammo !== this.weapon.ammo)) {
       this.on.message?.('You have no arrows in your ammo slot.');
       this.target = null;
       return false;
     }
     ammo.qty--;
-    if (ammo.qty <= 0) { this.gear.slots.ammo = null; this.on.message?.("That was your last arrow!"); }
+    if (ammo.qty <= 0) {
+      if (thrown) { this.gear.slots.weapon = null; this.on.message?.(`That was your last ${ITEMS[ammo.id].name.toLowerCase()}!`); this.target = null; }
+      else { this.gear.slots.ammo = null; this.on.message?.("That was your last arrow!"); }
+    }
     const s = this.skills;
     const st = this.rangedStyle;
     const b = this.gear.bonuses();
@@ -224,7 +229,7 @@ export class Combat {
     const ticks = this.flightTicks(e, false);
     this.launch(e, 'arrow', ticks);
     this.playerLungeAt = this.now;
-    this.playerAttackKind = 'bow';
+    this.playerAttackKind = thrown ? 'slash' : 'bow';
     // Like OSRS, most arrows can be picked up again where they land.
     this.pending.push({ target: e, dmg, at: this.ticks + ticks, mode: 'ranged', arrow: ammo.id, keepArrow: this.rng() < 0.6 });
     this.on.inventoryChanged?.();
