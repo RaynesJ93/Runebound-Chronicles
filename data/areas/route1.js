@@ -238,11 +238,8 @@ export function buildRoute1() {
   for (const [x, y] of [[98, 37], [102, 37], [104, 39], [104, 43], [96, 39], [96, 43], [98, 45], [102, 45]]) one('standingStone', x, y);
   one('shrine', 100, 42, { interact: ['A worn stone altar. Carvings of a great tree circle its base.', "There's a hollow in the top, as if something used to sit there."] });
 
-  // The wrecked merchant's cart, on the mine road
+  // A clearing on the mine road (Pell's wrecked cart is in Brambleford, by the bridge)
   clearArea(36, 33, 42, 38);
-  one('stall', 38, 35, { interact: ['A merchant\'s cart, overturned. The goods are long gone.', 'Goblin footprints lead away to the west.'] });
-  for (const [x, y] of [[40, 34], [37, 37]]) one('crate', x, y);
-  one('barrel', 41, 36);
 
   // A fairy ring of mushrooms, deep in the woods
   clearArea(66, 86, 74, 92);

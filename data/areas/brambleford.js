@@ -228,6 +228,11 @@ export function buildBrambleford() {
   for (const [x, y] of [[6, 38], [14, 36], [20, 40], [28, 38], [33, 41], [10, 41]]) placeIfFree('bush', x, y);
   for (const [x, y] of [[4, 36], [17, 42], [35, 37], [26, 42]]) placeIfFree('rock', x, y);
   for (const [x, y] of [[12, 38], [24, 37], [31, 35], [8, 43], [33, 43]]) placeIfFree('tree', x, y, { variant: 'oak' });
+  // Pell's supply cart, wrecked by goblins just before the bridge (The Runebound, chapter 1)
+  prop('brokenCart', [{ x: 37, y: 42 }, { x: 38, y: 42 }], { interact: ["A merchant's cart, smashed and overturned. The goods are long gone.", 'Big goblin footprints lead away through the meadow, north-west towards Thornwood.'] });
+  one('brokenBarrel', 39, 41, { interact: ['A barrel with its side stove in. Empty.'] });
+  one('toppledBarrel', 39, 43, { interact: ['A barrel, knocked over and split open.'] });
+  one('smashedBarrel', 36, 43, { blocks: false, interact: ['What is left of a barrel: staves and a bent iron hoop.'] });
   one('sign', 39, 34, { interact: ['SOUTH ROAD', 'River and fishing ahead. Cows to the east.'] });
 
   // ---- Decoration ---------------------------------------------------------

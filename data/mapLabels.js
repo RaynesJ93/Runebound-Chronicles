@@ -35,6 +35,7 @@ export const LABELS = {
     { x: 51, y: 31, text: 'Orchard' },
     { x: 51, y: 36, text: 'Cow field' },
     { x: 40, y: 49, text: 'River' },
+    { x: 36, y: 41, text: 'Wrecked cart' },
   ],
   route1: [
     { x: 59, y: 45, text: 'Crossroads' },

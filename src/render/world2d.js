@@ -46,6 +46,10 @@ function getLib() {
     bones: art('bones') || [S.bones()],
     shelf: art('shelf') || [S.shelf(1), S.shelf(2), S.shelf(3)],
     barrel: art('barrel')?.[0] || S.barrel(),
+    brokenCart: art('brokenCart')?.[0] || art('stall')?.[0] || S.stall(),
+    brokenBarrel: art('brokenBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
+    toppledBarrel: art('toppledBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
+    smashedBarrel: art('smashedBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
     chest: art('chest')?.[0] || S.chest(),
     rug: art('rug')?.[0] || S.rug(),
     plant: art('plant')?.[0] || S.plant(),
@@ -217,6 +221,8 @@ export function createWorldView(canvasEl, area) {
       case 'table': place(lib.table || lib.crate, f.x, f.y); break;
       case 'shelf': place(p.variant !== undefined ? lib.shelf[p.variant % lib.shelf.length] : pick(lib.shelf, p), f.x, f.y + 2); break;
       case 'barrel': place(lib.barrel, f.x, f.y); break;
+      case 'brokenCart': place(lib.brokenCart, f.x, f.y + 1); break;
+      case 'brokenBarrel': case 'toppledBarrel': case 'smashedBarrel': place(lib[p.type], f.x, f.y); break;
       case 'chest': place(lib.chest, f.x, f.y); break;
       case 'plant': place(lib.plant, f.x, f.y); break;
       case 'ore': {

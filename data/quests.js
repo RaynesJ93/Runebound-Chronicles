@@ -21,12 +21,12 @@ export const QUESTS = [
     chapter: 1,
     name: 'The Overturned Cart',
     giver: { name: 'Pell the Shopkeeper', where: 'General Store, Brambleford', area: 'brambleford' },
-    about: "Pell's supply cart was raided on the mine road, and his strongbox is gone. The first chapter of The Runebound.",
+    about: "Pell's supply cart was raided on the south road, and his strongbox is gone. The first chapter of The Runebound.",
     recommend: 'Combat level 5+ (goblin brutes)',
     flag: 'cartQuest',
     steps: (c) => [
-      { text: 'Look at the overturned cart in Thornwood, north of the village', done: !!c.flags.cartClue },
-      { text: 'Follow the goblin tracks west and take back the strongbox from a goblin brute', done: c.count('pellsStrongbox') >= 1 },
+      { text: 'Look at the wrecked cart on the south road, just before the bridge', done: !!c.flags.cartClue },
+      { text: 'Follow the goblin tracks to the goblin camp in Thornwood and take back the strongbox from a goblin brute', done: c.count('pellsStrongbox') >= 1 },
       { text: 'Bring the strongbox to Pell', done: false },
     ],
     rewards: ['300 coins and 3 meat pies', 'A little Attack and Strength XP', 'A strange goblin token...'],
@@ -85,16 +85,16 @@ export const questsDone = (q, c) => (q.requiresQuests || []).every((id) => c.fla
 //   else `full` is shown)
 export const QUEST_HOOKS = [
   {
-    area: 'route1', type: 'stall', at: { x: 38, y: 35 },
+    area: 'brambleford', type: 'brokenCart', at: { x: 37, y: 42 },
     when: (f) => f.cartQuest === 'started' && !f.cartClue,
-    say: ["A merchant's cart, overturned. Barrels are smashed open and the goods are gone.", "This must be Pell's cart. There's no sign of his strongbox.",
-      'Big goblin footprints, heavier than the usual sort, lead away to the west. Towards the goblin camp.'],
+    say: ["A merchant's cart, smashed and overturned. Barrels are split open and the goods are gone.", "This is Pell's cart. There's no sign of his strongbox.",
+      'Big goblin footprints, heavier than the usual sort, lead away through the meadow, north-west into Thornwood. Towards the goblin camp.'],
     set: { cartClue: true },
   },
   {
-    area: 'route1', type: 'stall', at: { x: 38, y: 35 },
+    area: 'brambleford', type: 'brokenCart', at: { x: 37, y: 42 },
     when: (f) => f.cartQuest === 'started',
-    say: ["Pell's overturned cart. Heavy goblin footprints lead west, to the goblin camp. Goblin brutes, by the size of them."],
+    say: ["Pell's wrecked cart. Heavy goblin footprints lead north-west into Thornwood, to the goblin camp. Goblin brutes, by the size of them."],
   },
   {
     area: 'route1', type: 'memorial', at: { x: 43, y: 90 },
