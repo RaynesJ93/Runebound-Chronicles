@@ -690,7 +690,7 @@ Every skill uses the same XP curve and goes to 99. Resources respawn after a tim
 - Rewards: XP lamps, items, coins, and **new region access**.
 - Quest points unlock late-game content.
 
-### Main story: The Runebound (chapters 1–2 shipped in v0.37.0, chapter 3 in v0.38.0, chapter 4 in v0.39.0)
+### Main story: The Runebound (chapters 1–2 shipped in v0.37.0, chapter 3 in v0.38.0, chapter 4 in v0.39.0, chapter 5 in v0.40.0)
 
 **Backstory.** Forty years ago the goblin warlord **Grubnak** marched on Brambleford. The village held the Thornwood crossroads, and Captain **Holt** of the Watch led the last stand. Grubnak couldn't be killed, so the runekeepers of Whispering Vale *bound* him with runes, deep under the stones of the old cave north-west of the goblin camp, and set a runestone in the stone shrine to hold the binding. That's why the cave mouth is sealed, and why something deep inside is breathing. The village remembers a war it "won"; almost nobody alive knows the warlord was never killed. Now the goblins are bold again, a cart has been raided, and the binding is weakening.
 
@@ -702,7 +702,7 @@ The story runs through places already in the world (the wrecked cart by Bramblef
 | 2 | Echoes of the War | Elder Maren | Maren recognises Grubnak's mark on the token. Read the war memorial, find Captain Holt's journal in the old watchtower, and hear the truth from Tobin, the hermit who once served under Holt. | v0.37.0 |
 | 3 | The Empty Hollow | Tobin | The runestone that held the binding has been stolen from the shrine and broken in three. Find one shard at the shrine, wake the Goblin Chief for the second, take the third from the tunnel goblins in Copperdeep Mine, and bring them to Aldric in Whispering Vale. | v0.38.0 |
 | 4 | Stone and Rune | Aldric | Remaking the runestone needs essence and runes (Runecrafting) and a steel-and-silver setting that Dorrin forges from your bars (Smithing, Mining). Set the remade Binding Stone in the shrine; far away, something roars. | v0.39.0 |
-| 5 | The Sealed Cave | Tomas and the Watch | Open the sealed cave and go down through the goblin warrens beneath it. A new area. | planned |
+| 5 | The Sealed Cave | Tobin | Break open the sealed cave (Mining 30) and go down into the Goblin Warrens, a new area. Goblins are digging at the rune-sealed door of Grubnak's chamber; defeat their Digmaster and take his orders back to Tobin. | v0.40.0 |
 | 6 | The Runebound | Tobin | Face Grubnak, half-free of his binding: a story boss with telegraphed attacks. Re-seal or destroy him. Unlocks the next region. | planned |
 
 **Chapter 1: The Overturned Cart** (flag `cartQuest`; recommended combat level 5+). Ask Pell "You look worried." He says his supply cart was raided on the south road and his strongbox taken. Look at the wrecked cart in Brambleford (on the south road, just before the bridge): you find goblin tracks heading north-west into Thornwood, to the goblin camp. While you're on the quest, the first **goblin brute** you kill always drops **Pell's strongbox** (if you don't already have it). Bring it back to Pell for **300 coins, 3 meat pies**, a little Attack and Strength XP, and the **goblin token** that was in the box: a carved bone disc that isn't his. He tells you to show it to Elder Maren.
@@ -716,6 +716,12 @@ The Goblin Chief: level 16, 45 hitpoints, max hit 4, aggressive; drops coins (60
 **Chapter 4: Stone and Rune** (flag `remakeQuest`; needs chapter 3, Runecrafting 10 and Smithing 30). Ask Aldric how the runestone is. To remake it he needs **20 rune essence**, **30 water runes**, **30 mind runes**, and a **runestone setting** to hold the pieces together. Dorrin forges the setting if you bring him **2 steel bars and a silver bar**. Hand everything to Aldric: he remakes the stone and gives you the **Binding Stone**. Set it into the hollow of the stone shrine: the runes blaze, the ground shakes, and far to the north-west something roars. Tell Tobin, who realises the binding is back but Grubnak is half awake, and the sealed cave's boulders have shifted. Reward: 1,000 coins and Runecrafting, Smithing and Magic XP. If you lose the setting or the Binding Stone before it's placed, Dorrin or Aldric will make another.
 
 Story places can now also take an item from you (`take` in `QUEST_HOOKS`), as the shrine does with the Binding Stone.
+
+**Chapter 5: The Sealed Cave** (flag `caveQuest`; needs chapter 4 and Mining 30; recommended combat level 25+). Ask Tobin what happens now: the goblins are digging for their warlord, and someone has to see what's down there. Break the boulders at the sealed cave in north-west Thornwood (needs Mining 30 and a pickaxe, in your bag or hand): the cave opens for good and leads down into the **Goblin Warrens**. The warrens are a new area of tunnels and dens, home to **warren goblins** (level 20, pale cave goblins). In the great dig at the north end, goblins have been chipping at the rune-sealed door of Grubnak's chamber; look at the door, then defeat the **Goblin Digmaster** (level 26 mini-boss) who runs the dig. He drops his **orders**, which you can read: they are digging Grubnak free. Take them to Tobin. Reward: 1,500 coins and Attack, Strength, Defence and Mining XP.
+
+Warren goblins: level 20, 30 hitpoints, max hit 3, aggressive; drop coins, iron and steel gear, mithril ore, runes and coal. Goblin Digmaster: level 26, 60 hitpoints, max hit 5, respawns every 3 minutes; drops coins, steel and mithril gear, a war charm 1 in 12.
+
+**Other engine changes (v0.40.0).** Exits can have `when(flags)` (the sealed cave only leads anywhere once it's open), a cave mouth marked `openable` is drawn sealed or open from the `caveOpen` flag, and quest hook conditions can check whether you're holding an item.
 
 **Quest spawns (v0.38.0).** An enemy in an area's spawn list can have `when(flags)`: it only appears once that's true (the Goblin Chief appears when `chiefAwake` is set), including straight away if you're standing in the area when it happens.
 

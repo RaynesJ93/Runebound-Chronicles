@@ -98,7 +98,7 @@ export function drawArea(id) {
 // Everything to put on top of the map, in tiles. `live` (optional) has the
 // current npcs and enemies, so they show where they are right now; otherwise
 // they show at home.
-export function markers(id, live, star = null) {
+export function markers(id, live, star = null, flags = {}) {
   const a = areaFor(id);
   const out = [];
   // Skilling spots: one icon per cluster of the same kind.
@@ -115,7 +115,7 @@ export function markers(id, live, star = null) {
   }
   // Ways out (not doors into rooms, which the buildings already show).
   for (const e of a.exits) {
-    if (INSIDE[e.to]) continue;
+    if (INSIDE[e.to] || (e.when && !e.when(flags || {}))) continue;
     const t = e.tiles[0];
     const edge = t.y <= 1 ? 'n' : t.y >= a.H - 2 ? 's' : t.x <= 1 ? 'w' : t.x >= a.W - 2 ? 'e' : 'n';
     out.push({ type: 'exit', x: t.x + e.tiles.length / 2, y: t.y + 0.5, edge, name: `To ${MAP_NAME[e.to] || e.to}` });
@@ -125,7 +125,7 @@ export function markers(id, live, star = null) {
     : NPCS.filter((n) => n.area === id).map((n) => ({ name: n.name, x: n.x, y: n.y }));
   for (const n of npcs) out.push({ type: 'npc', x: n.x + 0.5, y: n.y + 0.5, name: n.name });
   const foes = live?.enemies ? live.enemies.filter((e) => !e.dead).map((e) => ({ name: e.name, boss: e.def.boss, ...e.tile }))
-    : (a.spawns || []).map((s) => ({ name: ENEMIES[s.enemy]?.name || s.enemy, boss: ENEMIES[s.enemy]?.boss, x: s.x, y: s.y }));
+    : (a.spawns || []).filter((s) => !s.when || s.when(flags || {})).map((s) => ({ name: ENEMIES[s.enemy]?.name || s.enemy, boss: ENEMIES[s.enemy]?.boss, x: s.x, y: s.y }));
   for (const f of foes) out.push({ type: 'enemy', x: f.x + 0.5, y: f.y + 0.5, name: f.name, boss: !!f.boss });
   for (const l of LABELS[id] || []) out.push({ type: 'label', x: l.x + 0.5, y: l.y + 0.5, name: l.text });
   if (star && star.area === id) out.push({ type: 'spot', kind: 'star', x: star.x + 0.5, y: star.y + 0.5, icon: itemIcon('stardust').url, name: `Shooting star (size ${star.size})` });

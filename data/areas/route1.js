@@ -197,7 +197,7 @@ export function buildRoute1() {
   // The sealed cave
   clearArea(4, 3, 14, 13);
   outcrop([[3, 2, 4], [4, 2, 5], [5, 2, 6], [6, 2, 6], [7, 2, 6], [8, 2, 6], [9, 2, 5], [10, 2, 6], [11, 2, 4]]);
-  one('caveMouth', 7, 6, { sealed: true, interact: ['Huge boulders block the mouth of a cave.', 'Cold air seeps out between them, and something deep inside is breathing.'] });
+  one('caveMouth', 7, 6, { sealed: true, openable: true, interact: ['Huge boulders block the mouth of a cave.', 'Cold air seeps out between them, and something deep inside is breathing.'] });
   for (const [x, y] of [[5, 8], [9, 8], [11, 9]]) one('rock', x, y);
 
   // The old graveyard: black iron railings, a flagstone path from the gate
@@ -313,6 +313,8 @@ export function buildRoute1() {
       { tiles: [{ x: 55, y: H - 1 }, { x: 56, y: H - 1 }], to: 'brambleford', at: { x: 21, y: 1 }, facing: 0 },
       { tiles: [{ x: 30, y: 1 }, { x: 31, y: 1 }], to: 'mine', at: { x: 15, y: 26 }, facing: Math.PI },
       { tiles: [{ x: W - 1, y: 48 }, { x: W - 1, y: 49 }], to: 'vale', at: { x: 2, y: 29 }, facing: Math.PI / 2 },
+      // The sealed cave: only once you've broken the boulders (The Runebound, chapter 5)
+      { tiles: [{ x: 7, y: 7 }], to: 'warrens', at: { x: 22, y: 35 }, facing: Math.PI, when: (f) => !!f.caveOpen },
     ],
     spawns: [
       // Goblin territory

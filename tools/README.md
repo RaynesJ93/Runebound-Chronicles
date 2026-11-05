@@ -20,4 +20,5 @@ Small one-off sprites (already cut from a magenta sheet and shrunk to game
 size) live in `tools/sprites/<name>.png`. `python3 tools/derived.py` adds any
 that aren't in the atlas yet, anchored at the bottom middle, under `<name>`.
 So far: Pell's wrecked cart and three broken barrels (`brokenCart`,
-`brokenBarrel`, `toppledBarrel`, `smashedBarrel`).
+`brokenBarrel`, `toppledBarrel`, `smashedBarrel`), and the rune-sealed door of
+Grubnak's chamber (`runeDoor`, drawn by hand in code).

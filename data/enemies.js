@@ -154,6 +154,48 @@ export const ENEMIES = {
       rare: { chance: 1 / 16, table: [{ item: 'warCharm', qty: 1 }] },
     },
   },
+  // ---- The Goblin Warrens (The Runebound, chapter 5) ----
+  warrenGoblin: {
+    id: 'warrenGoblin', name: 'Warren goblin', level: 20, hp: 30,
+    attack: 16, strength: 15, defence: 14,
+    attackBonus: 8, strengthBonus: 6, defenceBonus: 10, maxHit: 3,
+    speed: 5, attackType: 'slash', aggressive: true, aggroRange: 3, wander: 2, leash: 6, respawn: 40,
+    look: { skin: '#8a9a80', hair: '#1a1a14', tunic: '#5a2a24', pants: '#3a3028', belt: '#1a1a14', ears: true, eyes: '#e8e0a0', hat: 'helmet', hatColor: '#5a5650' },
+    examine: 'A pale goblin with huge eyes. It has never seen the sun, and it does not want to.',
+    loot: {
+      always: [{ item: 'bones', qty: 1 }],
+      main: [
+        { item: 'coins', min: 20, max: 80, chance: 1 / 2 },
+        { item: 'coal', qty: 1, chance: 1 / 6 },
+        { item: 'mithrilOre', qty: 1, chance: 1 / 12 },
+        { item: 'mindRune', min: 10, max: 25, chance: 1 / 8 },
+        { item: 'waterRune', min: 10, max: 25, chance: 1 / 8 },
+        { item: 'steelMedHelm', qty: 1, chance: 1 / 20 },
+        { item: 'steelSword', qty: 1, chance: 1 / 24 },
+        { item: 'meatPie', qty: 1, chance: 1 / 10 },
+      ],
+      rare: { chance: 1 / 128, table: [{ item: 'warCharm', qty: 1 }] },
+    },
+  },
+  goblinDigmaster: {
+    id: 'goblinDigmaster', name: 'Goblin Digmaster', level: 26, hp: 60, boss: true,
+    attack: 22, strength: 22, defence: 20,
+    attackBonus: 12, strengthBonus: 10, defenceBonus: 14, maxHit: 5,
+    speed: 5, attackType: 'crush', aggressive: true, aggroRange: 4, wander: 2, leash: 5, respawn: 180,
+    look: { skin: '#8a9a80', hair: '#1a1a14', tunic: '#6a4a2a', pants: '#3a2a1a', belt: '#c8a030', ears: true, eyes: '#ffe080', hat: 'helmet', hatColor: '#c8a030' },
+    examine: 'The goblin in charge of the dig. He carries a huge pick and a scroll of orders.',
+    loot: {
+      always: [{ item: 'bones', qty: 1 }, { item: 'coins', min: 100, max: 250 }],
+      main: [
+        { item: 'steelChainbody', qty: 1, chance: 1 / 6 },
+        { item: 'mithrilOre', min: 2, max: 4, chance: 1 / 4 },
+        { item: 'mithrilMedHelm', qty: 1, chance: 1 / 12 },
+        { item: 'mithrilSword', qty: 1, chance: 1 / 16 },
+        { item: 'meatPie', qty: 2, chance: 1 / 4 },
+      ],
+      rare: { chance: 1 / 12, table: [{ item: 'warCharm', qty: 1 }] },
+    },
+  },
   alphaWolf: {
     id: 'alphaWolf', name: 'Alpha Wolf', level: 14, hp: 40, sprite: 'wolf', boss: true,
     attack: 10, strength: 10, defence: 8,

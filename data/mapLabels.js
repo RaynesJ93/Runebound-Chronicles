@@ -5,7 +5,10 @@
 // Tiles are (x, y) in the area's own grid. Keep labels short.
 
 // The outdoor maps, in the order of the map's tabs.
-export const MAP_AREAS = ['brambleford', 'route1', 'mine', 'depths', 'hollow', 'forge', 'vale'];
+export const MAP_AREAS = ['brambleford', 'route1', 'mine', 'depths', 'hollow', 'forge', 'vale', 'warrens'];
+
+// Maps the story hasn't opened yet stay off the map until this flag is set.
+export const MAP_HIDDEN = { warrens: 'caveOpen' };
 
 // Short names for the tabs and for "To ..." exit labels.
 export const MAP_NAME = {
@@ -16,10 +19,11 @@ export const MAP_NAME = {
   hollow: 'Copperdeep Hollow',
   forge: 'The Sunken Forge',
   vale: 'Whispering Vale',
+  warrens: 'Goblin Warrens',
 };
 
 // Even shorter names for the map's tabs.
-export const MAP_TAB = { brambleford: 'Brambleford', route1: 'Thornwood', mine: 'Mine', depths: 'Depths', hollow: 'Hollow', forge: 'Forge', vale: 'Vale' };
+export const MAP_TAB = { brambleford: 'Brambleford', route1: 'Thornwood', mine: 'Mine', depths: 'Depths', hollow: 'Hollow', forge: 'Forge', vale: 'Vale', warrens: 'Warrens' };
 
 // Rooms you walk into from another map. Inside them the map shows the
 // outside, with you at the door.
@@ -84,5 +88,12 @@ export const LABELS = {
     { x: 64, y: 6, text: 'Air altar' },
     { x: 64, y: 47, text: 'Mind altar' },
     { x: 15, y: 44, text: 'Water altar' },
+  ],
+  warrens: [
+    { x: 22, y: 4, text: "Grubnak's door" },
+    { x: 22, y: 14, text: 'The great dig' },
+    { x: 9, y: 19, text: 'West den' },
+    { x: 35, y: 16, text: 'East den' },
+    { x: 22, y: 30, text: 'Landing' },
   ],
 };

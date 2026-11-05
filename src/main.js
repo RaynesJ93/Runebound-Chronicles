@@ -304,6 +304,7 @@ function boot() {
   const refreshMap = () => {
     const here = mapPlace(area.id, state.player.x, state.player.y);
     hud.mapStar = state.star;
+    hud.mapFlags = state.flags;
     hud.setMapHere(here, here.id === area.id ? { npcs, enemies } : null);
   };
   hud.onMapOpen = () => refreshMap();
@@ -311,7 +312,8 @@ function boot() {
   hud.setGuideSeen(!!state.flags.seenGuide);
   hud.onGuideOpen = () => { if (!state.flags.seenGuide) { state.flags.seenGuide = true; save(); } };
   // Quest journal. A quest you can start glows the button until you've opened the journal.
-  const questCtx = () => ({ flags: state.flags, level: (sk) => book.level(sk), count: (id) => inventory.count(id), have: (id) => haveAnywhere(id) });
+  const questCtx = () => ({ flags: state.flags, level: (sk) => book.level(sk), count: (id) => inventory.count(id), have: (id) => haveAnywhere(id),
+    holdingPickaxe: () => PICKAXES.some((t) => hasItem(t.id)) });
   const refreshQuests = () => {
     const c = questCtx();
     hud.setQuestsNew(QUESTS.some((q) => questStatus(q, c) === 'available' && !state.flags[`seenQuest_${q.id}`]));
@@ -726,7 +728,7 @@ function boot() {
   };
 
   // Long-press (phone) or right-click (computer): every option for what's there.
-  const PROP_NAME = { sign: 'sign', door: 'door', well: 'well', stall: 'stall', brokenCart: 'broken cart', brokenBarrel: 'barrel', toppledBarrel: 'barrel', smashedBarrel: 'broken barrel', counter: 'counter', bankBooth: 'bank booth', fallenTree: 'fallen tree', logPile: 'log pile', tent: 'tent', campfire: 'campfire', scarecrow: 'scarecrow', lamp: 'lamp' };
+  const PROP_NAME = { sign: 'sign', door: 'door', well: 'well', stall: 'stall', brokenCart: 'broken cart', runeDoor: 'rune door', brokenBarrel: 'barrel', toppledBarrel: 'barrel', smashedBarrel: 'broken barrel', counter: 'counter', bankBooth: 'bank booth', fallenTree: 'fallen tree', logPile: 'log pile', tent: 'tent', campfire: 'campfire', scarecrow: 'scarecrow', lamp: 'lamp' };
   input.onLongPress = (sx, sy) => {
     if (hud.dialogOpen || !ready()) return;
     const t = view.screenToTile(sx, sy);
@@ -985,7 +987,9 @@ function boot() {
         refreshInventory();
       }
       if (hook.set) Object.assign(state.flags, hook.set);
+      for (const [skill, xp] of Object.entries(hook.xp || {})) book.add(skill, xp);
       syncSpawns();
+      syncCaves();
       refreshQuests();
       save();
     });
@@ -1001,12 +1005,16 @@ function boot() {
       }
     }
   };
+  // Cave mouths marked `openable` are drawn open once the story opens them.
+  const syncCaves = () => {
+    for (const w of worlds.values()) for (const p of w.area.props) if (p.openable) p.opened = !!state.flags.caveOpen;
+  };
   // Books and letters: tap to read, one page per dialogue box.
   const readItem = (id) => hud.showDialog(ITEMS[id].read, null, ITEMS[id].name);
   player.onStep = (tile) => {
     if (!player.path.length) { marker = null; if (!player.interact) goal = null; }
     const exit = area.exitAt.get(area.idx(tile.x, tile.y));
-    if (exit && !transitioning) travel(exit);
+    if (exit && !transitioning && (!exit.when || exit.when(state.flags))) travel(exit);
   };
 
   // ---- Ticks ----------------------------------------------------------------
@@ -1131,6 +1139,7 @@ function boot() {
     }
   };
   syncForge();
+  syncCaves();
 
   // ---- Gathering: woodcutting and mining --------------------------------------------
   // Trees and ore rocks work the same way: tap one, walk up, and swing away with
