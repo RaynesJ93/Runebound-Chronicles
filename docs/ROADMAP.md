@@ -63,6 +63,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Date | Change |
 | --- | --- |
+| 5 Nov 2026 | v0.35.0: a Guide button at the top left for new players — how to play, the free starter tools and who gives them, where to train each skill, where to fight, and banks and extras; rows open the map on that area. The button glows until it's first opened. |
 | 5 Nov 2026 | v0.34.0: bank tabs and search — items sort themselves into tabs (All, Weapons, Armour, Ammo & runes, Tools, Ores & bars, Materials, Food & potions, Jewellery & gems), each showing how many kinds of item it holds, plus a search box that finds anything in the bank. Works at the bank and every supply chest. |
 | 5 Nov 2026 | v0.33.2: the game now fills the whole iPhone screen when opened from the home screen — no more green strip along the bottom. The controls stay clear of the home bar. |
 | 5 Nov 2026 | v0.33.1: the level-up message is now a slim pill at the bottom of the screen, just above the joystick and buttons, instead of a big box near the top; it slides up and fades out. |

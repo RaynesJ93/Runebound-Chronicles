@@ -301,6 +301,9 @@ function boot() {
     hud.setMapHere(here, here.id === area.id ? { npcs, enemies } : null);
   };
   hud.onMapOpen = () => refreshMap();
+  // The Guide button glows until a new player first opens it.
+  hud.setGuideSeen(!!state.flags.seenGuide);
+  hud.onGuideOpen = () => { if (!state.flags.seenGuide) { state.flags.seenGuide = true; save(); } };
   // Inventory panel: tap for options, drag to rearrange.
   refreshInventory = () => {
     currentLook();
@@ -772,7 +775,8 @@ function boot() {
     if (e.code === 'KeyR') toggleRun();
     else if (e.code === 'Equal' || e.code === 'NumpadAdd') zoomBy(1);
     else if (e.code === 'Minus' || e.code === 'NumpadSubtract') zoomBy(-1);
-    else if (e.code === 'Escape') { if (hud.menuOpen) hud.closeMenu(); else if (hud.dialogOpen) hud.advanceDialog(); else if (hud.settingsOpen) { hud.closeSettings(); hud.closeSkills(); hud.closeInventory(); hud.closeMap(); } }
+    else if (e.code === 'Escape') { if (hud.menuOpen) hud.closeMenu(); else if (hud.dialogOpen) hud.advanceDialog(); else if (hud.settingsOpen) { hud.closeSettings(); hud.closeSkills(); hud.closeInventory(); hud.closeMap(); hud.closeGuidePanel(); } }
+    else if (e.code === 'KeyG' && !hud.dialogOpen) { if (hud.guideOpen) hud.closeGuidePanel(); else hud.openGuidePanel(); }
     else if (e.code === 'KeyM' && !hud.dialogOpen) { if (hud.mapOpen) hud.closeMap(); else hud.openMap(); }
     else if ((e.code === 'KeyI' || e.code === 'KeyB') && !hud.dialogOpen) { if (hud.invOpen) hud.closeInventory(); else hud.openInventory(); }
     else if (e.code === 'KeyK' && !hud.dialogOpen) { if (hud.skillsOpen) hud.closeSkills(); else hud.openSkills('skills'); }
