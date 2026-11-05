@@ -650,6 +650,10 @@ A map button (top right, or M on a keyboard) opens the map of the area you're in
 
 The map shows the ground, trees, water and buildings drawn small, and on top: place names (from `data/mapLabels.js`), villagers (yellow dots) and monsters (red; the Alpha Wolf ringed in gold) where they are right now, the ways out to other areas, and icons for the bank and shop, fishing, mining, smithing, cooking, tanning and runecrafting altars. Tap any marker to see what it is. Everything except the place names is read from the area data, so new areas and skilling spots show up by themselves; a new area only needs adding to `MAP_AREAS` and its labels.
 
+### The Guide (v0.35.0)
+
+A **Guide** button at the top left (or G on a keyboard) opens a short guide for new players: how to play; the free starter tools and who gives them (Dorrin: pickaxe and hammer; Bram: axe, knife, shortbow and arrows; Wren: staff and runes; Old Finn: net, rod and bait; Hilda: needle and thread; Pell's store for everything else); where to train each gathering and production skill; where to fight by level; and banks, shooting stars and the Cold Forge quest. Rows with a map pin open the map on that area. The button glows until a player first opens it. The content lives in `data/startGuide.js`; keep it up to date as the world grows.
+
 ### Skill guides (v0.24.0)
 
 Tap any skill in the skills panel to open its guide: everything the skill unlocks, in level order, with an icon, what it needs and the XP it gives. Rows you can already do are bright; locked rows are greyed with the level in red. The header shows your level and the next unlock. Guides are built from the data files (`src/skills/guide.js`), so new items, recipes, trees, rocks, fish, spells and altars appear automatically. Combat skills list the gear that needs them (Attack: weapons; Defence: armour; Ranged: bows and gear; Magic: spells and staffs); Strength and Hitpoints explain what they do.
