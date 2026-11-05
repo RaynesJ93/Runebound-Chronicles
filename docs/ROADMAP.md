@@ -34,7 +34,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 2. ✅ Mining (a small mine area) and Smithing (bars, bronze/iron gear) — v0.12.0; ✅ full bronze and iron sets — v0.26.0; ✅ Copperdeep Depths, coal and steel — v0.27.0; ✅ silver, gold, gems and jewellery — v0.28.0; ✅ Copperdeep Hollow and mithril — v0.29.0
 3. ✅ Fishing and Cooking (food you make yourself) — v0.13.0
 4. ✅ Crafting (leather armour) — v0.15.0; ✅ lower levels and a hard leather set — v0.23.0; next: spinning, robes, jewellery, wolf leather; ✅ Runecrafting (air, mind and water runes) and Whispering Vale — v0.16.0
-5. Bank tabs and search
+5. ✅ Bank tabs and search — v0.34.0
 6. Mining and Smithing, part 2 (see GAME_DESIGN): ✅ F more to smith — v0.30.0 (boots, gauntlets, 2h swords, warhammers, spears, thrown weapons, nails); ✅ G shooting stars and stardust — v0.31.0: a stardust shop selling the prospector outfit, coal bags (open for 20–60 coal) and gem bags (open for random uncut gems), gem rocks; ✅ E adamant, rune and the Sunken Forge — v0.32.0; ✅ H saving bars and the Cold Forge quest — v0.33.0. No golden nuggets, no blast furnace.
 
 ## Phase 3 — Quests and new regions (v0.3)
@@ -63,6 +63,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Date | Change |
 | --- | --- |
+| 5 Nov 2026 | v0.34.0: bank tabs and search — items sort themselves into tabs (All, Weapons, Armour, Ammo & runes, Tools, Ores & bars, Materials, Food & potions, Jewellery & gems), each showing how many kinds of item it holds, plus a search box that finds anything in the bank. Works at the bank and every supply chest. |
 | 5 Nov 2026 | v0.33.2: the game now fills the whole iPhone screen when opened from the home screen — no more green strip along the bottom. The controls stay clear of the home bar. |
 | 5 Nov 2026 | v0.33.1: the level-up message is now a slim pill at the bottom of the screen, just above the joystick and buttons, instead of a big box near the top; it slides up and fades out. |
 | 5 Nov 2026 | v0.33.0: Batch H — saving bars (from Smithing 40, the anvil sometimes gives a bar back: 2% at 40 up to 10% at 99) and the quest The Cold Forge (Smithing 40, Mining 40): bring Dorrin 25 coal, 5 steel bars and an ember core from the Molten beast to relight the Sunken Forge's great furnace. Rewards: the great furnace works, the smith's outfit (+6% Smithing XP for the full set), and Smithing and Mining XP. NPCs can now take items and give quest rewards. |

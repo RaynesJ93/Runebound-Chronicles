@@ -315,7 +315,8 @@ Ranged gear follows the same idea (leather → hide armour, shortbow → oak →
 - Found in every town. Opened by talking to the banker or clicking the bank booth.
 - Hundreds of slots, every item stacks in the bank.
 - Deposit all / deposit inventory / deposit equipment / withdraw 1, 5, 10, X, All.
-- Tabs and search arrive in a later batch.
+- **Tabs (v0.34.0):** items sort themselves into tabs automatically — All, Weapons, Armour, Ammo & runes, Tools, Ores & bars, Materials, Food & potions, Jewellery & gems (`data/bankTabs.js`). Each tab shows how many kinds of item it holds; empty tabs are greyed. Nothing to set up or drag.
+- **Search:** type part of a name to find it anywhere in the bank (search covers every tab). Tabs and search work at the bank and at every supply chest.
 
 ### Shops
 
