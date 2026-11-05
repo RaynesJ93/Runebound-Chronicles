@@ -1,6 +1,6 @@
 # RuneBound Chronicles — Game Design Document
 
-*Version 2.3 · Updated 3 November 2026 · 2D pixel art; supersedes the original creature-battler concept*
+*Version 2.4 · Updated 5 November 2026 · 2D pixel art; supersedes the original creature-battler concept*
 
 ## 1. Vision
 
@@ -80,7 +80,7 @@ Regions unlock through quests, skill or combat level requirements, or key items 
 
 - NPCs stand or wander on set paths. Tap/click to talk.
 - Dialogue boxes in the Emerald style at the bottom of the screen, with choice options.
-- A main story questline drives you from region to region; side quests reward XP, items and access.
+- A main story questline drives you from region to region; side quests reward XP, items and access. The main story is **The Runebound** (see section 9, Quests).
 
 ## 4. Combat system
 
@@ -685,6 +685,27 @@ Every skill uses the same XP curve and goes to 99. Resources respawn after a tim
 - Quests use NPC dialogue, item delivery, kill tasks, simple puzzles and story bosses.
 - Rewards: XP lamps, items, coins, and **new region access**.
 - Quest points unlock late-game content.
+
+### Main story: The Runebound (chapters 1–2 shipped in v0.37.0)
+
+**Backstory.** Forty years ago the goblin warlord **Grubnak** marched on Brambleford. The village held the Thornwood crossroads, and Captain **Holt** of the Watch led the last stand. Grubnak couldn't be killed, so the runekeepers of Whispering Vale *bound* him with runes, deep under the stones of the old cave north-west of the goblin camp, and set a runestone in the stone shrine to hold the binding. That's why the cave mouth is sealed, and why something deep inside is breathing. The village remembers a war it "won"; almost nobody alive knows the warlord was never killed. Now the goblins are bold again, a cart has been raided, and the binding is weakening.
+
+The story runs through places already in the world (the overturned cart, the graveyard memorial, the old watchtower, the hermit's hut, the shrine with its empty hollow, the sealed cave) and gives each one a reason to exist. Each chapter is a quest in the journal; a chapter needs the one before it.
+
+| Chapter | Name | Giver | Summary | Status |
+| --- | --- | --- | --- | --- |
+| 1 | The Overturned Cart | Pell (General Store) | Pell's supply cart was raided on the mine road. Look at the cart, follow the goblin tracks, take back his strongbox from the goblin brutes. Inside is a goblin token that isn't his. | v0.37.0 |
+| 2 | Echoes of the War | Elder Maren | Maren recognises Grubnak's mark on the token. Read the war memorial, find Captain Holt's journal in the old watchtower, and hear the truth from Tobin, the hermit who once served under Holt. | v0.37.0 |
+| 3 | The Empty Hollow | Tobin | The runestone that held the binding has been stolen from the shrine. Track it to the goblins, then take the pieces to Aldric in Whispering Vale to remake it (Runecrafting). | planned |
+| 4 | Stone and Rune | Aldric | Remaking the runestone needs runes, essence and a metal setting from Dorrin (Smithing, Mining). | planned |
+| 5 | The Sealed Cave | Tomas and the Watch | Open the sealed cave and go down through the goblin warrens beneath it. A new area. | planned |
+| 6 | The Runebound | Tobin | Face Grubnak, half-free of his binding: a story boss with telegraphed attacks. Re-seal or destroy him. Unlocks the next region. | planned |
+
+**Chapter 1: The Overturned Cart** (flag `cartQuest`; recommended combat level 5+). Ask Pell "You look worried." He says his supply cart was raided on the mine road and his strongbox taken. Look at the overturned cart in Thornwood (just north of the village road): you find goblin tracks heading west, to the goblin camp. While you're on the quest, the first **goblin brute** you kill always drops **Pell's strongbox** (if you don't already have it). Bring it back to Pell for **300 coins, 3 meat pies**, a little Attack and Strength XP, and the **goblin token** that was in the box: a carved bone disc that isn't his. He tells you to show it to Elder Maren.
+
+**Chapter 2: Echoes of the War** (flag `warQuest`; needs chapter 1). Show Maren the token. She goes pale: it's the mark of Grubnak, the warlord of the Goblin War, and she sends you to learn what you can. Read the **war memorial** in the old graveyard (it ends "Here lies no warlord. He sleeps beneath the stones."). Search the **old watchtower** for **Captain Holt's journal** (a book you can read: the last days of the war, the binding by the shrine's stones, and two names left to keep watch: Holt and a young soldier called Tobin). Find **Tobin the Hermit** at the hermit's hut, now an old man, who tells you the truth about the binding. Go back to Maren for **600 coins** and Attack, Strength and Defence XP. The journal then says the story continues in the next chapter.
+
+**Quest engine (v0.37.0).** Quests can now need earlier quests (`requiresQuests`) and show a recommended level. Story places can react to a quest (`QUEST_HOOKS` in `data/quests.js`: tap the cart, the memorial or the watchtower while on a quest to find a clue or an item). Monsters can drop quest items while you need them (`QUEST_DROPS`; the Cold Forge's ember core moved here too). Some items can be read (a `read` list of pages), by tapping them in the bag.
 
 ### Endgame goals
 - Level 99 in every skill (skill capes)

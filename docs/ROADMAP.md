@@ -1,6 +1,6 @@
 # RuneBound Chronicles — Roadmap
 
-*Updated 3 November 2026 · matches [GAME_DESIGN.md](GAME_DESIGN.md) v2.3*
+*Updated 5 November 2026 · matches [GAME_DESIGN.md](GAME_DESIGN.md) v2.4*
 
 The game is built in small batches. Each batch must:
 
@@ -40,7 +40,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 ## Phase 3 — Quests and new regions (v0.3)
 
 1. Quest journal and quest system (stages, flags, rewards)
-2. First main-story quest that unlocks the second town
+2. First main-story quest that unlocks the second town: **The Runebound**, six chapters (chapters 1 and 2 done in v0.37.0; see GAME_DESIGN.md section 9)
 3. Second town, two more routes, a cave
 4. New enemy families and gear tiers (steel, mithril)
 5. Specialist shops in the new town
@@ -63,6 +63,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Date | Change |
 | --- | --- |
+| 5 Nov 2026 | v0.37.0: main story, The Runebound, chapters 1 and 2 — The Overturned Cart (Pell) and Echoes of the War (Maren, the war memorial, Captain Holt's journal in the old watchtower, and Tobin the Hermit, a new villager at the hermit's hut). Quest engine: quests that need earlier quests, story places that react to quests, quest-item drops, and books you can read. |
 | 5 Nov 2026 | v0.36.0: quest journal — a Quests button under the Guide lists every quest with its status, requirements (ticked against your levels), who starts it (map pin), a live checklist while it's in progress, and rewards. New quests appear automatically when added to `data/quests.js`. The button glows when there's a new quest you can start. |
 | 5 Nov 2026 | v0.35.1: the run button is gone — you always run (it never tires you out). The R key no longer toggles walking. The HP orb stays bottom right. |
 | 5 Nov 2026 | v0.35.0: a Guide button at the top left for new players — how to play, the free starter tools and who gives them, where to train each skill, where to fight, and banks and extras; rows open the map on that area. The button glows until it's first opened. |

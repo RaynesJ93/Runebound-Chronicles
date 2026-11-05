@@ -9,7 +9,7 @@ import { itemIcon, stackLabel } from '../render/items.js';
 import { ITEMS } from '../../data/items.js';
 import { BANK_TABS, tabOf } from '../../data/bankTabs.js';
 import { GUIDE } from '../../data/startGuide.js';
-import { QUESTS, questStatus } from '../../data/quests.js';
+import { QUESTS, questStatus, questById, questsDone } from '../../data/quests.js';
 import { SLOT_NAME, TYPES } from '../items/equipment.js';
 
 // Where each equipment slot sits on the 3 x 5 grid (like a paper doll).
@@ -586,15 +586,19 @@ export class Hud {
   renderQuests(c) {
     const LABEL = { locked: 'Not available yet', available: 'Available', started: 'In progress', done: 'Complete' };
     const rank = { started: 0, available: 1, locked: 2, done: 3 };
-    const list = QUESTS.map((q) => ({ q, st: questStatus(q, c) })).sort((a, b) => rank[a.st] - rank[b.st]);
+    // Later story chapters stay hidden until the one before is done.
+    const list = QUESTS.filter((q) => !q.chapter || q.chapter === 1 || questsDone(q, c) || c.flags[q.flag]).map((q) => ({ q, st: questStatus(q, c) })).sort((a, b) => rank[a.st] - rank[b.st] || (a.q.chapter || 99) - (b.q.chapter || 99));
     const done = list.filter((x) => x.st === 'done').length;
     const tick = (ok) => `<span class="q-tick ${ok ? 'ok' : ''}">${ok ? '✔' : '✘'}</span>`;
     const SK = Object.fromEntries(SKILLS.map((s) => [s.id, s.name]));
-    this.$('quests-body').innerHTML = `<p class="muted small">${done} of ${QUESTS.length} complete. New quests appear here as they're added to the world.</p>`
+    this.$('quests-body').innerHTML = `<p class="muted small">${done} of ${list.length} complete. New quests appear here as they're added to the world.</p>`
       + list.map(({ q, st }) => {
-        const reqs = Object.entries(q.requires || {}).map(([sk, lv]) => `<li>${tick(c.level(sk) >= lv)} ${SK[sk] || sk} ${lv} <small>(you: ${c.level(sk)})</small></li>`).join('');
+        const reqs = (q.requiresQuests || []).map((id) => { const r = questById(id); return `<li>${tick(c.flags[r?.flag] === 'done')} Finish ${r?.name || id}</li>`; }).join('')
+          + Object.entries(q.requires || {}).map(([sk, lv]) => `<li>${tick(c.level(sk) >= lv)} ${SK[sk] || sk} ${lv} <small>(you: ${c.level(sk)})</small></li>`).join('')
+          + (q.recommend ? `<li class="muted">Recommended: ${q.recommend}</li>` : '');
         const steps = st === 'started' ? `<h4>What to do</h4><ul class="q-list">${q.steps(c).map((s) => `<li>${tick(s.done)} ${s.text}</li>`).join('')}</ul>` : '';
         return `<div class="quest-card q-${st}">
+          ${q.chapter ? `<div class="q-chapter">The Runebound · Chapter ${q.chapter}</div>` : ''}
           <div class="quest-top"><b>${q.name}</b><span class="q-status">${LABEL[st]}</span></div>
           <p class="quest-about">${q.about}</p>
           ${st !== 'done' ? `<button class="quest-giver" data-gmap="${q.giver.area}">${st === 'started' ? 'Quest giver' : 'Start: talk to'} ${q.giver.name}, ${q.giver.where} <span class="guide-pin">📍</span></button>` : ''}

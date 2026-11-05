@@ -622,6 +622,31 @@ SOOT = ['#120e0c', '#2e221a', '#54402e', '#8a6c4e']
 SOOT_GREY = ['#0e0e10', '#26262a', '#46464c', '#76767e']
 
 
+# ---- The Runebound: Tobin the Hermit (Old Finn in a faded Watch coat) -------------
+
+WATCH_COAT = ['#1e2416', '#3a4628', '#5a6a3a', '#86945a']
+OLD_HAT = ['#1a120c', '#3a2a1a', '#5a4228', '#7a5c3a']
+
+
+def tobin_garb(im, get=None):
+    """Finn's blue coat -> a faded olive Watch coat; his straw hat -> worn brown."""
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.float32)
+    h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
+    m = rgba[..., 3] > 0
+    rows = np.arange(h.shape[0])[:, None] * np.ones_like(h)
+    coat = m & (h > 130) & (h < 215) & (s > 35)
+    hat = m & (h >= 8) & (h < 48) & (s > 70) & (v > 70) & ((rows <= 7) | ((rows <= 9) & (s > 150)))
+    l = lum(rgba[..., :3]) / 255
+    out = rgba.copy()
+    for mask, pal in ((coat, WATCH_COAT), (hat, OLD_HAT)):
+        if mask.any():
+            lo, hi = np.percentile(l[mask], 3), np.percentile(l[mask], 99)
+            t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+            out[mask, :3] = J.ramp(pal, t)[mask]
+    return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
 # ---- What to make ------------------------------------------------------------------
 # new item: icon=(source item, fn), gear=(source item, fn) or None,
 #           small=(source item, fn), or None to shrink the new 32 px icon down.
@@ -757,6 +782,7 @@ EXTRA = [
     ('anim:moltenBeast:attack:right', 'anim:caveBeast:attack:right', molten(CHARCOAL, LAVA, beast_glow, 0.2, 0.55)),
     ('anim:forgeGolem:fall', 'anim:essenceGolem:fall', molten(IRON_BODY, LAVA, golem_glow)),
     ('anim:forgeGolem:hit', 'anim:essenceGolem:hit', molten(IRON_BODY, LAVA, golem_glow)),
+    ('chars:tobin', 'chars:finn', tobin_garb),
 ]
 
 # Side-on shields stay as they are (a kite shape only reads from the front or back).

@@ -784,6 +784,23 @@ export const ITEMS = {
     name: 'Rune javelin heads', stackable: true, value: 270, examine: 'Fletch them onto arrow shafts to make javelins.',
   },
   emberCore: { name: 'Ember core', value: 0, examine: 'A lump of rock from the Molten beast. It glows from within and never cools. Dorrin needs it.' },
+
+  // ---- The Runebound (main story) ---------------------------------------------------
+  // read: pages shown when you tap the item (one dialogue box each).
+  pellsStrongbox: { name: "Pell's strongbox", value: 0, examine: "A battered iron box with Pell's name scratched on the lid. Still locked, luckily." },
+  goblinToken: { name: 'Goblin token', value: 0, examine: 'A disc of carved bone on a leather cord. A crude crown is cut into it, above three slashes.' },
+  holtsJournal: {
+    name: "Holt's journal", value: 0, examine: 'A small leather journal from the old watchtower. Tap it to read.',
+    read: [
+      'Captain Edric Holt, of the Watch. Brambleford, in the year of the Goblin War.',
+      'Day 40. Grubnak\'s horde holds the whole of Thornwood. We hold the crossroads, and nothing else. The men are tired. So am I.',
+      'Day 41. Our arrows do nothing to him. Grubnak took a spear through the chest this morning and laughed. He is no ordinary goblin. The runekeepers say he cannot be killed. Only bound.',
+      'Day 44. It is done. The runekeepers from the Vale bound him with their runes, deep under the stones of the old cave in the north-west, and sealed the mouth with boulders.',
+      'The binding is held by a runestone they set in the stone shrine on the eastern hill. While the stone sits in the shrine, Grubnak sleeps. Tobin and I will keep watch over it.',
+      'Day 45. The village will be told he is dead. Better they sleep easy. Better nobody goes looking for that cave.',
+      'If you are reading this and I am gone: find Tobin. Keep the stone safe. — E. H.',
+    ],
+  },
   smithsTunic: {
     name: "Smith's tunic", value: 0, examine: "Dorrin's old leather tunic, scorched at the cuffs. +2% Smithing XP, and more for the full outfit.",
     equip: { slot: 'body', req: {}, def: { stab: 1, slash: 1, crush: 1 }, xpBonus: { smithing: 0.02 }, set: 'smith', look: { tunic: '#3a2a1e' } },

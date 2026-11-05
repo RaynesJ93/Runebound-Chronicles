@@ -27,12 +27,57 @@ export const NPCS = [
         menu: {
           say: [],
           choices: [
+            { text: 'Pell found this token in his strongbox...', next: 'war', if: (c) => c.flags.cartQuest === 'done' && !c.flags.warQuest },
+            { text: 'About the Goblin War...', next: 'warProgress', if: (c) => c.flags.warQuest === 'started' },
+            { text: 'About Grubnak...', next: 'warDone', if: (c) => c.flags.warQuest === 'done' },
             { text: 'Tell me about Brambleford.', next: 'town' },
             { text: "What's north of the village?", next: 'north' },
             { text: 'How do I get stronger?', next: 'stronger' },
             { text: 'Goodbye.', next: 'bye' },
           ],
         },
+        // ---- The Runebound, chapter 2: Echoes of the War -------------------------------
+        war: {
+          say: ['A token? Let me see.', '...', 'A crown over three slashes. I have not seen that mark since I was a girl.',
+            "It's the mark of Grubnak, the goblin warlord. Forty years ago his horde came out of the north-west and burned half of Thornwood.",
+            "The Watch held the crossroads, and the war ended. They told us he was dead. So why are his goblins carrying his mark again?"],
+          choices: [
+            { text: "I'll find out.", next: 'warStart' },
+            { text: "That's in the past.", next: 'warPast' },
+          ],
+        },
+        warPast: { say: "I hope you're right. Come back if you change your mind.", next: 'more' },
+        warStart: {
+          set: { warQuest: 'started' },
+          say: ['Thank you. Start with the war memorial in the old graveyard, south in Thornwood. It names the fallen.',
+            'Captain Holt of the Watch led the last stand. He kept a post at the old watchtower, north of the road. If he left anything behind, it would be there.',
+            'And ask about. Some who fought are still alive, though few of them like to talk about it.'],
+          next: 'more',
+        },
+        warProgress: {
+          say: (c) => (c.flags.hermitTold
+            ? ['You look like you have news.']
+            : [`Have you been to the memorial in the graveyard${c.flags.warMemorial ? '? Yes, good' : ' yet'}? And the old watchtower${c.flags.warJournal ? '? Good' : ''}?`,
+              c.flags.warJournal ? "A journal of Holt's? Then he mentions others who fought. Find them, if any still live." : 'Holt kept a post at the old watchtower, north of the road.']),
+          choices: [
+            { text: "Grubnak isn't dead.", next: 'warHandIn', if: (c) => c.flags.hermitTold && c.flags.warMemorial },
+            { text: "Grubnak isn't dead.", next: 'warNotYet', if: (c) => c.flags.hermitTold && !c.flags.warMemorial },
+            { text: "I'm still looking.", next: 'more' },
+          ],
+        },
+        warNotYet: { say: "Not dead? Then why is there a memorial... Go and read it again, in the graveyard. I want to be sure before I believe this.", next: 'more' },
+        warHandIn: {
+          give: { flag: 'warPaid', items: [{ item: 'coins', qty: 600 }] },
+          giveFail: 'warFull',
+          set: { warQuest: 'done' },
+          reward: { xp: { attack: 250, strength: 250, defence: 250 }, quest: 'Echoes of the War' },
+          say: ['Bound? Under the old cave? And a runestone in the shrine holding him there...', 'Holt lied to all of us. To keep us safe, I suppose. Forty years we\'ve slept easy on top of that.',
+            "If his goblins are carrying his mark again, something has changed. The binding must be weakening.",
+            "Take this, for your trouble. And thank you. I need to think about what we do next. Come and see me again soon."],
+          next: 'more',
+        },
+        warFull: { say: "Your bag's full, dear. Make a little room and come back.", next: 'more' },
+        warDone: { say: ["Grubnak, bound under the old cave. I still can't quite believe it.", 'I\'m thinking on what to do. Talk to me again soon. (The story continues in chapter 3, coming soon.)'], next: 'more' },
         town: {
           say: ['Brambleford sits at the edge of Thornwood Forest.', 'The bank and the General Store face the square. They open soon. The merchants are still on the road.'],
           next: 'more',
@@ -48,6 +93,8 @@ export const NPCS = [
           next: 'more',
         },
         more: { say: 'Anything else?', choices: [
+          { text: 'Pell found this token in his strongbox...', next: 'war', if: (c) => c.flags.cartQuest === 'done' && !c.flags.warQuest },
+          { text: 'About the Goblin War...', next: 'warProgress', if: (c) => c.flags.warQuest === 'started' },
           { text: 'Tell me about Brambleford.', next: 'town' },
           { text: "What's north of the village?", next: 'north' },
           { text: 'How do I get stronger?', next: 'stronger' },
@@ -118,9 +165,49 @@ export const NPCS = [
         again: { say: 'Back again! What can I get you?', next: 'menu' },
         menu: { say: [], choices: [
           { text: "Let's trade.", action: 'shop' },
+          { text: 'You look worried.', next: 'cart', if: (c) => !c.flags.cartQuest },
+          { text: 'About your cart...', next: 'cartProgress', if: (c) => c.flags.cartQuest === 'started' },
           { text: 'How do prices work?', next: 'prices' },
           { text: 'Just looking, thanks.', next: 'bye' },
         ] },
+
+        // ---- The Runebound, chapter 1: The Overturned Cart ------------------------------
+        cart: {
+          say: ['Worried? Me? ...Oh, all right. Yes.', 'My second supply cart never made it. The driver ran back last night: goblins jumped him on the mine road, just north of the village.',
+            "He's fine. But they took my strongbox. Everything I've saved this season is in it."],
+          choices: [
+            { text: "I'll get it back.", next: 'cartStart' },
+            { text: 'Sorry to hear that.', next: 'menu' },
+          ],
+        },
+        cartStart: {
+          set: { cartQuest: 'started' },
+          say: ["You will? Bless you! The cart's still lying where they left it, in Thornwood, a little way up the road.",
+            "Have a look around it. And be careful. The driver said these weren't the little goblins. Big ones. Brutes."],
+          next: 'menu',
+        },
+        cartProgress: {
+          say: (c) => (c.count('pellsStrongbox') ? ['Is that... my strongbox?!'] : c.flags.cartClue
+            ? ['Goblin tracks heading west, you say? That\'ll be the goblin camp. Watch out for the brutes.']
+            : ["The cart's in Thornwood, a little way up the road north of the village. Have a look around it."]),
+          choices: [
+            { text: 'Here it is.', next: 'cartHandIn', if: (c) => c.count('pellsStrongbox') >= 1 },
+            { text: "I'm still looking.", next: 'menu' },
+          ],
+        },
+        cartHandIn: {
+          give: { flag: 'cartPaid', items: [{ item: 'coins', qty: 300 }, { item: 'meatPie', qty: 3 }, { item: 'goblinToken', qty: 1 }] },
+          giveFail: 'cartFull',
+          take: [{ item: 'pellsStrongbox', qty: 1 }],
+          takeFail: 'cartProgress',
+          set: { cartQuest: 'done' },
+          reward: { xp: { attack: 150, strength: 150 }, quest: 'The Overturned Cart' },
+          say: ['It IS! Still locked, too. Those brutes never got it open.', '*click* ...All there. Every coin. Here, take some for your trouble, and some pies. Fresh this morning.',
+            "Hang on, what's this? This isn't mine. A bone disc, carved with... a crown? Three slashes?",
+            "Gives me the shivers. Show it to Elder Maren in the square. If anyone knows what it means, she will."],
+          next: 'menu',
+        },
+        cartFull: { say: "I want to give you something, but your bag's full! Make room for five things and come back.", next: 'menu' },
         prices: { say: ['The more I have of something, the cheaper it gets. Sell me ten swords and I will not pay much for the eleventh!', 'I sell to you at a fair price and buy at about a third of that.'], next: 'menu' },
         bye: { say: 'Come back soon!' },
       },
@@ -371,6 +458,41 @@ export const NPCS = [
         magic: { say: ['Runes hold the power. The staff just points it.', 'Goblins carry air and mind runes; the brute by the tents often has water runes.'], next: 'menu' },
         mine: { say: ['Copper and tin near the entrance, iron deeper in.', "Dorrin runs the place. Ask him and he'll teach you to mine and smith."], next: 'menu' },
         bye: { say: 'And to you.' },
+      },
+    },
+  },
+
+  // ---- Thornwood -------------------------------------------------------------------
+  {
+    examine: 'A weathered old man in a faded Watch coat. He looks like he was a soldier once.',
+    id: 'tobin', name: 'Tobin the Hermit', short: 'Tobin', area: 'route1', x: 17, y: 26, radius: 1, wander: 0.08,
+    look: { hair: '#d8d4cc', tunic: '#4a5a3a', pants: '#3a3a30', beard: '#e4e0d8', hat: 'hood', hatColor: '#3e3428' },
+    talk: {
+      start: (c) => (c.flags.warQuest === 'started' && !c.flags.hermitTold ? (c.flags.warJournal ? 'journal' : 'wary') : c.flags.hermitTold ? 'again' : 'hi'),
+      nodes: {
+        hi: { say: pickLine([
+          "Hmph. Visitors. Don't get many. Don't want many.",
+          'Mind the goblins on your way back. They\'re getting bolder.',
+          "I've lived out here forty years. I like the quiet.",
+        ]) },
+        wary: {
+          say: ['The war? Who sent you? Maren?', "I don't talk about the war. Not to strangers.",
+            "If you want to know what happened, go and look in the old watchtower. If Holt left anything, it'll be there. Then come back."],
+        },
+        journal: {
+          say: ["That book. Where did you... that's Holt's hand. I'd know it anywhere.", 'Sit down. I suppose you\'ve earned the truth.',
+            "I was sixteen. Holt's youngest soldier. We held the crossroads for forty days, and Grubnak walked through our arrows like they were rain.",
+            "He can't be killed. So the runekeepers came from the Vale and bound him, under the stones of the cave north-west of here. Then they sealed it with boulders.",
+            'The binding is held by a runestone in the stone shrine, on the eastern hill. As long as the stone sits there, he sleeps.',
+            'Holt and I swore to watch over it. Holt is gone now. I built my hut here, close to the cave, and I have kept watch every day since.',
+            "And now his goblins carry his mark again. They can feel him stirring. Tell Maren. Tell her the binding is weakening."],
+          set: { hermitTold: true },
+        },
+        again: {
+          say: (c) => (c.flags.warQuest === 'done'
+            ? ['Maren knows, then. Good. Keep your sword sharp. (The story continues in chapter 3, coming soon.)']
+            : ['Go on, tell Maren what I told you. The binding, the runestone, the cave. She needs to know.']),
+        },
       },
     },
   },
