@@ -799,6 +799,7 @@ function boot() {
     refreshTrade();
   };
   hud.onTradeClose = () => { refreshInventory(); save(); };
+  hud.onTradeRefresh = () => refreshTrade();
   hud.onTradeTake = (id) => {
     const q = hud.tradeQty;
     if (hud.tradeMode === 'bank') {

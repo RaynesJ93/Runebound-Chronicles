@@ -7,6 +7,7 @@ import { iconUrl, paintedIconUrl } from '../render/icons.js';
 const uiIcon = (name, svg, size) => { const u = paintedIconUrl(name); return u ? `<img class="px ui-ic" src="${u}" alt="" width="${size}" height="${size}" id="ic-${name}">` : svg; };
 import { itemIcon, stackLabel } from '../render/items.js';
 import { ITEMS } from '../../data/items.js';
+import { BANK_TABS, tabOf } from '../../data/bankTabs.js';
 import { SLOT_NAME, TYPES } from '../items/equipment.js';
 
 // Where each equipment slot sits on the 3 x 5 grid (like a paper doll).
@@ -79,6 +80,10 @@ export class Hud {
           </div>
           <div class="panel-body">
             <p class="muted small trade-help" id="trade-help"></p>
+            <div class="bank-tools" id="bank-tools">
+              <div class="bank-tabs" id="bank-tabs" role="tablist"></div>
+              <input class="bank-search" id="bank-search" type="search" placeholder="Search the bank" aria-label="Search the bank" autocomplete="off" spellcheck="false">
+            </div>
             <div class="trade-grid" id="trade-grid"></div>
             <div class="trade-actions" id="trade-actions">
               <button class="btn" id="bank-dep-inv">Deposit bag</button>
@@ -244,7 +249,12 @@ export class Hud {
     this.bindInventoryDrag($('inv-grid'));
     this.tradeQty = 1;
     this.el.trade = $('trade');
+    this.bankTab = 'all';
+    this.bankSearch = '';
+    $('bank-search').addEventListener('input', (e) => { this.bankSearch = e.target.value; this.onTradeRefresh?.(); });
     this.el.trade.addEventListener('click', (e) => {
+      const bt = e.target.closest('[data-btab]');
+      if (bt) { this.bankTab = bt.dataset.btab; this.onTradeRefresh?.(); return; }
       if (e.target === this.el.trade || e.target.closest('[data-close]')) { this.closeTrade(); return; }
       const q = e.target.closest('[data-q]');
       if (q) {
@@ -293,6 +303,8 @@ export class Hud {
     this.tradeMode = mode;
     this.$('trade-title').textContent = title;
     this.$('trade-actions').classList.toggle('hidden', mode !== 'bank');
+    this.$('bank-tools').classList.toggle('hidden', mode !== 'bank');
+    if (mode === 'bank') { this.bankSearch = ''; this.$('bank-search').value = ''; }
     this.$('trade-help').textContent = mode === 'bank'
       ? 'Tap an item in the bank to take it out, or in your bag to put it in. Choose how many with the buttons above.'
       : help || 'Tap an item to buy it, or one of your own to sell it. Prices are in coins.';
@@ -309,6 +321,22 @@ export class Hud {
 
   // top: [{ id, qty, price? }], bag: inventory slots, sell: (id) => price (shop only)
   renderTrade(top, bag, sell = null) {
+    let emptyMsg = 'Your bank is empty. Tap items in your bag to store them.';
+    if (this.tradeMode === 'bank') {
+      // Tabs (with how many kinds of item each holds), then the search, then the grid.
+      const counts = {};
+      for (const t of top) { const k = tabOf(t.id); counts[k] = (counts[k] || 0) + 1; }
+      counts.all = top.length;
+      this.$('bank-tabs').innerHTML = BANK_TABS.map((t) => `<button class="bank-tab ${this.bankTab === t.id ? 'on' : ''} ${counts[t.id] ? '' : 'none'}" data-btab="${t.id}" role="tab" aria-selected="${this.bankTab === t.id}" title="${t.name}" aria-label="${t.name}${counts[t.id] ? ` (${counts[t.id]})` : ''}">
+          <img class="px" src="${itemIcon(t.icon).url}" alt=""><span>${counts[t.id] || 0}</span></button>`).join('');
+      const q = (this.bankSearch || '').trim().toLowerCase();
+      this.$('bank-tabs').classList.toggle('searching', !!q);
+      const tab = BANK_TABS.find((t) => t.id === this.bankTab) || BANK_TABS[0];
+      if (q) top = top.filter((t) => (ITEMS[t.id]?.name || '').toLowerCase().includes(q));
+      else if (tab.id !== 'all') top = top.filter((t) => tabOf(t.id) === tab.id);
+      if (counts.all) emptyMsg = q ? `Nothing in your bank matches "${q.replace(/[<>&"]/g, '')}".` : `Nothing in ${tab.name.toLowerCase()} yet.`;
+      this.$('bank-search').placeholder = `Search the bank (${counts.all} items)`;
+    }
     const cell = (id, qty, extra) => {
       const lab = qty !== null && (qty > 1 || ITEMS[id]?.stackable) ? stackLabel(qty) : null;
       return `<img class="px" src="${itemIcon(id).url}" alt="${ITEMS[id]?.name ?? ''}" draggable="false">
@@ -317,7 +345,7 @@ export class Hud {
     this.$('trade-grid').innerHTML = top.length
       ? top.map((t) => `<button class="slot full ${t.qty !== null && t.qty <= 0 ? 'empty-stock' : ''}" data-take="${t.id}" title="${ITEMS[t.id]?.name}${t.price ? ` — ${t.price} ${t.currency || 'coins'}` : ''}">
           ${cell(t.id, t.qty, t.price ? `<span class="price">${t.price}</span>` : '')}</button>`).join('')
-      : '<p class="muted" style="grid-column: 1 / -1; margin: 6px 4px; color: #e8d8b0">Your bank is empty. Tap items in your bag to store them.</p>';
+      : `<p class="muted" style="grid-column: 1 / -1; margin: 6px 4px; color: #e8d8b0">${emptyMsg}</p>`;
     this.$('trade-inv').innerHTML = bag.map((s, i) => {
       if (!s) return '<div class="slot"></div>';
       const p = sell ? sell(s.id) : null;
