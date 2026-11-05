@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 5 Nov 2026 | v0.40.1: the prospector outfit in Lyra's star shop costs three times as much (helmet 240, jacket 360, legs 300, boots 180 stardust; 1,080 for the set). Coal and gem bags are unchanged. |
 | 5 Nov 2026 | v0.40.0: The Runebound, chapter 5: The Sealed Cave — break open the sealed cave (Mining 30) into the Goblin Warrens, a new area with warren goblins (level 20) and the Goblin Digmaster (level 26), who is digging at the door of Grubnak's chamber. Exits that open with the story. |
 | 5 Nov 2026 | v0.39.0: The Runebound, chapter 4: Stone and Rune — bring Aldric essence and water and mind runes, have Dorrin forge a steel-and-silver setting, and set the remade Binding Stone in the shrine (needs Runecrafting 10 and Smithing 30). Story places can now take items. |
 | 5 Nov 2026 | v0.38.0: The Runebound, chapter 3: The Empty Hollow — the runestone holding Grubnak's binding was stolen from the shrine and broken in three. Find the shards at the shrine, from the Goblin Chief (a new level 16 boss you wake at his hut in the goblin camp) and from the tunnel goblins in Copperdeep Mine, and take them to Aldric in Whispering Vale. Enemies can now appear only once a quest flag is set. |

@@ -7,10 +7,10 @@ export const SHOPS = {
   starShop: {
     name: "Lyra's star shop", currency: 'stardust', buyOnly: true, unlimited: true,
     stock: [
-      { id: 'prospectorHelmet', price: 80 },
-      { id: 'prospectorJacket', price: 120 },
-      { id: 'prospectorLegs', price: 100 },
-      { id: 'prospectorBoots', price: 60 },
+      { id: 'prospectorHelmet', price: 240 },
+      { id: 'prospectorJacket', price: 360 },
+      { id: 'prospectorLegs', price: 300 },
+      { id: 'prospectorBoots', price: 180 },
       { id: 'coalBag', price: 15 },
       { id: 'gemBag', price: 40 },
     ],
