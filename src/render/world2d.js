@@ -48,6 +48,7 @@ function getLib() {
     barrel: art('barrel')?.[0] || S.barrel(),
     brokenCart: art('brokenCart')?.[0] || art('stall')?.[0] || S.stall(),
     runeDoor: art('runeDoor')?.[0] || null,
+    runeDoorOpen: art('runeDoorOpen')?.[0] || null,
     brokenBarrel: art('brokenBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
     toppledBarrel: art('toppledBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
     smashedBarrel: art('smashedBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
@@ -223,7 +224,11 @@ export function createWorldView(canvasEl, area) {
       case 'shelf': place(p.variant !== undefined ? lib.shelf[p.variant % lib.shelf.length] : pick(lib.shelf, p), f.x, f.y + 2); break;
       case 'barrel': place(lib.barrel, f.x, f.y); break;
       case 'brokenCart': place(lib.brokenCart, f.x, f.y + 1); break;
-      case 'runeDoor': place(lib.runeDoor || lib.caveMouth[1], f.x, f.y + 1); break;
+      case 'runeDoor': {
+        const shut = lib.runeDoor || lib.caveMouth[1], open = lib.runeDoorOpen || lib.caveMouth[0];
+        place(shut, f.x, f.y + 1, p.openable ? { prop: p, open: { img: open.img, x: Math.round(f.x - open.ax), y: Math.round(f.y + 1 - open.ay) } } : {});
+        break;
+      }
       case 'brokenBarrel': case 'toppledBarrel': case 'smashedBarrel': place(lib[p.type], f.x, f.y); break;
       case 'chest': place(lib.chest, f.x, f.y); break;
       case 'plant': place(lib.plant, f.x, f.y); break;
@@ -477,6 +482,56 @@ export function createWorldView(canvasEl, area) {
   let lastLook = null;
   let lastLookKey = null;
 
+  // Boss fights: red warning tiles where a slam will land, the dust ring when
+  // it does, and the glowing chains from the rune pillars to the boss.
+  function drawBossGround(combat, enemies, time) {
+    for (const w of combat.warnings) {
+      const k = Math.max(0, Math.min(1, (time - w.start) / Math.max(0.1, w.land - w.start)));
+      const pulse = 0.5 + 0.5 * Math.sin(time * (8 + k * 14));
+      for (const t of w.tiles) {
+        const x = t.x * TILE, y = t.y * TILE;
+        ctx.fillStyle = `rgba(230, 40, 24, ${0.18 + 0.32 * k + 0.1 * pulse})`;
+        ctx.fillRect(x, y, TILE, TILE);
+        ctx.fillStyle = `rgba(255, 210, 120, ${0.35 + 0.4 * pulse})`;
+        ctx.fillRect(x, y, TILE, 1); ctx.fillRect(x, y + TILE - 1, TILE, 1);
+        ctx.fillRect(x, y, 1, TILE); ctx.fillRect(x + TILE - 1, y, 1, TILE);
+      }
+    }
+    for (const im of combat.impacts) {
+      const k = (time - im.time) / 0.6;
+      if (k < 0 || k > 1) continue;
+      ctx.globalAlpha = 1 - k;
+      ctx.strokeStyle = '#d8c8a0';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc((im.x + 0.5) * TILE, (im.y + 0.5) * TILE, 3 + k * 9, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    const pillars = area.props.filter((p) => p.pillar && !p.snapped);
+    if (!pillars.length) return;
+    for (const e of enemies) {
+      if (e.dead || !e.def.mechanics?.chained) continue;
+      const wp = e.worldPosition();
+      const bx = wp.x * TILE, by = wp.z * TILE - 12;
+      const pinned = e.boss?.pinned > 0;
+      for (const p of pillars) {
+        const px = (p.x + 0.5) * TILE, py = (p.y + 1) * TILE - 20;
+        const flash = time - (p.flashAt ?? -99) < 1.2 || pinned;
+        const len = Math.hypot(bx - px, by - py);
+        const n = Math.max(2, Math.floor(len / 4));
+        const sag = flash ? 2 : 6 + Math.sin(time * 2 + p.x) * 2; // pulled tight when pinned
+        for (let i = 0; i <= n; i++) {
+          const u = i / n;
+          const x = px + (bx - px) * u, y = py + (by - py) * u + Math.sin(u * Math.PI) * sag;
+          const glow = 0.55 + 0.45 * Math.sin(time * 5 - i * 0.6);
+          ctx.fillStyle = flash ? '#ffffff' : i % 2 ? `rgba(120, 230, 255, ${glow})` : `rgba(40, 120, 170, ${0.6 + 0.4 * glow})`;
+          ctx.fillRect(Math.round(x) - 1, Math.round(y) - 1, i % 2 ? 2 : 3, i % 2 ? 2 : 3);
+        }
+      }
+    }
+  }
+
   function render(player, opts) {
     const { time, steps, marker, characters = [], enemies = [], combat = null, ground: groundItems = [], playerLook = null, playerGear = null } = opts;
     // Your character, dressed in whatever you're wearing.
@@ -529,6 +584,7 @@ export function createWorldView(canvasEl, area) {
 
     const inView = (x, y, w, h) => x + w >= cam.x && y + h >= cam.y && x <= cam.x + vw && y <= cam.y + vh;
     for (const d of decals) if (inView(d.x, d.y, d.img.width, d.img.height)) ctx.drawImage(d.img, d.x, d.y);
+    if (combat) drawBossGround(combat, enemies, time);
 
     // Items on the ground: up to three per tile, fanned out a little.
     const perTile = new Map();
@@ -557,7 +613,7 @@ export function createWorldView(canvasEl, area) {
 
     for (const s of shadows) if (!s.prop?.depleted) ctx.drawImage(s.spr.img, Math.round(s.x - s.spr.ax), Math.round(s.y - s.spr.ay));
     const people = [pObj];
-    for (const c of characters) people.push(personObj(framesFor(lib, c.def.look, c.id), c, c.steps, { person: true }));
+    for (const c of characters) people.push(personObj(framesFor(lib, c.def.look, c.def.art || c.id), c, c.steps, { person: true }));
     const foes = [];
     for (const e of enemies) {
       const since = time - e.diedAt;

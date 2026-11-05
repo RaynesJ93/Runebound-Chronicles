@@ -30,6 +30,7 @@ export class Enemy {
     this.lastHit = -99;
     this.lungeAt = -99;
     this.steps = 0;
+    this.boss = null; // boss fight state (see bossTick in combat.js)
   }
 
   get name() { return this.def.name; }

@@ -155,6 +155,14 @@ function boot() {
       enemyDied: (e) => {
         hud.message(`You defeated the ${e.name}!`);
         state.stats.kills = (state.stats.kills || 0) + 1;
+        if (e.summoned) return; // a boss's adds drop nothing
+        // Story bosses set a flag when they fall (def.defeatFlag).
+        if (e.def.defeatFlag && !state.flags[e.def.defeatFlag]) {
+          state.flags[e.def.defeatFlag] = true;
+          if (e.def.defeatText) hud.showDialog(e.def.defeatText);
+          refreshQuests();
+          save();
+        }
         // Quest items (data/quests.js): always dropped while you need one.
         for (const qd of QUEST_DROPS) {
           if (qd.enemy !== e.def.id || !qd.when(state.flags) || haveAnywhere(qd.item)) continue;
@@ -167,6 +175,31 @@ function boot() {
         }
       },
       playerDied: () => die(),
+      // A boss calls for help: its adds appear on free tiles around it.
+      summon: (boss, id, n) => {
+        const def = ENEMIES[id];
+        if (!def) return;
+        const spots = [];
+        for (let r = 1; r <= 3 && spots.length < n; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+          const x = boss.tile.x + dx, y = boss.tile.y + dy;
+          if (spots.length < n && Math.max(Math.abs(dx), Math.abs(dy)) === r && area.isFree(x, y) && !enemies.some((o) => o.occupies(x, y))
+            && !(player.tile.x === x && player.tile.y === y)) spots.push({ x, y });
+        }
+        for (const sp of spots) {
+          const add = new Enemy(def, sp, area);
+          add.summoned = true;
+          add.summonedBy = boss;
+          add.state = 'fight';
+          add.cooldown = 2;
+          enemies.push(add);
+        }
+      },
+      // Boss fight events: a chain snaps in phase 2; everything resets if the fight is abandoned.
+      bossEvent: (boss, what) => {
+        const pillars = area.props.filter((p) => p.pillar);
+        if (what === 'phase2') { const p = pillars.find((q) => q.chain === 0); if (p) p.snapped = true; }
+        if (what === 'reset') for (const p of pillars) { p.used = false; p.snapped = false; }
+      },
     },
   });
   combat.setWorld(area, enemies);
@@ -691,6 +724,7 @@ function boot() {
   };
   const goToGrave = (t) => interactWith({ tiles: [{ x: t.x, y: t.y }], grave: true, goal: (x, y) => Math.abs(x - t.x) + Math.abs(y - t.y) <= 1 });
   const useProp = (prop) => {
+    if (prop.pillar) combat.stop(); // walk over to the pillar instead of swinging at the boss
     if (prop.type === 'enter') walkTo(prop.tiles[0].x, prop.tiles[0].y);
     else interactWith(prop);
   };
@@ -963,6 +997,7 @@ function boot() {
       return;
     }
     if (prop.grave) { graveMenu(); return; }
+    if (prop.pillar) { usePillar(prop); return; }
     if (prop.type === 'tree' || prop.type === 'ore' || prop.type === 'fishingSpot') { startGather(prop); return; }
     if (prop.type === 'altar') { lastStation = null; startRunecraft(prop); return; }
     if (prop.action) { lastStation = prop; runAction(prop.action); return; }
@@ -1005,9 +1040,25 @@ function boot() {
       }
     }
   };
-  // Cave mouths marked `openable` are drawn open once the story opens them.
+  // Doors and cave mouths marked `openable` are drawn open once the story opens
+  // them (their openFlag, or caveOpen).
   const syncCaves = () => {
-    for (const w of worlds.values()) for (const p of w.area.props) if (p.openable) p.opened = !!state.flags.caveOpen;
+    for (const w of worlds.values()) for (const p of w.area.props) if (p.openable) p.opened = !!state.flags[p.openFlag || 'caveOpen'];
+  };
+  // Rune pillars in a boss's chamber: 10 mind runes tighten its chain.
+  const PILLAR_RUNES = 10;
+  const usePillar = (p) => {
+    const boss = enemies.find((e) => e.def.mechanics && !e.dead && e.state === 'fight');
+    if (p.snapped) { hud.showDialog(['The pillar is dark. Its chain has snapped.']); return; }
+    if (!boss) { hud.showDialog(p.interact || ['A rune pillar.']); return; }
+    if (p.used) { hud.message('This pillar has nothing left to give.'); return; }
+    if (inventory.count('mindRune') < PILLAR_RUNES) { hud.message(`You need ${PILLAR_RUNES} mind runes to feed the pillar.`); return; }
+    inventory.remove('mindRune', PILLAR_RUNES);
+    refreshInventory();
+    p.used = true;
+    p.flashAt = time;
+    combat.pinBoss(boss, 5, 4);
+    hud.message(`You press ${PILLAR_RUNES} mind runes into the pillar. Its chain blazes and pulls tight: ${boss.name} is pinned!`);
   };
   // Books and letters: tap to read, one page per dialogue box.
   const readItem = (id) => hud.showDialog(ITEMS[id].read, null, ITEMS[id].name);
@@ -1562,7 +1613,8 @@ function boot() {
       hud.setGraveTimer(`Gravestone ${mm}:${ss}${freeLeft > 0 ? ' · free to reclaim' : ''}`);
     } else hud.setGraveTimer(null);
     hud.setHp(state.player.hp, combat.maxHp);
-    hud.setTarget(combat.target || enemies.find((e) => !e.dead && e.state === 'fight') || null, combat.level);
+    // A boss you're fighting keeps the bar, even while you deal with its adds.
+    hud.setTarget(enemies.find((e) => e.def.mechanics && !e.dead && e.state === 'fight') || combat.target || enemies.find((e) => !e.dead && e.state === 'fight') || null, combat.level);
     requestAnimationFrame(frame);
   };
 

@@ -250,6 +250,13 @@ const DRAW = {
     b.rect(4, 10, 8, 1, hex('#5a3a1e'));
   },
   // The Runebound, chapter 3: the three pieces of the broken runestone.
+  runeKey(b) {
+    const [d, m, l, g] = [hex('#3e424c'), hex('#6a707c'), hex('#9aa0ac'), hex('#7ff0e0')];
+    b.ellipse(5, 5, 3.6, 3.6, d); b.ellipse(5, 4.6, 3, 3, m); b.ellipse(5, 5, 1.4, 1.4, [0, 0, 0]);
+    for (let k = 0; k < 9; k++) { b.set(7 + k, 7 + k, m); b.set(8 + k, 7 + k, d); b.set(7 + k, 6 + k, l); }
+    for (const [x, y] of [[11, 13], [12, 14], [13, 12], [14, 13]]) b.set(x, y, m); // the bit
+    for (const [x, y] of [[9, 9], [11, 11], [13, 13], [4, 3], [6, 3]]) b.set(x, y, g);   // runes
+  },
   bindingStone(b) {
     shard(b, [[8, 0], [12, 3], [13, 9], [12, 15], [4, 15], [3, 9], [4, 3]], [[8, 3], [8, 4], [7, 5], [9, 5], [6, 8], [10, 8], [8, 9], [8, 10], [7, 12], [9, 12]]);
     for (const [x, y] of [[3, 7], [3, 11], [12, 7], [12, 11]]) b.set(x, y, hex('#9aa0aa')); // the steel band

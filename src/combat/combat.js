@@ -50,6 +50,9 @@ export class Combat {
     this.playerLungeAt = -99;
     this.playerAttackKind = 'slash'; // which attack animation to show: slash, bow or cast
     this.now = 0;
+    // Boss slams on their way down: { by, tiles: [{x, y}], at (tick), start (seconds), land (seconds), dmg: [min, max] }
+    this.warnings = [];
+    this.impacts = []; // slams that just landed, for the shockwave: { x, y, time }
   }
 
   // ---- Player stats, from the skills you've trained -------------------------------
@@ -123,12 +126,13 @@ export class Combat {
   get inCombat() { return !!this.target || this.enemies.some((e) => !e.dead && e.state === 'fight'); }
 
   setWorld(area, enemies) {
-    for (const e of this.enemies) if (!e.dead && e.state === 'fight') e.state = 'return';
+    for (const e of this.enemies) if (!e.dead && e.state === 'fight') { e.state = 'return'; this.bossReset(e); }
     this.area = area;
     this.enemies = enemies;
     this.target = null;
     this.pending = [];
     this.projectiles = [];
+    this.warnings = [];
   }
 
   attack(enemy) {
@@ -190,7 +194,87 @@ export class Combat {
     this.pending = this.pending.filter((h) => h.at > this.ticks);
     for (const h of landing) this.land(h);
 
+    this.landSlams();
     for (const e of this.enemies) this.enemyTick(e);
+    // Summoned adds vanish once they've fallen (after their fade-out).
+    for (let i = this.enemies.length - 1; i >= 0; i--) {
+      const e = this.enemies[i];
+      if (e.summoned && e.dead && now - e.diedAt > 1) this.enemies.splice(i, 1);
+    }
+    this.impacts = this.impacts.filter((s) => now - s.time < 0.6);
+  }
+
+  // ---- Bosses (def.mechanics) --------------------------------------------------------
+  // Runs on the boss's turn while it's fighting. Returns true if the boss used
+  // its turn on a mechanic (so it doesn't also swing).
+  bossTick(e) {
+    const m = e.def.mechanics;
+    const b = (e.boss ||= { phase: 1, cried: [], slamIn: m.slamEvery, pinned: 0 });
+    const frac = e.hp / e.maxHp;
+    if (b.phase === 1 && m.phase2At && frac <= m.phase2At) {
+      b.phase = 2;
+      b.slamIn = Math.min(b.slamIn, 3);
+      this.on.message?.(m.phase2Text || `The ${e.def.name} is enraged!`);
+      this.on.bossEvent?.(e, 'phase2');
+    }
+    for (const thr of m.warCry || []) {
+      if (b.cried.includes(thr) || frac > thr) continue;
+      b.cried.push(thr);
+      this.on.message?.(m.warCryText || `The ${e.def.name} roars for help!`);
+      this.on.summon?.(e, m.adds, m.addCount || 2);
+    }
+    if (b.pinned > 0) { b.pinned--; return true; }
+    if (m.slamEvery && --b.slamIn <= 0) {
+      b.slamIn = b.phase === 2 ? m.slamEvery2 || m.slamEvery : m.slamEvery;
+      const pt = this.player.moving ? this.player.to : this.player.tile;
+      const tiles = [];
+      // 'plus': your tile and the four next to it (one diagonal step gets you clear); 'square': all nine
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        if (m.slamShape !== 'square' && dx && dy) continue;
+        const t = { x: pt.x + dx, y: pt.y + dy };
+        if (this.area.inBounds(t.x, t.y) && this.area.isWalkable(t.x, t.y)) tiles.push(t);
+      }
+      const wind = m.slamWindup || 4;
+      this.warnings.push({ by: e, tiles, at: this.ticks + wind, start: this.now, land: this.now + wind * 0.6, dmg: b.phase === 2 ? m.slamDmg2 || m.slamDmg : m.slamDmg });
+      this.on.message?.(m.slamText || `The ${e.def.name} raises its fists. Get off the red ground!`);
+      e.lungeAt = this.now;
+      e.cooldown = Math.max(e.cooldown, wind);
+      return true;
+    }
+    return false;
+  }
+
+  // Slams whose time has come: hit you if you're still on a red tile.
+  landSlams() {
+    const due = this.warnings.filter((w) => w.at <= this.ticks);
+    if (!due.length) return;
+    this.warnings = this.warnings.filter((w) => w.at > this.ticks);
+    const pt = this.player.tile;
+    for (const w of due) {
+      if (w.by.dead || w.by.state !== 'fight') continue;
+      for (const t of w.tiles) this.impacts.push({ x: t.x, y: t.y, time: this.now });
+      if (w.tiles.some((t) => t.x === pt.x && t.y === pt.y) && this.state.player.hp > 0) {
+        const [lo, hi] = w.dmg;
+        this.on.message?.('The slam hits you!');
+        this.hurtPlayer(w.by, lo + Math.floor(this.rng() * (hi - lo + 1)));
+      } else this.on.message?.('You get clear of the slam!');
+    }
+  }
+
+  // A rune pillar tightens the boss's chains: some damage, and it's pinned
+  // for a few ticks (no swings, no slams).
+  pinBoss(e, dmg, ticks) {
+    if (!e || e.dead) return;
+    const b = (e.boss ||= { phase: 1, cried: [], slamIn: e.def.mechanics.slamEvery, pinned: 0 });
+    b.pinned = Math.max(b.pinned, ticks);
+    this.warnings = this.warnings.filter((w) => w.by !== e);
+    this.hurtEnemy(e, Math.min(dmg, e.hp));
+    if (!e.dead && e.state !== 'fight') e.state = 'fight';
+  }
+
+  // The stats a monster fights with right now (bosses change in phase 2).
+  fightStats(e) {
+    return e.boss?.phase === 2 && e.def.mechanics?.phase2 ? { ...e.def, ...e.def.mechanics.phase2 } : e.def;
   }
 
   // ---- Ranged and magic --------------------------------------------------------------
@@ -327,7 +411,7 @@ export class Combat {
     if (!this.target && st.settings.autoRetaliate !== false && !p.moving && !p.path.length) this.target = e;
     if (st.player.hp <= 0) {
       this.target = null;
-      for (const o of this.enemies) if (o.state === 'fight') o.state = 'return';
+      for (const o of this.enemies) if (o.state === 'fight') { o.state = 'return'; this.bossReset(o); }
       this.on.playerDied?.();
     }
   }
@@ -362,15 +446,17 @@ export class Combat {
     }
 
     if (e.state === 'fight') {
-      if (!playerUp || cheb(e.tile, e.spawn) > def.leash || cheb(pt, e.spawn) > def.leash + 2) { e.state = 'return'; return; }
+      if (!playerUp || cheb(e.tile, e.spawn) > def.leash || cheb(pt, e.spawn) > def.leash + 2) { e.state = 'return'; this.bossReset(e); return; }
+      if (def.mechanics && this.bossTick(e)) { e.faceTowards(pt.x, pt.y); return; }
       if (adjacent(e.tile, pt)) {
         e.faceTowards(pt.x, pt.y);
         if (e.cooldown <= 0) {
+          const f = this.fightStats(e);
           const dmg = resolveAttack(this.rng,
-            { attack: def.attack, strength: def.strength, attackBonus: def.attackBonus, maxHit: def.maxHit },
+            { attack: f.attack, strength: f.strength, attackBonus: f.attackBonus, maxHit: f.maxHit },
             { defence: this.skills.defence, defenceBonus: this.defenceAgainst(def.attackType || 'crush'), defenceStyle: this.defenceStyleBonus() });
           e.lungeAt = this.now;
-          e.cooldown = def.speed;
+          e.cooldown = f.speed;
           this.hurtPlayer(e, dmg);
         }
       } else this.chase(e, pt);
@@ -378,10 +464,18 @@ export class Combat {
     }
 
     // Returning home: walk back, then heal to full.
-    if (e.tile.x === e.spawn.x && e.tile.y === e.spawn.y) { e.hp = e.maxHp; e.state = 'idle'; e.stuck = 0; return; }
+    if (e.tile.x === e.spawn.x && e.tile.y === e.spawn.y) { e.hp = e.maxHp; e.state = 'idle'; e.stuck = 0; e.boss = null; return; }
     if (!this.stepToward(e, (n) => cheb(n, e.spawn) + Math.abs(n.x - e.spawn.x) * 0.01 + Math.abs(n.y - e.spawn.y) * 0.01)) {
       if (++e.stuck > 12) { e.reset(); }
     }
+  }
+
+  // A boss fight is over without a winner: clear its slams and adds.
+  bossReset(e) {
+    if (!e.def.mechanics) return;
+    this.warnings = this.warnings.filter((w) => w.by !== e);
+    for (const o of this.enemies) if (o.summonedBy === e && !o.dead) { o.dead = true; o.diedAt = this.now - 1; }
+    this.on.bossEvent?.(e, 'reset');
   }
 
   canEnemyStep(e, n) {
