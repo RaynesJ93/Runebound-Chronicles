@@ -520,14 +520,14 @@ Rules for everything below: **every bar that needs coal takes exactly one** (iro
 
     | Reward | Stardust |
     | --- | --- |
-    | Prospector helmet (+1% Mining XP) | 80 |
-    | Prospector jacket (+2%) | 120 |
-    | Prospector legs (+1.5%) | 100 |
-    | Prospector boots (+0.5%) | 60 |
+    | Prospector helmet (+1% Mining XP) | 240 |
+    | Prospector jacket (+2%) | 360 |
+    | Prospector legs (+1.5%) | 300 |
+    | Prospector boots (+0.5%) | 180 |
     | Coal bag — open for a random 20–60 coal | 15 |
     | Gem bag — open for 3–10 uncut gems at the usual rarities | 40 |
 
-    The full prospector outfit gives +1% more, 6% in all. The outfit is only available from Lyra. Bags are used up when opened; coal or gems that don't fit in your bag go on the ground.
+    The full prospector outfit gives +1% more, 6% in all. The outfit is only available from Lyra, and costs 1,080 stardust in all (tripled in v0.40.1). Bags are used up when opened; coal or gems that don't fit in your bag go on the ground.
   - **Gem rocks** (Mining 40, 65 XP) give an uncut gem every time you mine them (sapphire most often, diamond rarely). Two in Copperdeep Depths, two in Copperdeep Hollow.
 - **Batch H — saving bars and the Cold Forge (v0.33.0).**
   - **Saving bars:** from Smithing 40, every anvil make has a chance to give one bar back: 2% at 40, rising evenly to 10% at 99. (Smelting is unchanged.)
