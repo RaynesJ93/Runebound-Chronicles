@@ -363,8 +363,11 @@ export function createWorldView(canvasEl, area) {
     // iPhones are 3x, but pixel art looks the same at 2x and there are
     // less than half as many pixels to fill each frame.
     dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvasEl.width = Math.round(window.innerWidth * dpr);
-    canvasEl.height = Math.round(window.innerHeight * dpr);
+    // The canvas's real size on screen (it can be taller than innerHeight on an
+    // iPhone home-screen app, where it reaches under the home bar).
+    const box = canvasEl.getBoundingClientRect();
+    canvasEl.width = Math.round((box.width || window.innerWidth) * dpr);
+    canvasEl.height = Math.round((box.height || window.innerHeight) * dpr);
     // About 12 tiles across a phone held upright; about 20 x 12 on wide screens.
     const portrait = canvasEl.height > canvasEl.width;
     const across = canvasEl.width / (TILE * (portrait ? 12 : 20));

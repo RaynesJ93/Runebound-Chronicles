@@ -63,6 +63,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Date | Change |
 | --- | --- |
+| 5 Nov 2026 | v0.33.2: the game now fills the whole iPhone screen when opened from the home screen — no more green strip along the bottom. The controls stay clear of the home bar. |
 | 5 Nov 2026 | v0.33.1: the level-up message is now a slim pill at the bottom of the screen, just above the joystick and buttons, instead of a big box near the top; it slides up and fades out. |
 | 5 Nov 2026 | v0.33.0: Batch H — saving bars (from Smithing 40, the anvil sometimes gives a bar back: 2% at 40 up to 10% at 99) and the quest The Cold Forge (Smithing 40, Mining 40): bring Dorrin 25 coal, 5 steel bars and an ember core from the Molten beast to relight the Sunken Forge's great furnace. Rewards: the great furnace works, the smith's outfit (+6% Smithing XP for the full set), and Smithing and Mining XP. NPCs can now take items and give quest rewards. |
 | 4 Nov 2026 | v0.32.0: Batch E — the Sunken Forge, an old dwarven forge hall below Copperdeep Hollow, with a supply chest, working dwarven anvils, a cold great furnace (for Dorrin's quest later), forge golems (level 48) and the Molten beast mini-boss (level 70). Adamantite (Mining 70) and runite (Mining 85) rocks; adamant and rune bars (Smithing 70 and 85, 1 ore + 1 coal); everything bronze–mithril has, in adamant and rune (up to Smithing 99); adamant and rune pickaxes and axes; adamant and rune arrows, darts and javelins. Map tab for the Forge. |
