@@ -48,10 +48,17 @@ html, body {
 }
 
 #game {
+  /* Cover the whole screen. On an iPhone, when the game is opened from the
+     home screen, "100%" can stop short of the very bottom (where the home
+     bar is) and the page shows through as a strip; 100lvh is the full height.
+     The controls (#ui) stay inside the safe area, so nothing goes under the
+     home bar or Safari's toolbar. */
   position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100lvh;
   display: block;
   touch-action: none;
   image-rendering: pixelated;
