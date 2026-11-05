@@ -689,6 +689,46 @@ def digmaster(im, get=None):
     return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
 
 
+# ---- The Runebound, chapter 6: Grubnak (the Goblin Chief, twice the size, with
+# stone-grey skin from forty years bound in the rock and glowing rune marks) ----
+
+GRUB_STONE = ['#1a1e1c', '#363e3a', '#5a6460', '#8e9a94']
+GRUB_CAPE = ['#100406', '#300a10', '#561420', '#7e2230']
+
+
+def grubnak(im, get=None):
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.float32)
+    h, s = hsv[..., 0], hsv[..., 1]
+    m = rgba[..., 3] > 0
+    skin = m & (h >= 28) & (h < 80) & (s > 50)
+    cape = m & ((h >= 200) | (h < 6)) & (s > 90)
+    l = lum(rgba[..., :3]) / 255
+    out = rgba.copy()
+    for mask, pal in ((skin, GRUB_STONE), (cape, GRUB_CAPE)):
+        if mask.any():
+            lo, hi = np.percentile(l[mask], 3), np.percentile(l[mask], 99)
+            t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+            out[mask, :3] = J.ramp(pal, t)[mask]
+    img = Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+    big = img.resize((img.width * 2, img.height * 2), Image.NEAREST)
+    sk = np.array(Image.fromarray((skin * 255).astype(np.uint8)).resize(big.size, Image.NEAREST)) > 0
+    b = np.array(big)
+    ys, xs = np.nonzero(sk)
+    if len(xs):
+        rng = np.random.default_rng(1)  # the same marks on every frame
+        for i in rng.choice(len(xs), size=min(len(xs) // 40 + 1, 14), replace=False):
+            x, y = xs[i], ys[i]
+            for d in range(3):
+                if y + d < b.shape[0] and sk[y + d, x]: b[y + d, x, :3] = (190, 245, 255) if d == 1 else (110, 225, 255)
+    return Image.fromarray(b, 'RGBA')
+
+
+# Sprites made at a different size: new key <- source key, every frame, scale.
+SCALED = [('chars:enemy:grubnak', 'chars:enemy:goblinChief', grubnak, 2)] + [
+    (f'anim:grubnak:attack:{d}', f'anim:goblinChief:attack:{d}', grubnak, 2) for d in DIRS]
+
+
 # ---- What to make ------------------------------------------------------------------
 # new item: icon=(source item, fn), gear=(source item, fn) or None,
 #           small=(source item, fn), or None to shrink the new 32 px icon down.
@@ -890,6 +930,9 @@ def derive(get0):
     for new, src, fn in EXTRA:
         for k, im, ax, ay in get(src):
             emit((new, k, fn(im, get), ax, ay))
+    for new, src, fn, k2 in SCALED:
+        for k, im, ax, ay in get(src):
+            emit((new, k, fn(im, get), ax * k2, ay * k2))
     # Ready-made sprites (cut from a magenta sheet and shrunk to game size),
     # kept in tools/sprites/<name>.png; anchored at the bottom middle.
     for f in sorted(os.listdir(SPRITE_DIR)) if os.path.isdir(SPRITE_DIR) else []:

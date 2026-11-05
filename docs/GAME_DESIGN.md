@@ -690,7 +690,7 @@ Every skill uses the same XP curve and goes to 99. Resources respawn after a tim
 - Rewards: XP lamps, items, coins, and **new region access**.
 - Quest points unlock late-game content.
 
-### Main story: The Runebound (chapters 1–2 shipped in v0.37.0, chapter 3 in v0.38.0, chapter 4 in v0.39.0, chapter 5 in v0.40.0)
+### Main story: The Runebound (chapters 1–2 shipped in v0.37.0, chapter 3 in v0.38.0, chapter 4 in v0.39.0, chapter 5 in v0.40.0, chapter 6 part 1 in v0.41.0)
 
 **Backstory.** Forty years ago the goblin warlord **Grubnak** marched on Brambleford. The village held the Thornwood crossroads, and Captain **Holt** of the Watch led the last stand. Grubnak couldn't be killed, so the runekeepers of Whispering Vale *bound* him with runes, deep under the stones of the old cave north-west of the goblin camp, and set a runestone in the stone shrine to hold the binding. That's why the cave mouth is sealed, and why something deep inside is breathing. The village remembers a war it "won"; almost nobody alive knows the warlord was never killed. Now the goblins are bold again, a cart has been raided, and the binding is weakening.
 
@@ -703,7 +703,7 @@ The story runs through places already in the world (the wrecked cart by Bramblef
 | 3 | The Empty Hollow | Tobin | The runestone that held the binding has been stolen from the shrine and broken in three. Find one shard at the shrine, wake the Goblin Chief for the second, take the third from the tunnel goblins in Copperdeep Mine, and bring them to Aldric in Whispering Vale. | v0.38.0 |
 | 4 | Stone and Rune | Aldric | Remaking the runestone needs essence and runes (Runecrafting) and a steel-and-silver setting that Dorrin forges from your bars (Smithing, Mining). Set the remade Binding Stone in the shrine; far away, something roars. | v0.39.0 |
 | 5 | The Sealed Cave | Tobin | Break open the sealed cave (Mining 30) and go down into the Goblin Warrens, a new area. Goblins are digging at the rune-sealed door of Grubnak's chamber; defeat their Digmaster and take his orders back to Tobin. | v0.40.0 |
-| 6 | The Runebound | Tobin | Face Grubnak, half-free of his binding: a story boss with telegraphed attacks. Re-seal or destroy him. Unlocks the next region. | planned |
+| 6 | The Runebound | Tobin | Get a rune key from Aldric, open the door of Grubnak's chamber and face him: the game's first story boss (part 1, v0.41.0). The ending and rewards follow in part 2. | part 1 v0.41.0 |
 
 **Chapter 1: The Overturned Cart** (flag `cartQuest`; recommended combat level 5+). Ask Pell "You look worried." He says his supply cart was raided on the south road and his strongbox taken. Look at the wrecked cart in Brambleford (on the south road, just before the bridge): you find goblin tracks heading north-west into Thornwood, to the goblin camp. While you're on the quest, the first **goblin brute** you kill always drops **Pell's strongbox** (if you don't already have it). Bring it back to Pell for **300 coins, 3 meat pies**, a little Attack and Strength XP, and the **goblin token** that was in the box: a carved bone disc that isn't his. He tells you to show it to Elder Maren.
 
@@ -722,6 +722,20 @@ Story places can now also take an item from you (`take` in `QUEST_HOOKS`), as th
 Warren goblins: level 20, 30 hitpoints, max hit 3, aggressive; drop coins, iron and steel gear, mithril ore, runes and coal. Goblin Digmaster: level 26, 60 hitpoints, max hit 5, respawns every 3 minutes; drops coins, steel and mithril gear, a war charm 1 in 12.
 
 **Other engine changes (v0.40.0).** Exits can have `when(flags)` (the sealed cave only leads anywhere once it's open), a cave mouth marked `openable` is drawn sealed or open from the `caveOpen` flag, and quest hook conditions can check whether you're holding an item.
+
+**Chapter 6: The Runebound, part 1** (flag `finalQuest`; needs chapter 5; recommended combat level 35+). Ask Tobin what now: it's time to go through the door. Aldric gives you a **rune key**, which opens the door from your side without breaking the binding. Use it on the rune door in the Goblin Warrens: the door grinds open (drawn open from then on) and leads into **Grubnak's chamber**, a new small area: a round cavern with four glowing **rune pillars**, each holding a binding chain that runs to Grubnak. Tobin is waiting just inside the entrance with advice.
+
+**Grubnak** (level 40, 90 hitpoints, max hit 6, attacks every 3 seconds) is the first boss with mechanics of his own:
+- **Ground slam:** every 10 ticks (8 in phase 2) he raises his fists and your tile and the four next to it glow red (one diagonal step gets you clear). About 2.4 seconds later the slam lands: 3–7 damage (5–9 in phase 2) if you're still on a red tile. While winding up he doesn't swing.
+- **War cry:** at 75% and 40% health he roars and two warren goblins rush in. They don't respawn, drop nothing and vanish if the fight resets.
+- **Phase 2:** at half health one chain snaps (its pillar goes dark). He hits harder (max 8) and faster (every 2.4 seconds), and slams more often.
+- **Rune pillars:** during the fight, tap a pillar with 10 mind runes in your bag: the runes pour into it, its chain blazes and tightens, Grubnak takes 5 damage and is pinned for 4 ticks (no swings, no slams). Each pillar works once per fight (not the one whose chain snapped).
+- Balance (tested with a simulated level-35 player in mithril with 20 salmon and 30 mind runes): dodging the slams and using the pillars, the fight takes about 3 minutes and half the food; ignoring the slams, the player runs out of food with Grubnak nearly dead.
+- If you die or leave, he goes back to his place, heals and the pillars reset. Defeating him sets `grubnakDown`; he doesn't come back. The boss health bar at the top of the screen is bigger, gold-edged and says when he's enraged; it stays on the boss while you fight his adds. On phones, health bars now sit below the Guide and Quests buttons instead of over them.
+
+Part 1 ends with Grubnak down and Tobin at your side; part 2 adds the ending scene, the rewards and what lies beyond.
+
+**Boss engine (v0.41.0).** An enemy's `mechanics` (in `data/enemies.js`) can give it telegraphed slams (warning tiles that land a few ticks later), war cries that summon temporary adds, a phase 2 at a share of its health with stat changes, and chains to pillars that the player can use to stun it. Doors other than the sealed cave can open with the story (`openable` with `openFlag`).
 
 **Quest spawns (v0.38.0).** An enemy in an area's spawn list can have `when(flags)`: it only appears once that's true (the Goblin Chief appears when `chiefAwake` is set), including straight away if you're standing in the area when it happens.
 

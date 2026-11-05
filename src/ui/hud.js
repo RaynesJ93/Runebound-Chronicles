@@ -881,14 +881,17 @@ export class Hud {
   // playerLevel colours the name: green = weaker than you, yellow = close, red = stronger.
   setTarget(enemy, playerLevel = 3) {
     const el = this.el.target;
-    const key = enemy ? `${enemy.id ?? enemy.name}|${enemy.hp}|${enemy.maxHp}|${playerLevel}` : '';
+    const key = enemy ? `${enemy.id ?? enemy.name}|${enemy.hp}|${enemy.maxHp}|${playerLevel}|${enemy.boss?.phase || 1}` : '';
     if (key === this.targetKey) return;
     this.targetKey = key;
+    document.body.classList.toggle('has-target', !!enemy);
     if (!enemy) { el.classList.add('hidden'); return; }
     el.classList.remove('hidden');
     const diff = enemy.def.level - playerLevel;
     el.dataset.diff = diff <= -3 ? 'easy' : diff >= 3 ? 'hard' : 'even';
-    const name = `${enemy.name}  (level ${enemy.def.level})`;
+    // Story bosses get a bigger, gold-edged bar, and say when they're enraged.
+    el.classList.toggle('boss', !!enemy.def.mechanics);
+    const name = enemy.def.mechanics ? `${enemy.name}${enemy.boss?.phase === 2 ? ' · enraged' : ''}` : `${enemy.name}  (level ${enemy.def.level})`;
     if (this.el.targetName.textContent !== name) this.el.targetName.textContent = name;
     this.el.targetFill.style.width = `${(100 * enemy.hp) / enemy.maxHp}%`;
   }

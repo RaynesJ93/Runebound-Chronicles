@@ -502,7 +502,8 @@ export const NPCS = [
             { text: 'What happens now?', next: 'cave', if: (c) => c.flags.remakeQuest === 'done' && !c.flags.caveQuest },
             { text: 'About the cave...', next: 'caveProgress', if: (c) => c.flags.caveQuest === 'started' && !c.count('digmastersOrders') },
             { text: 'I found these orders on the Digmaster.', next: 'caveEnd', if: (c) => c.flags.caveQuest === 'started' && c.count('digmastersOrders') > 0 },
-            { text: 'What now?', next: 'caveAfter', if: (c) => c.flags.caveQuest === 'done' },
+            { text: 'What now?', next: 'final', if: (c) => c.flags.caveQuest === 'done' && !c.flags.finalQuest },
+            { text: 'About Grubnak...', next: 'finalHut', if: (c) => c.flags.finalQuest === 'started' },
             { text: 'Goodbye, Tobin.', next: 'bye' },
           ],
         },
@@ -583,7 +584,51 @@ export const NPCS = [
             "Stopping the Digmaster buys us time. Not much. They'll dig again, and the binding won't hold forever.",
             "There's only one way this ends. Someone goes through that door and finishes what Holt and I couldn't. Take this. You've earned every coin. (The story continues in chapter 6, coming soon.)"],
         },
-        caveAfter: { say: ['They are digging again. Slower, without their Digmaster. But they are digging.', "When it's time to go through that door, I'm coming with you. Knees or no knees. (The story continues in chapter 6, coming soon.)"] },
+        caveAfter: { say: ['They are digging again. Slower, without their Digmaster. But they are digging.'] },
+
+        // ---- The Runebound, chapter 6 ----------------------------------------------
+        final: {
+          say: ['They are digging again. Slower, without their Digmaster. But they are digging, and he is waking.',
+            "Holt and I couldn't kill him. But we were two tired soldiers with bent swords. You're something else.",
+            "It's time to go through that door. Not break it. Open it, and face him while the chains still hold him.",
+            "Aldric's lot made that door. Ask him for a way through. And bring food. Lots of food."],
+          choices: [
+            { text: "Let's finish it.", next: 'finalStart' },
+            { text: 'Not yet.', next: 'bye' },
+          ],
+        },
+        finalStart: {
+          set: { finalQuest: 'started' },
+          say: ['Good. Go and see Aldric in the Vale.', "I'll be at the door when you get there. Don't argue. I've waited forty years for this."],
+        },
+        finalHut: {
+          say: (c) => (c.flags.grubnakDown ? ['You did it. I saw it with my own eyes, and I still can\'t believe it. (The ending of the story is coming in the next update.)']
+            : c.flags.chamberOpen ? ['What are you doing back here? Grubnak is through that door!'] : ["Get Aldric's help with the door. I'll meet you there."]),
+        },
+      },
+    },
+  },
+
+  {
+    // Tobin again, waiting just inside Grubnak's chamber (The Runebound, chapter 6).
+    examine: 'Old Tobin, in his faded Watch coat, with a bent old sword. His knuckles are white on the hilt.',
+    id: 'tobinChamber', art: 'tobin', name: 'Tobin the Hermit', short: 'Tobin', area: 'chamber', x: 14, y: 24, radius: 0,
+    look: { hair: '#d8d4cc', tunic: '#4a5a3a', pants: '#3a3a30', beard: '#e4e0d8', hat: 'hood', hatColor: '#3e3428' },
+    talk: {
+      start: (c) => (c.flags.grubnakDown ? 'after' : 'before'),
+      nodes: {
+        before: {
+          say: ['There he is. Grubnak. Forty years, and he hasn\'t changed. Bigger, if anything.',
+            "Listen. When he lifts both fists, the ground under you goes red. Get off it. Fast.",
+            "When he roars, his goblins come running. Deal with them, or they'll wear you down.",
+            'And the pillars: ten mind runes each, and the chain pulls him to his knees for a moment. Save them for when you need them.',
+            "I'll hold the tunnel. Nothing gets past me. Go."],
+        },
+        after: {
+          say: ['He\'s down. He\'s really down.', 'Forty years I watched that cave. I thought I\'d die watching it.',
+            'But look at him. Those runes on his skin are still glowing. Whatever holds him together isn\'t finished yet...',
+            '(The ending of The Runebound is coming in the next update.)'],
+        },
       },
     },
   },
@@ -724,7 +769,8 @@ export const NPCS = [
           { text: 'How is the runestone?', next: 'remake', if: (c) => c.flags.stoneQuest === 'done' && !c.flags.remakeQuest },
           { text: 'About remaking the stone...', next: 'remakeProgress', if: (c) => c.flags.remakeQuest === 'started' && !c.flags.stoneRemade },
           { text: 'I lost the Binding Stone.', next: 'remakeAgain', if: (c) => c.flags.stoneRemade && !c.flags.stonePlaced && !c.have('bindingStone') },
-          { text: 'How is the Binding Stone?', next: 'remakeDone', if: (c) => c.flags.stonePlaced },
+          { text: 'How is the Binding Stone?', next: 'remakeDone', if: (c) => c.flags.stonePlaced && !c.flags.finalQuest },
+          { text: "We need to open Grubnak's door.", next: 'key', if: (c) => c.flags.finalQuest === 'started' && !c.flags.chamberOpen && !c.have('runeKey') },
           { text: 'Farewell, Aldric.', next: 'bye' },
         ] },
 
@@ -795,6 +841,18 @@ export const NPCS = [
         remakeFull: { say: 'Make room in your bag first. You will need to carry the stone.', next: 'menu' },
         remakeAgain: { set: { gotBindingStone: false }, say: ['Lost it?! ...Very well. The pieces remember being whole. I can coax them together once more.'], next: 'remakeGive' },
         remakeGive: { give: { flag: 'gotBindingStone', items: [{ item: 'bindingStone', qty: 1 }] }, giveFail: 'remakeFull', say: ['There. Guard it with your life this time.'], next: 'menu' },
+        // ---- The Runebound, chapter 6: the rune key ---------------------------------
+        key: { set: { gotRuneKey: false }, say: [], next: 'keyGive' },
+        keyGive: {
+          give: { flag: 'gotRuneKey', items: [{ item: 'runeKey', qty: 1 }] },
+          giveFail: 'remakeFull',
+          say: ['So it has come to this. Forty years, and someone must finally face him.',
+            'That door was made by my master. Break it, and the binding breaks with it. But it was made to be opened, once, by one of us.',
+            'Take this rune key. It opens the door and leaves the chains whole. While they hold, he cannot reach his full strength.',
+            'The pillars in his chamber hold the chains. Feed them mind runes, ten at a time, and they will pull tight. Use them when he is hurting you most.',
+            'Go, and may the wind carry you.'],
+          next: 'menu',
+        },
         remakeDone: { say: ['I felt it from here when the stone went in. And I felt something else push back.', 'Talk to Tobin. He knows that cave better than anyone.'], next: 'menu' },
         how: {
           say: ['First, mine essence in the quarry to the north-west. Any pickaxe will do, and the crystals never run dry.',

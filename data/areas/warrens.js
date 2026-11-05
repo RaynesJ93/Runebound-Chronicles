@@ -73,7 +73,7 @@ export function buildWarrens() {
   // ---- The great dig -------------------------------------------------------------
   // Grubnak's chamber door: sealed with the runekeepers' runes, which the
   // goblins have been chipping at. Glowing rune stones stand either side.
-  prop('runeDoor', [{ x: 21, y: 2 }, { x: 22, y: 2 }, { x: 23, y: 2 }], { chamberDoor: true, interact: ['A great door of solid rock, carved all over with runes. They glow a faint, steady blue.', 'Something behind it is breathing.'] });
+  prop('runeDoor', [{ x: 21, y: 2 }, { x: 22, y: 2 }, { x: 23, y: 2 }], { chamberDoor: true, openable: true, openFlag: 'chamberOpen', interact: ['A great door of solid rock, carved all over with runes. They glow a faint, steady blue.', 'Something behind it is breathing.'] });
   one('runeStone', 19, 3, { interact: ['A standing stone carved with a glowing rune. Part of the seal on the door.'] });
   one('runeStone', 25, 3, { interact: ['A standing stone carved with a glowing rune. Someone has been hacking at it with a pick.'] });
   for (const [x, y] of [[14, 6], [30, 6], [16, 10], [28, 10]]) put('lamp', x, y);
@@ -92,6 +92,8 @@ export function buildWarrens() {
     spawn: { x: 22, y: 32, facing: Math.PI },
     exits: [
       { tiles: [{ x: 22, y: 34 }], to: 'route1', at: { x: 7, y: 8 }, facing: 0 },
+      // Through the rune door, once Aldric's key has opened it (The Runebound, chapter 6)
+      { tiles: [{ x: 22, y: 3 }], to: 'chamber', at: { x: 15, y: 27 }, facing: Math.PI, when: (f) => !!f.chamberOpen },
     ],
     spawns: [
       { enemy: 'warrenGoblin', x: 7, y: 20 },

@@ -106,7 +106,24 @@ export const QUESTS = [
       { text: 'Defeat the Goblin Digmaster and take his orders', done: !!c.flags.gotOrders || c.count('digmastersOrders') >= 1 },
       { text: 'Show the orders to Tobin', done: false },
     ],
-    rewards: ['1,500 coins', 'Attack, Strength, Defence and Mining XP', 'The Goblin Warrens stay open', 'The story continues in chapter 6 (coming soon)'],
+    rewards: ['1,500 coins', 'Attack, Strength, Defence and Mining XP', 'The Goblin Warrens stay open', 'The story continues in chapter 6'],
+  },
+  {
+    id: 'final',
+    chapter: 6,
+    name: 'The Runebound',
+    giver: { name: 'Tobin the Hermit', where: "The hermit's hut, Thornwood", area: 'route1' },
+    about: 'Forty years ago Grubnak could not be killed, only bound. Now he is waking. Go through the door and face him.',
+    requiresQuests: ['cave'],
+    recommend: 'Combat level 35+, plenty of food, and 30 mind runes for the rune pillars',
+    flag: 'finalQuest',
+    steps: (c) => [
+      { text: 'Ask Aldric in Whispering Vale for a way through the rune door', done: !!c.flags.chamberOpen || c.have('runeKey') },
+      { text: "Open the rune door in the Goblin Warrens' great dig", done: !!c.flags.chamberOpen },
+      { text: 'Face Grubnak in his chamber. Watch for red ground, and feed the rune pillars mind runes to pin him', done: !!c.flags.grubnakDown },
+      { text: 'Talk to Tobin. (The ending of the story is coming in the next update.)', done: false },
+    ],
+    rewards: ['The ending of The Runebound (coming in the next update)'],
   },
   {
     id: 'coldForge',
@@ -254,6 +271,25 @@ export const QUEST_HOOKS = [
       'Behind the door, something breathes. Slowly. Heavily. And it is listening.',
       'Whoever is giving the orders here must be stopped.'],
     set: { sawDoor: true },
+  },
+  // Chapter 6: open the rune door with Aldric's key.
+  {
+    area: 'warrens', type: 'runeDoor', at: { x: 22, y: 5 },
+    when: (f, c) => f.finalQuest === 'started' && !f.chamberOpen && c.count('runeKey') >= 1,
+    say: ['You fit the rune key into a slot in the middle of the door. Its runes light up one by one, then all together.',
+      'With a long, grinding groan, the slab sinks into the floor. Cold air rolls out of the dark.',
+      'Behind you, a voice: "Not without me, you don\'t." Tobin, out of breath, sword in hand. "Knees or no knees. Let\'s go."'],
+    set: { chamberOpen: true },
+  },
+  {
+    area: 'warrens', type: 'runeDoor', at: { x: 22, y: 5 },
+    when: (f) => f.finalQuest === 'started' && !f.chamberOpen,
+    say: ['The rune door is shut fast, and the runes on it are still strong enough to hold.', "Aldric's order made this door. He'll know how to open it without breaking the binding."],
+  },
+  {
+    area: 'warrens', type: 'runeDoor', at: { x: 22, y: 5 },
+    when: (f) => f.chamberOpen,
+    say: (f) => [f.grubnakDown ? "The rune door stands open. Grubnak's chamber is quiet now." : "The rune door stands open. Beyond it, something huge is breathing."],
   },
   // The Goblin Chief's hut: knock to wake him (chapter 3).
   {

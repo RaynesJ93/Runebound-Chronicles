@@ -793,6 +793,7 @@ export const ITEMS = {
   runestoneHeart: { name: 'Runestone heart', value: 0, examine: 'The middle of the runestone, where the glow is brightest. It hums when you hold it.' },
   runestoneSetting: { name: 'Runestone setting', value: 0, examine: 'A heavy band of steel with silver inlay, made by Dorrin to hold the pieces of the runestone together.' },
   bindingStone: { name: 'Binding Stone', value: 0, examine: 'The runestone, made whole again by Aldric. Its runes glow steadily. It belongs in the shrine.' },
+  runeKey: { name: 'Rune key', value: 0, examine: 'A slim stone key from Aldric, carved with the same runes as the door of Grubnak\'s chamber. It opens the door without breaking the binding.' },
   digmastersOrders: {
     name: "Digmaster's orders", value: 0, examine: 'A filthy scroll from the Goblin Digmaster. Tap it to read.',
     read: [

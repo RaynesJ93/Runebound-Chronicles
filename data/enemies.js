@@ -196,6 +196,33 @@ export const ENEMIES = {
       rare: { chance: 1 / 12, table: [{ item: 'warCharm', qty: 1 }] },
     },
   },
+  // ---- The Runebound, chapter 6: the warlord himself ----
+  grubnak: {
+    id: 'grubnak', name: 'Grubnak', level: 40, hp: 90, boss: true,
+    attack: 30, strength: 28, defence: 16,
+    attackBonus: 16, strengthBonus: 12, defenceBonus: 4, maxHit: 6,
+    speed: 5, attackType: 'crush', aggressive: true, aggroRange: 7, wander: 0, leash: 14, respawn: 1e9,
+    look: { skin: '#5a6460', hair: '#1a1a14', tunic: '#561420', pants: '#2a1a14', belt: '#c8a030', ears: true, eyes: '#80e8ff', hat: 'helmet', hatColor: '#c8a030' },
+    examine: 'The goblin warlord of forty years ago. His skin has turned the grey of the rock he slept in, and runes still glow on it.',
+    defeatFlag: 'grubnakDown',
+    defeatText: ['Grubnak staggers. The runes on his skin flare white, and he drops to one knee with a crash that shakes the whole chamber.',
+      'The chains go slack. For the first time in forty years, the warlord is still.', 'Tobin will want to see this.'],
+    // Boss mechanics (bossTick in src/combat/combat.js)
+    mechanics: {
+      chained: true,                 // chains are drawn from the rune pillars to him
+      slamEvery: 10, slamEvery2: 8,  // ticks between ground slams (phase 1, phase 2)
+      slamWindup: 4,                 // ticks of red warning before it lands
+      slamShape: 'plus',             // your tile and the four next to it: step diagonally to get clear
+      slamDmg: [3, 7], slamDmg2: [5, 9],
+      slamText: 'Grubnak raises both fists over his head. The ground glows red under you: MOVE!',
+      warCry: [0.75, 0.4], adds: 'warrenGoblin', addCount: 2,
+      warCryText: 'Grubnak bellows a war cry, and warren goblins come pouring out of the tunnels!',
+      phase2At: 0.5,
+      phase2: { maxHit: 8, speed: 4 },
+      phase2Text: 'With a scream of iron, one of the chains SNAPS! Grubnak is enraged!',
+    },
+    loot: { always: [{ item: 'bones', qty: 1 }], main: [] },
+  },
   alphaWolf: {
     id: 'alphaWolf', name: 'Alpha Wolf', level: 14, hp: 40, sprite: 'wolf', boss: true,
     attack: 10, strength: 10, defence: 8,
