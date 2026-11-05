@@ -48,7 +48,7 @@ export class Hud {
       </div>
       <div class="levelup hidden" id="levelup" role="status">
         <img class="px" id="levelup-icon" alt="">
-        <div><div class="levelup-title">Level up!</div><div id="levelup-text"></div></div>
+        <span class="levelup-title">Level up!</span><span class="levelup-text" id="levelup-text"></span>
       </div>
       <div class="panel-backdrop ui hidden" id="inv">
         <div class="panel inv-panel" role="dialog" aria-label="Inventory">
@@ -678,7 +678,7 @@ export class Hud {
   levelUp(skillId, skillName, level) {
     const el = this.$('levelup');
     this.$('levelup-icon').src = iconUrl(skillId);
-    this.$('levelup-text').textContent = `Your ${skillName} level is now ${level}.`;
+    this.$('levelup-text').textContent = `${skillName} is now ${level}`;
     el.classList.remove('hidden', 'pop');
     void el.offsetWidth;
     el.classList.add('pop');
