@@ -65,7 +65,30 @@ export const QUESTS = [
       ] : []),
       { text: 'Bring all three shards to Aldric in Whispering Vale', done: false },
     ],
-    rewards: ['800 coins', 'Runecrafting XP', 'Attack, Strength and Defence XP', 'The story continues in chapter 4 (coming soon)'],
+    rewards: ['800 coins', 'Runecrafting XP', 'Attack, Strength and Defence XP', 'The story continues in chapter 4'],
+  },
+  {
+    id: 'remake',
+    chapter: 4,
+    name: 'Stone and Rune',
+    giver: { name: 'Aldric the Runekeeper', where: 'Whispering Vale', area: 'vale' },
+    about: 'Aldric can remake the broken runestone, but he needs essence, runes and a strong metal setting to do it.',
+    requiresQuests: ['stone'],
+    requires: { runecrafting: 10, smithing: 30 },
+    flag: 'remakeQuest',
+    steps: (c) => {
+      const made = !!c.flags.stoneRemade;
+      return [
+        { text: `Bring Aldric 20 rune essence (you have ${c.count('runeEssence')})`, done: made || c.count('runeEssence') >= 20 },
+        { text: `Bring Aldric 30 water runes (you have ${c.count('waterRune')})`, done: made || c.count('waterRune') >= 30 },
+        { text: `Bring Aldric 30 mind runes (you have ${c.count('mindRune')})`, done: made || c.count('mindRune') >= 30 },
+        { text: 'Get a runestone setting from Dorrin in Copperdeep Mine (he needs 2 steel bars and a silver bar)', done: made || c.count('runestoneSetting') >= 1 },
+        { text: 'Give it all to Aldric so he can remake the stone', done: made },
+        { text: 'Set the Binding Stone in the stone shrine', done: !!c.flags.stonePlaced },
+        { text: 'Tell Tobin', done: false },
+      ];
+    },
+    rewards: ['1,000 coins', 'Runecrafting, Smithing and Magic XP', 'The story continues in chapter 5 (coming soon)'],
   },
   {
     id: 'coldForge',
@@ -101,8 +124,9 @@ export const questsDone = (q, c) => (q.requiresQuests || []).every((id) => c.fla
 // items. The first hook that matches is used instead of the place's own text.
 //   area, type (prop type), at: { x, y } (any tile of the prop)
 //   when(flags, c): whether this hook applies (c has count(item))
-//   say: lines;  set: flags;  give: [{ item, qty }] (needs room in the bag,
-//   else `full` is shown)
+//   say: lines (or a function of flags, c);  set: flags;  give: [{ item, qty }]
+//   (needs room in the bag, else `full` is shown);  take: [{ item, qty }]
+//   (taken from your bag when the text closes)
 export const QUEST_HOOKS = [
   {
     area: 'brambleford', type: 'brokenCart', at: { x: 37, y: 42 },
@@ -155,6 +179,27 @@ export const QUEST_HOOKS = [
     say: ['You search under the altar again and find the runestone base where it fell.'],
     give: [{ item: 'runestoneBase', qty: 1 }],
     full: ['The runestone base is here, but your bag is full.'],
+  },
+  // Chapter 4: set the remade Binding Stone in the shrine.
+  {
+    area: 'route1', type: 'shrine', at: { x: 100, y: 42 },
+    when: (f, c) => f.remakeQuest === 'started' && !f.stonePlaced && c.count('bindingStone') >= 1,
+    say: ['You lift the Binding Stone into the hollow on the altar. It fits perfectly, as if it had never left.',
+      'The runes blaze white. The standing stones around you hum, one after another, all the way round the ring.',
+      'The ground shakes.', 'Far away to the north-west, something ROARS. Birds burst from every tree in Thornwood.',
+      'Then silence. The light settles into a steady glow... though every few moments, it flickers.', 'Tobin will want to know.'],
+    take: [{ item: 'bindingStone', qty: 1 }],
+    set: { stonePlaced: true },
+  },
+  {
+    area: 'route1', type: 'shrine', at: { x: 100, y: 42 },
+    when: (f) => f.stonePlaced,
+    say: ['The Binding Stone sits in the hollow, glowing softly.', 'Every few moments the light flickers, as if something far away is pushing against it.'],
+  },
+  {
+    area: 'route1', type: 'caveMouth', at: { x: 7, y: 6 },
+    when: (f) => f.stonePlaced,
+    say: ['Huge boulders block the mouth of the cave. But they have shifted: there is a dark crack between them now.', 'Cold air pours out. Deep inside, something is breathing. Slowly. Heavily.'],
   },
   {
     area: 'route1', type: 'shrine', at: { x: 100, y: 42 },

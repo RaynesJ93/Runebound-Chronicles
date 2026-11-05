@@ -972,11 +972,13 @@ function boot() {
     const c = questCtx();
     const hook = QUEST_HOOKS.find((h) => h.area === area.id && h.type === prop.type && prop.tiles.some((t) => t.x === h.at.x && t.y === h.at.y) && h.when(state.flags, c));
     if (!hook) return false;
+    if (hook.take && !hook.take.every((it) => inventory.count(it.item) >= it.qty)) return false;
     if (hook.give) {
       const needed = hook.give.filter((it) => !ITEMS[it.item].stackable || !inventory.count(it.item)).length;
       if (inventory.freeSlots < needed) { hud.showDialog(hook.full || ['Your bag is full.']); return true; }
     }
     hud.showDialog(typeof hook.say === 'function' ? hook.say(state.flags, c) : hook.say, () => {
+      if (hook.take) { for (const it of hook.take) inventory.remove(it.item, it.qty); refreshInventory(); }
       if (hook.give) {
         for (const it of hook.give) inventory.add(it.item, it.qty);
         hud.message(`You get: ${hook.give.map((it) => itemName(it.item)).join(', ')}.`);
