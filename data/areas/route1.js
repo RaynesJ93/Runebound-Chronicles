@@ -83,7 +83,10 @@ export function buildRoute1() {
   clearArea(49, 43, 62, 57);
 
   // ---- The stream, winding across the south, with a bridge on the road ------------------
-  const streamY = (x) => 66 + Math.round(Math.sin(x / 7) * 2.2 + Math.sin(x / 3.1) * 0.8);
+  const bend = (x) => 66 + Math.round(Math.sin(x / 7) * 2.2 + Math.sin(x / 3.1) * 0.8);
+  // Level for a few tiles each side of the road (x 55-56), so the bridge goes
+  // straight across instead of stepping with the stream's bend.
+  const streamY = (x) => (x >= 52 && x <= 59 ? bend(55) : bend(x));
   for (let x = 0; x < W; x++) {
     const cy = streamY(x);
     for (let y = cy - 1; y <= cy + 1; y++) {

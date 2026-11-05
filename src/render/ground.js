@@ -217,6 +217,75 @@ function shadeRock(kinds, W, H, frames, P) {
   }
 }
 
+// Bridges are drawn last, as one piece over the water: a plank deck that runs a
+// few pixels onto each bank, side rails, posts along them and big end posts.
+function drawBridges(area, g, frames) {
+  const seen = new Uint8Array(area.W * area.H);
+  const lerp = (a, b, t) => a.map((v, k) => Math.round(v + (b[k] - v) * t));
+  const dark = P.plankDark, rail = P.rail, [p0, p1, p2] = P.plank;
+  const hi = lerp(p2, [255, 236, 200], 0.25);
+  for (let ty = 0; ty < area.H; ty++) for (let tx = 0; tx < area.W; tx++) {
+    if (seen[ty * area.W + tx] || g(tx, ty) !== GROUND.BRIDGE) continue;
+    // this bridge's tiles and their bounding box
+    let x0 = tx, x1 = tx, y0 = ty, y1 = ty;
+    const stack = [[tx, ty]];
+    seen[ty * area.W + tx] = 1;
+    while (stack.length) {
+      const [x, y] = stack.pop();
+      x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx, ny = y + dy;
+        if (!area.inBounds(nx, ny) || seen[ny * area.W + nx] || g(nx, ny) !== GROUND.BRIDGE) continue;
+        seen[ny * area.W + nx] = 1;
+        stack.push([nx, ny]);
+      }
+    }
+    // Which way it runs: across water on its left and right means north-south.
+    const ns = g(x0 - 1, (y0 + y1) >> 1) === GROUND.WATER || g(x1 + 1, (y0 + y1) >> 1) === GROUND.WATER;
+    // a = across the bridge, b = along it (the way you walk)
+    const a0 = (ns ? x0 : y0) * 16, a1 = ((ns ? x1 : y1) + 1) * 16;
+    const b0 = (ns ? y0 : x0) * 16 - 6, b1 = ((ns ? y1 : x1) + 1) * 16 + 6;
+    const put = (a, b, c) => { const x = ns ? a : b, y = ns ? b : a; if (x >= 0 && y >= 0) for (const f of frames) f.set(x, y, c); };
+    const shade = (a, b, k) => {
+      const x = ns ? a : b, y = ns ? b : a;
+      if (x < 0 || y < 0 || x >= frames[0].w || y >= frames[0].h) return;
+      const i = (y * frames[0].w + x) * 4;
+      for (const f of frames) for (let c = 0; c < 3; c++) f.data[i + c] = Math.round(f.data[i + c] * k);
+    };
+    // shadow on the water beside the bridge
+    for (let b = b0 + 6; b < b1 - 6; b++) for (const [a, k] of [[a0 - 1, 0.6], [a0 - 2, 0.8], [a1, 0.6], [a1 + 1, 0.8]]) shade(a, b, k);
+    // the deck: planks across, 5 px each with a dark gap; ragged ends
+    for (let b = b0 + 1; b < b1 - 1; b++) {
+      const n = Math.floor((b - b0) / 5), r = (b - b0) % 5;
+      const base = [p0, p1, p2][Math.floor(rnd(n, x0 + y0, 191) * 3)];
+      const jl = rnd(n, 1, 192) < 0.5 ? 1 : 0, jr = rnd(n, 2, 192) < 0.5 ? 1 : 0;
+      for (let a = a0 + 2 + jl; a < a1 - 2 - jr; a++) {
+        let c = base;
+        if (r === 4) c = dark;
+        else if (r === 0) c = lerp(base, hi, 0.5);
+        else if (rnd(a, b, 193) < 0.04) c = lerp(base, dark, 0.5); // grain and knots
+        else if ((a + n * 7) % 13 === 0) c = lerp(base, dark, 0.3);
+        put(a, b, c);
+      }
+    }
+    // rails along both sides: a dark outer edge, the beam, a lit inner edge
+    for (const side of [0, 1]) {
+      const at = (k) => (side ? a1 - 1 - k : a0 + k);
+      for (let b = b0 + 3; b < b1 - 3; b++) { put(at(0), b, dark); put(at(1), b, rail); put(at(2), b, hi); put(at(3), b, lerp(p1, dark, 0.4)); }
+      // posts: big ones at each end, small ones between
+      const posts = [b0 + 1, b1 - 6];
+      for (let b = b0 + 13; b < b1 - 12; b += 11) posts.push(b);
+      posts.forEach((pb, k) => {
+        const big = k < 2, w = big ? 5 : 4, h = big ? 6 : 4;
+        for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < w; dx++) {
+          const edge = dx === 0 || dy === 0 || dx === w - 1 || dy === h - 1;
+          put(side ? a1 - w + dx + (big ? 1 : 0) : a0 + dx - (big ? 1 : 0), pb + dy, edge ? dark : dy === 1 ? hi : rail);
+        }
+      });
+    }
+  }
+}
+
 export function buildGround(area) {
   P = area.theme === 'vale' ? VALE : BASE;
   const T = textures(area.theme === 'vale' ? 'vale' : 'base');
@@ -513,5 +582,6 @@ export function buildGround(area) {
     }
   }
 
+  drawBridges(area, g, frames);
   return frames.map((b) => b.toCanvas());
 }
