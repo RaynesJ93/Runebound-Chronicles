@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 5 Nov 2026 | v0.37.1: axes and pickaxes need Attack to wield, like other weapons of their metal (bronze 1, iron 5, steel 10, mithril 20, adamant 30, rune 40). They still work from the bag for Woodcutting and Mining with just the skill level. |
 | 0 ✅ | Project foundation | `index.html`, renderer, game loop, 0.6 s tick, game-state object, save system v1 (versioned, autosave, two slots, export/import), GitHub Pages deploy | Page loads on desktop and iPhone; a save survives a reload |
 | 1 ✅ | Starting village + Emerald camera | Tile-map village, top-down follow camera, grid movement (WASD/arrows), tap/click-to-move with A* pathfinding, collision, run toggle and energy | You can walk around the village on both devices |
 | 2 ✅ | NPCs and the forest route | Wandering NPCs, Emerald-style dialogue box with choices, inspectable doors, Route 1 (Thornwood) connected to the village with area transitions. Building interiors move to Batch 8 with the bank and shop | You can talk to NPCs and walk to the forest and back |
