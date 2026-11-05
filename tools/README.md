@@ -13,3 +13,11 @@ with Pillow, NumPy and SciPy.
 There are two sets of sheets (01–16 and 17–31). Cut both into the same folder
 before building. Sheet 21 (worn gear) is cut by its own script into
 `<cut>/21_gear/<item>-<direction>.png` (one standing frame per direction).
+
+## Ready-made sprites
+
+Small one-off sprites (already cut from a magenta sheet and shrunk to game
+size) live in `tools/sprites/<name>.png`. `python3 tools/derived.py` adds any
+that aren't in the atlas yet, anchored at the bottom middle, under `<name>`.
+So far: Pell's wrecked cart and three broken barrels (`brokenCart`,
+`brokenBarrel`, `toppledBarrel`, `smashedBarrel`).

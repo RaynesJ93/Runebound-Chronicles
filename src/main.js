@@ -724,7 +724,7 @@ function boot() {
   };
 
   // Long-press (phone) or right-click (computer): every option for what's there.
-  const PROP_NAME = { sign: 'sign', door: 'door', well: 'well', stall: 'stall', counter: 'counter', bankBooth: 'bank booth', fallenTree: 'fallen tree', logPile: 'log pile', tent: 'tent', campfire: 'campfire', scarecrow: 'scarecrow', lamp: 'lamp' };
+  const PROP_NAME = { sign: 'sign', door: 'door', well: 'well', stall: 'stall', brokenCart: 'broken cart', brokenBarrel: 'barrel', toppledBarrel: 'barrel', smashedBarrel: 'broken barrel', counter: 'counter', bankBooth: 'bank booth', fallenTree: 'fallen tree', logPile: 'log pile', tent: 'tent', campfire: 'campfire', scarecrow: 'scarecrow', lamp: 'lamp' };
   input.onLongPress = (sx, sy) => {
     if (hud.dialogOpen || !ready()) return;
     const t = view.screenToTile(sx, sy);

@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 5 Nov 2026 | v0.37.6: Pell's wrecked cart is now in Brambleford, on the south road just before the bridge, with new painted art: a broken cart and three smashed barrels (from a new sprite sheet, kept in `tools/sprites/`). The Overturned Cart's text and journal steps point there; the goblin tracks lead north-west into Thornwood. |
 | 5 Nov 2026 | v0.37.5: bridges look like bridges — Thornwood's stream runs level at the road so the bridge crosses straight (it was stepped), and both bridges are drawn as one piece with a plank deck, railings, posts and a shadow on the water. |
 | 5 Nov 2026 | v0.37.4: outdoor rock (the Alpha's den, the sealed cave, the mine entrance, the essence quarry rim) gets the same natural edges and shadows as the caves, and the den and sealed cave are now uneven outcrops instead of big rectangular blocks. |
 | 5 Nov 2026 | v0.37.3: iPhone home-screen app fills the screen more reliably (also detects the app by display mode, adds back the status-bar height if the phone under-reports its size, and re-checks just after launch); the page behind the game is dark instead of green; Settings shows a screen-size readout under the version, to help fix layout bugs. |

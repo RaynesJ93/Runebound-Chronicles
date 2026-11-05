@@ -173,7 +173,7 @@ export const NPCS = [
 
         // ---- The Runebound, chapter 1: The Overturned Cart ------------------------------
         cart: {
-          say: ['Worried? Me? ...Oh, all right. Yes.', 'My second supply cart never made it. The driver ran back last night: goblins jumped him on the mine road, just north of the village.',
+          say: ['Worried? Me? ...Oh, all right. Yes.', 'My second supply cart never made it. Goblins jumped the driver last night on the south road, right before the bridge. Inside the village!',
             "He's fine. But they took my strongbox. Everything I've saved this season is in it."],
           choices: [
             { text: "I'll get it back.", next: 'cartStart' },
@@ -182,14 +182,14 @@ export const NPCS = [
         },
         cartStart: {
           set: { cartQuest: 'started' },
-          say: ["You will? Bless you! The cart's still lying where they left it, in Thornwood, a little way up the road.",
+          say: ["You will? Bless you! The cart's still lying where they left it, down the south road by the bridge.",
             "Have a look around it. And be careful. The driver said these weren't the little goblins. Big ones. Brutes."],
           next: 'menu',
         },
         cartProgress: {
           say: (c) => (c.count('pellsStrongbox') ? ['Is that... my strongbox?!'] : c.flags.cartClue
             ? ['Goblin tracks heading west, you say? That\'ll be the goblin camp. Watch out for the brutes.']
-            : ["The cart's in Thornwood, a little way up the road north of the village. Have a look around it."]),
+            : ["The cart's down the south road, just before the bridge. Have a look around it."]),
           choices: [
             { text: 'Here it is.', next: 'cartHandIn', if: (c) => c.count('pellsStrongbox') >= 1 },
             { text: "I'm still looking.", next: 'menu' },

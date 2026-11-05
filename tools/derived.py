@@ -18,6 +18,7 @@ from shrink import shrink
 import jewel_art as J
 
 ROOT = os.path.join(os.path.dirname(__file__), '..')
+SPRITE_DIR = os.path.join(os.path.dirname(__file__), 'sprites')
 DIRS = ['down', 'up', 'left', 'right']
 
 
@@ -836,6 +837,12 @@ def derive(get0):
     for new, src, fn in EXTRA:
         for k, im, ax, ay in get(src):
             emit((new, k, fn(im, get), ax, ay))
+    # Ready-made sprites (cut from a magenta sheet and shrunk to game size),
+    # kept in tools/sprites/<name>.png; anchored at the bottom middle.
+    for f in sorted(os.listdir(SPRITE_DIR)) if os.path.isdir(SPRITE_DIR) else []:
+        if not f.endswith('.png'): continue
+        im = Image.open(os.path.join(SPRITE_DIR, f)).convert('RGBA')
+        emit((f[:-4], 0, im, im.width // 2, im.height - 2))
     for size, scale in ((1, 0.62), (2, 0.78), (3, 0.95), (4, 1.12), (5, 1.3)):
         src = get('oreEssence')
         if not src: break
