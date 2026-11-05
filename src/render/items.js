@@ -250,6 +250,19 @@ const DRAW = {
     b.rect(4, 10, 8, 1, hex('#5a3a1e'));
   },
   // The Runebound, chapter 3: the three pieces of the broken runestone.
+  bindingStone(b) {
+    shard(b, [[8, 0], [12, 3], [13, 9], [12, 15], [4, 15], [3, 9], [4, 3]], [[8, 3], [8, 4], [7, 5], [9, 5], [6, 8], [10, 8], [8, 9], [8, 10], [7, 12], [9, 12]]);
+    for (const [x, y] of [[3, 7], [3, 11], [12, 7], [12, 11]]) b.set(x, y, hex('#9aa0aa')); // the steel band
+    for (let x = 4; x <= 11; x++) { b.set(x, 13, hex('#5a5e68')); b.set(x, 14, x % 3 ? hex('#8a909c') : hex('#e8ecf0')); }
+  },
+  runestoneSetting(b) {
+    const [d, m, l, sv] = [hex('#3a3e46'), hex('#6e747e'), hex('#a4aab4'), hex('#eef2f6')];
+    b.ellipse(8, 9, 6.5, 5, d);
+    b.ellipse(8, 8.6, 5.6, 4.2, m);
+    for (let a = 0; a < 24; a++) { const t = (a / 24) * Math.PI * 2; const x = Math.round(8 + Math.cos(t) * 4.8), y = Math.round(8.8 + Math.sin(t) * 3.4); b.set(x, y, a % 2 ? sv : l); }
+    // the hole in the middle
+    for (let y = 5; y <= 13; y++) for (let x = 3; x <= 13; x++) if (((x + 0.5 - 8) / 3.2) ** 2 + ((y + 0.5 - 9.4) / 2.1) ** 2 <= 1) b.set(x, y, [0, 0, 0], 0);
+  },
   runestoneBase(b) { shard(b, [[2, 14], [14, 14], [13, 9], [10, 7], [7, 9], [3, 8]], [[5, 12], [6, 11], [7, 12], [9, 11], [10, 12], [11, 11]]); },
   runestoneCrown(b) { shard(b, [[8, 1], [12, 7], [13, 12], [6, 13], [3, 9]], [[8, 5], [8, 6], [7, 7], [9, 7], [8, 9], [8, 10]]); },
   runestoneHeart(b) { shard(b, [[4, 3], [11, 2], [14, 8], [11, 14], [4, 13], [2, 8]], [[6, 6], [7, 7], [8, 8], [9, 7], [10, 6], [8, 10], [8, 11]]); },

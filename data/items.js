@@ -791,6 +791,8 @@ export const ITEMS = {
   runestoneBase: { name: 'Runestone base', value: 0, examine: 'The broad bottom of the shrine\'s runestone. Carved runes still glow along its broken edge.' },
   runestoneCrown: { name: 'Runestone crown', value: 0, examine: 'The pointed top of the runestone. The Goblin Chief wore it on a cord, like a trophy.' },
   runestoneHeart: { name: 'Runestone heart', value: 0, examine: 'The middle of the runestone, where the glow is brightest. It hums when you hold it.' },
+  runestoneSetting: { name: 'Runestone setting', value: 0, examine: 'A heavy band of steel with silver inlay, made by Dorrin to hold the pieces of the runestone together.' },
+  bindingStone: { name: 'Binding Stone', value: 0, examine: 'The runestone, made whole again by Aldric. Its runes glow steadily. It belongs in the shrine.' },
   goblinToken: { name: 'Goblin token', value: 0, examine: 'A disc of carved bone on a leather cord. A crude crown is cut into it, above three slashes.' },
   holtsJournal: {
     name: "Holt's journal", value: 0, examine: 'A small leather journal from the old watchtower. Tap it to read.',

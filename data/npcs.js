@@ -497,7 +497,9 @@ export const NPCS = [
           choices: [
             { text: 'What do we do now?', next: 'stone', if: (c) => c.flags.warQuest === 'done' && !c.flags.stoneQuest },
             { text: 'About the runestone...', next: 'stoneProgress', if: (c) => c.flags.stoneQuest === 'started' },
-            { text: 'How are you holding up?', next: 'stoneDone', if: (c) => c.flags.stoneQuest === 'done' },
+            { text: 'How are you holding up?', next: 'stoneDone', if: (c) => c.flags.stoneQuest === 'done' && !c.flags.stonePlaced },
+            { text: 'The Binding Stone is back in the shrine.', next: 'remakeEnd', if: (c) => c.flags.stonePlaced && c.flags.remakeQuest === 'started' },
+            { text: 'What happens now?', next: 'remakeAfter', if: (c) => c.flags.remakeQuest === 'done' },
             { text: 'Goodbye, Tobin.', next: 'bye' },
           ],
         },
@@ -528,7 +530,21 @@ export const NPCS = [
           },
           next: 'bye',
         },
-        stoneDone: { say: ['Better, now the pieces are with Aldric. I can sleep for an hour or two at a time.', 'Go and see him. He\'ll need help to remake it. (The story continues in chapter 4, coming soon.)'] },
+        stoneDone: { say: ['Better, now the pieces are with Aldric. I can sleep for an hour or two at a time.', "Go and see him. He'll need help to remake it."] },
+
+        // ---- The Runebound, chapter 4: Stone and Rune -----------------------------
+        remakeEnd: {
+          give: { flag: 'remakePaid', items: [{ item: 'coins', qty: 1000 }] },
+          giveFail: 'remakeFull',
+          set: { remakeQuest: 'done' },
+          reward: { xp: { magic: 400, smithing: 200, runecrafting: 200 }, quest: 'Stone and Rune' },
+          say: ['I heard it. The whole forest heard it. That roar came from the cave.', 'The stone is back, and the binding holds. But he was never that loud when he slept. He is half awake now, pushing at it.',
+            'And the boulders at the cave mouth have shifted. Go and look, if you dare. There is a crack between them now.',
+            'Forty years I hoped it would never come to this. The binding will not hold him for long. Sooner or later someone has to go down there and finish it.',
+            'Take this. Old Watch pay, saved for a rainy day. I reckon the storm is coming. (The story continues in chapter 5, coming soon.)'],
+        },
+        remakeFull: { say: 'Make a bit of room in your bag first.' },
+        remakeAfter: { say: ['He is stirring down there. I hear him at night now.', "When it's time to go into that cave, I'm coming with you. Knees or no knees. (The story continues in chapter 5, coming soon.)"] },
       },
     },
   },
@@ -552,11 +568,32 @@ export const NPCS = [
           { text: 'How does mining work again?', next: 'lesson', if: (c) => c.flags.gotPickaxe },
           { text: 'How do I make things from ore?', next: 'smith' },
           { text: "What's deeper in?", next: 'deeper' },
+          { text: 'Aldric needs a setting for a runestone.', next: 'setting', if: (c) => c.flags.remakeQuest === 'started' && !c.flags.stoneRemade && !c.have('runestoneSetting') },
           { text: 'Is there anything I can help with?', next: 'quest', if: (c) => !c.flags.forgeQuest },
           { text: 'About the great forge...', next: 'questProgress', if: (c) => c.flags.forgeQuest === 'started' },
           { text: "How's the great forge?", next: 'questDone', if: (c) => c.flags.forgeQuest === 'done' },
           { text: 'See you, Dorrin.', next: 'bye' },
         ] },
+
+        // ---- The Runebound, chapter 4: the runestone setting -------------------------
+        setting: {
+          say: ['A setting for a runestone? For old Aldric? Ha! Course I can.', 'Steel band to hold it, silver inlay so the runes can flow through. Bring me two steel bars and a silver bar and I\'ll have it done before you can blink.'],
+          choices: [
+            { text: 'Here are the bars.', next: 'settingMake', if: (c) => c.count('steelBar') >= 2 && c.count('silverBar') >= 1 },
+            { text: "I'll get them.", next: 'menu' },
+          ],
+        },
+        settingMake: { set: { gotSetting: false }, say: [], next: 'settingGive' },
+        settingGive: {
+          give: { flag: 'gotSetting', items: [{ item: 'runestoneSetting', qty: 1 }] },
+          giveFail: 'settingFull',
+          take: [{ item: 'steelBar', qty: 2 }, { item: 'silverBar', qty: 1 }],
+          takeFail: 'setting',
+          reward: { xp: { smithing: 400 } },
+          say: ['*clang* *clang* *hiss*', 'There you go. A runestone setting, fit for a king. Don\'t tell Aldric I enjoyed that.'],
+          next: 'menu',
+        },
+        settingFull: { say: "No room in your bag for it! Clear a space and come back.", next: 'menu' },
 
         // ---- Quest: The Cold Forge -----------------------------------------------------
         quest: {
@@ -645,7 +682,10 @@ export const NPCS = [
           { text: 'Tell me about the altars.', next: 'altars' },
           { text: 'What is that chest?', next: 'chest' },
           { text: 'I have pieces of a runestone.', next: 'stone', if: (c) => c.flags.stoneQuest === 'started' },
-          { text: 'How is the runestone?', next: 'stoneDone', if: (c) => c.flags.stoneQuest === 'done' },
+          { text: 'How is the runestone?', next: 'remake', if: (c) => c.flags.stoneQuest === 'done' && !c.flags.remakeQuest },
+          { text: 'About remaking the stone...', next: 'remakeProgress', if: (c) => c.flags.remakeQuest === 'started' && !c.flags.stoneRemade },
+          { text: 'I lost the Binding Stone.', next: 'remakeAgain', if: (c) => c.flags.stoneRemade && !c.flags.stonePlaced && !c.have('bindingStone') },
+          { text: 'How is the Binding Stone?', next: 'remakeDone', if: (c) => c.flags.stonePlaced },
           { text: 'Farewell, Aldric.', next: 'bye' },
         ] },
 
@@ -674,7 +714,49 @@ export const NPCS = [
           next: 'menu',
         },
         stoneFull: { say: 'Your bag is full, friend. Make a little room first.', next: 'menu' },
-        stoneDone: { say: ['The pieces sit in my workshop, humming. I am working out what the remaking needs.', '(The story continues in chapter 4, coming soon.)'], next: 'menu' },
+        stoneDone: { say: ['The pieces sit in my workshop, humming.'], next: 'menu' },
+
+        // ---- The Runebound, chapter 4: Stone and Rune -----------------------------
+        remake: {
+          say: ['I have worked it out. The pieces can be bound back together, but the binding must be fed.',
+            'I need twenty rune essence to fill the cracks, thirty water runes to make it flow, and thirty mind runes to give it will.',
+            "And a setting: a band of steel with a silver inlay, to hold the three pieces as one. I am no smith. But Dorrin the miner is the best there is."],
+          choices: [
+            { text: "I'll gather it all.", next: 'remakeStart', if: (c) => c.level('runecrafting') >= 10 && c.level('smithing') >= 30 },
+            { text: "I'll gather it all.", next: 'remakeTooLow', if: (c) => !(c.level('runecrafting') >= 10 && c.level('smithing') >= 30) },
+            { text: 'Not yet.', next: 'menu' },
+          ],
+        },
+        remakeTooLow: { say: "Gladly, but this is skilled work. Come back with Runecrafting 10, to help me channel the runes, and Smithing 30, so you can make the steel Dorrin will need.", next: 'menu' },
+        remakeStart: {
+          set: { remakeQuest: 'started' },
+          say: ['Good. Twenty essence, thirty water runes, thirty mind runes, and the setting from Dorrin.', 'The binding will not wait forever. Be quick, but be careful.'],
+          next: 'menu',
+        },
+        remakeProgress: {
+          say: (c) => [`I need 20 rune essence (you have ${c.count('runeEssence')}), 30 water runes (${c.count('waterRune')}), 30 mind runes (${c.count('mindRune')}), and Dorrin's setting (${c.count('runestoneSetting') ? 'yes' : 'not yet'}).`],
+          choices: [
+            { text: 'Here, everything.', next: 'remakeHandIn', if: (c) => [['runeEssence', 20], ['waterRune', 30], ['mindRune', 30], ['runestoneSetting', 1]].every(([id, n]) => c.count(id) >= n) },
+            { text: 'Not yet.', next: 'menu' },
+          ],
+        },
+        remakeHandIn: {
+          give: { flag: 'gotBindingStone', items: [{ item: 'bindingStone', qty: 1 }] },
+          giveFail: 'remakeFull',
+          take: [{ item: 'runeEssence', qty: 20 }, { item: 'waterRune', qty: 30 }, { item: 'mindRune', qty: 30 }, { item: 'runestoneSetting', qty: 1 }],
+          takeFail: 'remakeProgress',
+          set: { stoneRemade: true },
+          reward: { xp: { runecrafting: 300 } },
+          say: ['Then let us begin. Hold the setting steady. Do not let go, whatever happens.',
+            'Aldric lays the three pieces in the steel band and scatters the essence over them. The runes in your bag rise into the air, glowing, and pour into the cracks like water.',
+            'The stone grows hot, then cold. The cracks close. With a sound like a bell, it is whole.',
+            'The Binding Stone. Take it to the shrine and set it in the hollow. Quickly, now.'],
+          next: 'menu',
+        },
+        remakeFull: { say: 'Make room in your bag first. You will need to carry the stone.', next: 'menu' },
+        remakeAgain: { set: { gotBindingStone: false }, say: ['Lost it?! ...Very well. The pieces remember being whole. I can coax them together once more.'], next: 'remakeGive' },
+        remakeGive: { give: { flag: 'gotBindingStone', items: [{ item: 'bindingStone', qty: 1 }] }, giveFail: 'remakeFull', say: ['There. Guard it with your life this time.'], next: 'menu' },
+        remakeDone: { say: ['I felt it from here when the stone went in. And I felt something else push back.', 'Talk to Tobin. He knows that cave better than anyone.'], next: 'menu' },
         how: {
           say: ['First, mine essence in the quarry to the north-west. Any pickaxe will do, and the crystals never run dry.',
             'Then carry it to an altar and touch the altar. Every piece of essence in your bag becomes a rune at once.',
