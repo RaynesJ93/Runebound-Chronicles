@@ -218,6 +218,7 @@ export class Hud {
             <h3>Danger zone</h3>
             <button class="btn danger" id="save-reset">Start a new game</button>
             <p class="version" id="version"></p>
+            <p class="version small" id="screen-info"></p>
           </div>
         </div>
       </div>
@@ -230,7 +231,7 @@ export class Hud {
       dialogName: $('dialog-name'), dialogChoices: $('dialog-choices'), dialogNext: $('dialog-next'), fade: $('fade'),
       settings: $('settings'), toast: $('toast'), saveStatus: $('save-status'),
       setDpad: $('set-dpad'), zoomVal: $('zoom-val'), importBox: $('import-box'), importText: $('import-text'),
-      version: $('version'), setRetaliate: $('set-retaliate'),
+      version: $('version'), screenInfo: $('screen-info'), setRetaliate: $('set-retaliate'),
       setItemTap: $('set-itemtap'), setTextSpeed: $('set-textspeed'), setXpDrops: $('set-xpdrops'), setBattery: $('set-battery'),
       hpOrb: $('hp-orb'), hpFill: $('hp-fill'), hpVal: $('hp-val'),
       target: $('target'), targetName: $('target-name'), targetFill: $('target-fill'),

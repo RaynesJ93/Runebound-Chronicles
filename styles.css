@@ -36,7 +36,7 @@ html, body {
   margin: 0;
   height: 100%;
   overflow: hidden;
-  background: #2c5a2a;
+  background: #15110c;
   color: var(--ink);
   font-family: var(--pixel);
   font-synthesis-weight: none; /* never smear the pixel digits with fake bold */

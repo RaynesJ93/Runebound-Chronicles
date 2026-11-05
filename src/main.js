@@ -229,6 +229,7 @@ function boot() {
   };
   hud.el.version.textContent = `RuneBound Chronicles v${GAME_VERSION} · ${BUILD_NAME}`;
   hud.onSettingsOpen = () => {
+    if (hud.el.screenInfo) hud.el.screenInfo.textContent = screenInfo();
     hud.el.saveStatus.textContent = describeSave();
     const st = state.stats;
     const rows = [
@@ -1542,19 +1543,37 @@ function boot() {
   };
 
   // A home-screen app on an iPhone fills the whole screen, but its CSS
-  // heights (even 100lvh) can stop short by the status bar's height, leaving a
-  // strip at the bottom. There, size the game to the screen itself.
+  // heights (even 100lvh) and innerHeight can stop short by the status bar's
+  // height, leaving a strip at the bottom. There, size the game to the screen.
+  const mq = (q) => window.matchMedia?.(q).matches;
+  const homeApp = () => !!navigator.standalone || mq('(display-mode: standalone)') || mq('(display-mode: fullscreen)');
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;left:0;top:0;width:0;visibility:hidden;pointer-events:none;height:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)';
+  document.body.appendChild(probe);
+  const safe = () => ({ top: probe.offsetHeight - (parseFloat(getComputedStyle(probe).paddingBottom) || 0), bottom: parseFloat(getComputedStyle(probe).paddingBottom) || 0 });
   const fitScreen = () => {
-    if (!navigator.standalone || !window.screen) return;
+    if (!homeApp() || !window.screen) { canvas.style.width = ''; canvas.style.height = ''; return; }
     const long = Math.max(screen.width, screen.height), short = Math.min(screen.width, screen.height);
     const wide = window.innerWidth > window.innerHeight;
+    let h = Math.max(wide ? short : long, window.innerHeight);
+    // If the screen size looks wrong too, add back the status bar's height.
+    const t = safe().top;
+    if (h < window.innerHeight + t - 1 && window.innerHeight + t <= (wide ? short : long) + 80) h = window.innerHeight + t;
     canvas.style.width = `${Math.max(wide ? long : short, window.innerWidth)}px`;
-    canvas.style.height = `${Math.max(wide ? short : long, window.innerHeight)}px`;
+    canvas.style.height = `${h}px`;
   };
-  const onResize = () => { fitScreen(); view.resize(); applySettings(); };
+  // The screen readout under the version in Settings (to help fix layout bugs).
+  const screenInfo = () => {
+    const r = canvas.getBoundingClientRect(), sf = safe();
+    return `Screen: ${homeApp() ? 'home-screen app' : 'browser'} · device ${screen.width}×${screen.height} · window ${window.innerWidth}×${window.innerHeight} · game ${Math.round(r.width)}×${Math.round(r.height)} · safe ${Math.round(sf.top)}/${Math.round(sf.bottom)}`;
+  };
+  const onResize = () => { fitScreen(); view.resize(); applySettings(); hud.el.screenInfo && (hud.el.screenInfo.textContent = screenInfo()); };
   onResize();
   window.addEventListener('resize', onResize);
   window.addEventListener('orientationchange', () => setTimeout(onResize, 200));
+  // iPhones sometimes report the wrong size just after launch; check again.
+  for (const ms of [300, 1000, 2500]) setTimeout(onResize, ms);
+  window.visualViewport?.addEventListener('resize', onResize);
   requestAnimationFrame(frame);
 
   document.getElementById('loading')?.classList.add('done');
