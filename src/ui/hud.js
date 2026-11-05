@@ -31,7 +31,6 @@ const GEAR_SVG = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="t
 const HEART_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 21 3.5 12.6A5.2 5.2 0 0 1 12 6.2a5.2 5.2 0 0 1 8.5 6.4z"/></svg>';
 const BOOK_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="#8a3a2a" stroke="#2b1d16" stroke-width="1.5" stroke-linejoin="round" d="M4 4.5C4 3.7 4.7 3 5.5 3H19v15H6a2 2 0 0 0-2 2z"/><path fill="#f4e6c4" stroke="#2b1d16" stroke-width="1.5" stroke-linejoin="round" d="M4 20a2 2 0 0 1 2-2h13v3H6a2 2 0 0 1-2-1z"/><path stroke="#e8b33c" stroke-width="1.6" d="M8 7.5h7M8 10.5h5"/></svg>';
 const MAP_SVG = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="#e8d8b0" stroke="#2b1d16" stroke-width="1.6" stroke-linejoin="round" d="M2.5 5.5 8.5 3l7 2.5 6-2.5v15l-6 2.5-7-2.5-6 2.5z"/><path stroke="#2b1d16" stroke-width="1.4" d="M8.5 3v15M15.5 5.5v15"/><path fill="none" stroke="#b0483a" stroke-width="1.6" stroke-dasharray="2 1.6" d="M4.5 15c2-3 4-1 5.5-4s3.5-2 5-4"/><path fill="#b0483a" d="m17 6.2 2.4.3-1.2 2.3z"/></svg>';
-const BOOT_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M7 3h5v8l6 3c1.7.8 3 2.4 3 4.3V20H4v-3l3-1z"/></svg>';
 
 export class Hud {
   constructor(root) {
@@ -162,10 +161,6 @@ export class Hud {
           <span class="run-bar"><span class="hp-fill" id="hp-fill"></span></span>
           <span class="run-val" id="hp-val">10</span>
         </div>
-        <button class="run-orb ui" id="run-orb" aria-label="Toggle run">
-          <span class="run-icon">${uiIcon('walk', BOOT_SVG, 26)}</span>
-          <span class="run-val" id="run-val">Run</span>
-        </button>
       </div>
       <div class="dpad ui hidden" id="dpad" aria-label="Movement joystick">
         <span class="joy-knob"></span>
@@ -218,7 +213,7 @@ export class Hud {
     `;
     const $ = (id) => root.querySelector(`#${id}`);
     this.el = {
-      banner: $('area-banner'), messages: $('messages'), runOrb: $('run-orb'), runVal: $('run-val'),
+      banner: $('area-banner'), messages: $('messages'), 
       dpad: $('dpad'), hint: $('hint'), dialog: $('dialog'), dialogText: $('dialog-text'),
       dialogName: $('dialog-name'), dialogChoices: $('dialog-choices'), dialogNext: $('dialog-next'), fade: $('fade'),
       settings: $('settings'), toast: $('toast'), saveStatus: $('save-status'),
@@ -804,17 +799,6 @@ export class Hud {
   }
 
   // These run every frame, so they only touch the page when something changed.
-  // The run button: running never runs out, it just toggles run / walk.
-  setRun(on) {
-    if (on === this.runOn) return;
-    this.runOn = on;
-    this.el.runOrb.classList.toggle('on', on);
-    this.el.runVal.textContent = on ? 'Run' : 'Walk';
-    const boot = this.el.runOrb.querySelector('img.ui-ic');
-    const u = paintedIconUrl(on ? 'run' : 'walk');
-    if (boot && u) boot.src = u;
-    this.el.runOrb.setAttribute('aria-pressed', String(on));
-  }
 
   setHp(hp, max) {
     const key = `${hp}|${max}`;

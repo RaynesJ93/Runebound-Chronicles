@@ -768,12 +768,11 @@ function boot() {
     hud.showMenu(sx, sy, title, opts);
   };
 
-  const toggleRun = () => { state.run.on = !state.run.on; };
-  hud.el.runOrb.addEventListener('click', toggleRun);
+  // There's no run button any more: you always run (it never tires you out).
+  state.run.on = true;
 
   input.onKey = (e) => {
-    if (e.code === 'KeyR') toggleRun();
-    else if (e.code === 'Equal' || e.code === 'NumpadAdd') zoomBy(1);
+    if (e.code === 'Equal' || e.code === 'NumpadAdd') zoomBy(1);
     else if (e.code === 'Minus' || e.code === 'NumpadSubtract') zoomBy(-1);
     else if (e.code === 'Escape') { if (hud.menuOpen) hud.closeMenu(); else if (hud.dialogOpen) hud.advanceDialog(); else if (hud.settingsOpen) { hud.closeSettings(); hud.closeSkills(); hud.closeInventory(); hud.closeMap(); hud.closeGuidePanel(); } }
     else if (e.code === 'KeyG' && !hud.dialogOpen) { if (hud.guideOpen) hud.closeGuidePanel(); else hud.openGuidePanel(); }
@@ -1492,7 +1491,6 @@ function boot() {
     } else hud.setGraveTimer(null);
     hud.setHp(state.player.hp, combat.maxHp);
     hud.setTarget(combat.target || enemies.find((e) => !e.dead && e.state === 'fight') || null, combat.level);
-    hud.setRun(state.run.on);
     requestAnimationFrame(frame);
   };
 

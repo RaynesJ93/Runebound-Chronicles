@@ -72,7 +72,7 @@ html, body {
 button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
 
 /* The shared wooden frame around parchment */
-.wood, .area-banner, .icon-btn, .run-orb, .dialog, .panel, .toast, .hint {
+.wood, .area-banner, .icon-btn, .dialog, .panel, .toast, .hint {
   background: var(--parch);
   border: 3px solid var(--wood-dark);
   border-radius: 7px;
@@ -159,20 +159,9 @@ button.guide-tip:active { background: #ffe9a8; }
 }
 .msg.fade { opacity: 0; }
 
-/* ---- Run button: boot icon with an energy bar ---- */
-.run-orb {
-  --pct: 100;
-  position: relative; width: 74px; height: 74px; padding: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  color: var(--ink-soft);
-}
-.run-orb.on { color: var(--wood-dark); }
-.run-icon svg { width: 24px; height: 24px; display: block; }
+/* ---- Bar and number inside the HP orb (shared names from the old run button) ---- */
 .run-bar { width: 44px; height: 7px; background: #5a3d22; border: 1px solid var(--wood-dark); border-radius: 2px; overflow: hidden; }
-.run-fill { display: block; height: 100%; width: calc(var(--pct) * 1%); background: #9a9a8a; }
-.run-orb.on .run-fill { background: var(--gold); }
 .run-val { font-size: 13px; font-weight: 700; line-height: 1; }
-.run-orb:active { transform: translateY(2px); }
 
 /* ---- Joystick ---- */
 .dpad {
@@ -600,7 +589,7 @@ img.px { -webkit-user-drag: none; }
   .skill-foot { margin-top: 6px; }
 }
 
-.hp-icon img.ui-ic, .run-icon img.ui-ic { display: block; width: 26px; height: 26px; image-rendering: pixelated; }
+.hp-icon img.ui-ic { display: block; width: 26px; height: 26px; image-rendering: pixelated; }
 .icon-btn img.ui-ic { width: 32px; height: 32px; }
 
 /* ---- Map ---- */

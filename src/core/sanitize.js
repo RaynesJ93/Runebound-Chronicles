@@ -48,7 +48,7 @@ export function sanitize(state) {
   p.y = Math.round(num(p.y, def.player.y, 0, 999));
   p.facing = num(p.facing, 0);
   p.hp = Math.round(num(p.hp, def.player.hp, 0, 99));
-  state.run.on = !!state.run.on;
+  state.run.on = true; // always run (the run button was removed in v0.35.1)
   state.run.energy = num(state.run.energy, 100, 0, 100);
 
   // Settings
