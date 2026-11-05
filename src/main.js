@@ -1541,7 +1541,17 @@ function boot() {
     requestAnimationFrame(frame);
   };
 
-  const onResize = () => { view.resize(); applySettings(); };
+  // A home-screen app on an iPhone fills the whole screen, but its CSS
+  // heights (even 100lvh) can stop short by the status bar's height, leaving a
+  // strip at the bottom. There, size the game to the screen itself.
+  const fitScreen = () => {
+    if (!navigator.standalone || !window.screen) return;
+    const long = Math.max(screen.width, screen.height), short = Math.min(screen.width, screen.height);
+    const wide = window.innerWidth > window.innerHeight;
+    canvas.style.width = `${Math.max(wide ? long : short, window.innerWidth)}px`;
+    canvas.style.height = `${Math.max(wide ? short : long, window.innerHeight)}px`;
+  };
+  const onResize = () => { fitScreen(); view.resize(); applySettings(); };
   onResize();
   window.addEventListener('resize', onResize);
   window.addEventListener('orientationchange', () => setTimeout(onResize, 200));
