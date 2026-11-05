@@ -45,7 +45,27 @@ export const QUESTS = [
       { text: 'Find someone who remembers the war', done: !!c.flags.hermitTold },
       { text: 'Tell Elder Maren what you learned', done: false },
     ],
-    rewards: ['600 coins', 'Attack, Strength and Defence XP', 'The story continues in chapter 3 (coming soon)'],
+    rewards: ['600 coins', 'Attack, Strength and Defence XP', 'The story continues in chapter 3'],
+  },
+  {
+    id: 'stone',
+    chapter: 3,
+    name: 'The Empty Hollow',
+    giver: { name: 'Tobin the Hermit', where: "The hermit's hut, Thornwood", area: 'route1' },
+    about: 'The runestone that keeps Grubnak bound has been stolen from the shrine. Find it before the binding fails.',
+    requiresQuests: ['war'],
+    recommend: 'Combat level 15+ (the Goblin Chief)',
+    flag: 'stoneQuest',
+    steps: (c) => [
+      { text: 'Look at the stone shrine on the eastern hill of Thornwood', done: !!c.flags.stoneShrine },
+      { text: 'Pick up the runestone base at the shrine', done: c.count('runestoneBase') >= 1 },
+      ...(c.flags.stoneShrine ? [
+        { text: c.flags.chiefAwake ? 'Defeat the Goblin Chief for the runestone crown' : "Wake the Goblin Chief: knock on his hut in the goblin camp", done: c.count('runestoneCrown') >= 1 },
+        { text: 'Take the runestone heart from the tunnel goblins in Copperdeep Mine', done: c.count('runestoneHeart') >= 1 },
+      ] : []),
+      { text: 'Bring all three shards to Aldric in Whispering Vale', done: false },
+    ],
+    rewards: ['800 coins', 'Runecrafting XP', 'Attack, Strength and Defence XP', 'The story continues in chapter 4 (coming soon)'],
   },
   {
     id: 'coldForge',
@@ -120,8 +140,40 @@ export const QUEST_HOOKS = [
   },
   {
     area: 'route1', type: 'shrine', at: { x: 100, y: 42 },
+    when: (f) => f.stoneQuest === 'started' && !f.stoneShrine,
+    say: ['The hollow in the top of the altar is empty. The runestone has been prised out, and not gently: there are chisel marks all round it.',
+      'Glittering chips of stone are scattered in the grass. They smashed it getting it out!',
+      'One big piece lies under the altar, still glowing faintly: the base of the runestone.',
+      'Goblin tracks lead away two ways: west, towards the goblin camp, and north-west, towards Copperdeep Mine.'],
+    give: [{ item: 'runestoneBase', qty: 1 }],
+    full: ['There\'s a glowing piece of stone under the altar, but your bag is full. Make some room.'],
+    set: { stoneShrine: true },
+  },
+  {
+    area: 'route1', type: 'shrine', at: { x: 100, y: 42 },
+    when: (f, c) => f.stoneQuest === 'started' && !c.have('runestoneBase'),
+    say: ['You search under the altar again and find the runestone base where it fell.'],
+    give: [{ item: 'runestoneBase', qty: 1 }],
+    full: ['The runestone base is here, but your bag is full.'],
+  },
+  {
+    area: 'route1', type: 'shrine', at: { x: 100, y: 42 },
     when: (f) => f.warQuest === 'done',
-    say: ['A worn stone altar. Carvings of a great tree circle its base.', 'The hollow in the top is empty. Tobin said a runestone sat here, holding the binding.', 'Someone has prised it out. The scratches look fresh.'],
+    say: (f) => (f.stoneQuest === 'done'
+      ? ['The empty hollow waits for its stone. Aldric is working on it.']
+      : ['A worn stone altar. Carvings of a great tree circle its base.', 'The hollow in the top is empty. Tobin said a runestone sat here, holding the binding.', 'Someone has prised it out. The scratches look fresh.']),
+  },
+  // The Goblin Chief's hut: knock to wake him (chapter 3).
+  {
+    area: 'route1', type: 'door', at: { x: 15, y: 36 },
+    when: (f) => f.stoneQuest === 'started' && f.stoneShrine && !f.chiefAwake,
+    say: ['You hammer on the door of the chief\'s hut.', 'The snoring stops.', '...', 'The door bursts open and the Goblin Chief storms out, roaring. Round his neck, on a leather cord, is a big glowing piece of stone!'],
+    set: { chiefAwake: true },
+  },
+  {
+    area: 'route1', type: 'door', at: { x: 15, y: 36 },
+    when: (f) => f.chiefAwake,
+    say: ["The goblin chief's hut. It's empty, and it stinks."],
   },
 ];
 
@@ -131,4 +183,6 @@ export const QUEST_HOOKS = [
 export const QUEST_DROPS = [
   { enemy: 'moltenBeast', item: 'emberCore', when: (f) => f.forgeQuest === 'started', say: 'The Molten beast leaves behind a glowing ember core!' },
   { enemy: 'goblinBrute', item: 'pellsStrongbox', when: (f) => f.cartQuest === 'started' && f.cartClue, say: "The goblin brute drops a battered strongbox. Pell's!" },
+  { enemy: 'goblinChief', item: 'runestoneCrown', when: (f) => f.stoneQuest === 'started', say: 'The Goblin Chief falls, and the glowing stone on his cord drops to the ground: the runestone crown!' },
+  { enemy: 'tunnelGoblin', item: 'runestoneHeart', when: (f) => f.stoneQuest === 'started' && f.stoneShrine, say: 'The tunnel goblin drops a glowing lump of stone it was hiding: the runestone heart!' },
 ];

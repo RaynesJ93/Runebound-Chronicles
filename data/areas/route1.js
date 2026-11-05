@@ -324,6 +324,8 @@ export function buildRoute1() {
       { enemy: 'wolf', x: 74, y: 20 }, { enemy: 'wolf', x: 80, y: 13 }, { enemy: 'wolf', x: 86, y: 24 },
       { enemy: 'wolf', x: 92, y: 17 }, { enemy: 'wolf', x: 77, y: 28 }, { enemy: 'wolf', x: 100, y: 22 },
       { enemy: 'alphaWolf', x: 96, y: 10 },
+      // The Runebound, chapter 3: only once you've woken him (data/quests.js)
+      { enemy: 'goblinChief', x: 15, y: 38, when: (f) => !!f.chiefAwake },
     ],
   };
 }

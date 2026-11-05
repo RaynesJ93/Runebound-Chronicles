@@ -69,7 +69,9 @@ function boot() {
     const a = new Area(AREAS[id]());
     const v = createWorldView(canvas, a);
     const people = NPCS.filter((n) => n.area === id).map((d) => new Npc(d, a));
-    const foes = a.spawns.filter((sp) => ENEMIES[sp.enemy]).map((sp) => new Enemy(ENEMIES[sp.enemy], sp, a));
+    // Spawns with `when(flags)` only appear once it's true (quest monsters).
+    const live = new Set(a.spawns.filter((sp) => ENEMIES[sp.enemy] && (!sp.when || sp.when(state.flags))));
+    const foes = [...live].map((sp) => new Enemy(ENEMIES[sp.enemy], sp, a));
     a.dynamicBlock = (x, y) => people.some((n) => n.occupies(x, y)) || foes.some((e) => e.occupies(x, y));
     // Tiles you can tap to look at something: props with text, and every
     // tile of a building (which shows its door text).
@@ -89,7 +91,7 @@ function boot() {
       const door = b.enter ? { type: 'enter', tiles: b.doorTiles } : a.props.find((p) => p.type === 'door' && p.building === b.id);
       for (let y = b.y; y < b.y + b.h; y++) for (let x = b.x; x < b.x + b.w; x++) look.set(a.idx(x, y), door);
     }
-    const w = { id, area: a, view: v, npcs: people, enemies: foes, lookup: look, ground: new GroundItems() };
+    const w = { id, area: a, view: v, npcs: people, enemies: foes, lookup: look, ground: new GroundItems(), live };
     worlds.set(id, w);
     return w;
   }
@@ -974,17 +976,28 @@ function boot() {
       const needed = hook.give.filter((it) => !ITEMS[it.item].stackable || !inventory.count(it.item)).length;
       if (inventory.freeSlots < needed) { hud.showDialog(hook.full || ['Your bag is full.']); return true; }
     }
-    hud.showDialog(hook.say, () => {
+    hud.showDialog(typeof hook.say === 'function' ? hook.say(state.flags, c) : hook.say, () => {
       if (hook.give) {
         for (const it of hook.give) inventory.add(it.item, it.qty);
         hud.message(`You get: ${hook.give.map((it) => itemName(it.item)).join(', ')}.`);
         refreshInventory();
       }
       if (hook.set) Object.assign(state.flags, hook.set);
+      syncSpawns();
       refreshQuests();
       save();
     });
     return true;
+  };
+  // Quest monsters whose `when` has just come true appear straight away.
+  const syncSpawns = () => {
+    for (const w of worlds.values()) {
+      for (const sp of w.area.spawns) {
+        if (w.live.has(sp) || !ENEMIES[sp.enemy] || !sp.when || !sp.when(state.flags)) continue;
+        w.live.add(sp);
+        w.enemies.push(new Enemy(ENEMIES[sp.enemy], sp, w.area));
+      }
+    }
   };
   // Books and letters: tap to read, one page per dialogue box.
   const readItem = (id) => hud.showDialog(ITEMS[id].read, null, ITEMS[id].name);

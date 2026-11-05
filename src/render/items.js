@@ -169,6 +169,24 @@ function logPair(b, bark, ring) {
   }
 }
 
+// A broken piece of grey runestone (outline points), with glowing rune marks.
+function shard(b, pts, runes) {
+  const [d, m, l] = [hex('#4a4e58'), hex('#727885'), hex('#9ea4b0')];
+  const inside = (x, y) => {
+    let c = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      const [xi, yi] = pts[i], [xj, yj] = pts[j];
+      if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c;
+    }
+    return c;
+  };
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+    if (!inside(x + 0.5, y + 0.5)) continue;
+    b.set(x, y, !inside(x + 0.5, y - 0.5) ? l : !inside(x + 0.5, y + 1.5) ? d : (x + y) % 5 === 0 ? d : m);
+  }
+  for (const [x, y] of runes) { b.set(x, y, hex('#7ff0e0')); if (inside(x + 1.5, y + 0.5)) b.set(x + 1, y, hex('#2fb0a8')); }
+}
+
 const DRAW = {
   coins(b) {
     const gold = [hex('#8a6410'), hex('#d4a020'), hex('#f2c94a'), hex('#fff0a0')];
@@ -231,6 +249,10 @@ const DRAW = {
     }
     b.rect(4, 10, 8, 1, hex('#5a3a1e'));
   },
+  // The Runebound, chapter 3: the three pieces of the broken runestone.
+  runestoneBase(b) { shard(b, [[2, 14], [14, 14], [13, 9], [10, 7], [7, 9], [3, 8]], [[5, 12], [6, 11], [7, 12], [9, 11], [10, 12], [11, 11]]); },
+  runestoneCrown(b) { shard(b, [[8, 1], [12, 7], [13, 12], [6, 13], [3, 9]], [[8, 5], [8, 6], [7, 7], [9, 7], [8, 9], [8, 10]]); },
+  runestoneHeart(b) { shard(b, [[4, 3], [11, 2], [14, 8], [11, 14], [4, 13], [2, 8]], [[6, 6], [7, 7], [8, 8], [9, 7], [10, 6], [8, 10], [8, 11]]); },
   // The Runebound: Pell's strongbox, the goblin token and Holt's journal.
   pellsStrongbox(b) {
     const [d, m, l] = [hex('#3a3a40'), hex('#62626c'), hex('#8e8e98')];

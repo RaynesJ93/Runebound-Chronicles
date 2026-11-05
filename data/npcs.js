@@ -77,7 +77,9 @@ export const NPCS = [
           next: 'more',
         },
         warFull: { say: "Your bag's full, dear. Make a little room and come back.", next: 'more' },
-        warDone: { say: ["Grubnak, bound under the old cave. I still can't quite believe it.", 'I\'m thinking on what to do. Talk to me again soon. (The story continues in chapter 3, coming soon.)'], next: 'more' },
+        warDone: { say: (c) => (c.flags.stoneQuest === 'done'
+          ? ['The pieces of the stone are with Aldric? Thank the stars. Help him however you can.']
+          : ["Grubnak, bound under the old cave. I still can't quite believe it.", "Tobin has watched that binding for forty years. Go and see him. He'll know what needs doing."]), next: 'more' },
         town: {
           say: ['Brambleford sits at the edge of Thornwood Forest.', 'The bank and the General Store face the square. They open soon. The merchants are still on the road.'],
           next: 'more',
@@ -490,9 +492,43 @@ export const NPCS = [
         },
         again: {
           say: (c) => (c.flags.warQuest === 'done'
-            ? ['Maren knows, then. Good. Keep your sword sharp. (The story continues in chapter 3, coming soon.)']
+            ? ['Maren knows, then. Good.']
             : ['Go on, tell Maren what I told you. The binding, the runestone, the cave. She needs to know.']),
+          choices: [
+            { text: 'What do we do now?', next: 'stone', if: (c) => c.flags.warQuest === 'done' && !c.flags.stoneQuest },
+            { text: 'About the runestone...', next: 'stoneProgress', if: (c) => c.flags.stoneQuest === 'started' },
+            { text: 'How are you holding up?', next: 'stoneDone', if: (c) => c.flags.stoneQuest === 'done' },
+            { text: 'Goodbye, Tobin.', next: 'bye' },
+          ],
         },
+        bye: { say: 'Hmph. Mind the goblins.' },
+
+        // ---- The Runebound, chapter 3: The Empty Hollow -----------------------------
+        stone: {
+          say: ['Now? Now it\'s worse than I feared.', 'I went up to the shrine this morning, like I do every week. The hollow is empty. The runestone is gone.',
+            "Without it the binding won't hold for long. Days, maybe. Weeks if we're lucky.", 'Go and look for yourself. Find out who took it. I\'d go, but these knees...'],
+          choices: [
+            { text: "I'll find the stone.", next: 'stoneStart' },
+            { text: 'Not yet.', next: 'bye' },
+          ],
+        },
+        stoneStart: {
+          set: { stoneQuest: 'started' },
+          say: ['Good. The shrine is on the eastern hill, past the crossroads, in the ring of standing stones.',
+            "If goblins took it, they'll have smashed it up and shared out the pieces. Goblins always share out loot. Find every piece."],
+        },
+        stoneProgress: {
+          say: (c) => {
+            const have = ['runestoneBase', 'runestoneCrown', 'runestoneHeart'].filter((id) => c.count(id) > 0).length;
+            if (!c.flags.stoneShrine) return ['The shrine is on the eastern hill, in the ring of standing stones. Go and look.'];
+            if (have === 3) return ['All three pieces! Take them to Aldric in Whispering Vale. His order made that stone. If anyone can mend it, he can.'];
+            return [`Smashed in pieces, you say? You've got ${have} of them. Goblins share loot by rank: the chief keeps the best bit, and the rest goes to whoever ran off with it.`,
+              c.flags.chiefAwake ? 'You woke the chief? Ha! Then go and take it off him.' : 'The chief sleeps in the big hut in the goblin camp. Knock loud.',
+              'And tracks towards the mine? Dorrin has had tunnel goblins for months.'];
+          },
+          next: 'bye',
+        },
+        stoneDone: { say: ['Better, now the pieces are with Aldric. I can sleep for an hour or two at a time.', 'Go and see him. He\'ll need help to remake it. (The story continues in chapter 4, coming soon.)'] },
       },
     },
   },
@@ -608,8 +644,37 @@ export const NPCS = [
           { text: 'How do I make runes?', next: 'how' },
           { text: 'Tell me about the altars.', next: 'altars' },
           { text: 'What is that chest?', next: 'chest' },
+          { text: 'I have pieces of a runestone.', next: 'stone', if: (c) => c.flags.stoneQuest === 'started' },
+          { text: 'How is the runestone?', next: 'stoneDone', if: (c) => c.flags.stoneQuest === 'done' },
           { text: 'Farewell, Aldric.', next: 'bye' },
         ] },
+
+        // ---- The Runebound, chapter 3: The Empty Hollow -----------------------------
+        stone: {
+          say: (c) => {
+            const n = ['runestoneBase', 'runestoneCrown', 'runestoneHeart'].filter((id) => c.count(id) > 0).length;
+            return n === 3 ? ['Pieces of a... let me see them.'] : [`A runestone, broken? Bring me every piece you can find. You have ${n} of 3.`];
+          },
+          choices: [
+            { text: 'Here they are.', next: 'stoneHandIn', if: (c) => ['runestoneBase', 'runestoneCrown', 'runestoneHeart'].every((id) => c.count(id) > 0) },
+            { text: "I'll find the rest.", next: 'menu' },
+          ],
+        },
+        stoneHandIn: {
+          give: { flag: 'stonePaid', items: [{ item: 'coins', qty: 800 }] },
+          giveFail: 'stoneFull',
+          take: [{ item: 'runestoneBase', qty: 1 }, { item: 'runestoneCrown', qty: 1 }, { item: 'runestoneHeart', qty: 1 }],
+          takeFail: 'stone',
+          set: { stoneQuest: 'done' },
+          reward: { xp: { runecrafting: 300, attack: 400, strength: 400, defence: 400 }, quest: 'The Empty Hollow' },
+          say: ['...', 'By the old winds. The Binding Stone. My master carved this, forty years ago, with three others of our order. I helped polish it. I was just a boy.',
+            'And goblins have smashed it. The runes along the breaks are still alive, faintly. That is the only reason Grubnak still sleeps.',
+            'I can remake it. But not with what I have here. It will need runes, a great deal of essence, and a setting of strong metal to hold the pieces together.',
+            'Leave the pieces with me. Take this for your trouble. When I know exactly what I need, I will send word. (The story continues in chapter 4, coming soon.)'],
+          next: 'menu',
+        },
+        stoneFull: { say: 'Your bag is full, friend. Make a little room first.', next: 'menu' },
+        stoneDone: { say: ['The pieces sit in my workshop, humming. I am working out what the remaking needs.', '(The story continues in chapter 4, coming soon.)'], next: 'menu' },
         how: {
           say: ['First, mine essence in the quarry to the north-west. Any pickaxe will do, and the crystals never run dry.',
             'Then carry it to an altar and touch the altar. Every piece of essence in your bag becomes a rune at once.',
