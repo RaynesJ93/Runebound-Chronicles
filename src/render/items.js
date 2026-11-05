@@ -231,6 +231,36 @@ const DRAW = {
     }
     b.rect(4, 10, 8, 1, hex('#5a3a1e'));
   },
+  // The Runebound: Pell's strongbox, the goblin token and Holt's journal.
+  pellsStrongbox(b) {
+    const [d, m, l] = [hex('#3a3a40'), hex('#62626c'), hex('#8e8e98')];
+    b.rect(2, 6, 12, 8, m);
+    b.rect(2, 4, 12, 3, l);          // the lid
+    b.rect(2, 7, 12, 1, d);
+    b.rect(2, 13, 12, 1, d);
+    for (const x of [4, 11]) b.rect(x, 4, 1, 10, d); // straps
+    b.rect(7, 8, 2, 3, hex('#d4a020')); // the lock
+    b.set(7, 9, hex('#5a3a10'));
+  },
+  goblinToken(b) {
+    const cord = hex('#6e4424');
+    line(b, 5, 5, 6, 2, cord); line(b, 6, 1, 10, 1, cord); line(b, 10, 2, 11, 5, cord); // a loop of cord
+    b.ellipse(8, 10, 5, 5, hex('#b8ac8a'));
+    b.ellipse(8, 9.6, 4.4, 4.4, hex('#e4dac0'));
+    const cut = hex('#5a4a30');
+    for (const [x, y] of [[5, 7], [8, 7], [11, 7], [5, 8], [6, 8], [8, 8], [10, 8], [11, 8]]) b.set(x, y, cut); // a crude crown...
+    b.rect(5, 9, 7, 1, cut);
+    for (const x of [6, 8, 10]) line(b, x, 11, x + 1, 13, hex('#8a2a1a')); // three slashes
+  },
+  holtsJournal(b) {
+    b.rect(3, 2, 10, 13, hex('#5a3420'));
+    b.rect(4, 2, 9, 12, hex('#7a4a2c'));
+    b.rect(12, 3, 1, 11, hex('#efe6cf')); // page edges
+    b.rect(3, 2, 1, 13, hex('#3e2414'));  // spine
+    b.rect(6, 5, 5, 1, hex('#c8a040'));
+    b.rect(6, 7, 4, 1, hex('#c8a040'));
+    line(b, 9, 14, 10, 16, hex('#8c2f2f')); // ribbon
+  },
   warCharm(b) {
     const cord = hex('#6e4424');
     for (let a = 0; a < 18; a++) {

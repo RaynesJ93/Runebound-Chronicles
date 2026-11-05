@@ -33,7 +33,7 @@ import { RECIPES, GROUP_OF } from '../data/fletching.js';
 import { ROCKS, PICKAXES, MINE_TICKS, gemChance, rollGem } from '../data/mining.js';
 import { STAR_SITES, DUST_PER_SIZE, FIRST_STAR, NEXT_STAR, STAR_LIFETIME, rollSize } from '../data/stars.js';
 import { MAP_NAME } from '../data/mapLabels.js';
-import { QUESTS, questStatus } from '../data/quests.js';
+import { QUESTS, questStatus, QUEST_HOOKS, QUEST_DROPS } from '../data/quests.js';
 import { SMELTING, SMITHING, saveBarChance } from '../data/smithing.js';
 import { SPOTS, FISH_TICKS, spotLevel } from '../data/fishing.js';
 import { COOKING } from '../data/cooking.js';
@@ -153,10 +153,11 @@ function boot() {
       enemyDied: (e) => {
         hud.message(`You defeated the ${e.name}!`);
         state.stats.kills = (state.stats.kills || 0) + 1;
-        // The Cold Forge: the Molten beast always drops an ember core while you need one.
-        if (e.def.id === 'moltenBeast' && state.flags.forgeQuest === 'started' && !haveAnywhere('emberCore')) {
-          ground.add('emberCore', 1, e.tile.x, e.tile.y, time, { rare: true });
-          hud.message('The Molten beast leaves behind a glowing ember core!');
+        // Quest items (data/quests.js): always dropped while you need one.
+        for (const qd of QUEST_DROPS) {
+          if (qd.enemy !== e.def.id || !qd.when(state.flags) || haveAnywhere(qd.item)) continue;
+          ground.add(qd.item, 1, e.tile.x, e.tile.y, time, { rare: true });
+          hud.message(qd.say);
         }
         for (const drop of rollLoot(e.def.loot, rng)) {
           ground.add(drop.item, drop.qty, e.tile.x, e.tile.y, time, { rare: drop.rare || !!ITEMS[drop.item]?.rare });
@@ -307,7 +308,7 @@ function boot() {
   hud.setGuideSeen(!!state.flags.seenGuide);
   hud.onGuideOpen = () => { if (!state.flags.seenGuide) { state.flags.seenGuide = true; save(); } };
   // Quest journal. A quest you can start glows the button until you've opened the journal.
-  const questCtx = () => ({ flags: state.flags, level: (sk) => book.level(sk), count: (id) => inventory.count(id) });
+  const questCtx = () => ({ flags: state.flags, level: (sk) => book.level(sk), count: (id) => inventory.count(id), have: (id) => haveAnywhere(id) });
   const refreshQuests = () => {
     const c = questCtx();
     hud.setQuestsNew(QUESTS.some((q) => questStatus(q, c) === 'available' && !state.flags[`seenQuest_${q.id}`]));
@@ -370,6 +371,7 @@ function boot() {
     if (CUT_FROM[id] || id === 'chisel') return () => cutMenu(x, y);
     if (id === 'steelStuds') return () => studMenu(x, y);
     if (id === 'coalBag' || id === 'gemBag') return () => openBag(i);
+    if (def.read) return () => readItem(id);
     if (/Mould$/.test(id)) return () => hud.message('Use a mould at a furnace, with a silver or gold bar, to cast jewellery.');
     if (id === 'silverBar' || id === 'goldBar') return () => hud.message('Cast it into rings and amulets at a furnace, with a ring or amulet mould.');
     if (id === 'knife') return () => fletchMenu(inventory.count('logs') ? 'logs' : inventory.count('oakLogs') ? 'oakLogs' : null, x, y);
@@ -391,6 +393,7 @@ function boot() {
     if (CUT_FROM[s.id] || s.id === 'chisel') options.push({ label: 'Cut', fn: () => cutMenu(x, y) });
     if (s.id === 'steelStuds') options.push({ label: 'Stud leather', fn: () => studMenu(x, y) });
     if (s.id === 'coalBag' || s.id === 'gemBag') options.push({ label: 'Open', fn: () => openBag(i) });
+    if (def.read) options.push({ label: 'Read', fn: () => readItem(s.id) });
     if (def.food) options.push({ label: 'Eat', fn: () => eat(i) });
     if (def.potion) options.push({ label: 'Drink', fn: () => eat(i) });
     if (def.equip) {
@@ -933,6 +936,7 @@ function boot() {
         flags: state.flags, give: giveItems(npc), action: runAction, starNews,
         level: (skill) => book.level(skill),
         count: (id) => inventory.count(id),
+        have: (id) => haveAnywhere(id),
         take: (items) => {
           if (!items.every((it) => inventory.count(it.item) >= it.qty)) return false;
           for (const it of items) inventory.remove(it.item, it.qty);
@@ -957,8 +961,32 @@ function boot() {
     if (prop.type === 'tree' || prop.type === 'ore' || prop.type === 'fishingSpot') { startGather(prop); return; }
     if (prop.type === 'altar') { lastStation = null; startRunecraft(prop); return; }
     if (prop.action) { lastStation = prop; runAction(prop.action); return; }
+    if (questHook(prop)) return;
     if (prop.interact) hud.showDialog(prop.interact);
   };
+  // Story places react to quests (QUEST_HOOKS in data/quests.js).
+  const questHook = (prop) => {
+    const c = questCtx();
+    const hook = QUEST_HOOKS.find((h) => h.area === area.id && h.type === prop.type && prop.tiles.some((t) => t.x === h.at.x && t.y === h.at.y) && h.when(state.flags, c));
+    if (!hook) return false;
+    if (hook.give) {
+      const needed = hook.give.filter((it) => !ITEMS[it.item].stackable || !inventory.count(it.item)).length;
+      if (inventory.freeSlots < needed) { hud.showDialog(hook.full || ['Your bag is full.']); return true; }
+    }
+    hud.showDialog(hook.say, () => {
+      if (hook.give) {
+        for (const it of hook.give) inventory.add(it.item, it.qty);
+        hud.message(`You get: ${hook.give.map((it) => itemName(it.item)).join(', ')}.`);
+        refreshInventory();
+      }
+      if (hook.set) Object.assign(state.flags, hook.set);
+      refreshQuests();
+      save();
+    });
+    return true;
+  };
+  // Books and letters: tap to read, one page per dialogue box.
+  const readItem = (id) => hud.showDialog(ITEMS[id].read, null, ITEMS[id].name);
   player.onStep = (tile) => {
     if (!player.path.length) { marker = null; if (!player.interact) goal = null; }
     const exit = area.exitAt.get(area.idx(tile.x, tile.y));
