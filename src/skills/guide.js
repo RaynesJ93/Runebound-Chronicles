@@ -49,7 +49,10 @@ const recipes = (rs, extra = () => '') => byLevel(rs.map((r) => ({
   sub: [list(Object.keys(r.uses), r.uses), xp(r.xp), extra(r)].filter(Boolean).join(' · '),
 })));
 
-const tools = (ts, verb) => byLevel(ts.map((t) => ({ level: t.level, icon: t.id, name: name(t.id), sub: `${verb}${t.bonus ? ` ${Math.round(t.bonus * 100)}% faster` : ''}` })));
+const tools = (ts, verb) => byLevel(ts.map((t) => {
+  const atk = ITEMS[t.id]?.equip?.req?.attack;
+  return { level: t.level, icon: t.id, name: name(t.id), sub: `${verb}${t.bonus ? ` ${Math.round(t.bonus * 100)}% faster` : ''}${atk > 1 ? ` · works from your bag; Attack ${atk} to wield` : ''}` };
+}));
 
 const BUILD = {
   attack: () => [{ title: 'Weapons', rows: gear('attack', (id, it) => it.equip.slot !== 'weapon') }],

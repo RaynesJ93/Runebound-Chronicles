@@ -370,6 +370,10 @@ Each level above the tree adds 1.2% to the chance per swing. Axes: bronze (Woodc
 
 Feathers and bronze arrowtips come from Pell; goblins also drop feathers. Longbows shoot 9 tiles but take 6 ticks per shot; oak bows need Ranged 5 and have +14 ranged attack (normal bows +8). Bows are ready to use straight away (bowstrings arrive with Crafting).
 
+### Axes and pickaxes as weapons (v0.37.1)
+
+Axes and pickaxes work from your bag (or in your hand) for Woodcutting and Mining, needing only that skill's level. Wielding one as a weapon needs the same Attack level as other weapons of its metal: bronze 1, iron 5, steel 10, mithril 20, adamant 30, rune 40. The skill guides for Woodcutting and Mining show this, and the Attack guide lists them with the other weapons.
+
 ### Mining and Smithing (shipped in v0.12.0)
 
 **Copperdeep Mine** opens at the end of Thornwood's north-west road now the rockslide is cleared. It has three parts:

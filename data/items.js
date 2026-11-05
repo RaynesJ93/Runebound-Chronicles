@@ -94,7 +94,7 @@ export const ITEMS = {
   },
   ironAxe: {
     name: 'Iron axe', value: 56, tool: { woodcutting: 5 }, examine: 'A sharper axe. Chops faster. Needs Woodcutting 5.',
-    equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 5, att: { stab: -2, slash: 6, crush: 3 }, str: 5, look: { weapon: 'iron', blade: 5 } },
+    equip: { slot: 'weapon', req: { attack: 5 }, type: 'slash', speed: 5, att: { stab: -2, slash: 6, crush: 3 }, str: 5, look: { weapon: 'iron', blade: 5 } },
   },
   // ---- Mining and Smithing -----------------------------------------------------------
   bronzePickaxe: {
@@ -103,7 +103,7 @@ export const ITEMS = {
   },
   ironPickaxe: {
     name: 'Iron pickaxe', value: 56, tool: { mining: 5 }, examine: 'A tougher pickaxe. Mines faster. Needs Mining 5.',
-    equip: { slot: 'weapon', req: { attack: 1 }, type: 'stab', speed: 5, att: { stab: 6, slash: -2, crush: 3 }, str: 5, look: { weapon: 'iron', blade: 5 } },
+    equip: { slot: 'weapon', req: { attack: 5 }, type: 'stab', speed: 5, att: { stab: 6, slash: -2, crush: 3 }, str: 5, look: { weapon: 'iron', blade: 5 } },
   },
   hammer: { name: 'Hammer', value: 1, examine: 'For smithing at an anvil.' },
   copperOre: { name: 'Copper ore', value: 5, examine: 'Smelt it with tin ore to make bronze.' },
@@ -314,11 +314,11 @@ export const ITEMS = {
   },
   steelAxe: {
     name: 'Steel axe', value: 200, tool: { woodcutting: 10 }, examine: 'A steel axe. Chops faster still. Needs Woodcutting 10.',
-    equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 5, att: { stab: -2, slash: 9, crush: 4 }, str: 7, look: { weapon: 'steel', blade: 5 } },
+    equip: { slot: 'weapon', req: { attack: 10 }, type: 'slash', speed: 5, att: { stab: -2, slash: 9, crush: 4 }, str: 7, look: { weapon: 'steel', blade: 5 } },
   },
   steelPickaxe: {
     name: 'Steel pickaxe', value: 200, tool: { mining: 10 }, examine: 'A steel pickaxe. Mines faster still. Needs Mining 10.',
-    equip: { slot: 'weapon', req: { attack: 1 }, type: 'stab', speed: 5, att: { stab: 9, slash: -2, crush: 4 }, str: 7, look: { weapon: 'steel', blade: 5 } },
+    equip: { slot: 'weapon', req: { attack: 10 }, type: 'stab', speed: 5, att: { stab: 9, slash: -2, crush: 4 }, str: 7, look: { weapon: 'steel', blade: 5 } },
   },
   steelMace: {
     name: 'Steel mace', value: 225, examine: 'A flanged steel mace. Good against armour.',
@@ -374,11 +374,11 @@ export const ITEMS = {
   },
   mithrilAxe: {
     name: 'Mithril axe', value: 520, tool: { woodcutting: 20 }, examine: 'A light mithril axe. Chops fast. Needs Woodcutting 20.',
-    equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 5, att: { stab: -2, slash: 12, crush: 5 }, str: 9, look: { weapon: 'mithril', blade: 5 } },
+    equip: { slot: 'weapon', req: { attack: 20 }, type: 'slash', speed: 5, att: { stab: -2, slash: 12, crush: 5 }, str: 9, look: { weapon: 'mithril', blade: 5 } },
   },
   mithrilPickaxe: {
     name: 'Mithril pickaxe', value: 520, tool: { mining: 20 }, examine: 'A light mithril pickaxe. Mines fast. Needs Mining 20.',
-    equip: { slot: 'weapon', req: { attack: 1 }, type: 'stab', speed: 5, att: { stab: 12, slash: -2, crush: 5 }, str: 9, look: { weapon: 'mithril', blade: 5 } },
+    equip: { slot: 'weapon', req: { attack: 20 }, type: 'stab', speed: 5, att: { stab: 12, slash: -2, crush: 5 }, str: 9, look: { weapon: 'mithril', blade: 5 } },
   },
   mithrilMace: {
     name: 'Mithril mace', value: 585, examine: 'A flanged mithril mace. Good against armour.',
@@ -586,11 +586,11 @@ export const ITEMS = {
   },
   adamantAxe: {
     name: 'Adamant axe', value: 1300, tool: { woodcutting: 30 }, examine: 'An adamant axe. Chops very fast. Needs Woodcutting 30.',
-    equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 5, att: { stab: -2, slash: 16, crush: 7 }, str: 12, look: { weapon: 'adamant', blade: 5 } },
+    equip: { slot: 'weapon', req: { attack: 30 }, type: 'slash', speed: 5, att: { stab: -2, slash: 16, crush: 7 }, str: 12, look: { weapon: 'adamant', blade: 5 } },
   },
   adamantPickaxe: {
     name: 'Adamant pickaxe', value: 1300, tool: { mining: 30 }, examine: 'An adamant pickaxe. Mines very fast. Needs Mining 30.',
-    equip: { slot: 'weapon', req: { attack: 1 }, type: 'stab', speed: 5, att: { stab: 16, slash: -2, crush: 7 }, str: 12, look: { weapon: 'adamant', blade: 5 } },
+    equip: { slot: 'weapon', req: { attack: 30 }, type: 'stab', speed: 5, att: { stab: 16, slash: -2, crush: 7 }, str: 12, look: { weapon: 'adamant', blade: 5 } },
   },
   adamantMace: {
     name: 'Adamant mace', value: 1463, examine: 'A flanged adamant mace. Good against armour.',
@@ -691,11 +691,11 @@ export const ITEMS = {
   },
   runeAxe: {
     name: 'Rune axe', value: 3900, tool: { woodcutting: 40 }, examine: 'A rune axe. Chops very fast. Needs Woodcutting 40.',
-    equip: { slot: 'weapon', req: { attack: 1 }, type: 'slash', speed: 5, att: { stab: -2, slash: 20, crush: 8 }, str: 15, look: { weapon: 'rune', blade: 5 } },
+    equip: { slot: 'weapon', req: { attack: 40 }, type: 'slash', speed: 5, att: { stab: -2, slash: 20, crush: 8 }, str: 15, look: { weapon: 'rune', blade: 5 } },
   },
   runePickaxe: {
     name: 'Rune pickaxe', value: 3900, tool: { mining: 40 }, examine: 'A rune pickaxe. Mines very fast. Needs Mining 40.',
-    equip: { slot: 'weapon', req: { attack: 1 }, type: 'stab', speed: 5, att: { stab: 20, slash: -2, crush: 8 }, str: 15, look: { weapon: 'rune', blade: 5 } },
+    equip: { slot: 'weapon', req: { attack: 40 }, type: 'stab', speed: 5, att: { stab: 20, slash: -2, crush: 8 }, str: 15, look: { weapon: 'rune', blade: 5 } },
   },
   runeMace: {
     name: 'Rune mace', value: 4388, examine: 'A flanged rune mace. Good against armour.',
