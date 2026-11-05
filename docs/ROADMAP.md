@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 5 Nov 2026 | v0.38.0: The Runebound, chapter 3: The Empty Hollow — the runestone holding Grubnak's binding was stolen from the shrine and broken in three. Find the shards at the shrine, from the Goblin Chief (a new level 16 boss you wake at his hut in the goblin camp) and from the tunnel goblins in Copperdeep Mine, and take them to Aldric in Whispering Vale. Enemies can now appear only once a quest flag is set. |
 | 5 Nov 2026 | v0.37.6: Pell's wrecked cart is now in Brambleford, on the south road just before the bridge, with new painted art: a broken cart and three smashed barrels (from a new sprite sheet, kept in `tools/sprites/`). The Overturned Cart's text and journal steps point there; the goblin tracks lead north-west into Thornwood. |
 | 5 Nov 2026 | v0.37.5: bridges look like bridges — Thornwood's stream runs level at the road so the bridge crosses straight (it was stepped), and both bridges are drawn as one piece with a plank deck, railings, posts and a shadow on the water. |
 | 5 Nov 2026 | v0.37.4: outdoor rock (the Alpha's den, the sealed cave, the mine entrance, the essence quarry rim) gets the same natural edges and shadows as the caves, and the den and sealed cave are now uneven outcrops instead of big rectangular blocks. |
@@ -46,7 +47,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 ## Phase 3 — Quests and new regions (v0.3)
 
 1. Quest journal and quest system (stages, flags, rewards)
-2. First main-story quest that unlocks the second town: **The Runebound**, six chapters (chapters 1 and 2 done in v0.37.0; see GAME_DESIGN.md section 9)
+2. First main-story quest that unlocks the second town: **The Runebound**, six chapters (chapters 1 and 2 done in v0.37.0, chapter 3 in v0.38.0; see GAME_DESIGN.md section 9)
 3. Second town, two more routes, a cave
 4. New enemy families and gear tiers (steel, mithril)
 5. Specialist shops in the new town

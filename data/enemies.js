@@ -135,6 +135,25 @@ export const ENEMIES = {
       rare: { chance: 1 / 128, table: [{ item: 'warCharm', qty: 1 }] },
     },
   },
+  goblinChief: {
+    id: 'goblinChief', name: 'Goblin Chief', level: 16, hp: 45, boss: true,
+    attack: 12, strength: 12, defence: 10,
+    attackBonus: 8, strengthBonus: 6, defenceBonus: 8, maxHit: 4,
+    speed: 5, attackType: 'crush', aggressive: true, aggroRange: 4, wander: 2, leash: 6, respawn: 300,
+    look: { skin: '#5a8a34', hair: '#2a1e12', tunic: '#6a1e1a', pants: '#3a2a1a', belt: '#c8a030', ears: true, eyes: '#ff3a1a', hat: 'helmet', hatColor: '#c8a030' },
+    examine: 'The biggest goblin you have ever seen, in a crown of bent iron. He does not look pleased to be awake.',
+    loot: {
+      always: [{ item: 'bones', qty: 1 }, { item: 'coins', min: 60, max: 150 }],
+      main: [
+        { item: 'ironSword', qty: 1, chance: 1 / 4 },
+        { item: 'goblinMail', qty: 1, chance: 1 / 4 },
+        { item: 'ironMedHelm', qty: 1, chance: 1 / 5 },
+        { item: 'steelSword', qty: 1, chance: 1 / 12 },
+        { item: 'meatPie', qty: 2, chance: 1 / 4 },
+      ],
+      rare: { chance: 1 / 16, table: [{ item: 'warCharm', qty: 1 }] },
+    },
+  },
   alphaWolf: {
     id: 'alphaWolf', name: 'Alpha Wolf', level: 14, hp: 40, sprite: 'wolf', boss: true,
     attack: 10, strength: 10, defence: 8,

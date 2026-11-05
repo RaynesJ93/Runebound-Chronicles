@@ -690,7 +690,7 @@ Every skill uses the same XP curve and goes to 99. Resources respawn after a tim
 - Rewards: XP lamps, items, coins, and **new region access**.
 - Quest points unlock late-game content.
 
-### Main story: The Runebound (chapters 1–2 shipped in v0.37.0)
+### Main story: The Runebound (chapters 1–2 shipped in v0.37.0, chapter 3 in v0.38.0)
 
 **Backstory.** Forty years ago the goblin warlord **Grubnak** marched on Brambleford. The village held the Thornwood crossroads, and Captain **Holt** of the Watch led the last stand. Grubnak couldn't be killed, so the runekeepers of Whispering Vale *bound* him with runes, deep under the stones of the old cave north-west of the goblin camp, and set a runestone in the stone shrine to hold the binding. That's why the cave mouth is sealed, and why something deep inside is breathing. The village remembers a war it "won"; almost nobody alive knows the warlord was never killed. Now the goblins are bold again, a cart has been raided, and the binding is weakening.
 
@@ -700,7 +700,7 @@ The story runs through places already in the world (the wrecked cart by Bramblef
 | --- | --- | --- | --- | --- |
 | 1 | The Overturned Cart | Pell (General Store) | Pell's supply cart was raided on the south road, by the bridge. Look at the cart, follow the goblin tracks, take back his strongbox from the goblin brutes. Inside is a goblin token that isn't his. | v0.37.0 |
 | 2 | Echoes of the War | Elder Maren | Maren recognises Grubnak's mark on the token. Read the war memorial, find Captain Holt's journal in the old watchtower, and hear the truth from Tobin, the hermit who once served under Holt. | v0.37.0 |
-| 3 | The Empty Hollow | Tobin | The runestone that held the binding has been stolen from the shrine. Track it to the goblins, then take the pieces to Aldric in Whispering Vale to remake it (Runecrafting). | planned |
+| 3 | The Empty Hollow | Tobin | The runestone that held the binding has been stolen from the shrine and broken in three. Find one shard at the shrine, wake the Goblin Chief for the second, take the third from the tunnel goblins in Copperdeep Mine, and bring them to Aldric in Whispering Vale. | v0.38.0 |
 | 4 | Stone and Rune | Aldric | Remaking the runestone needs runes, essence and a metal setting from Dorrin (Smithing, Mining). | planned |
 | 5 | The Sealed Cave | Tomas and the Watch | Open the sealed cave and go down through the goblin warrens beneath it. A new area. | planned |
 | 6 | The Runebound | Tobin | Face Grubnak, half-free of his binding: a story boss with telegraphed attacks. Re-seal or destroy him. Unlocks the next region. | planned |
@@ -708,6 +708,12 @@ The story runs through places already in the world (the wrecked cart by Bramblef
 **Chapter 1: The Overturned Cart** (flag `cartQuest`; recommended combat level 5+). Ask Pell "You look worried." He says his supply cart was raided on the south road and his strongbox taken. Look at the wrecked cart in Brambleford (on the south road, just before the bridge): you find goblin tracks heading north-west into Thornwood, to the goblin camp. While you're on the quest, the first **goblin brute** you kill always drops **Pell's strongbox** (if you don't already have it). Bring it back to Pell for **300 coins, 3 meat pies**, a little Attack and Strength XP, and the **goblin token** that was in the box: a carved bone disc that isn't his. He tells you to show it to Elder Maren.
 
 **Chapter 2: Echoes of the War** (flag `warQuest`; needs chapter 1). Show Maren the token. She goes pale: it's the mark of Grubnak, the warlord of the Goblin War, and she sends you to learn what you can. Read the **war memorial** in the old graveyard (it ends "Here lies no warlord. He sleeps beneath the stones."). Search the **old watchtower** for **Captain Holt's journal** (a book you can read: the last days of the war, the binding by the shrine's stones, and two names left to keep watch: Holt and a young soldier called Tobin). Find **Tobin the Hermit** at the hermit's hut, now an old man, who tells you the truth about the binding. Go back to Maren for **600 coins** and Attack, Strength and Defence XP. The journal then says the story continues in the next chapter.
+
+**Chapter 3: The Empty Hollow** (flag `stoneQuest`; needs chapter 2; recommended combat level 15+). Ask Tobin what's next: he went to the shrine and the runestone is gone. Look at the shrine on the eastern hill: the stone has been prised out and smashed, one shard (the **runestone base**) is lying in the grass, and goblin tracks split two ways: west to the goblin camp and north-west towards Copperdeep Mine. In the goblin camp, bang on the chief's hut door to wake the **Goblin Chief** (level 16 boss, new): he comes storming out wearing the **runestone crown** shard and stays awake from then on, respawning like the Alpha Wolf. The **tunnel goblins** in Copperdeep Mine carry the third shard, the **runestone heart** (one always drops while you need it). Take all three to **Aldric** in Whispering Vale: his order made the stone, and he can remake it, but not without help (chapter 4). Reward: 800 coins, Runecrafting XP and Attack, Strength and Defence XP.
+
+The Goblin Chief: level 16, 45 hitpoints, max hit 4, aggressive; drops coins (60–150) and bones always, sometimes iron or steel weapons and goblin mail, and a war charm 1 in 16.
+
+**Quest spawns (v0.38.0).** An enemy in an area's spawn list can have `when(flags)`: it only appears once that's true (the Goblin Chief appears when `chiefAwake` is set), including straight away if you're standing in the area when it happens.
 
 **Quest engine (v0.37.0).** Quests can now need earlier quests (`requiresQuests`) and show a recommended level. Story places can react to a quest (`QUEST_HOOKS` in `data/quests.js`: tap the cart, the memorial or the watchtower while on a quest to find a clue or an item). Monsters can drop quest items while you need them (`QUEST_DROPS`; the Cold Forge's ember core moved here too). Some items can be read (a `read` list of pages), by tapping them in the bag.
 
