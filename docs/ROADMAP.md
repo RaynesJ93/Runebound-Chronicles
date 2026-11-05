@@ -63,6 +63,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Date | Change |
 | --- | --- |
+| 5 Nov 2026 | v0.36.0: quest journal — a Quests button under the Guide lists every quest with its status, requirements (ticked against your levels), who starts it (map pin), a live checklist while it's in progress, and rewards. New quests appear automatically when added to `data/quests.js`. The button glows when there's a new quest you can start. |
 | 5 Nov 2026 | v0.35.1: the run button is gone — you always run (it never tires you out). The R key no longer toggles walking. The HP orb stays bottom right. |
 | 5 Nov 2026 | v0.35.0: a Guide button at the top left for new players — how to play, the free starter tools and who gives them, where to train each skill, where to fight, and banks and extras; rows open the map on that area. The button glows until it's first opened. |
 | 5 Nov 2026 | v0.34.0: bank tabs and search — items sort themselves into tabs (All, Weapons, Armour, Ammo & runes, Tools, Ores & bars, Materials, Food & potions, Jewellery & gems), each showing how many kinds of item it holds, plus a search box that finds anything in the bank. Works at the bank and every supply chest. |

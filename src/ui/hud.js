@@ -9,6 +9,7 @@ import { itemIcon, stackLabel } from '../render/items.js';
 import { ITEMS } from '../../data/items.js';
 import { BANK_TABS, tabOf } from '../../data/bankTabs.js';
 import { GUIDE } from '../../data/startGuide.js';
+import { QUESTS, questStatus } from '../../data/quests.js';
 import { SLOT_NAME, TYPES } from '../items/equipment.js';
 
 // Where each equipment slot sits on the 3 x 5 grid (like a paper doll).
@@ -30,6 +31,7 @@ const fmt = (n) => Math.floor(n).toLocaleString('en-GB');
 const GEAR_SVG = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.2 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>';
 const HEART_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 21 3.5 12.6A5.2 5.2 0 0 1 12 6.2a5.2 5.2 0 0 1 8.5 6.4z"/></svg>';
 const BOOK_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="#8a3a2a" stroke="#2b1d16" stroke-width="1.5" stroke-linejoin="round" d="M4 4.5C4 3.7 4.7 3 5.5 3H19v15H6a2 2 0 0 0-2 2z"/><path fill="#f4e6c4" stroke="#2b1d16" stroke-width="1.5" stroke-linejoin="round" d="M4 20a2 2 0 0 1 2-2h13v3H6a2 2 0 0 1-2-1z"/><path stroke="#e8b33c" stroke-width="1.6" d="M8 7.5h7M8 10.5h5"/></svg>';
+const SCROLL_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="#f4e6c4" stroke="#2b1d16" stroke-width="1.5" stroke-linejoin="round" d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7"/><path fill="#d8c49a" stroke="#2b1d16" stroke-width="1.5" stroke-linejoin="round" d="M4 6a2 2 0 1 1 4 0v12a2 2 0 1 1-4 0z"/><path stroke="#8a3a2a" stroke-width="1.6" d="M11 9h5M11 12h5M11 15h3"/></svg>';
 const MAP_SVG = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="#e8d8b0" stroke="#2b1d16" stroke-width="1.6" stroke-linejoin="round" d="M2.5 5.5 8.5 3l7 2.5 6-2.5v15l-6 2.5-7-2.5-6 2.5z"/><path stroke="#2b1d16" stroke-width="1.4" d="M8.5 3v15M15.5 5.5v15"/><path fill="none" stroke="#b0483a" stroke-width="1.6" stroke-dasharray="2 1.6" d="M4.5 15c2-3 4-1 5.5-4s3.5-2 5-4"/><path fill="#b0483a" d="m17 6.2 2.4.3-1.2 2.3z"/></svg>';
 
 export class Hud {
@@ -38,6 +40,7 @@ export class Hud {
     root.innerHTML = `
       <div class="hud-top-left">
         <button class="guide-btn ui" id="btn-guide" aria-label="Guide: how to play and where to get your first tools">${BOOK_SVG}<span>Guide</span></button>
+        <button class="guide-btn ui" id="btn-quests" aria-label="Quests">${SCROLL_SVG}<span>Quests</span></button>
         <div class="area-banner" id="area-banner"></div>
         <div class="grave-timer hidden" id="grave-timer"></div>
         <div class="messages" id="messages" aria-live="polite"></div>
@@ -105,6 +108,15 @@ export class Hud {
             <button class="close-btn" data-close aria-label="Close">✕</button>
           </div>
           <div class="panel-body" id="guide-body"></div>
+        </div>
+      </div>
+      <div class="panel-backdrop ui hidden" id="quests">
+        <div class="panel guide-panel" role="dialog" aria-label="Quests">
+          <div class="panel-head">
+            <h2>Quests</h2>
+            <button class="close-btn" data-close aria-label="Close">✕</button>
+          </div>
+          <div class="panel-body" id="quests-body"></div>
         </div>
       </div>
       <div class="panel-backdrop ui hidden" id="map">
@@ -232,6 +244,13 @@ export class Hud {
     $('btn-skills').addEventListener('click', () => this.openSkills());
     $('btn-map').addEventListener('click', () => this.openMap());
     $('btn-guide').addEventListener('click', () => this.openGuidePanel());
+    $('btn-quests').addEventListener('click', () => this.openQuests());
+    this.el.quests = $('quests');
+    this.el.quests.addEventListener('click', (e) => {
+      if (e.target === this.el.quests || e.target.closest('[data-close]')) { this.closeQuests(); return; }
+      const row = e.target.closest('[data-gmap]');
+      if (row) { this.closeQuests(); this.openMapAt(row.dataset.gmap); }
+    });
     this.el.guide = $('guide');
     this.el.guide.addEventListener('click', (e) => {
       if (e.target === this.el.guide || e.target.closest('[data-close]')) { this.closeGuidePanel(); return; }
@@ -305,7 +324,7 @@ export class Hud {
   }
 
   get settingsOpen() {
-    return !this.el.settings.classList.contains('hidden') || !this.el.skills.classList.contains('hidden') || this.mapOpen || this.guideOpen || this.invOpen || this.menuOpen || this.tradeOpen;
+    return !this.el.settings.classList.contains('hidden') || !this.el.skills.classList.contains('hidden') || this.mapOpen || this.guideOpen || this.questsOpen || this.invOpen || this.menuOpen || this.tradeOpen;
   }
 
   // ---- Bank and shop -------------------------------------------------------------
@@ -548,6 +567,43 @@ export class Hud {
     this.openMap();
     this.mapShown = areaId;
     this.renderMap(true);
+  }
+
+  // ---- Quest journal (top left) -----------------------------------------------------
+  // c: { flags, level(skill), count(item) } from the game.
+  get questsOpen() { return !this.el.quests.classList.contains('hidden'); }
+
+  // The button glows while a quest you could start hasn't been looked at yet.
+  setQuestsNew(on) { this.$('btn-quests').classList.toggle('new', !!on); }
+
+  openQuests() {
+    this.el.quests.classList.remove('hidden');
+    this.onQuestsOpen?.();
+  }
+
+  closeQuests() { this.el.quests.classList.add('hidden'); }
+
+  renderQuests(c) {
+    const LABEL = { locked: 'Not available yet', available: 'Available', started: 'In progress', done: 'Complete' };
+    const rank = { started: 0, available: 1, locked: 2, done: 3 };
+    const list = QUESTS.map((q) => ({ q, st: questStatus(q, c) })).sort((a, b) => rank[a.st] - rank[b.st]);
+    const done = list.filter((x) => x.st === 'done').length;
+    const tick = (ok) => `<span class="q-tick ${ok ? 'ok' : ''}">${ok ? '✔' : '✘'}</span>`;
+    const SK = Object.fromEntries(SKILLS.map((s) => [s.id, s.name]));
+    this.$('quests-body').innerHTML = `<p class="muted small">${done} of ${QUESTS.length} complete. New quests appear here as they're added to the world.</p>`
+      + list.map(({ q, st }) => {
+        const reqs = Object.entries(q.requires || {}).map(([sk, lv]) => `<li>${tick(c.level(sk) >= lv)} ${SK[sk] || sk} ${lv} <small>(you: ${c.level(sk)})</small></li>`).join('');
+        const steps = st === 'started' ? `<h4>What to do</h4><ul class="q-list">${q.steps(c).map((s) => `<li>${tick(s.done)} ${s.text}</li>`).join('')}</ul>` : '';
+        return `<div class="quest-card q-${st}">
+          <div class="quest-top"><b>${q.name}</b><span class="q-status">${LABEL[st]}</span></div>
+          <p class="quest-about">${q.about}</p>
+          ${st !== 'done' ? `<button class="quest-giver" data-gmap="${q.giver.area}">${st === 'started' ? 'Quest giver' : 'Start: talk to'} ${q.giver.name}, ${q.giver.where} <span class="guide-pin">📍</span></button>` : ''}
+          ${reqs && st !== 'done' ? `<h4>Requirements</h4><ul class="q-list">${reqs}</ul>` : ''}
+          ${steps}
+          <h4>${st === 'done' ? 'You got' : 'Rewards'}</h4><ul class="q-list q-rewards">${q.rewards.map((r) => `<li>${r}</li>`).join('')}</ul>
+        </div>`;
+      }).join('');
+    this.el.quests.querySelector('.panel-body').scrollTop = 0;
   }
 
   // ---- Map ---------------------------------------------------------------------

@@ -33,6 +33,7 @@ import { RECIPES, GROUP_OF } from '../data/fletching.js';
 import { ROCKS, PICKAXES, MINE_TICKS, gemChance, rollGem } from '../data/mining.js';
 import { STAR_SITES, DUST_PER_SIZE, FIRST_STAR, NEXT_STAR, STAR_LIFETIME, rollSize } from '../data/stars.js';
 import { MAP_NAME } from '../data/mapLabels.js';
+import { QUESTS, questStatus } from '../data/quests.js';
 import { SMELTING, SMITHING, saveBarChance } from '../data/smithing.js';
 import { SPOTS, FISH_TICKS, spotLevel } from '../data/fishing.js';
 import { COOKING } from '../data/cooking.js';
@@ -115,6 +116,7 @@ function boot() {
       if (combat.level > oldCombat) hud.message(`Your combat level is now ${combat.level}.`);
       levelUpAt = time;
       refreshSkills();
+      refreshQuests();
       save();
     },
   });
@@ -304,6 +306,21 @@ function boot() {
   // The Guide button glows until a new player first opens it.
   hud.setGuideSeen(!!state.flags.seenGuide);
   hud.onGuideOpen = () => { if (!state.flags.seenGuide) { state.flags.seenGuide = true; save(); } };
+  // Quest journal. A quest you can start glows the button until you've opened the journal.
+  const questCtx = () => ({ flags: state.flags, level: (sk) => book.level(sk), count: (id) => inventory.count(id) });
+  const refreshQuests = () => {
+    const c = questCtx();
+    hud.setQuestsNew(QUESTS.some((q) => questStatus(q, c) === 'available' && !state.flags[`seenQuest_${q.id}`]));
+    if (hud.questsOpen) hud.renderQuests(c);
+  };
+  hud.onQuestsOpen = () => {
+    const c = questCtx();
+    for (const q of QUESTS) if (questStatus(q, c) === 'available') state.flags[`seenQuest_${q.id}`] = true;
+    hud.renderQuests(c);
+    refreshQuests();
+    save();
+  };
+  refreshQuests();
   // Inventory panel: tap for options, drag to rearrange.
   refreshInventory = () => {
     currentLook();
@@ -774,7 +791,8 @@ function boot() {
   input.onKey = (e) => {
     if (e.code === 'Equal' || e.code === 'NumpadAdd') zoomBy(1);
     else if (e.code === 'Minus' || e.code === 'NumpadSubtract') zoomBy(-1);
-    else if (e.code === 'Escape') { if (hud.menuOpen) hud.closeMenu(); else if (hud.dialogOpen) hud.advanceDialog(); else if (hud.settingsOpen) { hud.closeSettings(); hud.closeSkills(); hud.closeInventory(); hud.closeMap(); hud.closeGuidePanel(); } }
+    else if (e.code === 'Escape') { if (hud.menuOpen) hud.closeMenu(); else if (hud.dialogOpen) hud.advanceDialog(); else if (hud.settingsOpen) { hud.closeSettings(); hud.closeSkills(); hud.closeInventory(); hud.closeMap(); hud.closeGuidePanel(); hud.closeQuests(); } }
+    else if (e.code === 'KeyQ' && !hud.dialogOpen) { if (hud.questsOpen) hud.closeQuests(); else hud.openQuests(); }
     else if (e.code === 'KeyG' && !hud.dialogOpen) { if (hud.guideOpen) hud.closeGuidePanel(); else hud.openGuidePanel(); }
     else if (e.code === 'KeyM' && !hud.dialogOpen) { if (hud.mapOpen) hud.closeMap(); else hud.openMap(); }
     else if ((e.code === 'KeyI' || e.code === 'KeyB') && !hud.dialogOpen) { if (hud.invOpen) hud.closeInventory(); else hud.openInventory(); }
@@ -930,6 +948,7 @@ function boot() {
         },
       }, () => {
         npc.busy = false;
+        refreshQuests();
         save();
       });
       return;
