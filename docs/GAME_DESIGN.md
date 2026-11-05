@@ -56,7 +56,7 @@ Long loop (weeks): quests, new regions, bosses, 99s, rare drops.
 - **Camera:** 2D top-down view with the 3/4 perspective of Emerald (you see the tops and fronts of things), follows the player, no rotation. The world is drawn at 16 px per tile and scaled by whole numbers so pixels stay crisp; a few zoom steps are allowed (mouse wheel, pinch, or Settings).
 - **Movement:** tile grid. The player moves tile to tile with smooth interpolation, four directions with keyboard/D-pad, eight-direction pathing when clicking/tapping a destination.
 - **Click/tap to move:** A* pathfinding over the tile grid; a marker shows the destination.
-- **Run toggle:** walking is 1 tile per tick, running is 2 tiles per tick, using a run-energy bar that refills while walking or standing.
+- **Running:** you always run, 2 tiles per tick. Run energy was removed in v0.17.0 and the run/walk button in v0.35.1.
 - **Collision:** buildings, trees, water, fences and NPCs block tiles. Doors and ledges are special tiles.
 - **Map transitions:** walking off a route edge or through a door loads the connected area with a short fade (no separate screen for anything else).
 
@@ -709,7 +709,6 @@ Every skill uses the same XP curve and goes to 99. Resources respawn after a tim
 | Move | Click a tile, or WASD / arrow keys |
 | Attack / interact | Left-click enemy, NPC, item or object |
 | Options menu | Right-click (Attack, Examine, Take, Talk-to) |
-| Run toggle | R or the run orb |
 | Panels | Tabs: Inventory, Equipment, Skills, Combat styles, Quests, Settings (keys 1–6) |
 | Zoom | Mouse wheel (limited range) |
 
