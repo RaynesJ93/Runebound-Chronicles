@@ -793,6 +793,17 @@ export const ITEMS = {
   runestoneHeart: { name: 'Runestone heart', value: 0, examine: 'The middle of the runestone, where the glow is brightest. It hums when you hold it.' },
   runestoneSetting: { name: 'Runestone setting', value: 0, examine: 'A heavy band of steel with silver inlay, made by Dorrin to hold the pieces of the runestone together.' },
   bindingStone: { name: 'Binding Stone', value: 0, examine: 'The runestone, made whole again by Aldric. Its runes glow steadily. It belongs in the shrine.' },
+  digmastersOrders: {
+    name: "Digmaster's orders", value: 0, examine: 'A filthy scroll from the Goblin Digmaster. Tap it to read.',
+    read: [
+      'Scrawled in goblin letters, in something that might be blood:',
+      'TO THE DIGMASTER. FROM THE CHIEF OF CHIEFS.',
+      'DIG. DIG DAY AND DIG NIGHT. BREAK THE RUNES ON THE BIG DOOR.',
+      'THE OLD ONE SPEAKS IN OUR DREAMS. HE SAYS: THE STONE ON THE HILL IS GONE. THE SLEEP IS THIN. HE IS NEARLY AWAKE.',
+      'WHEN THE DOOR BREAKS, GRUBNAK WALKS AGAIN, AND THE VILLAGE OF BRAMBLEFORD BURNS LIKE BEFORE.',
+      'NO RESTING. NO EATING THE PICKS. — THE CHIEF OF CHIEFS',
+    ],
+  },
   goblinToken: { name: 'Goblin token', value: 0, examine: 'A disc of carved bone on a leather cord. A crude crown is cut into it, above three slashes.' },
   holtsJournal: {
     name: "Holt's journal", value: 0, examine: 'A small leather journal from the old watchtower. Tap it to read.',

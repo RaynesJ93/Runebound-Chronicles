@@ -47,6 +47,7 @@ function getLib() {
     shelf: art('shelf') || [S.shelf(1), S.shelf(2), S.shelf(3)],
     barrel: art('barrel')?.[0] || S.barrel(),
     brokenCart: art('brokenCart')?.[0] || art('stall')?.[0] || S.stall(),
+    runeDoor: art('runeDoor')?.[0] || null,
     brokenBarrel: art('brokenBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
     toppledBarrel: art('toppledBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
     smashedBarrel: art('smashedBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
@@ -222,6 +223,7 @@ export function createWorldView(canvasEl, area) {
       case 'shelf': place(p.variant !== undefined ? lib.shelf[p.variant % lib.shelf.length] : pick(lib.shelf, p), f.x, f.y + 2); break;
       case 'barrel': place(lib.barrel, f.x, f.y); break;
       case 'brokenCart': place(lib.brokenCart, f.x, f.y + 1); break;
+      case 'runeDoor': place(lib.runeDoor || lib.caveMouth[1], f.x, f.y + 1); break;
       case 'brokenBarrel': case 'toppledBarrel': case 'smashedBarrel': place(lib[p.type], f.x, f.y); break;
       case 'chest': place(lib.chest, f.x, f.y); break;
       case 'plant': place(lib.plant, f.x, f.y); break;
@@ -239,7 +241,13 @@ export function createWorldView(canvasEl, area) {
       case 'ruinArch': place(lib.ruinArch || lib.ruinWall[0], f.x, f.y); break;
       case 'ruinLow': place(lib.ruinLow ? pick(lib.ruinLow, p) : lib.ruinWall[0], f.x, f.y); break;
       case 'fallenPillar': place(lib.fallenPillar || lib.logPile, f.x, f.y); break;
-      case 'caveMouth': place(lib.caveMouth[p.sealed ? 1 : 0], f.x, f.y); break;
+      case 'caveMouth': {
+        const spr = lib.caveMouth[p.sealed ? 1 : 0];
+        // a sealed cave the story can open: drawn open once p.opened is set
+        const open = p.openable ? lib.caveMouth[0] : null;
+        place(spr, f.x, f.y, open ? { prop: p, open: { img: open.img, x: Math.round(f.x - open.ax), y: Math.round(f.y - open.ay) } } : {});
+        break;
+      }
       case 'tombstone': place(pick(lib.tombstone, p), f.x, f.y); break;
       case 'grave': {
         // headstone, with its mound of earth on the tile in front
@@ -580,6 +588,7 @@ export function createWorldView(canvasEl, area) {
 
     for (const o of list) {
       if (o.prop?.cold && o.cold) { ctx.drawImage(o.cold.img, o.x, o.y); continue; } // the great furnace, before it's lit
+      if (o.prop?.opened && o.open) { ctx.drawImage(o.open.img, o.open.x, o.open.y); continue; } // the sealed cave, broken open
       if (o.prop?.depleted) {
         // A chopped-down tree: just its stump until it grows back.
         const st = o.alt || lib.stump[(o.prop.x + o.prop.y) % lib.stump.length];

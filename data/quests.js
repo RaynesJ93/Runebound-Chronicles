@@ -88,7 +88,25 @@ export const QUESTS = [
         { text: 'Tell Tobin', done: false },
       ];
     },
-    rewards: ['1,000 coins', 'Runecrafting, Smithing and Magic XP', 'The story continues in chapter 5 (coming soon)'],
+    rewards: ['1,000 coins', 'Runecrafting, Smithing and Magic XP', 'The story continues in chapter 5'],
+  },
+  {
+    id: 'cave',
+    chapter: 5,
+    name: 'The Sealed Cave',
+    giver: { name: 'Tobin the Hermit', where: "The hermit's hut, Thornwood", area: 'route1' },
+    about: 'Grubnak is stirring, and his goblins are digging for him. Open the sealed cave and find out what is going on down there.',
+    requiresQuests: ['remake'],
+    requires: { mining: 30 },
+    recommend: 'Combat level 25+ (warren goblins and the Digmaster)',
+    flag: 'caveQuest',
+    steps: (c) => [
+      { text: 'Break the boulders at the sealed cave, north of the hermit\'s hut (needs a pickaxe)', done: !!c.flags.caveOpen },
+      { text: 'Go down into the Goblin Warrens and find the great dig', done: !!c.flags.sawDoor },
+      { text: 'Defeat the Goblin Digmaster and take his orders', done: !!c.flags.gotOrders || c.count('digmastersOrders') >= 1 },
+      { text: 'Show the orders to Tobin', done: false },
+    ],
+    rewards: ['1,500 coins', 'Attack, Strength, Defence and Mining XP', 'The Goblin Warrens stay open', 'The story continues in chapter 6 (coming soon)'],
   },
   {
     id: 'coldForge',
@@ -198,7 +216,7 @@ export const QUEST_HOOKS = [
   },
   {
     area: 'route1', type: 'caveMouth', at: { x: 7, y: 6 },
-    when: (f) => f.stonePlaced,
+    when: (f) => f.stonePlaced && !f.caveQuest,
     say: ['Huge boulders block the mouth of the cave. But they have shifted: there is a dark crack between them now.', 'Cold air pours out. Deep inside, something is breathing. Slowly. Heavily.'],
   },
   {
@@ -207,6 +225,35 @@ export const QUEST_HOOKS = [
     say: (f) => (f.stoneQuest === 'done'
       ? ['The empty hollow waits for its stone. Aldric is working on it.']
       : ['A worn stone altar. Carvings of a great tree circle its base.', 'The hollow in the top is empty. Tobin said a runestone sat here, holding the binding.', 'Someone has prised it out. The scratches look fresh.']),
+  },
+  // Chapter 5: break the boulders at the sealed cave.
+  {
+    area: 'route1', type: 'caveMouth', at: { x: 7, y: 6 },
+    when: (f, c) => f.caveQuest === 'started' && !f.caveOpen && c.level('mining') >= 30 && c.holdingPickaxe(),
+    say: ['You set your pickaxe against the crack between the boulders and swing.', '*crack* ... *CRACK*', 'The biggest boulder splits in two and rolls aside. Cold air rushes out, and the smell of goblin.',
+      'A rough tunnel slopes down into the dark. The sealed cave is open.'],
+    set: { caveOpen: true },
+    xp: { mining: 300 },
+  },
+  {
+    area: 'route1', type: 'caveMouth', at: { x: 7, y: 6 },
+    when: (f) => f.caveQuest === 'started' && !f.caveOpen,
+    say: (f, c) => [c.level('mining') >= 30 ? 'The boulders are cracked. With a pickaxe in your bag, you could break them open.' : `The boulders are cracked, but they are huge. You'd need Mining 30 to break them (you have ${c.level('mining')}).`],
+  },
+  {
+    area: 'route1', type: 'caveMouth', at: { x: 7, y: 6 },
+    when: (f) => f.caveOpen,
+    say: ['The broken boulders lie to one side. A rough tunnel slopes down into the Goblin Warrens.'],
+  },
+  // Chapter 5: the door of Grubnak's chamber, in the great dig.
+  {
+    area: 'warrens', type: 'runeDoor', at: { x: 22, y: 5 },
+    when: (f) => f.caveQuest === 'started' && !f.sawDoor,
+    say: ['A great door of solid rock, carved all over with runes. They glow a faint, steady blue.',
+      'The goblins have been at it with picks. Some of the runes are chipped half away, and their glow is weaker.',
+      'Behind the door, something breathes. Slowly. Heavily. And it is listening.',
+      'Whoever is giving the orders here must be stopped.'],
+    set: { sawDoor: true },
   },
   // The Goblin Chief's hut: knock to wake him (chapter 3).
   {
@@ -229,5 +276,6 @@ export const QUEST_DROPS = [
   { enemy: 'moltenBeast', item: 'emberCore', when: (f) => f.forgeQuest === 'started', say: 'The Molten beast leaves behind a glowing ember core!' },
   { enemy: 'goblinBrute', item: 'pellsStrongbox', when: (f) => f.cartQuest === 'started' && f.cartClue, say: "The goblin brute drops a battered strongbox. Pell's!" },
   { enemy: 'goblinChief', item: 'runestoneCrown', when: (f) => f.stoneQuest === 'started', say: 'The Goblin Chief falls, and the glowing stone on his cord drops to the ground: the runestone crown!' },
+  { enemy: 'goblinDigmaster', item: 'digmastersOrders', when: (f) => f.caveQuest === 'started', say: 'The Digmaster drops a filthy scroll: his orders!' },
   { enemy: 'tunnelGoblin', item: 'runestoneHeart', when: (f) => f.stoneQuest === 'started' && f.stoneShrine, say: 'The tunnel goblin drops a glowing lump of stone it was hiding: the runestone heart!' },
 ];

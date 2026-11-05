@@ -8,6 +8,7 @@ import { buildDepths } from './depths.js';
 import { buildHollow } from './hollow.js';
 import { buildForge } from './forge.js';
 import { buildVale } from './vale.js';
+import { buildWarrens } from './warrens.js';
 import { waterEdges } from './decor.js';
 
 export const AREAS = {
@@ -20,6 +21,7 @@ export const AREAS = {
   hollow: buildHollow,
   forge: buildForge,
   vale: buildVale,
+  warrens: buildWarrens,
 };
 
 export const START_AREA = 'brambleford';

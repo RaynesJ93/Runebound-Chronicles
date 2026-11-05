@@ -648,6 +648,47 @@ def tobin_garb(im, get=None):
     return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
 
 
+# ---- The Runebound, chapter 5: pale cave goblins (warren goblins, the Digmaster) --
+
+CAVE_SKIN = ['#262c24', '#4a5646', '#76866e', '#a6b69c']
+
+
+def cave_goblin(im, get=None):
+    """Green goblin skin -> the pale grey-green of goblins that never see the sun."""
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.float32)
+    h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
+    skin = (rgba[..., 3] > 0) & (h > 40) & (h < 115) & (s > 60)
+    if not skin.any():
+        return im
+    l = lum(rgba[..., :3]) / 255
+    lo, hi = np.percentile(l[skin], 3), np.percentile(l[skin], 99)
+    t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+    out = rgba.copy()
+    out[skin, :3] = J.ramp(CAVE_SKIN, t)[skin]
+    return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
+DIG_APRON = ['#20160e', '#4a3420', '#7a5832', '#a8804a']
+
+
+def digmaster(im, get=None):
+    """The Goblin Chief as the Digmaster: pale cave skin (the chief's is a
+    darker olive) and a dusty leather apron instead of his red cape."""
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.float32)
+    h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
+    m = rgba[..., 3] > 0
+    l = lum(rgba[..., :3]) / 255
+    out = rgba.copy()
+    for mask, pal in ((m & (h >= 28) & (h < 115) & (s > 60), CAVE_SKIN), (m & ((h >= 200) | (h < 6)) & (s > 90), DIG_APRON)):
+        if mask.any():
+            lo, hi = np.percentile(l[mask], 3), np.percentile(l[mask], 99)
+            t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+            out[mask, :3] = J.ramp(pal, t)[mask]
+    return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
 # ---- What to make ------------------------------------------------------------------
 # new item: icon=(source item, fn), gear=(source item, fn) or None,
 #           small=(source item, fn), or None to shrink the new 32 px icon down.
@@ -784,6 +825,18 @@ EXTRA = [
     ('anim:forgeGolem:fall', 'anim:essenceGolem:fall', molten(IRON_BODY, LAVA, golem_glow)),
     ('anim:forgeGolem:hit', 'anim:essenceGolem:hit', molten(IRON_BODY, LAVA, golem_glow)),
     ('chars:tobin', 'chars:finn', tobin_garb),
+    ('chars:enemy:warrenGoblin', 'chars:enemy:goblinBrute', cave_goblin),
+    ('chars:enemy:goblinDigmaster', 'chars:enemy:goblinChief', digmaster),
+    ('anim:warrenGoblin:attack:up', 'anim:goblinBrute:attack:up', cave_goblin),
+    ('anim:goblinDigmaster:attack:up', 'anim:goblinChief:attack:up', digmaster),
+    ('anim:warrenGoblin:attack:down', 'anim:goblinBrute:attack:down', cave_goblin),
+    ('anim:goblinDigmaster:attack:down', 'anim:goblinChief:attack:down', digmaster),
+    ('anim:warrenGoblin:attack:left', 'anim:goblinBrute:attack:left', cave_goblin),
+    ('anim:goblinDigmaster:attack:left', 'anim:goblinChief:attack:left', digmaster),
+    ('anim:warrenGoblin:attack:right', 'anim:goblinBrute:attack:right', cave_goblin),
+    ('anim:goblinDigmaster:attack:right', 'anim:goblinChief:attack:right', digmaster),
+    ('anim:warrenGoblin:hit', 'anim:goblinBrute:hit', cave_goblin),
+    ('anim:warrenGoblin:fall', 'anim:goblinBrute:fall', cave_goblin),
 ]
 
 # Side-on shields stay as they are (a kite shape only reads from the front or back).

@@ -499,7 +499,10 @@ export const NPCS = [
             { text: 'About the runestone...', next: 'stoneProgress', if: (c) => c.flags.stoneQuest === 'started' },
             { text: 'How are you holding up?', next: 'stoneDone', if: (c) => c.flags.stoneQuest === 'done' && !c.flags.stonePlaced },
             { text: 'The Binding Stone is back in the shrine.', next: 'remakeEnd', if: (c) => c.flags.stonePlaced && c.flags.remakeQuest === 'started' },
-            { text: 'What happens now?', next: 'remakeAfter', if: (c) => c.flags.remakeQuest === 'done' },
+            { text: 'What happens now?', next: 'cave', if: (c) => c.flags.remakeQuest === 'done' && !c.flags.caveQuest },
+            { text: 'About the cave...', next: 'caveProgress', if: (c) => c.flags.caveQuest === 'started' && !c.count('digmastersOrders') },
+            { text: 'I found these orders on the Digmaster.', next: 'caveEnd', if: (c) => c.flags.caveQuest === 'started' && c.count('digmastersOrders') > 0 },
+            { text: 'What now?', next: 'caveAfter', if: (c) => c.flags.caveQuest === 'done' },
             { text: 'Goodbye, Tobin.', next: 'bye' },
           ],
         },
@@ -544,7 +547,43 @@ export const NPCS = [
             'Take this. Old Watch pay, saved for a rainy day. I reckon the storm is coming. (The story continues in chapter 5, coming soon.)'],
         },
         remakeFull: { say: 'Make a bit of room in your bag first.' },
-        remakeAfter: { say: ['He is stirring down there. I hear him at night now.', "When it's time to go into that cave, I'm coming with you. Knees or no knees. (The story continues in chapter 5, coming soon.)"] },
+        remakeAfter: { say: ['He is stirring down there. I hear him at night now.'] },
+
+        // ---- The Runebound, chapter 5: The Sealed Cave -----------------------------
+        cave: {
+          say: ['Now? Now somebody goes down there. I heard picks last night. Under my own floor. Clink, clink, clink, all night long.',
+            "The goblins are digging. For him. The stone holds him asleep, but if they break the runes on his door, he won't need to wake up gently.",
+            "Those boulders have cracked since the stone went back in. A good miner with a pickaxe could break them open. Then we'd see what's down there."],
+          choices: [
+            { text: "I'll open the cave.", next: 'caveStart', if: (c) => c.level('mining') >= 30 },
+            { text: "I'll open the cave.", next: 'caveTooLow', if: (c) => c.level('mining') < 30 },
+            { text: 'Not yet.', next: 'bye' },
+          ],
+        },
+        caveTooLow: { say: (c) => [`Those boulders are big. You'll want Mining 30 to break them (you have ${c.level('mining')}). Dorrin's mine is good practice.`] },
+        caveStart: {
+          set: { caveQuest: 'started' },
+          say: ['Good. The cave is just north of here, past my hut. Take a pickaxe, and plenty of food.',
+            "Find out who is giving the orders down there, and stop them. And whatever you do, don't open that door."],
+        },
+        caveProgress: {
+          say: (c) => (!c.flags.caveOpen ? ['The cave is just north of my hut. Break the boulders with a pickaxe.']
+            : !c.flags.sawDoor ? ["You've opened it? Then go down. Find where they're digging."]
+              : ['Chipping at the runes on his door? Then find whoever is in charge of that dig, and stop them.']),
+        },
+        caveEnd: {
+          give: { flag: 'cavePaid', items: [{ item: 'coins', qty: 1500 }] },
+          giveFail: 'remakeFull',
+          take: [{ item: 'digmastersOrders', qty: 1 }],
+          set: { caveQuest: 'done', gotOrders: true },
+          reward: { xp: { attack: 600, strength: 600, defence: 600, mining: 300 }, quest: 'The Sealed Cave' },
+          say: ['Let me see. ...My goblin is rusty. "Chief of Chiefs"... "Old One speaks in our dreams"...',
+            '"When the door breaks, Grubnak walks again, and Brambleford burns like before."',
+            "He's talking to them. In their sleep. That's how they knew to steal the stone. He can't get out, so he's getting them to dig him out.",
+            "Stopping the Digmaster buys us time. Not much. They'll dig again, and the binding won't hold forever.",
+            "There's only one way this ends. Someone goes through that door and finishes what Holt and I couldn't. Take this. You've earned every coin. (The story continues in chapter 6, coming soon.)"],
+        },
+        caveAfter: { say: ['They are digging again. Slower, without their Digmaster. But they are digging.', "When it's time to go through that door, I'm coming with you. Knees or no knees. (The story continues in chapter 6, coming soon.)"] },
       },
     },
   },

@@ -24,7 +24,7 @@ const sign = (n) => (n > 0 ? `+${n}` : String(n));
 import { SKILLS, xpForLevel, MAX_LEVEL } from '../skills/skills.js';
 import { guide } from '../skills/guide.js';
 import { drawArea, markers } from './map.js';
-import { MAP_AREAS, MAP_TAB } from '../../data/mapLabels.js';
+import { MAP_AREAS, MAP_TAB, MAP_HIDDEN } from '../../data/mapLabels.js';
 
 const fmt = (n) => Math.floor(n).toLocaleString('en-GB');
 
@@ -657,8 +657,8 @@ export class Hud {
     if (!here) return;
     const id = this.mapShown || here.id;
     const onIt = id === here.id;
-    this.$('map-areas').innerHTML = MAP_AREAS.map((a) => `<button class="chip ${a === id ? 'on' : ''}" data-map="${a}">${MAP_TAB[a]}${a === here.id ? ' •' : ''}${this.mapStar?.area === a ? ' ★' : ''}</button>`).join('');
-    const m = markers(id, onIt ? this.mapLive : null, this.mapStar);
+    this.$('map-areas').innerHTML = MAP_AREAS.filter((a) => !MAP_HIDDEN[a] || this.mapFlags?.[MAP_HIDDEN[a]] || a === here.id).map((a) => `<button class="chip ${a === id ? 'on' : ''}" data-map="${a}">${MAP_TAB[a]}${a === here.id ? ' •' : ''}${this.mapStar?.area === a ? ' ★' : ''}</button>`).join('');
+    const m = markers(id, onIt ? this.mapLive : null, this.mapStar, this.mapFlags);
     const pct = (x, y) => `left:${(x / m.W) * 100}%;top:${(y / m.H) * 100}%`;
     const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const mk = m.list.map((k) => {
