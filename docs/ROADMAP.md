@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 5 Nov 2026 | v0.37.3: iPhone home-screen app fills the screen more reliably (also detects the app by display mode, adds back the status-bar height if the phone under-reports its size, and re-checks just after launch); the page behind the game is dark instead of green; Settings shows a screen-size readout under the version, to help fix layout bugs. |
 | 5 Nov 2026 | v0.37.2: cave walls in every mine level have rounded, natural outlines with a lit lip and a soft shadow on the floor, instead of square tile steps. iPhone home-screen app: the game is sized to the whole screen, fixing the green strip at the bottom. |
 | 5 Nov 2026 | v0.37.1: axes and pickaxes need Attack to wield, like other weapons of their metal (bronze 1, iron 5, steel 10, mithril 20, adamant 30, rune 40). They still work from the bag for Woodcutting and Mining with just the skill level. |
 | 0 ✅ | Project foundation | `index.html`, renderer, game loop, 0.6 s tick, game-state object, save system v1 (versioned, autosave, two slots, export/import), GitHub Pages deploy | Page loads on desktop and iPhone; a save survives a reload |
