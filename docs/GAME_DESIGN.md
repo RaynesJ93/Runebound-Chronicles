@@ -650,6 +650,10 @@ A map button (top right, or M on a keyboard) opens the map of the area you're in
 
 The map shows the ground, trees, water and buildings drawn small, and on top: place names (from `data/mapLabels.js`), villagers (yellow dots) and monsters (red; the Alpha Wolf ringed in gold) where they are right now, the ways out to other areas, and icons for the bank and shop, fishing, mining, smithing, cooking, tanning and runecrafting altars. Tap any marker to see what it is. Everything except the place names is read from the area data, so new areas and skilling spots show up by themselves; a new area only needs adding to `MAP_AREAS` and its labels.
 
+### Quest journal (v0.36.0)
+
+A **Quests** button under the Guide (or Q on a keyboard) lists every quest in `data/quests.js`, so a new quest appears there as soon as it's added to that list (with its dialogue in `npcs.js`). Each quest shows its status (not available yet / available / in progress / complete), what it's about, who starts it (with a map pin), its skill requirements with a tick or cross against your levels, a live checklist while it's in progress (e.g. "Bring Dorrin 25 coal (you have 12)"), and its rewards. In-progress quests come first, then available, then locked, then complete. The button glows while there's a quest you can start that you haven't looked at yet.
+
 ### The Guide (v0.35.0)
 
 A **Guide** button at the top left (or G on a keyboard) opens a short guide for new players: how to play; the free starter tools and who gives them (Dorrin: pickaxe and hammer; Bram: axe, knife, shortbow and arrows; Wren: staff and runes; Old Finn: net, rod and bait; Hilda: needle and thread; Pell's store for everything else); where to train each gathering and production skill; where to fight by level; and banks, shooting stars and the Cold Forge quest. Rows with a map pin open the map on that area. The button glows until a player first opens it. The content lives in `data/startGuide.js`; keep it up to date as the world grows.
@@ -677,7 +681,7 @@ Tap any skill in the skills panel to open its guide: everything the skill unlock
 Every skill uses the same XP curve and goes to 99. Resources respawn after a timer, with chances to succeed improving with level and tools.
 
 ### Quests
-- A quest journal lists quests as not started / in progress / complete.
+- A quest journal lists quests as not started / in progress / complete (done in v0.36.0: the Quests button).
 - Quests use NPC dialogue, item delivery, kill tasks, simple puzzles and story bosses.
 - Rewards: XP lamps, items, coins, and **new region access**.
 - Quest points unlock late-game content.

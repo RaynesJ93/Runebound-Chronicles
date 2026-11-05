@@ -51,7 +51,7 @@ export const GUIDE = [
     rows: [
       { icon: 'coins', name: 'Banks', sub: 'The Bank of Brambleford on the square, plus supply chests (they open the same bank) in Copperdeep Mine, Whispering Vale and the Sunken Forge.', map: 'brambleford' },
       { icon: 'stardust', name: 'Shooting stars', sub: 'Every so often a star crashes somewhere: mine it for stardust and trade it with Lyra the Stargazer by the square.', map: 'brambleford' },
-      { icon: 'emberCore', name: 'Quest: The Cold Forge', sub: 'With Smithing and Mining 40, ask Dorrin if there\'s anything you can help with.', map: 'mine' },
+      { icon: 'emberCore', name: 'Quests', sub: 'Tap the Quests button (under this Guide) to see every quest, what it needs, and what to do next. It glows when there\'s a new one you can start.' },
     ],
   },
 ];
