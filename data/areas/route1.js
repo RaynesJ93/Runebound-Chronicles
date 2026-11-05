@@ -127,7 +127,9 @@ export function buildRoute1() {
   for (let k = 0; k < 46; k++) at('rock', 66 + Math.floor(rng() * 40), 4 + Math.floor(rng() * 30));
   for (let k = 0; k < 22; k++) at('bones', 68 + Math.floor(rng() * 36), 6 + Math.floor(rng() * 26), { blocks: false });
   // the alpha's den: a rock face with a dark mouth
-  for (let x = 90; x <= 103; x++) for (let y = 4; y <= 7; y++) { ground[i(x, y)] = GROUND.ROCKWALL; block(x, y); taken[i(x, y)] = 1; }
+  // (an uneven outcrop: each column's top and bottom rock rows)
+  const outcrop = (cols) => { for (const [x, top, bottom] of cols) for (let y = top; y <= bottom; y++) { ground[i(x, y)] = GROUND.ROCKWALL; block(x, y); taken[i(x, y)] = 1; } };
+  outcrop([[90, 5, 6], [91, 4, 6], [92, 4, 7], [93, 4, 6], [94, 4, 7], [95, 4, 7], [96, 4, 7], [97, 4, 7], [98, 4, 6], [99, 4, 7], [100, 4, 6], [101, 4, 6], [102, 5, 6], [103, 5, 5]]);
   one('caveMouth', 96, 7, { interact: ["The alpha wolf's den. Bones are piled at the entrance.", 'It goes back further than you can see.'] });
   one('sign', 86, 36, { interact: ['WOLF HILLS', 'Travel in daylight. Travel in groups.'] });
 
@@ -191,7 +193,7 @@ export function buildRoute1() {
 
   // The sealed cave
   clearArea(4, 3, 14, 13);
-  for (let x = 3; x <= 11; x++) for (let y = 2; y <= 6; y++) { ground[i(x, y)] = GROUND.ROCKWALL; block(x, y); taken[i(x, y)] = 1; }
+  outcrop([[3, 2, 4], [4, 2, 5], [5, 2, 6], [6, 2, 6], [7, 2, 6], [8, 2, 6], [9, 2, 5], [10, 2, 6], [11, 2, 4]]);
   one('caveMouth', 7, 6, { sealed: true, interact: ['Huge boulders block the mouth of a cave.', 'Cold air seeps out between them, and something deep inside is breathing.'] });
   for (const [x, y] of [[5, 8], [9, 8], [11, 9]]) one('rock', x, y);
 

@@ -119,20 +119,40 @@ function roundPaving(kinds, W, H, vn, isNeat) {
   }
 }
 
+// Ground a rock wall can round off into: cave floor, and outdoors grass, paths,
+// soil and sand (paving and floors keep their straight, built edges).
+const OPEN = new Set([GROUND.CAVE, GROUND.GRASS, GROUND.PATH, GROUND.DIRT, GROUND.SAND]);
+
 function roundRock(kinds, W, H, vn, area, g) {
   const R = 6;
-  const RW = GROUND.ROCKWALL, CV = GROUND.CAVE;
-  // only tiles where rock meets cave floor can change
+  const RW = GROUND.ROCKWALL;
+  const rockish = (t) => t === RW || OPEN.has(t);
+  // only tiles where rock meets open ground can change
   const near = new Uint8Array(area.W * area.H);
   let any = false;
   for (let ty = 0; ty < area.H; ty++) for (let tx = 0; tx < area.W; tx++) {
     const t = g(tx, ty);
-    if (t !== RW && t !== CV) continue;
+    if (!rockish(t)) continue;
     for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      if (!area.inBounds(tx + dx, ty + dy)) continue;
       const n = g(tx + dx, ty + dy);
-      if ((n === RW || n === CV) && n !== t) { near[ty * area.W + tx] = 1; any = true; }
+      if (rockish(n) && (n === RW) !== (t === RW)) { near[ty * area.W + tx] = 1; any = true; }
     }
   }
+  // What a pixel of trimmed-off rock becomes: the open ground of the nearest
+  // neighbouring tile.
+  const openNear = (x, y) => {
+    const tx = x >> 4, ty = y >> 4;
+    let best = null, bd = Infinity;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      if (!dx && !dy) continue;
+      const n = g(tx + dx, ty + dy);
+      if (!OPEN.has(n) || !area.inBounds(tx + dx, ty + dy)) continue;
+      const cx = (tx + dx) * 16 + 8, cy = (ty + dy) * 16 + 8, d = (cx - x) ** 2 + (cy - y) ** 2;
+      if (d < bd) { bd = d; best = n; }
+    }
+    return best;
+  };
   if (!any) return;
   const sum = new Float32Array((W + 1) * (H + 1));
   for (let y = 0; y < H; y++) {
@@ -145,25 +165,29 @@ function roundRock(kinds, W, H, vn, area, g) {
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
     if (!near[(y >> 4) * area.W + (x >> 4)]) continue;
     const k = kinds[y * W + x];
-    if (k !== RW && k !== CV) continue;
+    if (!rockish(k)) continue;
     const x0 = Math.max(0, x - R), y0 = Math.max(0, y - R), x1 = Math.min(W, x + R + 1), y1 = Math.min(H, y + R + 1);
     const a = (sum[y1 * (W + 1) + x1] - sum[y0 * (W + 1) + x1] - sum[y1 * (W + 1) + x0] + sum[y0 * (W + 1) + x0]) / ((x1 - x0) * (y1 - y0));
     if (a === 0 || a === 1) continue;
     const rock = a + (vn(x, y, 6, 171) - 0.5) * 0.5 + (vn(x, y, 2.5, 172) - 0.5) * 0.12 > 0.5;
-    if (rock && k === CV) {
-      // keep the middle of a floor tile clear, where you stand
+    if (rock && k !== RW) {
+      // keep the middle of an open tile clear, where you stand
       const lx = x & 15, ly = y & 15;
       if (lx >= 3 && lx <= 12 && ly >= 3 && ly <= 12) continue;
       kinds[y * W + x] = RW;
-    } else if (!rock && k === RW) kinds[y * W + x] = CV;
+    } else if (!rock && k === RW) {
+      const o = openNear(x, y);
+      if (o != null) kinds[y * W + x] = o;
+    }
   }
 }
 
 // Rock walls: a dark outline where they meet the floor, a lit lip along the
 // bottom edge, and a soft shadow on the floor at their foot.
 function shadeRock(kinds, W, H, frames, P) {
-  const RW = GROUND.ROCKWALL, CV = GROUND.CAVE;
+  const RW = GROUND.ROCKWALL;
   const at = (x, y) => (x < 0 || y < 0 || x >= W || y >= H ? -1 : kinds[y * W + x]);
+  const open = (x, y) => OPEN.has(at(x, y));
   const mul = (x, y, f) => {
     const i = (y * W + x) * 4;
     for (const fr of frames) for (let c = 0; c < 3; c++) fr.data[i + c] = Math.max(0, Math.min(255, fr.data[i + c] * f));
@@ -174,7 +198,7 @@ function shadeRock(kinds, W, H, frames, P) {
     if (k === RW) {
       // floor just below: dark edge, then a lit lip above it
       let d = 0;
-      for (let j = 1; j <= 4; j++) if (at(x, y + j) === CV) { d = j; break; }
+      for (let j = 1; j <= 4; j++) if (open(x, y + j)) { d = j; break; }
       if (d === 1) { mul(x, y, 0.42); continue; }
       if (d >= 2 && d <= 3) {
         const i = (y * W + x) * 4;
@@ -182,8 +206,8 @@ function shadeRock(kinds, W, H, frames, P) {
         continue;
       }
       // floor beside or above: a thin dark outline
-      if (at(x - 1, y) === CV || at(x + 1, y) === CV || at(x, y - 1) === CV) mul(x, y, 0.6);
-    } else if (k === CV) {
+      if (open(x - 1, y) || open(x + 1, y) || open(x, y - 1)) mul(x, y, 0.6);
+    } else if (OPEN.has(k)) {
       // shadow under the wall above, fading over a few pixels; less from the sides
       let f = 1;
       for (let j = 1; j <= 6; j++) if (at(x, y - j) === RW) { f = Math.min(f, 0.5 + 0.5 * (j - 1) / 6); break; }
