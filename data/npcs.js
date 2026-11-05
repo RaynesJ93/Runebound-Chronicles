@@ -394,8 +394,52 @@ export const NPCS = [
           { text: 'How does mining work again?', next: 'lesson', if: (c) => c.flags.gotPickaxe },
           { text: 'How do I make things from ore?', next: 'smith' },
           { text: "What's deeper in?", next: 'deeper' },
+          { text: 'Is there anything I can help with?', next: 'quest', if: (c) => !c.flags.forgeQuest },
+          { text: 'About the great forge...', next: 'questProgress', if: (c) => c.flags.forgeQuest === 'started' },
+          { text: "How's the great forge?", next: 'questDone', if: (c) => c.flags.forgeQuest === 'done' },
           { text: 'See you, Dorrin.', next: 'bye' },
         ] },
+
+        // ---- Quest: The Cold Forge -----------------------------------------------------
+        quest: {
+          say: ["Help? Well... far below the Hollow there's an old dwarven forge. My grandad used to talk about it.",
+            'The great furnace down there has gone cold. Light it again, and you could smelt right next to the best ore there is.'],
+          next: 'questAsk',
+        },
+        questAsk: { say: [], choices: [
+          { text: "I'll help.", next: 'questStart', if: (c) => c.level('smithing') >= 40 && c.level('mining') >= 40 },
+          { text: "I'll help.", next: 'questTooLow', if: (c) => !(c.level('smithing') >= 40 && c.level('mining') >= 40) },
+          { text: 'Maybe later.', next: 'menu' },
+        ] },
+        questTooLow: { say: "I'd like that, but it's no place for a beginner. Come back with Smithing 40 and Mining 40.", next: 'menu' },
+        questStart: {
+          set: { forgeQuest: 'started' },
+          say: ['Right! The furnace needs relining and fuel. Bring me 25 coal and 5 steel bars.',
+            "And it needs a spark that never goes out. The Molten beast in the forge's far hall carries one inside it: an ember core.",
+            "Bring me all three, and I'll head down and fire it up."],
+          next: 'menu',
+        },
+        questProgress: {
+          say: (c) => [`Got everything? I need 25 coal (you have ${c.count('coal')}), 5 steel bars (${c.count('steelBar')}) and the ember core (${c.count('emberCore') ? 'yes' : 'not yet'}).`],
+          choices: [
+            { text: 'Here you go.', next: 'questHandIn', if: (c) => c.count('coal') >= 25 && c.count('steelBar') >= 5 && c.count('emberCore') >= 1 },
+            { text: 'Not yet.', next: 'menu' },
+          ],
+        },
+        questHandIn: {
+          give: { flag: 'gotSmithOutfit', items: [{ item: 'smithsTunic', qty: 1 }, { item: 'smithsTrousers', qty: 1 }, { item: 'smithsGloves', qty: 1 }, { item: 'smithsBoots', qty: 1 }] },
+          giveFail: 'questFull',
+          take: [{ item: 'coal', qty: 25 }, { item: 'steelBar', qty: 5 }, { item: 'emberCore', qty: 1 }],
+          takeFail: 'questProgress',
+          set: { forgeQuest: 'done' },
+          reward: { xp: { smithing: 1000, mining: 500 }, quest: 'The Cold Forge' },
+          say: ["That's everything! Right, I'm off down the tunnels. Back soon...",
+            '...and done! The great furnace in the Sunken Forge is roaring again. Smelt anything you like down there.',
+            "And take this: my old smithing outfit. It'll help you learn faster at the furnace and anvil."],
+          next: 'menu',
+        },
+        questFull: { say: "I've got something for you, but your bag's full. Make room for four things and come back.", next: 'menu' },
+        questDone: { say: 'Roaring away, last I looked. Best forge in the land, that.', next: 'menu' },
         teach: {
           say: ['Course! Every miner starts with a pickaxe. Take this old bronze one.', 'And a hammer, for the anvil. You\'ll want that soon enough.'],
           give: { flag: 'gotPickaxe', items: [{ item: 'bronzePickaxe', qty: 1 }, { item: 'hammer', qty: 1 }] },

@@ -77,6 +77,7 @@ const BUILD = {
   smithing: () => {
     const bars = [...new Set(SMITHING.map((r) => r.bar))];
     return [
+      { title: 'Saving bars', note: 'From Smithing 40, the anvil sometimes gives you a bar back: 2% of the time at 40, rising to 10% at 99. The smith\'s outfit, from Dorrin\'s quest The Cold Forge, gives up to +6% Smithing XP.', rows: [] },
       { title: 'Smelting (furnace)', rows: recipes(SMELTING) },
       ...bars.map((bar) => ({ title: `${name(bar)} items (anvil)`, rows: recipes(SMITHING.filter((r) => r.bar === bar)) })),
     ];

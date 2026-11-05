@@ -182,3 +182,7 @@ export const SMITHING = [
     ['runePlatebody', 'Rune platebody', 99, 5, 375],
   ]),
 ];
+
+// From Smithing 40, each anvil make has a chance to give one bar back:
+// 2% at 40, rising evenly to 10% at 99.
+export const saveBarChance = (level) => (level < 40 ? 0 : 0.02 + ((Math.min(99, level) - 40) * 0.08) / 59);

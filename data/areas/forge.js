@@ -66,7 +66,8 @@ export function buildForge() {
   for (const [x, y] of [[18, 31], [28, 31]]) one('lamp', x, y);
 
   // ---- The great forge hall ------------------------------------------------------------
-  prop('furnace', [{ x: 23, y: 11 }], { interact: ["The dwarves' great furnace. It's stone cold.", 'Dorrin might know how to fire it up again.'] });
+  // The great furnace: cold until Dorrin's quest (The Cold Forge) is done; then it smelts like any furnace.
+  prop('furnace', [{ x: 23, y: 11 }], { greatFurnace: true, interact: ["The dwarves' great furnace. It's stone cold.", 'Dorrin might know how to fire it up again.'] });
   prop('anvil', [{ x: 21, y: 13 }], { action: 'smith', interact: ['A dwarven anvil, still sound after all these years.'] });
   prop('anvil', [{ x: 25, y: 13 }], { action: 'smith', interact: ['A dwarven anvil, still sound after all these years.'] });
   for (const [x, y] of [[18, 12], [28, 12], [18, 18], [28, 18]]) one('fallenPillar', x, y, { interact: ['A carved dwarven pillar, long since toppled.'] });

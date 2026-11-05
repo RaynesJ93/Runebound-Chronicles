@@ -33,7 +33,7 @@ import { RECIPES, GROUP_OF } from '../data/fletching.js';
 import { ROCKS, PICKAXES, MINE_TICKS, gemChance, rollGem } from '../data/mining.js';
 import { STAR_SITES, DUST_PER_SIZE, FIRST_STAR, NEXT_STAR, STAR_LIFETIME, rollSize } from '../data/stars.js';
 import { MAP_NAME } from '../data/mapLabels.js';
-import { SMELTING, SMITHING } from '../data/smithing.js';
+import { SMELTING, SMITHING, saveBarChance } from '../data/smithing.js';
 import { SPOTS, FISH_TICKS, spotLevel } from '../data/fishing.js';
 import { COOKING } from '../data/cooking.js';
 import { TANNING, SEWING, CRAFT_GROUP, CUTTING, JEWELLERY, STUDDING } from '../data/crafting.js';
@@ -151,6 +151,11 @@ function boot() {
       enemyDied: (e) => {
         hud.message(`You defeated the ${e.name}!`);
         state.stats.kills = (state.stats.kills || 0) + 1;
+        // The Cold Forge: the Molten beast always drops an ember core while you need one.
+        if (e.def.id === 'moltenBeast' && state.flags.forgeQuest === 'started' && !haveAnywhere('emberCore')) {
+          ground.add('emberCore', 1, e.tile.x, e.tile.y, time, { rare: true });
+          hud.message('The Molten beast leaves behind a glowing ember core!');
+        }
         for (const drop of rollLoot(e.def.loot, rng)) {
           ground.add(drop.item, drop.qty, e.tile.x, e.tile.y, time, { rare: drop.rare || !!ITEMS[drop.item]?.rare });
           if (drop.rare) hud.message(`Rare drop: ${itemName(drop.item)}!`);
@@ -582,6 +587,7 @@ function boot() {
       ({ area, view, npcs, enemies, lookup, ground } = world);
       combat.setWorld(area, enemies);
       syncStar();
+      syncForge();
       view.resize();
       applySettings();
       const s = area.spawn;
@@ -616,6 +622,7 @@ function boot() {
       ({ area, view, npcs, enemies, lookup, ground } = world);
       combat.setWorld(area, enemies);
       syncStar();
+      syncForge();
       view.resize();
       applySettings();
       player.teleport(area, exit.at.x + exit.offset, exit.at.y, exit.facing ?? player.facing);
@@ -900,7 +907,24 @@ function boot() {
       player.faceTowards(npc.standTile.x, npc.standTile.y);
       talkTarget = null;
       npc.busy = true;
-      hud.startConversation({ name: npc.name, ...npc.def.talk }, { flags: state.flags, give: giveItems(npc), action: runAction, starNews }, () => {
+      hud.startConversation({ name: npc.name, ...npc.def.talk }, {
+        flags: state.flags, give: giveItems(npc), action: runAction, starNews,
+        level: (skill) => book.level(skill),
+        count: (id) => inventory.count(id),
+        take: (items) => {
+          if (!items.every((it) => inventory.count(it.item) >= it.qty)) return false;
+          for (const it of items) inventory.remove(it.item, it.qty);
+          hud.message(`You hand over: ${items.map((it) => `${itemName(it.item)}${it.qty > 1 ? ` × ${it.qty}` : ''}`).join(', ')}.`);
+          refreshInventory();
+          return true;
+        },
+        reward: (r) => {
+          for (const [skill, xp] of Object.entries(r.xp || {})) book.add(skill, xp);
+          if (r.quest) { hud.message(`Quest complete: ${r.quest}!`); hud.toast?.(`Quest complete: ${r.quest}!`); }
+          syncForge();
+          save();
+        },
+      }, () => {
         npc.busy = false;
         save();
       });
@@ -1028,6 +1052,19 @@ function boot() {
 
   syncStar(); // a star saved in the last session
 
+  // The Sunken Forge's great furnace: cold until The Cold Forge is done.
+  const syncForge = () => {
+    const lit = state.flags.forgeQuest === 'done';
+    for (const w of worlds.values()) for (const p of w.area.props) {
+      if (!p.greatFurnace) continue;
+      p.cold = !lit;
+      p.action = lit ? 'smelt' : undefined;
+      p.interact = lit ? ['The great furnace roars with heat. Dorrin got it going again.'] : ["The dwarves' great furnace. It's stone cold.", 'Dorrin might know how to fire it up again.'];
+      if (lit) for (const t of p.tiles) w.lookup.set(w.area.idx(t.x, t.y), p);
+    }
+  };
+  syncForge();
+
   // ---- Gathering: woodcutting and mining --------------------------------------------
   // Trees and ore rocks work the same way: tap one, walk up, and swing away with
   // your best tool until something comes loose. Then it's a stump or an empty
@@ -1059,6 +1096,8 @@ function boot() {
   };
   const levelOf = (g, d) => (g.perSpot ? spotLevel(d) : d.level);
   const hasItem = (id) => inventory.count(id) > 0 || state.equipment.weapon?.id === id;
+  // In your bag, your bank or lying on the ground nearby (for quest items).
+  const haveAnywhere = (id) => inventory.count(id) > 0 || bank.count(id) > 0 || ground.list.some((g) => g.item === id);
   const bestTool = (g, d) => (g.perSpot ? (hasItem(d.tool) ? { id: d.tool, bonus: 0 } : null)
     : g.tools.find((t) => hasItem(t.id) && book.level(g.skill) >= t.level));
   const trunk = (prop) => prop.tiles[0];
@@ -1360,6 +1399,11 @@ function boot() {
     else if (r.skill === 'crafting') hud.message(`You sew ${/s$/.test(name) ? 'some' : an} ${name}.`);
     else hud.message(`You carve the logs into ${an} ${name}.`);
     book.add(skillOf(r), r.xp * k);
+    // From Smithing 40, the anvil sometimes gives a bar back.
+    if (r.station === 'anvil' && r.bar && rng() < saveBarChance(book.level('smithing'))) {
+      inventory.add(r.bar, 1);
+      hud.message(`You manage to save ${/^[aeiou]/i.test(itemName(r.bar)) ? 'an' : 'a'} ${itemName(r.bar).toLowerCase()}.`);
+    }
     a.made++;
     refreshInventory();
   };
