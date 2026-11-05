@@ -12,8 +12,9 @@ const test = (name, fn) => tests.push({ name, fn });
 
 test('Lyra sells for stardust at fixed prices', () => {
   const shop = new Shop(SHOPS.starShop);
-  const inv = bag([['stardust', 200], ['coins', 10000]]);
-  assert.equal(shop.buyPrice('prospectorJacket'), 120);
+  const price = SHOPS.starShop.stock.find((s) => s.id === 'prospectorJacket').price;
+  const inv = bag([['stardust', price + 80], ['coins', 10000]]);
+  assert.equal(shop.buyPrice('prospectorJacket'), price);
   const r = shop.buy('prospectorJacket', 1, inv);
   assert.equal(r.n, 1);
   assert.equal(inv.count('stardust'), 80);
