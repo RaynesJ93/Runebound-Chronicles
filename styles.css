@@ -52,7 +52,9 @@ html, body {
      home screen, "100%" can stop short of the very bottom (where the home
      bar is) and the page shows through as a strip; 100lvh is the full height.
      The controls (#ui) stay inside the safe area, so nothing goes under the
-     home bar or Safari's toolbar. */
+     home bar or Safari's toolbar. Some iPhones still stop short (by the
+     status bar's height) as a home-screen app, so there main.js sizes the
+     game to the screen itself (fitScreen). */
   position: fixed;
   top: 0;
   left: 0;

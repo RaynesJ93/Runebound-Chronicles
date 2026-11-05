@@ -119,6 +119,80 @@ function roundPaving(kinds, W, H, vn, isNeat) {
   }
 }
 
+function roundRock(kinds, W, H, vn, area, g) {
+  const R = 6;
+  const RW = GROUND.ROCKWALL, CV = GROUND.CAVE;
+  // only tiles where rock meets cave floor can change
+  const near = new Uint8Array(area.W * area.H);
+  let any = false;
+  for (let ty = 0; ty < area.H; ty++) for (let tx = 0; tx < area.W; tx++) {
+    const t = g(tx, ty);
+    if (t !== RW && t !== CV) continue;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      const n = g(tx + dx, ty + dy);
+      if ((n === RW || n === CV) && n !== t) { near[ty * area.W + tx] = 1; any = true; }
+    }
+  }
+  if (!any) return;
+  const sum = new Float32Array((W + 1) * (H + 1));
+  for (let y = 0; y < H; y++) {
+    let row = 0;
+    for (let x = 0; x < W; x++) {
+      row += g(x >> 4, y >> 4) === RW ? 1 : 0;
+      sum[(y + 1) * (W + 1) + x + 1] = sum[y * (W + 1) + x + 1] + row;
+    }
+  }
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (!near[(y >> 4) * area.W + (x >> 4)]) continue;
+    const k = kinds[y * W + x];
+    if (k !== RW && k !== CV) continue;
+    const x0 = Math.max(0, x - R), y0 = Math.max(0, y - R), x1 = Math.min(W, x + R + 1), y1 = Math.min(H, y + R + 1);
+    const a = (sum[y1 * (W + 1) + x1] - sum[y0 * (W + 1) + x1] - sum[y1 * (W + 1) + x0] + sum[y0 * (W + 1) + x0]) / ((x1 - x0) * (y1 - y0));
+    if (a === 0 || a === 1) continue;
+    const rock = a + (vn(x, y, 6, 171) - 0.5) * 0.5 + (vn(x, y, 2.5, 172) - 0.5) * 0.12 > 0.5;
+    if (rock && k === CV) {
+      // keep the middle of a floor tile clear, where you stand
+      const lx = x & 15, ly = y & 15;
+      if (lx >= 3 && lx <= 12 && ly >= 3 && ly <= 12) continue;
+      kinds[y * W + x] = RW;
+    } else if (!rock && k === RW) kinds[y * W + x] = CV;
+  }
+}
+
+// Rock walls: a dark outline where they meet the floor, a lit lip along the
+// bottom edge, and a soft shadow on the floor at their foot.
+function shadeRock(kinds, W, H, frames, P) {
+  const RW = GROUND.ROCKWALL, CV = GROUND.CAVE;
+  const at = (x, y) => (x < 0 || y < 0 || x >= W || y >= H ? -1 : kinds[y * W + x]);
+  const mul = (x, y, f) => {
+    const i = (y * W + x) * 4;
+    for (const fr of frames) for (let c = 0; c < 3; c++) fr.data[i + c] = Math.max(0, Math.min(255, fr.data[i + c] * f));
+  };
+  const lip = P.rockwallHi;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const k = kinds[y * W + x];
+    if (k === RW) {
+      // floor just below: dark edge, then a lit lip above it
+      let d = 0;
+      for (let j = 1; j <= 4; j++) if (at(x, y + j) === CV) { d = j; break; }
+      if (d === 1) { mul(x, y, 0.42); continue; }
+      if (d >= 2 && d <= 3) {
+        const i = (y * W + x) * 4;
+        for (const fr of frames) for (let c = 0; c < 3; c++) fr.data[i + c] = Math.round(fr.data[i + c] * 0.45 + lip[c] * 0.65);
+        continue;
+      }
+      // floor beside or above: a thin dark outline
+      if (at(x - 1, y) === CV || at(x + 1, y) === CV || at(x, y - 1) === CV) mul(x, y, 0.6);
+    } else if (k === CV) {
+      // shadow under the wall above, fading over a few pixels; less from the sides
+      let f = 1;
+      for (let j = 1; j <= 6; j++) if (at(x, y - j) === RW) { f = Math.min(f, 0.5 + 0.5 * (j - 1) / 6); break; }
+      for (let j = 1; j <= 3; j++) if (at(x - j, y) === RW || at(x + j, y) === RW) { f = Math.min(f, 0.72 + 0.28 * (j - 1) / 3); break; }
+      if (f < 1) mul(x, y, f);
+    }
+  }
+}
+
 export function buildGround(area) {
   P = area.theme === 'vale' ? VALE : BASE;
   const T = textures(area.theme === 'vale' ? 'vale' : 'base');
@@ -181,6 +255,10 @@ export function buildGround(area) {
   // the paving is smoothed with a wide blur (which rounds the corners) and
   // its edge nudged by noise, and anything trimmed off becomes grass.
   roundPaving(kinds, W, H, vn, isNeat);
+
+  // Cave walls get rounded, rocky outlines instead of tile-sized steps (the
+  // same trick as the ponds): blur the rock, nudge the edge with noise.
+  roundRock(kinds, W, H, vn, area, g);
 
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
@@ -267,12 +345,11 @@ export function buildGround(area) {
         }
         case GROUND.ROCKWALL: {
           // rough rock: chunky facets, a lit lip where it meets the floor below
-          const below = g(tx, ty + 1);
           // chunky facets in staggered blocks, with the odd dark crack
+          // (the lit lip and shadow at its edge are added after, per pixel)
           const row = Math.floor(y / 4);
           const facet = rnd(Math.floor((x + (row % 2) * 3) / 6), row, 99);
-          if (below !== GROUND.ROCKWALL && ly >= 12) c = ly >= 14 ? P.rockwallTop : P.rockwallHi;
-          else if (T.rockwall) c = px(T.rockwall, x, y);
+          if (T.rockwall) c = px(T.rockwall, x, y);
           else if (rnd(x, y, 100) < 0.035 || y % 4 === 3 && rnd(x >> 1, row, 101) < 0.5) c = P.rockwallTop;
           else c = P.rockwall[Math.floor(facet * 3)];
           break;
@@ -283,6 +360,8 @@ export function buildGround(area) {
       frames[1].set(x, y, c);
     }
   }
+
+  shadeRock(kinds, W, H, frames, P);
 
   // A soft shadow where grass meets bare ground: the earth darkens along the
   // edge and the grass next to it is a little darker too, so the two blend.
