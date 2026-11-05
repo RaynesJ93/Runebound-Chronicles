@@ -77,6 +77,7 @@ function getLib() {
     deadGrass: art('deadGrass') || Array.from({ length: VARIANTS }, (_, i) => S.deadGrass(i + 211)),
     oreEmpty: art('oreEmpty') || [S.oreRock(null, 131), S.oreRock(null, 132)],
     furnace: art('furnace')?.[0] || S.furnace(),
+    furnaceCold: art('furnaceCold')?.[0] || null,
     mineLamp: art('mineLamp')?.[0] || null,
     tanningRack: art('tanningRack')?.[0] || S.tanningRack(),
     fishingSpot: art('fishingSpot') || [S.fishingSpot(0), S.fishingSpot(1)],
@@ -223,7 +224,7 @@ export function createWorldView(canvasEl, area) {
         place(lib.ore[p.variant][k], f.x, f.y + 1, { prop: p, fx: f.x, fy: f.y + 1, alt: lib.oreEmpty[k] });
         break;
       }
-      case 'furnace': place(lib.furnace, f.x, f.y + 1); break;
+      case 'furnace': place(lib.furnace, f.x, f.y + 1, p.greatFurnace ? { prop: p, cold: lib.furnaceCold } : {}); break;
       case 'tanningRack': place(lib.tanningRack, f.x, f.y); break;
       case 'altar': place(lib.altar[p.variant][0], f.x, f.y + 1, { frames: lib.altar[p.variant], rate: 2.5 }); break;
       case 'standingStone': place(pick(lib.standingStone, p), f.x, f.y); break;
@@ -265,7 +266,7 @@ export function createWorldView(canvasEl, area) {
   // ground around them; altars and fires also cast coloured light.
   const LIGHT = {
     altar: { air: ['#d8ecff', 84], mind: ['#ff9a3a', 84], water: ['#6fb8ff', 84] },
-    campfire: ['#ff9a3a', 64, true], cookingPit: ['#ff9a3a', 64, true], lamp: ['#ffd890', 52, true], campChest: ['#ffd890', 30, true],
+    furnace: ['#ff9a3a', 60, true], campfire: ['#ff9a3a', 64, true], cookingPit: ['#ff9a3a', 64, true], lamp: ['#ffd890', 52, true], campChest: ['#ffd890', 30, true],
     ore: ['#8ab8ff', 32], crystalShard: ['#8ab8ff', 16], glowShrooms: ['#5fd8ff', 18], glowFlowers: ['#c8b8ff', 12],
   };
   const ORE_GLOW = { mithril: ['#6f8cff', 30], adamantite: ['#5fd07a', 30], runite: ['#5fd8ff', 34] };
@@ -279,7 +280,7 @@ export function createWorldView(canvasEl, area) {
       if (!def) continue;
       const cxw = (p.tiles.reduce((a, t) => a + t.x, 0) / p.tiles.length + 0.5) * TILE;
       const cyw = (p.tiles[0].y + 0.3) * TILE;
-      lights.push({ x: cxw, y: cyw, colour: def[0], r: def[1], flicker: !!def[2], glow: def[1] >= 30, strength: p.type === 'altar' ? 0.42 : 0.22 });
+      lights.push({ x: cxw, y: cyw, colour: def[0], r: def[1], flicker: !!def[2], glow: def[1] >= 30, strength: p.type === 'altar' ? 0.42 : 0.22, prop: p });
     }
   }
   // Drifting wisps of light.
@@ -307,7 +308,8 @@ export function createWorldView(canvasEl, area) {
     g.globalCompositeOperation = 'destination-out';
     gl.clearRect(0, 0, w, h);
     gl.globalCompositeOperation = 'lighter';
-    const all = extra.length ? lights.concat(extra) : lights;
+    const lit = lights.filter((l) => !l.prop?.cold); // a cold furnace gives no light
+    const all = extra.length ? lit.concat(extra) : lit;
     const k = scale / LQ;
     for (const L of all) {
       const wob = L.flicker ? Math.sin(time * 9 + L.x) * 2 + Math.sin(time * 13 + L.y) * 1.5 : 0;
@@ -568,6 +570,7 @@ export function createWorldView(canvasEl, area) {
     list.sort((a, b) => a.sortY - b.sortY || ((a.player || a.person) ? 1 : -1));
 
     for (const o of list) {
+      if (o.prop?.cold && o.cold) { ctx.drawImage(o.cold.img, o.x, o.y); continue; } // the great furnace, before it's lit
       if (o.prop?.depleted) {
         // A chopped-down tree: just its stump until it grows back.
         const st = o.alt || lib.stump[(o.prop.x + o.prop.y) % lib.stump.length];

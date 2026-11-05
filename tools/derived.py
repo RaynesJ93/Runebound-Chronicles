@@ -604,6 +604,24 @@ golem_glow = lambda hsv: (hsv[..., 0] > 110) & (hsv[..., 0] < 190) & (hsv[..., 1
 beast_glow = lambda hsv: hsv[..., 2] > 135
 
 
+# ---- Batch H: the cold great furnace, the ember core, the smith's outfit ----------
+
+def cold(im, get=None):
+    """A furnace with its fire out: the warm glowing parts go to dead grey ash."""
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.float32)
+    h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
+    fire = (rgba[..., 3] > 0) & (s > 70) & (v > 100) & ((h < 62) | (h > 235))
+    l = lum(rgba[..., :3]) / 255
+    out = rgba.copy()
+    out[fire, :3] = (np.stack([30 + 50 * l, 28 + 46 * l, 28 + 44 * l], -1))[fire]
+    return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
+SOOT = ['#120e0c', '#2e221a', '#54402e', '#8a6c4e']
+SOOT_GREY = ['#0e0e10', '#26262a', '#46464c', '#76767e']
+
+
 # ---- What to make ------------------------------------------------------------------
 # new item: icon=(source item, fn), gear=(source item, fn) or None,
 #           small=(source item, fn), or None to shrink the new 32 px icon down.
@@ -688,6 +706,13 @@ for part in STEEL:
 DERIVED['adamantiteOre'] = dict(icon=('ironOre', lum_to(ADAMANT)), small=('ironOre', lum_to(ADAMANT)))
 DERIVED['runiteOre'] = dict(icon=('ironOre', lum_to(RUNE)), small=('ironOre', lum_to(RUNE)))
 
+# Batch H
+DERIVED['emberCore'] = dict(icon=('ironOre', lum_to(LAVA)), small=('ironOre', lum_to(LAVA)))
+DERIVED['smithsTunic'] = dict(icon=('leatherBody', lum_to(SOOT)), small=('leatherBody', lum_to(SOOT)), gear=('leatherBody', lum_to(SOOT)))
+DERIVED['smithsTrousers'] = dict(icon=('leatherChaps', lum_to(SOOT_GREY)), small=('leatherChaps', lum_to(SOOT_GREY)), gear=('leatherChaps', lum_to(SOOT_GREY)))
+DERIVED['smithsGloves'] = dict(icon=('leatherGloves', lum_to(SOOT)), small=('leatherGloves', lum_to(SOOT)))
+DERIVED['smithsBoots'] = dict(icon=('leatherBoots', lum_to(SOOT_GREY)), small=('leatherBoots', lum_to(SOOT_GREY)), gear=('leatherBoots', lum_to(SOOT_GREY)))
+
 # Steel studs and studded leather (after steel, so the studs are steel-coloured).
 DERIVED['steelStuds'] = dict(icon=('ironArrowtips', studs_of('icon:steelSqShield')))
 DERIVED['studdedBody'] = dict(icon=('leatherBody', studded_with('icon:steelSqShield')), small=('leatherBody', studded_with('icon:steelSqShield')), gear=('leatherBody', studded_with('icon:steelSqShield')))
@@ -714,6 +739,7 @@ EXTRA = [
     ('tool:mithrilPickaxe', 'tool:steelPickaxe', mithril),
     ('ore:gem', 'ore:copper', gem_veins),
     ('ore:adamantite', 'ore:copper', veins_to(ADAMANT)),
+    ('furnaceCold', 'furnace', cold),
     ('ore:runite', 'ore:copper', veins_to(RUNE)),
     ('tool:adamantAxe', 'tool:steelAxe', metal_ramp(ADAMANT)),
     ('tool:adamantPickaxe', 'tool:steelPickaxe', metal_ramp(ADAMANT)),

@@ -680,6 +680,13 @@ DRAW.prospectorJacket ||= (b) => DRAW.leatherBody(b);
 DRAW.prospectorLegs ||= (b) => DRAW.leatherChaps(b);
 DRAW.prospectorBoots ||= (b) => DRAW.leatherBoots(b);
 
+// Batch H items, from the nearest drawing.
+DRAW.emberCore ||= (b) => { DRAW.ironOre(b); for (let i = 0; i < b.data.length; i += 4) if (b.data[i + 3]) { const l = (b.data[i] + b.data[i + 1] + b.data[i + 2]) / 765; b.data[i] = 120 + 135 * l; b.data[i + 1] = 40 + 160 * l; b.data[i + 2] = 10 + 60 * l; } };
+DRAW.smithsTunic ||= (b) => DRAW.leatherBody(b);
+DRAW.smithsTrousers ||= (b) => DRAW.leatherChaps(b);
+DRAW.smithsGloves ||= (b) => DRAW.leatherGloves(b);
+DRAW.smithsBoots ||= (b) => DRAW.leatherBoots(b);
+
 // Hard leather pieces: the leather drawing in darker, redder leather.
 for (const part of ['Gloves', 'Boots', 'Cowl', 'Chaps']) {
   DRAW[`hardLeather${part}`] = (b) => {

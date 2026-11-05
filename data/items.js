@@ -783,6 +783,23 @@ export const ITEMS = {
   runeJavelinHeads: {
     name: 'Rune javelin heads', stackable: true, value: 270, examine: 'Fletch them onto arrow shafts to make javelins.',
   },
+  emberCore: { name: 'Ember core', value: 0, examine: 'A lump of rock from the Molten beast. It glows from within and never cools. Dorrin needs it.' },
+  smithsTunic: {
+    name: "Smith's tunic", value: 0, examine: "Dorrin's old leather tunic, scorched at the cuffs. +2% Smithing XP, and more for the full outfit.",
+    equip: { slot: 'body', req: {}, def: { stab: 1, slash: 1, crush: 1 }, xpBonus: { smithing: 0.02 }, set: 'smith', look: { tunic: '#3a2a1e' } },
+  },
+  smithsTrousers: {
+    name: "Smith's trousers", value: 0, examine: 'Heavy trousers that shrug off sparks. +1.5% Smithing XP, and more for the full outfit.',
+    equip: { slot: 'legs', req: {}, def: { stab: 1, slash: 1, crush: 1 }, xpBonus: { smithing: 0.015 }, set: 'smith', look: { pants: '#2a2622' } },
+  },
+  smithsGloves: {
+    name: "Smith's gloves", value: 0, examine: 'Thick gloves for handling hot metal. +1% Smithing XP, and more for the full outfit.',
+    equip: { slot: 'hands', req: {}, def: { stab: 1, slash: 1, crush: 1 }, xpBonus: { smithing: 0.01 }, set: 'smith' },
+  },
+  smithsBoots: {
+    name: "Smith's boots", value: 0, examine: 'Iron-capped boots, in case you drop the hammer. +0.5% Smithing XP, and more for the full outfit.',
+    equip: { slot: 'feet', req: {}, def: { stab: 1, slash: 1, crush: 1 }, xpBonus: { smithing: 0.005 }, set: 'smith' },
+  },
   stardust: { name: 'Stardust', stackable: true, value: 0, examine: 'Glittering dust from a fallen star. Lyra the Stargazer trades it for rewards.' },
   coalBag: { name: 'Coal bag', stackable: true, value: 0, examine: 'A heavy sack from Lyra. Open it for a random 20 to 60 coal.' },
   gemBag: { name: 'Gem bag', stackable: true, value: 0, examine: 'A little pouch from Lyra. Open it for a handful of uncut gems.' },
@@ -925,4 +942,5 @@ export const itemName = (id) => ITEMS[id]?.name ?? id;
 // Outfits that give a little extra XP when every piece is worn.
 export const SETS = {
   prospector: { pieces: 4, skill: 'mining', bonus: 0.01 },
+  smith: { pieces: 4, skill: 'smithing', bonus: 0.01 },
 };

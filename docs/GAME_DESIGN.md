@@ -524,7 +524,11 @@ Rules for everything below: **every bar that needs coal takes exactly one** (iro
 
     The full prospector outfit gives +1% more, 6% in all. The outfit is only available from Lyra. Bags are used up when opened; coal or gems that don't fit in your bag go on the ground.
   - **Gem rocks** (Mining 40, 65 XP) give an uncut gem every time you mine them (sapphire most often, diamond rarely). Two in Copperdeep Depths, two in Copperdeep Hollow.
-- **Batch H — smithing features.** A chance to save a bar at higher Smithing levels, and a quest for Dorrin to fix the mine's old forge, rewarding a smithing outfit (bonus Smithing XP).
+- **Batch H — saving bars and the Cold Forge (v0.33.0).**
+  - **Saving bars:** from Smithing 40, every anvil make has a chance to give one bar back: 2% at 40, rising evenly to 10% at 99. (Smelting is unchanged.)
+  - **Quest: The Cold Forge** (needs Smithing 40 and Mining 40 to start). Ask Dorrin if he needs help: the Sunken Forge's great furnace has gone cold. He needs **25 coal**, **5 steel bars** and an **ember core**, which the Molten beast carries; it drops one, guaranteed, while you're on the quest and don't already have one. Hand them in to Dorrin to finish.
+  - **Rewards:** the great furnace burns again and works like any furnace (smelt right next to the adamantite and runite); Dorrin's **smith's outfit** — tunic (+2% Smithing XP), trousers (+1.5%), gloves (+1%), boots (+0.5%), and +1% more for the full set, 6% in all; and 1,000 Smithing XP and 500 Mining XP (before the 12× rate).
+  - Dorrin's menu tracks the quest: what he still needs, and a reminder once it's done.
 
 Suggested order: F, G, E, H.
 

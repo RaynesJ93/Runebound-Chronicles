@@ -819,8 +819,12 @@ export class Hud {
     if (!node) { this.endConversation(); return; }
     // give: { flag, items: [{ item, qty }], say } — an NPC hands you things once.
     if (node.give && this.ctx.give && !this.ctx.give(node.give) && node.giveFail) { this.goto(node.giveFail); return; }
+    // take: [{ item, qty }] — the NPC takes things from your bag (all or nothing).
+    if (node.take && this.ctx.take && !this.ctx.take(node.take) && node.takeFail) { this.goto(node.takeFail); return; }
     this.node = node;
     if (node.set) Object.assign(this.ctx.flags, node.set);
+    // reward: { xp: { skill: base XP }, quest: 'name' } — after the flags are set.
+    if (node.reward) this.ctx.reward?.(node.reward);
     const said = typeof node.say === 'function' ? node.say(this.ctx || {}) : node.say;
     const say = Array.isArray(said) ? said : said ? [said] : [];
     this.dialogLines = say.map((l) => (typeof l === 'function' ? l(this.ctx) : l));
