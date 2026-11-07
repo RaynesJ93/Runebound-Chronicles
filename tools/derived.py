@@ -304,6 +304,26 @@ def _axis2(w, h):
     return (xx + (h - 1 - yy)) / (w + h - 2), np.abs(xx - (h - 1 - yy)) / np.sqrt(2)
 
 
+def bronze_to(ref_key):
+    """The new painted held weapons are bronze all over: recolour the lighter
+    (metal) pixels to another metal's colours, keeping the dark handle and
+    outline."""
+    def fn(im, get):
+        rc = _ramp_of(get(ref_key)[0][1])
+        h = np.array(im.convert('RGBA')).astype(float)
+        a = h[..., 3] > 0
+        l = lum(h[..., :3])
+        if not a.any():
+            return im
+        metal = a & (l > np.percentile(l[a], 40))
+        v = l[metal]
+        ranks = np.argsort(np.argsort(v)) / max(1, len(v) - 1)
+        out = h.copy()
+        out[metal, :3] = rc[(ranks * (len(rc) - 1)).round().astype(int)]
+        return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+    return fn
+
+
 def metal_parts(ref_key):
     """Recolour only the grey (metal) parts to a metal's colours; wood stays."""
     def fn(im, get):
@@ -784,8 +804,9 @@ def runebound_cape(im, get=None):
 
 
 # Sprites made at a different size: new key <- source key, every frame, scale.
-SCALED = [('chars:enemy:grubnak', 'chars:enemy:goblinChief', grubnak, 2)] + [
-    (f'anim:grubnak:attack:{d}', f'anim:goblinChief:attack:{d}', grubnak, 2) for d in DIRS]
+# (Grubnak used to be the chief at twice the size; he has his own painted art
+# now, in tools/sprites/, so nothing is scaled at the moment.)
+SCALED = []
 
 
 # ---- What to make ------------------------------------------------------------------
@@ -925,20 +946,7 @@ EXTRA = [
     ('anim:moltenBeast:attack:right', 'anim:caveBeast:attack:right', molten(CHARCOAL, LAVA, beast_glow, 0.2, 0.55)),
     ('anim:forgeGolem:fall', 'anim:essenceGolem:fall', molten(IRON_BODY, LAVA, golem_glow)),
     ('anim:forgeGolem:hit', 'anim:essenceGolem:hit', molten(IRON_BODY, LAVA, golem_glow)),
-    ('chars:tobin', 'chars:finn', tobin_garb),
     ('grubnakStatue', 'chars:enemy:grubnak', stone_statue),
-    ('chars:enemy:warrenGoblin', 'chars:enemy:goblinBrute', cave_goblin),
-    ('chars:enemy:goblinDigmaster', 'chars:enemy:goblinChief', digmaster),
-    ('anim:warrenGoblin:attack:up', 'anim:goblinBrute:attack:up', cave_goblin),
-    ('anim:goblinDigmaster:attack:up', 'anim:goblinChief:attack:up', digmaster),
-    ('anim:warrenGoblin:attack:down', 'anim:goblinBrute:attack:down', cave_goblin),
-    ('anim:goblinDigmaster:attack:down', 'anim:goblinChief:attack:down', digmaster),
-    ('anim:warrenGoblin:attack:left', 'anim:goblinBrute:attack:left', cave_goblin),
-    ('anim:goblinDigmaster:attack:left', 'anim:goblinChief:attack:left', digmaster),
-    ('anim:warrenGoblin:attack:right', 'anim:goblinBrute:attack:right', cave_goblin),
-    ('anim:goblinDigmaster:attack:right', 'anim:goblinChief:attack:right', digmaster),
-    ('anim:warrenGoblin:hit', 'anim:goblinBrute:hit', cave_goblin),
-    ('anim:warrenGoblin:fall', 'anim:goblinBrute:fall', cave_goblin),
 ]
 
 # Side-on shields stay as they are (a kite shape only reads from the front or back).
@@ -968,6 +976,36 @@ def derive(get0):
     def emit(t):
         out.append(t)
         made.setdefault(t[0], []).append((t[1], t[2], t[3], t[4]))
+    # Ready-made sprites (cut from a magenta sheet and shrunk to game size, see
+    # tools/new_art.py), kept in tools/sprites/. A file is one sprite and a
+    # folder holds the frames of one; names are atlas keys with ':' as '__'.
+    # Anchors: tools/sprites/anchors.json if listed; characters and their
+    # animations are centred on their feet; anything else on its bottom middle.
+    anchors = json.load(open(os.path.join(SPRITE_DIR, 'anchors.json'))) if os.path.exists(os.path.join(SPRITE_DIR, 'anchors.json')) else {}
+    def feet(im):
+        a = np.array(im.getchannel('A')) > 0
+        rows = np.where(a.any(1))[0]
+        ay = int(rows[-1]) if len(rows) else im.height - 1
+        cols = np.where(a[max(0, ay - max(2, im.height // 5)):ay + 1].any(0))[0]
+        return (int(round((cols.min() + cols.max()) / 2)) if len(cols) else im.width // 2), ay
+    for f in sorted(os.listdir(SPRITE_DIR)) if os.path.isdir(SPRITE_DIR) else []:
+        path = os.path.join(SPRITE_DIR, f)
+        key = f.removesuffix('.png').replace('__', ':')
+        if os.path.isdir(path):
+            n = len([x for x in os.listdir(path) if x.endswith('.png')])
+            for k in range(n):
+                im = Image.open(os.path.join(path, f'{k}.png')).convert('RGBA')
+                emit((key, k, im, *feet(im)))
+        elif f.endswith('.png'):
+            im = Image.open(path).convert('RGBA')
+            ax, ay = anchors.get(key, (im.width // 2, (feet(im)[1] if key.startswith('icon') else im.height - 2)))
+            emit((key, 0, im, ax, ay))
+    # Held weapons in the other metals, from the bronze ones above.
+    for metal in ('iron', 'steel', 'mithril', 'adamant', 'rune'):
+        for kind in ('Pickaxe', 'Dart', 'ThrowingKnife', 'Javelin'):
+            for d in DIRS:
+                for k, im, ax, ay in get(f'gear:bronze{kind}:{d}'):
+                    emit((f'gear:{metal}{kind}:{d}', k, bronze_to(f'icon:{metal}SqShield')(im, get), ax, ay))
     for new, spec in DERIVED.items():
         src, fn = spec['icon']
         icons = get(f'icon:{src}')
@@ -995,12 +1033,6 @@ def derive(get0):
     for new, src, fn, k2 in SCALED:
         for k, im, ax, ay in get(src):
             emit((new, k, fn(im, get), ax * k2, ay * k2))
-    # Ready-made sprites (cut from a magenta sheet and shrunk to game size),
-    # kept in tools/sprites/<name>.png; anchored at the bottom middle.
-    for f in sorted(os.listdir(SPRITE_DIR)) if os.path.isdir(SPRITE_DIR) else []:
-        if not f.endswith('.png'): continue
-        im = Image.open(os.path.join(SPRITE_DIR, f)).convert('RGBA')
-        emit((f[:-4], 0, im, im.width // 2, im.height - 2))
     for size, scale in ((1, 0.62), (2, 0.78), (3, 0.95), (4, 1.12), (5, 1.3)):
         src = get('oreEssence')
         if not src: break

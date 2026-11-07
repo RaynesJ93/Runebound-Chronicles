@@ -16,9 +16,35 @@ before building. Sheet 21 (worn gear) is cut by its own script into
 
 ## Ready-made sprites
 
-Small one-off sprites (already cut from a magenta sheet and shrunk to game
-size) live in `tools/sprites/<name>.png`. `python3 tools/derived.py` adds any
-that aren't in the atlas yet, anchored at the bottom middle, under `<name>`.
-So far: Pell's wrecked cart and three broken barrels (`brokenCart`,
-`brokenBarrel`, `toppledBarrel`, `smashedBarrel`), and the rune-sealed door of
-Grubnak's chamber (`runeDoor`, drawn by hand in code).
+Sprites that are already cut from a magenta sheet and shrunk to game size live
+in `tools/sprites/`. `python3 tools/derived.py` adds any that aren't in the
+atlas yet. A file is one sprite and a folder holds the frames of one (0.png,
+1.png, ...); names are atlas keys with `:` written as `__` (so
+`chars__lyra/` is `chars:lyra`). Anchors come from `tools/sprites/anchors.json`
+when listed; otherwise characters and animations are centred on their feet,
+icons sit on their bottom row, and anything else is anchored at its bottom
+middle.
+
+What's there:
+- Pell's wrecked cart and three broken barrels (`brokenCart`, `brokenBarrel`,
+  `toppledBarrel`, `smashedBarrel`).
+- From the "images 01-09" sheets (Nov 2026), made by `tools/new_art.py`:
+  - Lyra, Tobin, the warren goblin, the Goblin Digmaster and Grubnak, with
+    walking frames.
+  - Grubnak's attack animation.
+  - The ten Runebound story item icons.
+  - The rune door, shut and open.
+  - Bronze held pickaxe, darts, throwing knife and javelin.
+
+  `derived.py` recolours the held weapons into iron, steel, mithril, adamant
+  and rune, and makes Grubnak's statue from his frames.
+
+To redo them from the sheets: rename the sheet files `new01_...` to `new09_...`
+(the cutter treats `07_`, `08_` and `09_` as the old character sheets), then:
+
+    python3 tools/cut_sheets.py  <sheets>  <cut>
+    python3 tools/new_art.py     <cut>
+    python3 tools/derived.py
+
+Sprites already in the atlas aren't replaced, so remove their keys from
+`assets/art.json` first when redoing one.

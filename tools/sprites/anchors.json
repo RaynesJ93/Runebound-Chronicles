@@ -1,0 +1,66 @@
+{
+ "gear:bronzeDart:down": [
+  8,
+  11
+ ],
+ "gear:bronzeDart:left": [
+  9,
+  11
+ ],
+ "gear:bronzeDart:right": [
+  1,
+  11
+ ],
+ "gear:bronzeDart:up": [
+  -2,
+  11
+ ],
+ "gear:bronzeJavelin:down": [
+  7,
+  18
+ ],
+ "gear:bronzeJavelin:left": [
+  6,
+  20
+ ],
+ "gear:bronzeJavelin:right": [
+  -2,
+  20
+ ],
+ "gear:bronzeJavelin:up": [
+  -3,
+  18
+ ],
+ "gear:bronzePickaxe:down": [
+  10,
+  14
+ ],
+ "gear:bronzePickaxe:left": [
+  10,
+  15
+ ],
+ "gear:bronzePickaxe:right": [
+  2,
+  15
+ ],
+ "gear:bronzePickaxe:up": [
+  0,
+  14
+ ],
+ "gear:bronzeThrowingKnife:down": [
+  6,
+  11
+ ],
+ "gear:bronzeThrowingKnife:left": [
+  9,
+  8
+ ],
+ "gear:bronzeThrowingKnife:right": [
+  1,
+  8
+ ],
+ "gear:bronzeThrowingKnife:up": [
+  -4,
+  11
+ ]
+}

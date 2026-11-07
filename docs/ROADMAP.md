@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 7 Nov 2026 | v0.43.0: new painted art. Lyra the Stargazer finally has a sprite; Tobin, the warren goblins, the Goblin Digmaster and Grubnak (with his own club-swinging attack) have their own art instead of recolours; the ten Runebound story items have painted icons; the rune door is painted; and pickaxes, darts, throwing knives and javelins now show in your hand when wielded, in every metal. |
 | 7 Nov 2026 | v0.42.1: Echoes of the War says who to find: once you have Holt's journal, the journal step names Tobin and his hut in north-west Thornwood, Maren points you to him, and the journal's last page says where he went. |
 | 7 Nov 2026 | v0.42.0: The Runebound, chapter 6 part 2 — the ending. Grubnak turns to stone; lay your hand on him to bind him for ever. Tobin gives you Holt's sword (Attack 35) and the Runebound cape; Maren gives 5,000 coins and a big combat XP reward and points to the old road east, the next region. The main story is complete. |
 | 5 Nov 2026 | v0.41.0: The Runebound, chapter 6 part 1 — Aldric's rune key opens the door to Grubnak's chamber (a new area), and Grubnak is the first story boss: telegraphed ground slams, war cries that call in warren goblins, an enraged phase 2 at half health, and rune pillars you can feed mind runes to pin him. Bigger boss health bar. The ending and rewards come in part 2. |
