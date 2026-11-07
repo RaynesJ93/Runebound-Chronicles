@@ -121,9 +121,13 @@ export const QUESTS = [
       { text: 'Ask Aldric in Whispering Vale for a way through the rune door', done: !!c.flags.chamberOpen || c.have('runeKey') },
       { text: "Open the rune door in the Goblin Warrens' great dig", done: !!c.flags.chamberOpen },
       { text: 'Face Grubnak in his chamber. Watch for red ground, and feed the rune pillars mind runes to pin him', done: !!c.flags.grubnakDown },
-      { text: 'Talk to Tobin. (The ending of the story is coming in the next update.)', done: false },
+      ...(c.flags.grubnakDown ? [
+        { text: 'Lay your hand on the stone that was Grubnak', done: !!c.flags.runeSealed },
+        { text: 'Talk to Tobin in the chamber', done: !!c.flags.tobinThanked },
+        { text: 'Bring the news to Elder Maren in Brambleford', done: false },
+      ] : []),
     ],
-    rewards: ['The ending of The Runebound (coming in the next update)'],
+    rewards: ["Holt's sword (Attack 35)", 'The Runebound cape (Defence 30)', '5,000 coins', 'Attack, Strength, Defence and Hitpoints XP'],
   },
   {
     id: 'coldForge',
@@ -290,6 +294,22 @@ export const QUEST_HOOKS = [
     area: 'warrens', type: 'runeDoor', at: { x: 22, y: 5 },
     when: (f) => f.chamberOpen,
     say: (f) => [f.grubnakDown ? "The rune door stands open. Grubnak's chamber is quiet now." : "The rune door stands open. Beyond it, something huge is breathing."],
+  },
+  // Chapter 6, the ending: bind Grubnak for ever.
+  {
+    area: 'chamber', type: 'grubnakStatue', at: { x: 15, y: 11 },
+    when: (f) => f.grubnakDown && !f.runeSealed,
+    say: ['You lay your hand on the stone. It is warm, and under your palm something is still moving, very slowly.',
+      'The runes on his skin flare white, brighter and brighter, until you have to look away.',
+      'Then they sink into the stone, one by one, like water into sand. The warmth fades. The stone is cold.',
+      'The chains of light let go of the pillars and settle over him like a net, and they too turn to stone.',
+      'Grubnak is runebound: stone for ever.'],
+    set: { runeSealed: true },
+  },
+  {
+    area: 'chamber', type: 'grubnakStatue', at: { x: 15, y: 11 },
+    when: (f) => f.runeSealed,
+    say: ['Grubnak, runebound: a statue of grey stone, wrapped in stone chains. The runes on him are dark now.', 'Forty years of fear, and it ends as a statue in a cave.'],
   },
   // The Goblin Chief's hut: knock to wake him (chapter 3).
   {
