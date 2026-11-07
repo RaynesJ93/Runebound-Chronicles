@@ -823,7 +823,7 @@ export const ITEMS = {
       'Day 44. It is done. The runekeepers from the Vale bound him with their runes, deep under the stones of the old cave in the north-west, and sealed the mouth with boulders.',
       'The binding is held by a runestone they set in the stone shrine on the eastern hill. While the stone sits in the shrine, Grubnak sleeps. Tobin and I will keep watch over it.',
       'Day 45. The village will be told he is dead. Better they sleep easy. Better nobody goes looking for that cave.',
-      'If you are reading this and I am gone: find Tobin. Keep the stone safe. — E. H.',
+      'If you are reading this and I am gone: find Tobin. He says he will build himself a hut by the old cave in the north-west of Thornwood, and never leave it. Keep the stone safe. — E. H.',
     ],
   },
   smithsTunic: {

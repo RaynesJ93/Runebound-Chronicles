@@ -59,7 +59,7 @@ export const NPCS = [
           say: (c) => (c.flags.hermitTold
             ? ['You look like you have news.']
             : [`Have you been to the memorial in the graveyard${c.flags.warMemorial ? '? Yes, good' : ' yet'}? And the old watchtower${c.flags.warJournal ? '? Good' : ''}?`,
-              c.flags.warJournal ? "A journal of Holt's? Then he mentions others who fought. Find them, if any still live." : 'Holt kept a post at the old watchtower, north of the road.']),
+              c.flags.warJournal ? "A journal of Holt's? And it names a young soldier called Tobin? There's an old hermit called Tobin in the hut in north-west Thornwood, near the sealed cave. He keeps to himself. Folk say he was a soldier once. Go and see him." : 'Holt kept a post at the old watchtower, north of the road.']),
           choices: [
             { text: "Grubnak isn't dead.", next: 'warHandIn', if: (c) => c.flags.hermitTold && c.flags.warMemorial },
             { text: "Grubnak isn't dead.", next: 'warNotYet', if: (c) => c.flags.hermitTold && !c.flags.warMemorial },

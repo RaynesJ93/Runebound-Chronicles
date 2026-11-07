@@ -42,7 +42,9 @@ export const QUESTS = [
     steps: (c) => [
       { text: 'Read the war memorial in the old graveyard, in the south of Thornwood', done: !!c.flags.warMemorial },
       { text: 'Search the old watchtower in Thornwood', done: !!c.flags.warJournal },
-      { text: 'Find someone who remembers the war', done: !!c.flags.hermitTold },
+      { text: c.flags.warJournal
+        ? "Find Tobin, the young soldier in Holt's journal. He's now the hermit in the hut in north-west Thornwood"
+        : 'Find someone who remembers the war. Holt\'s journal, in the watchtower, may name someone', done: !!c.flags.hermitTold },
       { text: 'Tell Elder Maren what you learned', done: false },
     ],
     rewards: ['600 coins', 'Attack, Strength and Defence XP', 'The story continues in chapter 3'],
