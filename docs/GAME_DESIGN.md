@@ -745,6 +745,8 @@ Part 1 ends with Grubnak down and Tobin at your side; part 2 adds the ending sce
 
 Afterwards, both Tobins (at the hut and in the chamber) and Maren have new lines, and the statue can still be looked at.
 
+**Art (v0.43.0).** Lyra, Tobin, the warren goblins, the Digmaster and Grubnak (with a three-frame club attack) are painted from their own sheets; warren goblins and the Digmaster lunge instead of using an attack animation. The story items and the rune door are painted too. Wielded pickaxes, darts, throwing knives and javelins are drawn in your hand: painted in bronze and recoloured for the other metals.
+
 **Boss engine (v0.41.0).** An enemy's `mechanics` (in `data/enemies.js`) can give it telegraphed slams (warning tiles that land a few ticks later), war cries that summon temporary adds, a phase 2 at a share of its health with stat changes, and chains to pillars that the player can use to stun it. Doors other than the sealed cave can open with the story (`openable` with `openFlag`).
 
 **Quest spawns (v0.38.0).** An enemy in an area's spawn list can have `when(flags)`: it only appears once that's true (the Goblin Chief appears when `chiefAwake` is set), including straight away if you're standing in the area when it happens.
