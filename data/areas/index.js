@@ -11,8 +11,10 @@ import { buildVale } from './vale.js';
 import { buildWarrens } from './warrens.js';
 import { buildChamber } from './chamber.js';
 import { waterEdges } from './decor.js';
+import { withLodestones } from '../lodestones.js';
 
-export const AREAS = {
+// (Each area's lodestone, if it has one, is added as it's built: data/lodestones.js.)
+const BUILD = {
   brambleford: () => waterEdges(buildBrambleford()),
   route1: () => waterEdges(buildRoute1()),
   store: buildStore,
@@ -25,5 +27,6 @@ export const AREAS = {
   warrens: buildWarrens,
   chamber: buildChamber,
 };
+export const AREAS = Object.fromEntries(Object.entries(BUILD).map(([id, fn]) => [id, () => withLodestones(fn())]));
 
 export const START_AREA = 'brambleford';

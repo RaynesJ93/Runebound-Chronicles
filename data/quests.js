@@ -17,6 +17,19 @@
 
 export const QUESTS = [
   {
+    id: 'lodestones',
+    name: 'The Sleeping Stones',
+    giver: { name: 'Aldric the Runekeeper', where: 'Whispering Vale', area: 'vale' },
+    about: "The runekeepers' old lodestones once let travellers step from one end of the land to the other. They have slept since the Goblin War. Wake them.",
+    requires: { runecrafting: 5 },
+    flag: 'lodeQuest',
+    steps: (c) => [
+      { text: `Bring Aldric 20 air runes (you have ${c.count('airRune')}) and 10 rune essence (you have ${c.count('runeEssence')})`, done: !!c.flags.lodeVale },
+      { text: "Touch the lodestone in Brambleford's square to wake the network", done: !!c.flags.lodeOn },
+    ],
+    rewards: ['Teleport between lodestones in every area', 'Runecrafting and Magic XP'],
+  },
+  {
     id: 'cart',
     chapter: 1,
     name: 'The Overturned Cart',

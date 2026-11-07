@@ -50,6 +50,8 @@ function getLib() {
     runeDoor: art('runeDoor')?.[0] || null,
     runeDoorOpen: art('runeDoorOpen')?.[0] || null,
     grubnakStatue: art('grubnakStatue')?.[0] || null,
+    lodestone: art('lodestone')?.[0] || null,
+    lodestoneLit: art('lodestoneLit')?.[0] || null,
     brokenBarrel: art('brokenBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
     toppledBarrel: art('toppledBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
     smashedBarrel: art('smashedBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
@@ -225,6 +227,12 @@ export function createWorldView(canvasEl, area) {
       case 'shelf': place(p.variant !== undefined ? lib.shelf[p.variant % lib.shelf.length] : pick(lib.shelf, p), f.x, f.y + 2); break;
       case 'barrel': place(lib.barrel, f.x, f.y); break;
       case 'brokenCart': place(lib.brokenCart, f.x, f.y + 1); break;
+      case 'lodestone': {
+        // dull while dormant, glowing once awake (p.opened, set in main.js)
+        const dim = lib.lodestone || lib.standingStone[0], lit = lib.lodestoneLit || lib.runeStone || dim;
+        place(dim, f.x, f.y, { prop: p, open: { img: lit.img, x: Math.round(f.x - lit.ax), y: Math.round(f.y - lit.ay) } });
+        break;
+      }
       case 'grubnakStatue': if (lib.grubnakStatue) place(lib.grubnakStatue, f.x, f.y, { prop: p, hideShut: true }); break;
       case 'runeDoor': {
         const shut = lib.runeDoor || lib.caveMouth[1], open = lib.runeDoorOpen || lib.caveMouth[0];

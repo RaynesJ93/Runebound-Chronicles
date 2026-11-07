@@ -800,6 +800,8 @@ export const NPCS = [
           { text: 'How do I make runes?', next: 'how' },
           { text: 'Tell me about the altars.', next: 'altars' },
           { text: 'What is that chest?', next: 'chest' },
+          { text: 'What are those old standing stones?', next: 'lode', if: (c) => !c.flags.lodeQuest },
+          { text: 'About the sleeping stones...', next: 'lodeProgress', if: (c) => c.flags.lodeQuest === 'started' },
           { text: 'I have pieces of a runestone.', next: 'stone', if: (c) => c.flags.stoneQuest === 'started' },
           { text: 'How is the runestone?', next: 'remake', if: (c) => c.flags.stoneQuest === 'done' && !c.flags.remakeQuest },
           { text: 'About remaking the stone...', next: 'remakeProgress', if: (c) => c.flags.remakeQuest === 'started' && !c.flags.stoneRemade },
@@ -808,6 +810,44 @@ export const NPCS = [
           { text: "We need to open Grubnak's door.", next: 'key', if: (c) => c.flags.finalQuest === 'started' && !c.flags.chamberOpen && !c.have('runeKey') },
           { text: 'Farewell, Aldric.', next: 'bye' },
         ] },
+
+        // ---- Side quest: The Sleeping Stones (lodestones, data/lodestones.js) ----------
+        lode: {
+          say: ['The lodestones? Ah. My order raised them, long before I was born. One in every corner of the land.',
+            'Touch one, and it would carry you to any other you had touched before. Merchants, healers, runekeepers: everyone used them.',
+            'When Grubnak came, we put them to sleep, so his horde could not use them. And nobody ever woke them again.',
+            'I could. With enough runes to give them a push, and a pair of hands to wake the one in Brambleford, where the network meets.'],
+          choices: [
+            { text: "I'll help you wake them.", next: 'lodeStart', if: (c) => c.level('runecrafting') >= 5 },
+            { text: "I'll help you wake them.", next: 'lodeTooLow', if: (c) => c.level('runecrafting') < 5 },
+            { text: 'Maybe later.', next: 'menu' },
+          ],
+        },
+        lodeTooLow: { say: (c) => [`The stones only answer to someone who knows a little of runes. Come back with Runecrafting 5 (you have ${c.level('runecrafting')}).`], next: 'menu' },
+        lodeStart: {
+          set: { lodeQuest: 'started' },
+          say: ['Wonderful. Bring me twenty air runes, to carry the call, and ten rune essence, to wake the stone here.', 'Air runes are made at the air altar, to the north-east of the camp.'],
+          next: 'menu',
+        },
+        lodeProgress: {
+          say: (c) => (c.flags.lodeVale
+            ? ["Our stone is awake. Now go to Brambleford and lay your hand on the lodestone in the village square, north of the well. That will wake the rest."]
+            : [`Twenty air runes and ten rune essence. You have ${c.count('airRune')} air runes and ${c.count('runeEssence')} essence.`]),
+          choices: [
+            { text: 'Here they are.', next: 'lodeHandIn', if: (c) => !c.flags.lodeVale && c.count('airRune') >= 20 && c.count('runeEssence') >= 10 },
+            { text: 'Thanks.', next: 'menu' },
+          ],
+        },
+        lodeHandIn: {
+          take: [{ item: 'airRune', qty: 20 }, { item: 'runeEssence', qty: 10 }],
+          takeFail: 'lodeProgress',
+          set: { lodeVale: true },
+          reward: { xp: { runecrafting: 100 } },
+          say: ['Aldric walks to the old standing stone by the camp and presses the essence into the cracks round its rune. Then he throws the air runes up over it.',
+            'They burst into a little whirlwind of light, and the rune drinks it in. The stone begins to glow.',
+            "There. Ours is awake. But a lodestone alone is just a pretty rock. Go to Brambleford, to the stone in the village square, north of the well, and lay your hand on it. It will wake the others."],
+          next: 'menu',
+        },
 
         // ---- The Runebound, chapter 3: The Empty Hollow -----------------------------
         stone: {
