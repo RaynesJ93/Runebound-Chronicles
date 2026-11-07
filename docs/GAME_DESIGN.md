@@ -654,6 +654,25 @@ A map button (top right, or M on a keyboard) opens the map of the area you're in
 
 The map shows the ground, trees, water and buildings drawn small, and on top: place names (from `data/mapLabels.js`), villagers (yellow dots) and monsters (red; the Alpha Wolf ringed in gold) where they are right now, the ways out to other areas, and icons for the bank and shop, fishing, mining, smithing, cooking, tanning and runecrafting altars. Tap any marker to see what it is. Everything except the place names is read from the area data, so new areas and skilling spots show up by themselves; a new area only needs adding to `MAP_AREAS` and its labels.
 
+### Lodestones (v0.44.0)
+
+Ancient standing stones the runekeepers raised long ago, one in each main area, that let you teleport between them. They have been dormant since the Goblin War. A short side quest from Aldric, **The Sleeping Stones** (needs Runecrafting 5), wakes them: bring him **20 air runes and 10 rune essence**, and he wakes the Vale's stone and sends you to wake the one in Brambleford's square. Waking it finishes the quest (Runecrafting and Magic XP) and switches the network on.
+
+| Lodestone | Where |
+| --- | --- |
+| Brambleford | The village square, north of the well |
+| Thornwood | By the crossroads |
+| Copperdeep Mine | Beside the furnace and anvil |
+| The Sunken Forge | The landing at the bottom of the stairs |
+| Whispering Vale | By the runekeepers' camp |
+| Goblin Warrens | The landing (once the sealed cave is open) |
+
+- Each other stone has to be **attuned** once, by touching it: you have to walk there the first time.
+- Touch any awake lodestone to open the list of attuned stones and pick one. You arrive standing just south of it, with the usual fade.
+- Teleporting is free and works any time you're not in a fight.
+- Dormant stones (quest not done) are drawn dull grey; awake ones glow blue. Attuned lodestones show on the map.
+- Flags: `lodeQuest` ('started'/'done') and `lodestones` (the attuned stones, by id).
+
 ### Quest journal (v0.36.0)
 
 A **Quests** button under the Guide (or Q on a keyboard) lists every quest in `data/quests.js`, so a new quest appears there as soon as it's added to that list (with its dialogue in `npcs.js`). Each quest shows its status (not available yet / available / in progress / complete), what it's about, who starts it (with a map pin), its skill requirements with a tick or cross against your levels, a live checklist while it's in progress (e.g. "Bring Dorrin 25 coal (you have 12)"), and its rewards. In-progress quests come first, then available, then locked, then complete. The button glows while there's a quest you can start that you haven't looked at yet.

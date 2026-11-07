@@ -803,6 +803,40 @@ def runebound_cape(im, get=None):
     return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
 
 
+# ---- Lodestones: the mossy standing stone, its rune dull while dormant and
+# blazing blue once woken ----
+
+def _rune_mask(rgba):
+    hsv = np.array(Image.fromarray(rgba.astype(np.uint8), 'RGBA').convert('RGB').convert('HSV')).astype(np.float32)
+    return (rgba[..., 3] > 0) & (hsv[..., 0] > 100) & (hsv[..., 0] < 150) & (hsv[..., 1] > 40)
+
+
+def lodestone_dormant(im, get=None):
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    m = _rune_mask(rgba)
+    g = lum(rgba[..., :3])[m]
+    rgba[m, 0] = rgba[m, 1] = g * 0.62
+    rgba[m, 2] = g * 0.66
+    return Image.fromarray(rgba.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
+def lodestone_lit(im, get=None):
+    w, h = im.size
+    base = np.array(im.convert('RGBA')).astype(np.float32)
+    m = _rune_mask(base)
+    l = lum(base[..., :3]) / 255
+    base[m, :3] = J.ramp(['#2a90d0', '#3aa8e0', '#7ae4ff', '#d8faff'], np.clip((l - 0.3) * 2, 0, 1))[m]
+    # a soft blue glow around the stone (2 px border added)
+    out = np.zeros((h + 4, w + 4, 4), np.float32)
+    a = np.zeros((h + 4, w + 4), bool)
+    a[2:-2, 2:-2] = base[..., 3] > 0
+    from scipy import ndimage
+    halo = ndimage.binary_dilation(a, iterations=2) & ~a
+    out[halo] = (90, 210, 255, 110)
+    out[2:-2, 2:-2][base[..., 3] > 0] = base[base[..., 3] > 0]
+    return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA'), 2  # 2 px bigger on each side
+
+
 # Sprites made at a different size: new key <- source key, every frame, scale.
 # (Grubnak used to be the chief at twice the size; he has his own painted art
 # now, in tools/sprites/, so nothing is scaled at the moment.)
@@ -947,6 +981,8 @@ EXTRA = [
     ('anim:forgeGolem:fall', 'anim:essenceGolem:fall', molten(IRON_BODY, LAVA, golem_glow)),
     ('anim:forgeGolem:hit', 'anim:essenceGolem:hit', molten(IRON_BODY, LAVA, golem_glow)),
     ('grubnakStatue', 'chars:enemy:grubnak', stone_statue),
+    ('lodestone', 'standingStone', lodestone_dormant),
+    ('lodestoneLit', 'standingStone', lodestone_lit),
 ]
 
 # Side-on shields stay as they are (a kite shape only reads from the front or back).
@@ -1029,7 +1065,10 @@ def derive(get0):
                     emit((f'gear:{new}:{d}', k, f(im, get), ax, ay))
     for new, src, fn in EXTRA:
         for k, im, ax, ay in get(src):
-            emit((new, k, fn(im, get), ax, ay))
+            r = fn(im, get)
+            pad = 0
+            if isinstance(r, tuple): r, pad = r  # grew by `pad` pixels on every side
+            emit((new, k, r, ax + pad, ay + pad))
     for new, src, fn, k2 in SCALED:
         for k, im, ax, ay in get(src):
             emit((new, k, fn(im, get), ax * k2, ay * k2))

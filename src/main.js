@@ -24,6 +24,7 @@ import { GroundItems } from './items/ground.js';
 import { rollLoot } from './items/loot.js';
 import { ITEMS, itemName, SETS } from '../data/items.js';
 import { itemIcon } from './render/items.js';
+import { iconUrl } from './render/icons.js';
 import { Bank } from './items/bank.js';
 import { Shop } from './items/shop.js';
 import { SHOPS } from '../data/shops.js';
@@ -34,6 +35,7 @@ import { ROCKS, PICKAXES, MINE_TICKS, gemChance, rollGem } from '../data/mining.
 import { STAR_SITES, DUST_PER_SIZE, FIRST_STAR, NEXT_STAR, STAR_LIFETIME, rollSize } from '../data/stars.js';
 import { MAP_NAME } from '../data/mapLabels.js';
 import { QUESTS, questStatus, QUEST_HOOKS, QUEST_DROPS } from '../data/quests.js';
+import { LODESTONES } from '../data/lodestones.js';
 import { SMELTING, SMITHING, saveBarChance } from '../data/smithing.js';
 import { SPOTS, FISH_TICKS, spotLevel } from '../data/fishing.js';
 import { COOKING } from '../data/cooking.js';
@@ -349,6 +351,7 @@ function boot() {
   const questCtx = () => ({ flags: state.flags, level: (sk) => book.level(sk), count: (id) => inventory.count(id), have: (id) => haveAnywhere(id),
     holdingPickaxe: () => PICKAXES.some((t) => hasItem(t.id)) });
   const refreshQuests = () => {
+    syncCaves(); // doors, caves and lodestones the story has just opened or woken
     const c = questCtx();
     hud.setQuestsNew(QUESTS.some((q) => questStatus(q, c) === 'available' && !state.flags[`seenQuest_${q.id}`]));
     if (hud.questsOpen) hud.renderQuests(c);
@@ -650,6 +653,7 @@ function boot() {
       combat.setWorld(area, enemies);
       syncStar();
       syncForge();
+      syncCaves();
       view.resize();
       applySettings();
       const s = area.spawn;
@@ -685,6 +689,7 @@ function boot() {
       combat.setWorld(area, enemies);
       syncStar();
       syncForge();
+      syncCaves();
       view.resize();
       applySettings();
       player.teleport(area, exit.at.x + exit.offset, exit.at.y, exit.facing ?? player.facing);
@@ -763,7 +768,7 @@ function boot() {
   };
 
   // Long-press (phone) or right-click (computer): every option for what's there.
-  const PROP_NAME = { sign: 'sign', door: 'door', well: 'well', stall: 'stall', brokenCart: 'broken cart', runeDoor: 'rune door', grubnakStatue: 'stone Grubnak', brokenBarrel: 'barrel', toppledBarrel: 'barrel', smashedBarrel: 'broken barrel', counter: 'counter', bankBooth: 'bank booth', fallenTree: 'fallen tree', logPile: 'log pile', tent: 'tent', campfire: 'campfire', scarecrow: 'scarecrow', lamp: 'lamp' };
+  const PROP_NAME = { sign: 'sign', door: 'door', well: 'well', stall: 'stall', brokenCart: 'broken cart', lodestone: 'lodestone', runeDoor: 'rune door', grubnakStatue: 'stone Grubnak', brokenBarrel: 'barrel', toppledBarrel: 'barrel', smashedBarrel: 'broken barrel', counter: 'counter', bankBooth: 'bank booth', fallenTree: 'fallen tree', logPile: 'log pile', tent: 'tent', campfire: 'campfire', scarecrow: 'scarecrow', lamp: 'lamp' };
   input.onLongPress = (sx, sy) => {
     if (hud.dialogOpen || !ready()) return;
     const t = view.screenToTile(sx, sy);
@@ -999,6 +1004,7 @@ function boot() {
     }
     if (prop.grave) { graveMenu(); return; }
     if (prop.pillar) { usePillar(prop); return; }
+    if (prop.lodestone) { useLodestone(prop); return; }
     if (prop.hideShut && !prop.opened) return; // not there yet
     if (prop.type === 'tree' || prop.type === 'ore' || prop.type === 'fishingSpot') { startGather(prop); return; }
     if (prop.type === 'altar') { lastStation = null; startRunecraft(prop); return; }
@@ -1044,9 +1050,57 @@ function boot() {
   };
   // Doors and cave mouths marked `openable` are drawn open once the story opens
   // them (their openFlag, or caveOpen).
-  const syncCaves = () => {
+  function syncCaves() { // (a function declaration, so refreshQuests can call it from the start)
     for (const w of worlds.values()) for (const p of w.area.props) if (p.openable) p.opened = !!state.flags[p.openFlag || 'caveOpen'];
+  }
+  // ---- Lodestones (data/lodestones.js) ---------------------------------------------
+  // Dormant until The Sleeping Stones; then touch one once to attune it, and any
+  // awake stone lists the attuned ones to travel to.
+  const useLodestone = (p) => {
+    const f = state.flags;
+    const here = LODESTONES.find((l) => l.id === p.lodestone);
+    if (!f.lodeOn) {
+      if (here.id === 'brambleford' && f.lodeQuest === 'started' && f.lodeVale) {
+        hud.showDialog(['You lay your hand on the great rune. For a moment nothing happens.',
+          'Then it flares blue, and you feel it: a hum, running away under your feet in every direction at once, to stones you cannot see.',
+          'One by one, far away, they answer. The lodestones are awake.'], () => {
+          Object.assign(f, { lodeOn: true, lodeQuest: 'done' });
+          f.lodestones = { ...(f.lodestones || {}), vale: true, brambleford: true };
+          book.add('runecrafting', 300);
+          book.add('magic', 200);
+          hud.message('Quest complete: The Sleeping Stones!');
+          hud.toast?.('Quest complete: The Sleeping Stones!');
+          hud.message('Touch a lodestone to travel. Touch each new one once to attune to it.');
+          syncCaves();
+          refreshQuests();
+          save();
+        });
+        return;
+      }
+      if (here.id === 'vale' && f.lodeVale) { hud.showDialog(['The Vale lodestone hums, but it is alone. Aldric said to wake the one in Brambleford\'s square.']); return; }
+      hud.showDialog([...p.interact, f.lodeQuest ? 'It is dormant. Aldric knows how to wake these.' : "Its rune is dull and cold. The runekeepers in Whispering Vale might know what it's for."]);
+      return;
+    }
+    const tuned = (f.lodestones ||= {});
+    if (!tuned[here.id]) {
+      tuned[here.id] = true;
+      hud.message(`The rune flares under your hand. You are attuned to the ${here.name} lodestone.`);
+      save();
+    }
+    const dests = LODESTONES.filter((l) => l.id !== here.id && tuned[l.id]);
+    if (!dests.length) { hud.message('No other lodestones are attuned yet. Touch each one once to add it.'); return; }
+    if (combat.target) { hud.message("You can't travel while you're fighting."); return; }
+    const r = canvas.getBoundingClientRect();
+    hud.showMenu(r.width / 2, r.height / 2, 'Travel by lodestone', [
+      ...dests.map((l) => ({ label: l.name, icon: iconUrl('runecrafting'), fn: () => lodeTravel(l) })),
+      { label: 'Stay here', fn: () => {} },
+    ]);
   };
+  const lodeTravel = (l) => {
+    hud.message(`The rune blazes, and the world folds. You step out beside the ${l.name} lodestone.`);
+    travel({ to: l.area, at: { x: l.x, y: l.y + 1 }, offset: 0, facing: 0 });
+  };
+
   // Rune pillars in a boss's chamber: 10 mind runes tighten its chain.
   const PILLAR_RUNES = 10;
   const usePillar = (p) => {
