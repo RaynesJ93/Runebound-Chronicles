@@ -49,6 +49,7 @@ function getLib() {
     brokenCart: art('brokenCart')?.[0] || art('stall')?.[0] || S.stall(),
     runeDoor: art('runeDoor')?.[0] || null,
     runeDoorOpen: art('runeDoorOpen')?.[0] || null,
+    grubnakStatue: art('grubnakStatue')?.[0] || null,
     brokenBarrel: art('brokenBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
     toppledBarrel: art('toppledBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
     smashedBarrel: art('smashedBarrel')?.[0] || art('barrel')?.[0] || S.barrel(),
@@ -224,6 +225,7 @@ export function createWorldView(canvasEl, area) {
       case 'shelf': place(p.variant !== undefined ? lib.shelf[p.variant % lib.shelf.length] : pick(lib.shelf, p), f.x, f.y + 2); break;
       case 'barrel': place(lib.barrel, f.x, f.y); break;
       case 'brokenCart': place(lib.brokenCart, f.x, f.y + 1); break;
+      case 'grubnakStatue': if (lib.grubnakStatue) place(lib.grubnakStatue, f.x, f.y, { prop: p, hideShut: true }); break;
       case 'runeDoor': {
         const shut = lib.runeDoor || lib.caveMouth[1], open = lib.runeDoorOpen || lib.caveMouth[0];
         place(shut, f.x, f.y + 1, p.openable ? { prop: p, open: { img: open.img, x: Math.round(f.x - open.ax), y: Math.round(f.y + 1 - open.ay) } } : {});
@@ -645,6 +647,7 @@ export function createWorldView(canvasEl, area) {
     for (const o of list) {
       if (o.prop?.cold && o.cold) { ctx.drawImage(o.cold.img, o.x, o.y); continue; } // the great furnace, before it's lit
       if (o.prop?.opened && o.open) { ctx.drawImage(o.open.img, o.open.x, o.open.y); continue; } // the sealed cave, broken open
+      if (o.hideShut && !o.prop?.opened) continue; // not there yet (Grubnak's statue)
       if (o.prop?.depleted) {
         // A chopped-down tree: just its stump until it grows back.
         const st = o.alt || lib.stump[(o.prop.x + o.prop.y) % lib.stump.length];

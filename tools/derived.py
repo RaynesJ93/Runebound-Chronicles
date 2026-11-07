@@ -724,6 +724,65 @@ def grubnak(im, get=None):
     return Image.fromarray(b, 'RGBA')
 
 
+# ---- The Runebound, the ending: Grubnak turned to stone, Holt's sword and the
+# Runebound cape ----
+
+STATUE = ['#2a2c2c', '#4a4e4c', '#6e7270', '#9a9e9a', '#bcc0ba']
+
+
+def stone_statue(im, get=None):
+    """Grubnak as a statue: every colour turned to weathered grey stone, his
+    rune marks still glowing faintly blue."""
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    m = rgba[..., 3] > 0
+    glow = m & (rgba[..., 2] > 200) & (rgba[..., 1] > 180) & (rgba[..., 0] < 200)
+    l = lum(rgba[..., :3]) / 255
+    lo, hi = np.percentile(l[m], 2), np.percentile(l[m], 99)
+    t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+    out = rgba.copy()
+    out[m, :3] = J.ramp(STATUE, t)[m]
+    out[glow, :3] = (70, 150, 190)
+    return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
+def holts_blade(im, get=None):
+    """Steel longsword -> Captain Holt's old sword: a darker, older blade and a
+    worn gold hilt."""
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.float32)
+    h, s = hsv[..., 0], hsv[..., 1]
+    m = rgba[..., 3] > 0
+    warm = m & ((h < 45) | (h > 215)) & (s > 60)  # the hilt and grip (red-brown wraps round the hue wheel)
+    metal = m & ~warm
+    l = lum(rgba[..., :3]) / 255
+    out = rgba.copy()
+    out[metal, :3] = out[metal, :3] * 0.9 + np.array([4, 2, -4])
+    if warm.any():
+        lo, hi = np.percentile(l[warm], 3), np.percentile(l[warm], 99)
+        t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+        out[warm, :3] = J.ramp(['#4a3208', '#8a6418', '#c89a30', '#f0d070'], t)[warm]
+    return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
+def runebound_cape(im, get=None):
+    """The wolf-pelt cloak, dyed deep midnight blue, with a glowing rune."""
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    m = rgba[..., 3] > 0
+    l = lum(rgba[..., :3]) / 255
+    lo, hi = np.percentile(l[m], 3), np.percentile(l[m], 99)
+    t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+    out = rgba.copy()
+    out[m, :3] = J.ramp(['#0c1020', '#1a2444', '#2c3c6a', '#4a5e96'], t)[m]
+    ys, xs = np.nonzero(m)
+    if len(xs):  # a small rune in the middle of the cloak
+        cy, cx = int(ys.mean()), int(xs.mean())
+        for dy, dx in ((-2, 0), (-1, 0), (0, 0), (1, 0), (2, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)):
+            y, x = cy + dy, cx + dx
+            if 0 <= y < out.shape[0] and 0 <= x < out.shape[1] and m[y, x]:
+                out[y, x, :3] = (190, 245, 255) if dx == 0 else (110, 225, 255)
+    return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
 # Sprites made at a different size: new key <- source key, every frame, scale.
 SCALED = [('chars:enemy:grubnak', 'chars:enemy:goblinChief', grubnak, 2)] + [
     (f'anim:grubnak:attack:{d}', f'anim:goblinChief:attack:{d}', grubnak, 2) for d in DIRS]
@@ -774,6 +833,8 @@ STEEL = ['Dagger', 'Axe', 'Pickaxe', 'Mace', 'MedHelm', 'Sword', 'Scimitar', 'Lo
          'Boots', 'Gauntlets', 'Spear', 'Warhammer', '2hSword', 'Dart', 'DartTip', 'ThrowingKnife', 'Javelin', 'JavelinHeads']
 for part in STEEL:
     DERIVED[f'steel{part}'] = dict(icon=(f'iron{part}', steel), small=(f'iron{part}', steel), gear=(f'iron{part}', steel))
+DERIVED['holtsSword'] = dict(icon=('steelLongsword', holts_blade), small=('steelLongsword', holts_blade), gear=('steelLongsword', holts_blade))
+DERIVED['runeboundCape'] = dict(icon=('wolfCloak', runebound_cape), small=('wolfCloak', runebound_cape), gear=('wolfCloak', runebound_cape))
 DERIVED['coal'] = dict(icon=('ironOre', coal_lump), small=('ironOre', coal_lump))
 
 # Silver, gold and gems. Jewellery is drawn in code (tools/jewel_art.py).
@@ -865,6 +926,7 @@ EXTRA = [
     ('anim:forgeGolem:fall', 'anim:essenceGolem:fall', molten(IRON_BODY, LAVA, golem_glow)),
     ('anim:forgeGolem:hit', 'anim:essenceGolem:hit', molten(IRON_BODY, LAVA, golem_glow)),
     ('chars:tobin', 'chars:finn', tobin_garb),
+    ('grubnakStatue', 'chars:enemy:grubnak', stone_statue),
     ('chars:enemy:warrenGoblin', 'chars:enemy:goblinBrute', cave_goblin),
     ('chars:enemy:goblinDigmaster', 'chars:enemy:goblinChief', digmaster),
     ('anim:warrenGoblin:attack:up', 'anim:goblinBrute:attack:up', cave_goblin),

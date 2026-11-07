@@ -29,7 +29,8 @@ export const NPCS = [
           choices: [
             { text: 'Pell found this token in his strongbox...', next: 'war', if: (c) => c.flags.cartQuest === 'done' && !c.flags.warQuest },
             { text: 'About the Goblin War...', next: 'warProgress', if: (c) => c.flags.warQuest === 'started' },
-            { text: 'About Grubnak...', next: 'warDone', if: (c) => c.flags.warQuest === 'done' },
+            { text: "It's over. Grubnak is bound for ever.", next: 'finalEnd', if: (c) => c.flags.finalQuest === 'started' && c.flags.tobinThanked },
+            { text: 'About Grubnak...', next: 'warDone', if: (c) => c.flags.warQuest === 'done' && !(c.flags.finalQuest === 'started' && c.flags.tobinThanked) },
             { text: 'Tell me about Brambleford.', next: 'town' },
             { text: "What's north of the village?", next: 'north' },
             { text: 'How do I get stronger?', next: 'stronger' },
@@ -76,8 +77,23 @@ export const NPCS = [
             "Take this, for your trouble. And thank you. I need to think about what we do next. Come and see me again soon."],
           next: 'more',
         },
+        // ---- The Runebound, the ending -------------------------------------------------
+        finalEnd: {
+          give: { flag: 'finalPaid', items: [{ item: 'coins', qty: 5000 }] },
+          giveFail: 'warFull',
+          set: { finalQuest: 'done' },
+          reward: { xp: { attack: 800, strength: 800, defence: 800, hitpoints: 800 }, quest: 'The Runebound' },
+          say: ['Bound? For ever? Turned to stone?', '...', '*Maren takes both your hands in hers. Her eyes are wet.*',
+            'Forty years. Holt lied to keep us safe, and Tobin gave up his whole life to keep the lie true. And you ended it.',
+            'Brambleford owes you more than it can pay. But take this: the village chest, every coin we could spare. There will be a feast, and you will sit at the head of the table.',
+            'And one more thing. Since the war, the old road east of Whispering Vale has been closed. Nobody dared open it with Grubnak under our feet.',
+            'Now we can. There is a whole world out there. When you are ready, I think it is waiting for you.'],
+          next: 'more',
+        },
         warFull: { say: "Your bag's full, dear. Make a little room and come back.", next: 'more' },
-        warDone: { say: (c) => (c.flags.stoneQuest === 'done'
+        warDone: { say: (c) => (c.flags.finalQuest === 'done'
+          ? ['Grubnak, a statue in a cave. I go and look at the war memorial sometimes now, and for the first time in my life it feels finished.', 'Have you thought about the east road? There is a whole world past the Vale.']
+          : c.flags.stoneQuest === 'done'
           ? ['The pieces of the stone are with Aldric? Thank the stars. Help him however you can.']
           : ["Grubnak, bound under the old cave. I still can't quite believe it.", "Tobin has watched that binding for forty years. Go and see him. He'll know what needs doing."]), next: 'more' },
         town: {
@@ -95,6 +111,7 @@ export const NPCS = [
           next: 'more',
         },
         more: { say: 'Anything else?', choices: [
+          { text: "It's over. Grubnak is bound for ever.", next: 'finalEnd', if: (c) => c.flags.finalQuest === 'started' && c.flags.tobinThanked },
           { text: 'Pell found this token in his strongbox...', next: 'war', if: (c) => c.flags.cartQuest === 'done' && !c.flags.warQuest },
           { text: 'About the Goblin War...', next: 'warProgress', if: (c) => c.flags.warQuest === 'started' },
           { text: 'Tell me about Brambleford.', next: 'town' },
@@ -504,6 +521,7 @@ export const NPCS = [
             { text: 'I found these orders on the Digmaster.', next: 'caveEnd', if: (c) => c.flags.caveQuest === 'started' && c.count('digmastersOrders') > 0 },
             { text: 'What now?', next: 'final', if: (c) => c.flags.caveQuest === 'done' && !c.flags.finalQuest },
             { text: 'About Grubnak...', next: 'finalHut', if: (c) => c.flags.finalQuest === 'started' },
+            { text: 'How are you, Tobin?', next: 'finalAfter', if: (c) => c.flags.finalQuest === 'done' },
             { text: 'Goodbye, Tobin.', next: 'bye' },
           ],
         },
@@ -597,12 +615,13 @@ export const NPCS = [
             { text: 'Not yet.', next: 'bye' },
           ],
         },
+        finalAfter: { say: ['Slept for a week, just like I said. Best sleep of my life.', 'I still walk up to the shrine every morning. Old habits. But now it\'s just a walk.'] },
         finalStart: {
           set: { finalQuest: 'started' },
           say: ['Good. Go and see Aldric in the Vale.', "I'll be at the door when you get there. Don't argue. I've waited forty years for this."],
         },
         finalHut: {
-          say: (c) => (c.flags.grubnakDown ? ['You did it. I saw it with my own eyes, and I still can\'t believe it. (The ending of the story is coming in the next update.)']
+          say: (c) => (c.flags.grubnakDown ? (c.flags.tobinThanked ? ['Tell Maren. Then let an old man sleep.'] : ["You did it! But don't stand about here. Come back to the chamber. It isn't finished."])
             : c.flags.chamberOpen ? ['What are you doing back here? Grubnak is through that door!'] : ["Get Aldric's help with the door. I'll meet you there."]),
         },
       },
@@ -615,7 +634,7 @@ export const NPCS = [
     id: 'tobinChamber', art: 'tobin', name: 'Tobin the Hermit', short: 'Tobin', area: 'chamber', x: 14, y: 24, radius: 0,
     look: { hair: '#d8d4cc', tunic: '#4a5a3a', pants: '#3a3a30', beard: '#e4e0d8', hat: 'hood', hatColor: '#3e3428' },
     talk: {
-      start: (c) => (c.flags.grubnakDown ? 'after' : 'before'),
+      start: (c) => (!c.flags.grubnakDown ? 'before' : !c.flags.runeSealed ? 'after' : !c.flags.tobinThanked ? 'thanks' : 'end'),
       nodes: {
         before: {
           say: ['There he is. Grubnak. Forty years, and he hasn\'t changed. Bigger, if anything.',
@@ -626,8 +645,24 @@ export const NPCS = [
         },
         after: {
           say: ['He\'s down. He\'s really down.', 'Forty years I watched that cave. I thought I\'d die watching it.',
-            'But look at him. Those runes on his skin are still glowing. Whatever holds him together isn\'t finished yet...',
-            '(The ending of The Runebound is coming in the next update.)'],
+            'But look at him. He\'s turned to stone, and those runes on his skin are still glowing. The binding isn\'t finished.',
+            'Aldric told me once: when the binding has done its work, it wants a living hand to close it. Go on. Lay your hand on him.'],
+        },
+        thanks: {
+          give: { flag: 'tobinGifts', items: [{ item: 'holtsSword', qty: 1 }, { item: 'runeboundCape', qty: 1 }] },
+          giveFail: 'full',
+          set: { tobinThanked: true },
+          say: ['...It\'s over. It\'s really over.', '*Tobin sits down on a rock, very slowly, and is quiet for a long time.*',
+            'Holt would have liked you. He always said it wouldn\'t be a soldier who finished this. Too tired. Too scared.',
+            'This was his. His sword. I\'ve kept it sharp every week for forty years, waiting for someone worthy of it. Take it.',
+            'And this. The runekeepers made one for Holt and one for me, back then. Blue as the runes. I never felt I\'d earned mine. You have.',
+            'Go and tell Maren. Tell the whole village. And then, I think, I\'m going to sleep for a week.'],
+        },
+        full: { say: "I've something for you, but your hands are full. Make room in your bag for two things." },
+        end: {
+          say: (c) => (c.flags.finalQuest === 'done'
+            ? ['Just looking at him. Making sure. Old habits.', "Go on. The world's bigger than this cave. Holt would want you to see it."]
+            : ['Go on, tell Maren. I\'ll sit with him a while. Make sure.']),
         },
       },
     },

@@ -36,6 +36,10 @@ export function buildChamber() {
   };
   const one = (type, x, y, extra) => prop(type, [{ x, y }], extra);
 
+  // Grubnak, turned to stone where he fell: only there once he's beaten
+  // (openFlag), and drawn only then (hideShut).
+  one('grubnakStatue', 15, 11, { blocks: false, openable: true, openFlag: 'grubnakDown', hideShut: true, interact: ['Grubnak, turned to grey stone. Runes glow faintly on his skin.'] });
+
   // The way back to the warrens.
   one('caveMouth', 15, 29, { blocks: false });
 

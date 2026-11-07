@@ -159,6 +159,7 @@ function boot() {
         // Story bosses set a flag when they fall (def.defeatFlag).
         if (e.def.defeatFlag && !state.flags[e.def.defeatFlag]) {
           state.flags[e.def.defeatFlag] = true;
+          syncCaves();
           if (e.def.defeatText) hud.showDialog(e.def.defeatText);
           refreshQuests();
           save();
@@ -762,7 +763,7 @@ function boot() {
   };
 
   // Long-press (phone) or right-click (computer): every option for what's there.
-  const PROP_NAME = { sign: 'sign', door: 'door', well: 'well', stall: 'stall', brokenCart: 'broken cart', runeDoor: 'rune door', brokenBarrel: 'barrel', toppledBarrel: 'barrel', smashedBarrel: 'broken barrel', counter: 'counter', bankBooth: 'bank booth', fallenTree: 'fallen tree', logPile: 'log pile', tent: 'tent', campfire: 'campfire', scarecrow: 'scarecrow', lamp: 'lamp' };
+  const PROP_NAME = { sign: 'sign', door: 'door', well: 'well', stall: 'stall', brokenCart: 'broken cart', runeDoor: 'rune door', grubnakStatue: 'stone Grubnak', brokenBarrel: 'barrel', toppledBarrel: 'barrel', smashedBarrel: 'broken barrel', counter: 'counter', bankBooth: 'bank booth', fallenTree: 'fallen tree', logPile: 'log pile', tent: 'tent', campfire: 'campfire', scarecrow: 'scarecrow', lamp: 'lamp' };
   input.onLongPress = (sx, sy) => {
     if (hud.dialogOpen || !ready()) return;
     const t = view.screenToTile(sx, sy);
@@ -998,6 +999,7 @@ function boot() {
     }
     if (prop.grave) { graveMenu(); return; }
     if (prop.pillar) { usePillar(prop); return; }
+    if (prop.hideShut && !prop.opened) return; // not there yet
     if (prop.type === 'tree' || prop.type === 'ore' || prop.type === 'fishingSpot') { startGather(prop); return; }
     if (prop.type === 'altar') { lastStation = null; startRunecraft(prop); return; }
     if (prop.action) { lastStation = prop; runAction(prop.action); return; }

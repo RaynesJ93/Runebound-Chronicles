@@ -690,7 +690,7 @@ Every skill uses the same XP curve and goes to 99. Resources respawn after a tim
 - Rewards: XP lamps, items, coins, and **new region access**.
 - Quest points unlock late-game content.
 
-### Main story: The Runebound (chapters 1–2 shipped in v0.37.0, chapter 3 in v0.38.0, chapter 4 in v0.39.0, chapter 5 in v0.40.0, chapter 6 part 1 in v0.41.0)
+### Main story: The Runebound (chapters 1–2 shipped in v0.37.0, chapter 3 in v0.38.0, chapter 4 in v0.39.0, chapter 5 in v0.40.0, chapter 6 in v0.41.0 and v0.42.0: the story is complete)
 
 **Backstory.** Forty years ago the goblin warlord **Grubnak** marched on Brambleford. The village held the Thornwood crossroads, and Captain **Holt** of the Watch led the last stand. Grubnak couldn't be killed, so the runekeepers of Whispering Vale *bound* him with runes, deep under the stones of the old cave north-west of the goblin camp, and set a runestone in the stone shrine to hold the binding. That's why the cave mouth is sealed, and why something deep inside is breathing. The village remembers a war it "won"; almost nobody alive knows the warlord was never killed. Now the goblins are bold again, a cart has been raided, and the binding is weakening.
 
@@ -703,7 +703,7 @@ The story runs through places already in the world (the wrecked cart by Bramblef
 | 3 | The Empty Hollow | Tobin | The runestone that held the binding has been stolen from the shrine and broken in three. Find one shard at the shrine, wake the Goblin Chief for the second, take the third from the tunnel goblins in Copperdeep Mine, and bring them to Aldric in Whispering Vale. | v0.38.0 |
 | 4 | Stone and Rune | Aldric | Remaking the runestone needs essence and runes (Runecrafting) and a steel-and-silver setting that Dorrin forges from your bars (Smithing, Mining). Set the remade Binding Stone in the shrine; far away, something roars. | v0.39.0 |
 | 5 | The Sealed Cave | Tobin | Break open the sealed cave (Mining 30) and go down into the Goblin Warrens, a new area. Goblins are digging at the rune-sealed door of Grubnak's chamber; defeat their Digmaster and take his orders back to Tobin. | v0.40.0 |
-| 6 | The Runebound | Tobin | Get a rune key from Aldric, open the door of Grubnak's chamber and face him: the game's first story boss (part 1, v0.41.0). The ending and rewards follow in part 2. | part 1 v0.41.0 |
+| 6 | The Runebound | Tobin | Get a rune key from Aldric, open the door of Grubnak's chamber and face him: the game's first story boss. When he falls he turns to stone; lay your hand on him to bind him for ever. Tobin gives you Holt's sword and the Runebound cape, and Maren rewards you. | v0.41.0 (part 1), v0.42.0 (part 2) |
 
 **Chapter 1: The Overturned Cart** (flag `cartQuest`; recommended combat level 5+). Ask Pell "You look worried." He says his supply cart was raided on the south road and his strongbox taken. Look at the wrecked cart in Brambleford (on the south road, just before the bridge): you find goblin tracks heading north-west into Thornwood, to the goblin camp. While you're on the quest, the first **goblin brute** you kill always drops **Pell's strongbox** (if you don't already have it). Bring it back to Pell for **300 coins, 3 meat pies**, a little Attack and Strength XP, and the **goblin token** that was in the box: a carved bone disc that isn't his. He tells you to show it to Elder Maren.
 
@@ -734,6 +734,16 @@ Warren goblins: level 20, 30 hitpoints, max hit 3, aggressive; drop coins, iron 
 - If you die or leave, he goes back to his place, heals and the pillars reset. Defeating him sets `grubnakDown`; he doesn't come back. The boss health bar at the top of the screen is bigger, gold-edged and says when he's enraged; it stays on the boss while you fight his adds. On phones, health bars now sit below the Guide and Quests buttons instead of over them.
 
 Part 1 ends with Grubnak down and Tobin at your side; part 2 adds the ending scene, the rewards and what lies beyond.
+
+**Chapter 6: The Runebound, part 2 — the ending** (v0.42.0). When Grubnak falls, his body turns to grey stone where he stood, the runes on it still glowing faintly (a statue in the chamber, there for good). Tobin says the binding isn't finished. Lay your hand on the statue: the runes flare white, sink into the stone and go still. Grubnak is runebound, stone for ever. Tobin's forty-year watch is over; he gives you **Holt's sword** (Captain Holt's old blade, which he has kept all these years) and the **Runebound cape**, and tells you to take the news to Maren. Maren rewards you with **5,000 coins** and a large Attack, Strength, Defence and Hitpoints XP reward, and mentions that the old road east of Whispering Vale, closed since the war, can be opened again: the way to the next region.
+
+| Reward | Stats |
+| --- | --- |
+| Holt's sword (weapon, Attack 35) | Slash 28, stab 10, crush 2; strength 26; speed 4. Between adamant and rune. |
+| Runebound cape (cape, Defence 30) | +3 to every attack, +5 to every defence (magic +4), strength 3. A blue cloak with a glowing rune. |
+| From Maren | 5,000 coins; 800 base XP (9,600 at x12) each in Attack, Strength, Defence and Hitpoints. |
+
+Afterwards, both Tobins (at the hut and in the chamber) and Maren have new lines, and the statue can still be looked at.
 
 **Boss engine (v0.41.0).** An enemy's `mechanics` (in `data/enemies.js`) can give it telegraphed slams (warning tiles that land a few ticks later), war cries that summon temporary adds, a phase 2 at a share of its health with stat changes, and chains to pillars that the player can use to stun it. Doors other than the sealed cave can open with the story (`openable` with `openFlag`).
 

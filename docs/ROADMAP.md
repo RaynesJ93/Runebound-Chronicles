@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 7 Nov 2026 | v0.42.0: The Runebound, chapter 6 part 2 — the ending. Grubnak turns to stone; lay your hand on him to bind him for ever. Tobin gives you Holt's sword (Attack 35) and the Runebound cape; Maren gives 5,000 coins and a big combat XP reward and points to the old road east, the next region. The main story is complete. |
 | 5 Nov 2026 | v0.41.0: The Runebound, chapter 6 part 1 — Aldric's rune key opens the door to Grubnak's chamber (a new area), and Grubnak is the first story boss: telegraphed ground slams, war cries that call in warren goblins, an enraged phase 2 at half health, and rune pillars you can feed mind runes to pin him. Bigger boss health bar. The ending and rewards come in part 2. |
 | 5 Nov 2026 | v0.40.1: the prospector outfit in Lyra's star shop costs three times as much (helmet 240, jacket 360, legs 300, boots 180 stardust; 1,080 for the set). Coal and gem bags are unchanged. |
 | 5 Nov 2026 | v0.40.0: The Runebound, chapter 5: The Sealed Cave — break open the sealed cave (Mining 30) into the Goblin Warrens, a new area with warren goblins (level 20) and the Goblin Digmaster (level 26), who is digging at the door of Grubnak's chamber. Exits that open with the story. |
@@ -51,7 +52,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 ## Phase 3 — Quests and new regions (v0.3)
 
 1. Quest journal and quest system (stages, flags, rewards)
-2. First main-story quest that unlocks the second town: **The Runebound**, six chapters (chapters 1 and 2 done in v0.37.0, chapter 3 in v0.38.0, chapter 4 in v0.39.0, chapter 5 in v0.40.0, chapter 6 part 1 in v0.41.0; see GAME_DESIGN.md section 9)
+2. First main-story quest that unlocks the second town: **The Runebound**, six chapters (chapters 1 and 2 done in v0.37.0, chapter 3 in v0.38.0, chapter 4 in v0.39.0, chapter 5 in v0.40.0, chapter 6 in v0.41.0 and v0.42.0 — the main story is complete; see GAME_DESIGN.md section 9)
 3. Second town, two more routes, a cave
 4. New enemy families and gear tiers (steel, mithril)
 5. Specialist shops in the new town

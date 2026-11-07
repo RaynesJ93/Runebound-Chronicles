@@ -793,6 +793,14 @@ export const ITEMS = {
   runestoneHeart: { name: 'Runestone heart', value: 0, examine: 'The middle of the runestone, where the glow is brightest. It hums when you hold it.' },
   runestoneSetting: { name: 'Runestone setting', value: 0, examine: 'A heavy band of steel with silver inlay, made by Dorrin to hold the pieces of the runestone together.' },
   bindingStone: { name: 'Binding Stone', value: 0, examine: 'The runestone, made whole again by Aldric. Its runes glow steadily. It belongs in the shrine.' },
+  holtsSword: {
+    name: "Holt's sword", value: 0, rare: true, examine: 'Captain Edric Holt\'s blade. Tobin kept it sharp for forty years, waiting for someone to finish the job.',
+    equip: { slot: 'weapon', req: { attack: 35 }, type: 'slash', speed: 4, att: { stab: 10, slash: 28, crush: 2 }, def: { slash: 2 }, str: 26, look: { weapon: 'steel', blade: 9 } },
+  },
+  runeboundCape: {
+    name: 'Runebound cape', value: 0, rare: true, examine: 'A deep blue cloak with a glowing rune. Worn by the one who bound Grubnak for ever.',
+    equip: { slot: 'cape', req: { defence: 30 }, att: { stab: 3, slash: 3, crush: 3, ranged: 3, magic: 3 }, def: { stab: 5, slash: 5, crush: 5, ranged: 5, magic: 4 }, str: 3, look: {} },
+  },
   runeKey: { name: 'Rune key', value: 0, examine: 'A slim stone key from Aldric, carved with the same runes as the door of Grubnak\'s chamber. It opens the door without breaking the binding.' },
   digmastersOrders: {
     name: "Digmaster's orders", value: 0, examine: 'A filthy scroll from the Goblin Digmaster. Tap it to read.',
