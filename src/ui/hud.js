@@ -41,6 +41,7 @@ export class Hud {
       <div class="hud-top-left">
         <button class="guide-btn ui" id="btn-guide" aria-label="Guide: how to play and where to get your first tools">${BOOK_SVG}<span>Guide</span></button>
         <button class="guide-btn ui" id="btn-quests" aria-label="Quests">${SCROLL_SVG}<span>Quests</span></button>
+        <button class="slayer-chip ui hidden" id="slayer-chip" aria-label="Slayer task"><img class="px" src="${itemIcon('slayerGem').url}" alt=""><b id="slayer-left"></b><small id="slayer-name"></small></button>
         <div class="area-banner" id="area-banner"></div>
         <div class="grave-timer hidden" id="grave-timer"></div>
         <div class="messages" id="messages" aria-live="polite"></div>
@@ -246,6 +247,7 @@ export class Hud {
     $('btn-map').addEventListener('click', () => this.openMap());
     $('btn-guide').addEventListener('click', () => this.openGuidePanel());
     $('btn-quests').addEventListener('click', () => this.openQuests());
+    $('slayer-chip').addEventListener('click', () => this.onSlayerChip?.());
     this.el.quests = $('quests');
     this.el.quests.addEventListener('click', (e) => {
       if (e.target === this.el.quests || e.target.closest('[data-close]')) { this.closeQuests(); return; }
@@ -911,6 +913,38 @@ export class Hud {
   }
 
   // These run every frame, so they only touch the page when something changed.
+
+  // The slayer task counter under the Quests button: kills left, counting down
+  // (with a bump) as you kill. task: { name, left, total } or null. When a task
+  // is finished it says so for a few seconds, then hides.
+  setSlayer(task) {
+    const key = task ? `${task.name}|${task.left}` : '';
+    if (key === this.slayerKey) return;
+    const was = this.slayerKey || '';
+    this.slayerKey = key;
+    const chip = this.$('slayer-chip');
+    clearTimeout(this.slayerDone);
+    if (!task) {
+      // (skipped or blocked tasks just hide; main.js sets slayerFinished on a real finish)
+      if (!was || !this.slayerFinished) { chip.classList.add('hidden'); return; }
+      this.slayerFinished = false;
+      // just finished: "Task done!" for a moment
+      this.$('slayer-left').textContent = '✓';
+      this.$('slayer-name').textContent = 'Task done!';
+      chip.classList.add('done');
+      this.slayerDone = setTimeout(() => { chip.classList.add('hidden'); chip.classList.remove('done'); }, 4000);
+      return;
+    }
+    chip.classList.remove('hidden', 'done');
+    this.$('slayer-left').textContent = String(task.left);
+    this.$('slayer-name').textContent = `${task.name} left`;
+    const before = Number(was.split('|')[1]);
+    if (was.startsWith(task.name + '|') && task.left < before) {
+      chip.classList.remove('bump');
+      void chip.offsetWidth; // restart the animation
+      chip.classList.add('bump');
+    }
+  }
 
   setHp(hp, max) {
     const key = `${hp}|${max}`;
