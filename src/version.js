@@ -1,3 +1,3 @@
 // Shown in Settings. Bump with every batch.
-export const GAME_VERSION = '0.45.0';
+export const GAME_VERSION = '0.46.0';
 export const BUILD_NAME = 'Quest journal';

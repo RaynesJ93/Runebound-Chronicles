@@ -670,6 +670,12 @@ A new skill, **Slayer** (1–99), trained only by killing monsters on a task.
 | Warren goblins | warren goblin (once the sealed cave is open) | 22 | 20–40 |
 | Night stalkers | night stalker | 32 | 20–40 |
 | Forge golems | forge golem | 45 | 20–40 |
+| Giant spiders | giant spider | 6 | 15–30 |
+| Giant crabs | giant crab | 8 | 15–30 |
+| Bandits | bandit | 10 | 15–30 |
+| Skeletons and ghosts | skeleton, restless ghost | 13 | 20–40 |
+| Air elementals | air elemental | 24 | 20–40 |
+| Fire imps | fire imp | 28 | 20–40 |
 
 You never get the same task twice in a row, a blocked one, or one more than 25 combat levels below you (unless nothing else is left). Bosses aren't tasks. New monsters (batches 2 and 3) add more tasks, and slayer-only monsters will need a Slayer level.
 
@@ -679,6 +685,24 @@ You never get the same task twice in a row, a blocked one, or one more than 25 c
 - **Kesta's shop:** the **slayer helmet** (300 points; head slot, needs Defence 20; armour like an iron full helm, and **+15% accuracy and max hit against monsters on your task**, with melee, ranged or magic), and a spare **slayer gem** (1 point).
 
 State: `state.slayer = { task: { id, left, total }, streak, points, blocked: [] }`.
+
+### New monsters (v0.46.0)
+
+Seven monsters fill the gaps between the old ones' levels, each with painted art from the "monsters 01-12" sheets (tools/new_art.py), drops from existing items, and a slayer task with Kesta. Monsters that live where beginners train or quest are not aggressive. Balance check: simulated duels against a player 3 levels higher in an iron helm and shield cost about half to two-thirds of the player's hitpoints, in line with wolves, cave beasts and night stalkers (magic attackers hit a little harder through melee armour).
+
+| Monster | Level | HP | Max hit | Attack | Where | Aggressive | Notable drops |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Giant spider | 9 | 16 | 2 | stab | The ruins round the old watchtower, Thornwood | yes | arrowtips, feathers |
+| Giant crab | 11 | 20 | 3 | crush, high defence | The lake shore by the Hunters' camp | no (beginners fish there) | raw shrimps, sardines, trout |
+| Bandit | 13 | 22 | 3 | slash | The old farmstead, south-east Thornwood | yes | coins, daggers, hard leather |
+| Skeleton | 16 | 26 | 3 | slash | The old graveyard (west side, away from the memorial) | yes | iron arrows, iron shield and sword |
+| Restless ghost | 24 | 32 | 4 | magic | The old graveyard | yes | mind, air and water runes |
+| Air elemental | 28 | 36 | 4 | magic | Round the air altar, Whispering Vale | no (low-level runecrafters go there) | air runes, rune essence |
+| Fire imp | 32 | 38 | 5 | magic | The Sunken Forge | yes | coal, steel bars, mithril ore |
+
+New slayer tasks: giant spiders (combat 6+), giant crabs (8+), bandits (10+), skeletons and ghosts (13+), air elementals (24+), fire imps (28+). Kesta has painted art now too.
+
+The slayer-only monsters' art (cave crawler, bloodbat, stone wraith, ember wyrm) is already in the atlas, ready for batch 3.
 
 ### Lodestones (v0.44.0)
 

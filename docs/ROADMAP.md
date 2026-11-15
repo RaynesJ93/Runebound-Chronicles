@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 15 Nov 2026 | v0.46.0: seven new monsters with painted art — giant spiders (watchtower ruins), giant crabs (lake shore), bandits (old farmstead), skeletons and restless ghosts (old graveyard), air elementals (air altar) and fire imps (Sunken Forge) — each a new slayer task. Kesta has her painted sprite. |
 | 15 Nov 2026 | v0.45.0: Slayer — a new skill and Kesta the Huntress, slayer master at the Hunters' camp. Tasks to kill monsters that suit your level, Slayer XP for each kill, slayer points for each task (bonuses every 10th and 50th), skips and blocks, a slayer gem, and the slayer helmet (+15% against your task). New monsters and slayer-only monsters come next. |
 | 7 Nov 2026 | v0.44.0: lodestones — six ancient rune stones (Brambleford, Thornwood, Copperdeep Mine, the Sunken Forge, Whispering Vale, Goblin Warrens) for teleporting between areas. Woken by Aldric's side quest The Sleeping Stones (Runecrafting 5, 20 air runes and 10 essence); each one is attuned by touching it once. |
 | 7 Nov 2026 | v0.43.0: new painted art. Lyra the Stargazer finally has a sprite; Tobin, the warren goblins, the Goblin Digmaster and Grubnak (with his own club-swinging attack) have their own art instead of recolours; the ten Runebound story items have painted icons; the rune door is painted; and pickaxes, darts, throwing knives and javelins now show in your hand when wielded, in every metal. |

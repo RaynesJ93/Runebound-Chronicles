@@ -317,6 +317,27 @@ export function buildRoute1() {
       { tiles: [{ x: 7, y: 7 }], to: 'warrens', at: { x: 22, y: 35 }, facing: Math.PI, when: (f) => !!f.caveOpen },
     ],
     spawns: [
+      // v0.46.0: giant spiders in the watchtower ruins, crabs on the lake shore,
+      // bandits at the old farmstead, skeletons and ghosts in the old graveyard
+      // (kept to its west side, away from the war memorial, chapter 2)
+      { enemy: 'giantSpider', x: 37, y: 18 },
+      { enemy: 'giantSpider', x: 45, y: 20 },
+      { enemy: 'giantSpider', x: 38, y: 27 },
+      { enemy: 'giantSpider', x: 45, y: 26 },
+      { enemy: 'giantCrab', x: 10, y: 78 },
+      { enemy: 'giantCrab', x: 6, y: 81 },
+      { enemy: 'giantCrab', x: 5, y: 86 },
+      { enemy: 'giantCrab', x: 9, y: 89 },
+      { enemy: 'bandit', x: 90, y: 73 },
+      { enemy: 'bandit', x: 96, y: 74 },
+      { enemy: 'bandit', x: 89, y: 79 },
+      { enemy: 'bandit', x: 97, y: 80 },
+      { enemy: 'skeleton', x: 32, y: 85 },
+      { enemy: 'skeleton', x: 36, y: 86 },
+      { enemy: 'skeleton', x: 33, y: 89 },
+      { enemy: 'skeleton', x: 30, y: 91 },
+      { enemy: 'restlessGhost', x: 35, y: 83 },
+      { enemy: 'restlessGhost', x: 29, y: 86 },
       // Goblin territory
       { enemy: 'goblin', x: 13, y: 45 }, { enemy: 'goblin', x: 21, y: 43 }, { enemy: 'goblin', x: 27, y: 49 },
       { enemy: 'goblin', x: 12, y: 52 }, { enemy: 'goblin', x: 22, y: 54 }, { enemy: 'goblin', x: 29, y: 56 },

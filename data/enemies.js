@@ -223,6 +223,91 @@ export const ENEMIES = {
     },
     loot: { always: [{ item: 'bones', qty: 1 }], main: [] },
   },
+  // ---- New monsters (v0.46.0): filling the gaps between the old levels ----
+  giantSpider: {
+    id: 'giantSpider', name: 'Giant spider', level: 9, hp: 16,
+    attack: 7, strength: 6, defence: 5, attackBonus: 4, strengthBonus: 2, defenceBonus: 2, maxHit: 2,
+    speed: 4, attackType: 'stab', aggressive: true, aggroRange: 3, wander: 3, leash: 7, respawn: 35,
+    look: { skin: '#5a3a24', hair: '#2a1a10', tunic: '#5a3a24', pants: '#5a3a24', eyes: '#e83020' },
+    examine: 'A spider the size of a dog. It has far too many eyes, and all of them are looking at you.',
+    loot: {
+      always: [],
+      main: [{ item: 'coins', min: 2, max: 15, chance: 1 / 4 }, { item: 'bronzeArrowtips', min: 5, max: 12, chance: 1 / 8 }, { item: 'feather', min: 5, max: 15, chance: 1 / 8 }, { item: 'uncutSapphire', qty: 1, chance: 1 / 64 }],
+      rare: { chance: 1 / 128, table: [{ item: 'warCharm', qty: 1 }] },
+    },
+  },
+  giantCrab: {
+    id: 'giantCrab', name: 'Giant crab', level: 11, hp: 20,
+    attack: 7, strength: 8, defence: 12, attackBonus: 2, strengthBonus: 4, defenceBonus: 15, maxHit: 3,
+    speed: 5, attackType: 'crush', aggressive: false, wander: 2, leash: 5, respawn: 35, // not aggressive: beginners fish at this lake
+    look: { skin: '#d8603a', hair: '#a83a20', tunic: '#d8603a', pants: '#d8603a', eyes: '#1a1a1a' },
+    examine: 'A huge shore crab. Its shell is covered in barnacles, and one claw is as big as your head.',
+    loot: {
+      always: [],
+      main: [{ item: 'rawShrimps', min: 1, max: 2, chance: 1 / 3 }, { item: 'rawSardine', qty: 1, chance: 1 / 5 }, { item: 'rawTrout', qty: 1, chance: 1 / 8 }, { item: 'coins', min: 5, max: 20, chance: 1 / 4 }, { item: 'uncutSapphire', qty: 1, chance: 1 / 50 }],
+      rare: { chance: 1 / 128, table: [{ item: 'warCharm', qty: 1 }] },
+    },
+  },
+  bandit: {
+    id: 'bandit', name: 'Bandit', level: 13, hp: 22,
+    attack: 9, strength: 10, defence: 8, attackBonus: 6, strengthBonus: 4, defenceBonus: 6, maxHit: 3,
+    speed: 4, attackType: 'slash', aggressive: true, aggroRange: 4, wander: 3, leash: 7, respawn: 40,
+    look: { skin: '#c99a72', hair: '#2a1a10', tunic: '#2e4a2a', pants: '#4a3a28', hat: 'hood', hatColor: '#2e4a2a' },
+    examine: 'A highway robber in a green hood. He looks at your purse, not your face.',
+    loot: {
+      always: [{ item: 'bones', qty: 1 }],
+      main: [{ item: 'coins', min: 10, max: 50, chance: 1 / 2 }, { item: 'bronzeDagger', qty: 1, chance: 1 / 12 }, { item: 'ironDagger', qty: 1, chance: 1 / 20 }, { item: 'hardLeather', qty: 1, chance: 1 / 10 }, { item: 'meatPie', qty: 1, chance: 1 / 8 }, { item: 'ironScimitar', qty: 1, chance: 1 / 40 }],
+      rare: { chance: 1 / 96, table: [{ item: 'warCharm', qty: 1 }, { item: 'uncutEmerald', qty: 1 }] },
+    },
+  },
+  skeleton: {
+    id: 'skeleton', name: 'Skeleton', level: 16, hp: 26,
+    attack: 13, strength: 12, defence: 12, attackBonus: 6, strengthBonus: 4, defenceBonus: 12, maxHit: 3,
+    speed: 5, attackType: 'slash', aggressive: true, aggroRange: 4, wander: 2, leash: 6, respawn: 40,
+    look: { skin: '#e8dcb8', hair: '#e8dcb8', tunic: '#8a5a32', pants: '#e8dcb8', hat: 'helmet', hatColor: '#8a5a32', eyes: '#60e060' },
+    examine: 'An old soldier of the Goblin War, still wearing his helmet. He never got the message that it ended.',
+    loot: {
+      always: [{ item: 'bones', qty: 1 }],
+      main: [{ item: 'coins', min: 8, max: 40, chance: 1 / 3 }, { item: 'ironArrow', min: 5, max: 15, chance: 1 / 8 }, { item: 'ironSqShield', qty: 1, chance: 1 / 20 }, { item: 'ironSword', qty: 1, chance: 1 / 24 }, { item: 'steelArrowtips', min: 5, max: 10, chance: 1 / 16 }, { item: 'uncutSapphire', qty: 1, chance: 1 / 40 }],
+      rare: { chance: 1 / 96, table: [{ item: 'warCharm', qty: 1 }] },
+    },
+  },
+  restlessGhost: {
+    id: 'restlessGhost', name: 'Restless ghost', level: 24, hp: 32,
+    attack: 20, strength: 18, defence: 16, attackBonus: 10, strengthBonus: 6, defenceBonus: 20, maxHit: 4,
+    speed: 5, attackType: 'magic', aggressive: true, aggroRange: 4, wander: 3, leash: 6, respawn: 45,
+    look: { skin: '#c8d8f0', hair: '#c8d8f0', tunic: '#c8d8f0', pants: '#c8d8f0', robe: true, eyes: '#1a1a2a' },
+    examine: 'A pale spirit drifting between the graves. Its touch is cold enough to burn.',
+    loot: {
+      always: [],
+      main: [{ item: 'coins', min: 20, max: 80, chance: 1 / 3 }, { item: 'mindRune', min: 5, max: 15, chance: 1 / 3 }, { item: 'airRune', min: 10, max: 25, chance: 1 / 4 }, { item: 'waterRune', min: 5, max: 15, chance: 1 / 5 }, { item: 'uncutEmerald', qty: 1, chance: 1 / 40 }],
+      rare: { chance: 1 / 96, table: [{ item: 'warCharm', qty: 1 }, { item: 'uncutRuby', qty: 1 }] },
+    },
+  },
+  airElemental: {
+    id: 'airElemental', name: 'Air elemental', level: 28, hp: 36,
+    attack: 18, strength: 20, defence: 18, attackBonus: 6, strengthBonus: 6, defenceBonus: 15, maxHit: 4,
+    speed: 4, attackType: 'magic', aggressive: false, wander: 3, leash: 6, respawn: 45, // not aggressive: low-level runecrafters use the air altar
+    look: { skin: '#dce4ec', hair: '#dce4ec', tunic: '#dce4ec', pants: '#dce4ec', robe: true, eyes: '#a8e8ff' },
+    examine: 'A living whirlwind, drawn to the air altar. Leaves and grit spin round its glowing heart.',
+    loot: {
+      always: [],
+      main: [{ item: 'airRune', min: 15, max: 40, chance: 1 / 2 }, { item: 'runeEssence', min: 1, max: 4, chance: 1 / 4 }, { item: 'mindRune', min: 5, max: 15, chance: 1 / 6 }, { item: 'feather', min: 10, max: 30, chance: 1 / 6 }, { item: 'uncutSapphire', qty: 1, chance: 1 / 32 }],
+      rare: { chance: 1 / 96, table: [{ item: 'warCharm', qty: 1 }, { item: 'uncutDiamond', qty: 1 }] },
+    },
+  },
+  fireImp: {
+    id: 'fireImp', name: 'Fire imp', level: 32, hp: 38,
+    attack: 24, strength: 24, defence: 18, attackBonus: 10, strengthBonus: 8, defenceBonus: 12, maxHit: 5,
+    speed: 4, attackType: 'magic', aggressive: true, aggroRange: 4, wander: 3, leash: 6, respawn: 45,
+    look: { skin: '#d84a20', hair: '#f8a020', tunic: '#d84a20', pants: '#a83010', eyes: '#f8e040' },
+    examine: 'A little demon of the forge, all horns and flames. It giggles when it burns you.',
+    loot: {
+      always: [],
+      main: [{ item: 'coins', min: 30, max: 100, chance: 1 / 3 }, { item: 'coal', min: 2, max: 5, chance: 1 / 3 }, { item: 'steelBar', qty: 1, chance: 1 / 12 }, { item: 'mithrilOre', qty: 1, chance: 1 / 16 }, { item: 'uncutRuby', qty: 1, chance: 1 / 48 }],
+      rare: { chance: 1 / 96, table: [{ item: 'warCharm', qty: 1 }, { item: 'uncutDiamond', qty: 1 }] },
+    },
+  },
   alphaWolf: {
     id: 'alphaWolf', name: 'Alpha Wolf', level: 14, hp: 40, sprite: 'wolf', boss: true,
     attack: 10, strength: 10, defence: 8,

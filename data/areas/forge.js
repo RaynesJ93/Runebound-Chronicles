@@ -97,6 +97,11 @@ export function buildForge() {
       { tiles: [{ x: 23, y: 36 }], to: 'hollow', at: { x: 37, y: 3 }, facing: 0 },
     ],
     spawns: [
+      // v0.46.0: fire imps
+      { enemy: 'fireImp', x: 24, y: 13 },
+      { enemy: 'fireImp', x: 16, y: 16 },
+      { enemy: 'fireImp', x: 29, y: 12 },
+      { enemy: 'fireImp', x: 14, y: 19 },
       { enemy: 'forgeGolem', x: 9, y: 21 },
       { enemy: 'forgeGolem', x: 23, y: 16 },
       { enemy: 'forgeGolem', x: 37, y: 22 },
