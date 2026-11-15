@@ -649,6 +649,40 @@ export class Hud {
     inner.classList.toggle('zoomed', this.mapZoom > 1);
     this.$('map-zoom-out').disabled = this.mapZoom <= 1;
     this.$('map-zoom-in').disabled = this.mapZoom >= 4;
+    requestAnimationFrame(() => this.declutterMap());
+  }
+
+  // Map names never overlap: each one is tried where it belongs, then nudged
+  // up, down or sideways into a free spot; if there's no room at this zoom it's
+  // hidden (zoom in to see it). Place names come first, then the ways out
+  // (whose arrow stays when their name is hidden; tap it for the name), then
+  // people's names.
+  declutterMap() {
+    const inner = this.$('map-inner');
+    if (!this.mapOpen || !inner) return;
+    const box = inner.getBoundingClientRect();
+    const els = [
+      ...inner.querySelectorAll('.mk-label'),
+      ...inner.querySelectorAll('.mk-exit-wrap b'),
+      ...(this.mapZoom > 1 ? inner.querySelectorAll('.mk-npc b') : []),
+    ];
+    const placed = [];
+    // labels shouldn't cover you (they may sit partly over icons)
+    for (const e of inner.querySelectorAll('.mk-you')) placed.push(e.getBoundingClientRect());
+    const pad = 2;
+    const hits = (r) => r.left < box.left || r.right > box.right || r.top < box.top || r.bottom > box.bottom
+      || placed.some((q) => r.left < q.right + pad && r.right > q.left - pad && r.top < q.bottom + pad && r.bottom > q.top - pad);
+    for (const el of els) {
+      el.style.translate = '';
+      el.classList.remove('mk-hide');
+      const r = el.getBoundingClientRect();
+      const w = r.width, h = r.height;
+      const tries = [[0, 0], [0, -h * 0.9], [0, h * 0.9], [w * 0.55, 0], [-w * 0.55, 0], [0, -h * 1.8], [0, h * 1.8], [w * 0.55, -h * 0.9], [-w * 0.55, -h * 0.9], [w * 0.55, h * 0.9], [-w * 0.55, h * 0.9]];
+      const fit = tries.find(([dx, dy]) => !hits({ left: r.left + dx, right: r.right + dx, top: r.top + dy, bottom: r.bottom + dy }));
+      if (!fit) { el.classList.add('mk-hide'); continue; }
+      if (fit[0] || fit[1]) el.style.translate = `${Math.round(fit[0])}px ${Math.round(fit[1])}px`;
+      placed.push({ left: r.left + fit[0], right: r.right + fit[0], top: r.top + fit[1], bottom: r.bottom + fit[1] });
+    }
   }
 
   // centre: scroll so you (or the middle of the map) are in view.

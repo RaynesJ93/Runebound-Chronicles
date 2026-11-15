@@ -21,7 +21,7 @@ export const MAP_NAME = {
   vale: 'Whispering Vale',
   warrens: 'Goblin Warrens',
   chamber: "Grubnak's chamber",
-  slayerCave: 'The Slayer Caverns',
+  slayerCave: 'Slayer Caverns',
 };
 
 // Even shorter names for the map's tabs.
@@ -51,7 +51,7 @@ export const LABELS = {
     { x: 82, y: 56, text: 'Oak grove' },
     { x: 64, y: 70, text: "Bram's cabin" },
     { x: 14, y: 90, text: 'Lake' },
-    { x: 28, y: 76, text: "Hunters' camp" },
+    { x: 22, y: 74, text: "Hunters' camp" },
     { x: 44, y: 25, text: 'Old watchtower' },
     { x: 34, y: 87, text: 'Old graveyard' },
     { x: 15, y: 21, text: "Hermit's hut" },
