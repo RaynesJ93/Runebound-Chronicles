@@ -654,6 +654,8 @@ A map button (top right, or M on a keyboard) opens the map of the area you're in
 
 The map shows the ground, trees, water and buildings drawn small, and on top: place names (from `data/mapLabels.js`), villagers (yellow dots) and monsters (red; the Alpha Wolf ringed in gold) where they are right now, the ways out to other areas, and icons for the bank and shop, fishing, mining, smithing, cooking, tanning and runecrafting altars. Tap any marker to see what it is. Everything except the place names is read from the area data, so new areas and skilling spots show up by themselves; a new area only needs adding to `MAP_AREAS` and its labels.
 
+
+*v0.48.3, no overlapping names:* names on the map never overlap. Each is tried where it belongs, then nudged up, down or sideways into free space; if there's no room at that zoom it's hidden until you zoom in. Place names get first pick, then the "To ..." exit names (an exit's arrow always shows, and tapping it gives the name), then people's names (zoomed in). Names can sit partly over icons but never over each other or your marker. Zoomed-out names are a little smaller (`declutterMap` in src/ui/hud.js).
 ### Slayer (v0.45.0)
 
 A new skill, **Slayer** (1–99), trained only by killing monsters on a task.
