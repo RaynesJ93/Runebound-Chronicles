@@ -27,10 +27,10 @@ const TIPS = {
   undead: 'The old graveyard south of here is crawling: skeletons, and ghosts. Either counts.',
   airElementals: 'Air elementals spin round the air altar in Whispering Vale. They hit with magic, so armour helps less.',
   fireImps: 'Fire imps in the Sunken Forge. Small, quick, and they burn. Magic attacks.',
-  caveCrawlers: 'Cave crawlers, in the side caverns of Copperdeep Depths. They heal as you fight, so hit hard and don\'t stop.',
-  bloodbats: 'Bloodbats roost in Copperdeep Hollow. Every bite heals them. Kill them fast, and eat early.',
-  stoneWraiths: 'Stone wraiths haunt the deep tunnels of the Goblin Warrens. Blades and arrows barely scratch them: take a mace or a warhammer, or cast.',
-  emberWyrms: 'Ember wyrms, in the far hall of the Sunken Forge. Every few bites, fire. Magic defence helps with the breath. Bring your best food.',
+  caveCrawlers: 'Cave crawlers, in the side caverns of Copperdeep Depths. They heal as you fight, so hit hard and don\'t stop. Or the Crawling Pit, first section of the Slayer Caverns behind my camp.',
+  bloodbats: 'Bloodbats roost in Copperdeep Hollow. Every bite heals them. Kill them fast, and eat early. Or the Roost, in the Slayer Caverns.',
+  stoneWraiths: 'Stone wraiths haunt the deep tunnels of the Goblin Warrens. Blades and arrows barely scratch them: take a mace or a warhammer, or cast. Or the Wraith Gallery, deep in the Slayer Caverns.',
+  emberWyrms: 'Ember wyrms, in the far hall of the Sunken Forge. Every few bites, fire. Magic defence helps with the breath. Bring your best food. Or the Wyrm\'s Hearth, at the very bottom of the Slayer Caverns.',
 };
 
 export const NPCS = [

@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 15 Nov 2026 | v0.48.0: the Slayer Caverns, behind Kesta's camp: an entrance hall and corridors leading through four sections, deeper is tougher: cave crawlers (Slayer 10), bloodbats (25), stone wraiths (45), ember wyrms (60). On the map. |
 | 15 Nov 2026 | v0.47.2: finishing The Sleeping Stones opens every lodestone at once, so there's no need to walk to each one first. The Goblin Warrens stone joins once its cave is open. |
 | 15 Nov 2026 | v0.47.1: skill guide sections are dropdowns (tap a title to open or close it; shows how many rows you've unlocked). Only the section with your next unlock starts open, so long guides like Smithing need far less scrolling. |
 | 15 Nov 2026 | v0.47.0: slayer monsters — cave crawlers (Slayer 10, Depths, regenerate), bloodbats (25, Hollow, heal off your blood), stone wraiths (45, Warrens, stone skin: crush and magic work best) and ember wyrms (60, Sunken Forge, fire breath). You need the Slayer level to fight them. Unique drops: the bloodfang amulet, wraithstone ring and ember scimitar. Four new slayer tasks. |

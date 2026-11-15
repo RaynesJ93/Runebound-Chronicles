@@ -10,6 +10,7 @@ import { buildForge } from './forge.js';
 import { buildVale } from './vale.js';
 import { buildWarrens } from './warrens.js';
 import { buildChamber } from './chamber.js';
+import { buildSlayerCave } from './slayerCave.js';
 import { waterEdges } from './decor.js';
 import { withLodestones } from '../lodestones.js';
 
@@ -26,6 +27,7 @@ const BUILD = {
   vale: buildVale,
   warrens: buildWarrens,
   chamber: buildChamber,
+  slayerCave: buildSlayerCave,
 };
 export const AREAS = Object.fromEntries(Object.entries(BUILD).map(([id, fn]) => [id, () => withLodestones(fn())]));
 

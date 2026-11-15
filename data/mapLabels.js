@@ -5,7 +5,7 @@
 // Tiles are (x, y) in the area's own grid. Keep labels short.
 
 // The outdoor maps, in the order of the map's tabs.
-export const MAP_AREAS = ['brambleford', 'route1', 'mine', 'depths', 'hollow', 'forge', 'vale', 'warrens', 'chamber'];
+export const MAP_AREAS = ['brambleford', 'route1', 'mine', 'depths', 'hollow', 'forge', 'vale', 'warrens', 'chamber', 'slayerCave'];
 
 // Maps the story hasn't opened yet stay off the map until this flag is set.
 export const MAP_HIDDEN = { warrens: 'caveOpen', chamber: 'chamberOpen' };
@@ -21,10 +21,11 @@ export const MAP_NAME = {
   vale: 'Whispering Vale',
   warrens: 'Goblin Warrens',
   chamber: "Grubnak's chamber",
+  slayerCave: 'The Slayer Caverns',
 };
 
 // Even shorter names for the map's tabs.
-export const MAP_TAB = { brambleford: 'Brambleford', route1: 'Thornwood', mine: 'Mine', depths: 'Depths', hollow: 'Hollow', forge: 'Forge', vale: 'Vale', warrens: 'Warrens', chamber: 'Chamber' };
+export const MAP_TAB = { brambleford: 'Brambleford', route1: 'Thornwood', mine: 'Mine', depths: 'Depths', hollow: 'Hollow', forge: 'Forge', vale: 'Vale', warrens: 'Warrens', chamber: 'Chamber', slayerCave: 'Slayer' };
 
 // Rooms you walk into from another map. Inside them the map shows the
 // outside, with you at the door.
@@ -96,6 +97,13 @@ export const LABELS = {
     { x: 9, y: 19, text: 'West den' },
     { x: 35, y: 16, text: 'East den' },
     { x: 22, y: 30, text: 'Landing' },
+  ],
+  slayerCave: [
+    { x: 32, y: 34, text: 'Entrance hall' },
+    { x: 15, y: 24, text: 'Crawling Pit (Slayer 10)' },
+    { x: 13, y: 2, text: 'Roost (Slayer 25)' },
+    { x: 38, y: 2, text: 'Wraith Gallery (Slayer 45)' },
+    { x: 51, y: 18, text: "Wyrm's Hearth (Slayer 60)" },
   ],
   chamber: [
     { x: 15, y: 3, text: "Grubnak's chamber" },
