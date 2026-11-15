@@ -719,6 +719,22 @@ Four monsters you can only fight with a high enough **Slayer level**. Below it, 
 
 Balance check (simulated duels, player 3 levels higher in the best armour they can wear): about half to two-thirds of your hitpoints per kill, like the other monsters — but a stone wraith fought with a scimitar wins most of the time; take crush or magic. Their other drops are better versions of their area's loot (ores, bars, gems, coins, runes). New slayer tasks, which Kesta only gives once you have the Slayer level: cave crawlers (combat 15, Slayer 10), bloodbats (30, 25), stone wraiths (45, 45), ember wyrms (60, 60). Kills give Slayer XP like any monster (its hitpoints), so these are the best Slayer XP at their level.
 
+### The Slayer Caverns (v0.48.0)
+
+A cave system behind Kesta's camp in south-west Thornwood: the mouth is in a rock outcrop just north-east of the Hunters' camp. Inside, one long winding way leads through four sections, one slayer monster each, tougher the deeper you go. Corridors join the sections, and a sign at each section's entrance says what lives there and the Slayer level it needs.
+
+| Section | Monster | Slayer | Feel |
+| --- | --- | --- | --- |
+| Entrance hall | — | — | Lamps, Kesta's supply crates, a sign: "THE SLAYER CAVERNS. Deeper is deadlier." |
+| 1. The Crawling Pit (west) | 6 cave crawlers | 10 | Rubble and old bones |
+| 2. The Roost (north-west) | 6 bloodbats | 25 | A high cavern strewn with bones |
+| 3. The Wraith Gallery (north-east) | 5 stone wraiths | 45 | Broken pillars and old rune stones |
+| 4. The Wyrm's Hearth (east, the deepest) | 4 ember wyrms | 60 | Braziers you can cook on, scorched bones, a gem rock |
+
+- You can walk through any section; its monsters only attack you if you have the Slayer level to fight them (below it they ignore you, and you can't attack them).
+- The caverns are on the map ("Slayer Caverns" tab). The monsters' old spots (Depths, Hollow, Warrens, Forge) stay too.
+- Kesta's tips for these tasks mention the caverns.
+
 Enemy fields: `slayer` (level needed), `regen: [hp, ticks]`, `drain` (share of damage healed), `resist: { stab, slash, ranged }` (damage multipliers), `breath: { every, maxHit, text }`.
 
 ### Lodestones (v0.44.0)

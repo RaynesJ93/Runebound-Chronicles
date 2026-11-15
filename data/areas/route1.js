@@ -171,6 +171,12 @@ export function buildRoute1() {
   prop('logPile', [{ x: 31, y: 77 }, { x: 32, y: 77 }], { interact: ['Firewood, neatly stacked.'] });
   one('crate', 26, 79);
   one('sign', 33, 80, { interact: ["HUNTERS' CAMP", 'Cook your catch at the fire. The lake has fish too.'] });
+  // The Slayer Caverns (v0.48.0): a cave in a rock outcrop just north-east of the camp
+  clearArea(33, 68, 44, 78);
+  outcrop([[34, 72, 73], [35, 71, 74], [36, 70, 74], [37, 70, 74], [38, 70, 74], [39, 70, 74], [40, 70, 74], [41, 71, 74], [42, 72, 73]]);
+  one('caveMouth', 38, 74, { interact: ['The mouth of the Slayer Caverns. Claw marks score the rock.', 'Kesta hunts in there. Deeper is deadlier.'] });
+  for (const [x, y] of [[36, 76], [41, 76]]) one('rock', x, y);
+  one('sign', 40, 77, { interact: ['THE SLAYER CAVERNS', 'Slayer monsters only. Deeper is deadlier.', 'Talk to Kesta first.'] });
 
   // ---- Points of interest (quests to come) ----------------------------------------------------------
   // The ruined watchtower
@@ -315,6 +321,7 @@ export function buildRoute1() {
       { tiles: [{ x: W - 1, y: 48 }, { x: W - 1, y: 49 }], to: 'vale', at: { x: 2, y: 29 }, facing: Math.PI / 2 },
       // The sealed cave: only once you've broken the boulders (The Runebound, chapter 5)
       { tiles: [{ x: 7, y: 7 }], to: 'warrens', at: { x: 22, y: 35 }, facing: Math.PI, when: (f) => !!f.caveOpen },
+      { tiles: [{ x: 38, y: 75 }], to: 'slayerCave', at: { x: 32, y: 42 }, facing: Math.PI },
     ],
     spawns: [
       // v0.46.0: giant spiders in the watchtower ruins, crabs on the lake shore,

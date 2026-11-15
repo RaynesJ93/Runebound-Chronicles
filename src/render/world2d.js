@@ -188,7 +188,7 @@ export function createWorldView(canvasEl, area) {
       }
       case 'crop': place(lib.crop[p.ripe ? 1 : lib.crop[2] && (p.x + p.y * 3) % 3 === 0 ? 2 : 0], f.x, f.y); break;
       case 'fence': place(fenceSprite(isFence.has(`${p.x + 1},${p.y}`), isFence.has(`${p.x},${p.y + 1}`), p.style || 'wood'), f.x, f.y - 2); break;
-      case 'lamp': place((area.id === 'mine' || area.id === 'depths' || area.id === 'hollow' || area.id === 'forge') && lib.mineLamp ? lib.mineLamp : lib.lamp, f.x, f.y); break;
+      case 'lamp': place((area.id === 'mine' || area.id === 'depths' || area.id === 'hollow' || area.id === 'forge' || area.id === 'slayerCave') && lib.mineLamp ? lib.mineLamp : lib.lamp, f.x, f.y); break;
       case 'sign': place(lib.sign, f.x, f.y); break;
       case 'well': place(lib.well, f.x, f.y + 1); break;
       case 'stall': place(lib.stall, f.x, f.y); break;
