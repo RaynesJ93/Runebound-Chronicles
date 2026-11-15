@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 15 Nov 2026 | v0.47.1: skill guide sections are dropdowns (tap a title to open or close it; shows how many rows you've unlocked). Only the section with your next unlock starts open, so long guides like Smithing need far less scrolling. |
 | 15 Nov 2026 | v0.47.0: slayer monsters — cave crawlers (Slayer 10, Depths, regenerate), bloodbats (25, Hollow, heal off your blood), stone wraiths (45, Warrens, stone skin: crush and magic work best) and ember wyrms (60, Sunken Forge, fire breath). You need the Slayer level to fight them. Unique drops: the bloodfang amulet, wraithstone ring and ember scimitar. Four new slayer tasks. |
 | 15 Nov 2026 | v0.46.0: seven new monsters with painted art — giant spiders (watchtower ruins), giant crabs (lake shore), bandits (old farmstead), skeletons and restless ghosts (old graveyard), air elementals (air altar) and fire imps (Sunken Forge) — each a new slayer task. Kesta has her painted sprite. |
 | 15 Nov 2026 | v0.45.0: Slayer — a new skill and Kesta the Huntress, slayer master at the Hunters' camp. Tasks to kill monsters that suit your level, Slayer XP for each kill, slayer points for each task (bonuses every 10th and 50th), skips and blocks, a slayer gem, and the slayer helmet (+15% against your task). New monsters and slayer-only monsters come next. |

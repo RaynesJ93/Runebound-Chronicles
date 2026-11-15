@@ -372,7 +372,14 @@ button.skill:active { background: #ffe9a8; }
 .guide-title { display: flex; flex-direction: column; line-height: 1.15; }
 .guide-title b { font-size: 20px; }
 .guide-title small { font-size: 14px; color: var(--ink-soft); }
-.guide-sec { margin: 14px 0 6px; font-size: 16px; padding-bottom: 3px; border-bottom: 2px dashed rgba(122, 90, 58, 0.3); }
+/* Guide sections are tap-to-open dropdowns */
+.guide-sec { margin: 10px 0 6px; font-size: 16px; padding: 8px 4px 6px; border-bottom: 2px dashed rgba(122, 90, 58, 0.3); }
+summary.guide-sec { display: flex; align-items: center; gap: 8px; cursor: pointer; list-style: none; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+summary.guide-sec::-webkit-details-marker { display: none; }
+summary.guide-sec::before { content: '\25B8'; flex: none; transition: transform 0.15s; }
+details[open] > summary.guide-sec::before { transform: rotate(90deg); }
+summary.guide-sec small { margin-left: auto; font-size: 13px; color: var(--ink-soft); letter-spacing: 0; }
+summary.guide-sec:active { background: rgba(122, 90, 58, 0.12); }
 .guide-row {
   display: flex; align-items: center; gap: 8px; padding: 5px 8px; margin-bottom: 4px;
   background: #fff6dc; border: 2px solid var(--wood); border-radius: 6px;

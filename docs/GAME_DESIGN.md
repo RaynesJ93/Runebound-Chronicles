@@ -752,6 +752,8 @@ A **Guide** button at the top left (or G on a keyboard) opens a short guide for 
 
 Tap any skill in the skills panel to open its guide: everything the skill unlocks, in level order, with an icon, what it needs and the XP it gives. Rows you can already do are bright; locked rows are greyed with the level in red. The header shows your level and the next unlock. Guides are built from the data files (`src/skills/guide.js`), so new items, recipes, trees, rocks, fish, spells and altars appear automatically. Combat skills list the gear that needs them (Attack: weapons; Defence: armour; Ranged: bows and gear; Magic: spells and staffs); Strength and Hitpoints explain what they do.
 
+*v0.47.1:* each section of a guide (Smithing's bronze, iron, steel… items, say) is a dropdown: tap its title to open or close it. The title shows how many of its rows you've unlocked (e.g. 12/18). When you open a guide, only the section with your next unlock is open; once you open or close one yourself, it stays that way while the game is running.
+
 ### Gathering skills
 - **Woodcutting** — trees on routes and in forests (see above)
 - **Mining** — ore rocks in mines and caves (see above)
