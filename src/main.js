@@ -829,7 +829,7 @@ function boot() {
         const ACTION_LABEL = { bank: 'Use bank booth', shop: 'Trade', smelt: 'Smelt ore', smith: 'Smith metal', cook: 'Cook food', tan: 'Tan hides' };
         opts.push({ label: p.type === 'campChest' ? 'Open supply chest' : ACTION_LABEL[p.action] || 'Use', fn: () => { combat.stop(); useProp(p); } });
       } else if (p.interact) {
-        opts.push({ label: `Look at ${PROP_NAME[p.type] || p.type || 'this'}`, fn: () => { combat.stop(); useProp(p); } });
+        opts.push({ label: `Look at ${p.name || PROP_NAME[p.type] || p.type || 'this'}`, fn: () => { combat.stop(); useProp(p); } });
       }
     }
     if (area.isWalkable(t.x, t.y)) opts.push({ label: 'Walk here', fn: () => walkHere(t) });

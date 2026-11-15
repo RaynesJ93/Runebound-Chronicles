@@ -93,25 +93,56 @@ export function buildSlayerCave() {
   }
   // Lamps along the way
   for (const [x, y] of [[27, 41], [10, 22], [22, 11], [45, 15], [5, 30], [16, 28], [7, 6], [17, 13], [30, 5], [39, 12]]) put('lamp', x, y);
-  // 1. the Crawling Pit: rubble and old bones
-  for (const [x, y] of [[6, 33], [14, 30], [10, 36], [16, 34]]) put('bones', x, y, { blocks: false });
-  // 2. the Roost: bones everywhere, and crystals in the roof's drip
-  for (const [x, y] of [[8, 8], [15, 7], [6, 12], [17, 11], [11, 14], [12, 6]]) put('bones', x, y, { blocks: false });
-  for (const [x, y] of [[5, 9], [18, 8]]) put('crystalShard', x, y);
-  // 3. the Wraith Gallery: broken pillars and old rune stones
-  const pillarText = { interact: ['A fallen pillar, carved with faces worn smooth.'] };
-  for (const [x, y] of [[30, 7], [37, 11]]) if (free(x, y) && free(x + 1, y)) prop('fallenPillar', [{ x, y }, { x: x + 1, y }], pillarText);
-  const runeText = { interact: ['An old rune stone. The rune on it has been scratched out.'] };
-  for (const [x, y] of [[28, 10], [40, 7], [34, 5]]) put('runeStone', x, y, runeText);
-  // 4. the Wyrm's Hearth: braziers, scorched bones, a gem rock
+  // Each section's own painted decorations (art decor:<key>, v0.48.1). flat: lies
+  // on the ground (drawn under you); walk: you can walk over it.
+  const decor = (key, x, y, name, text, opt = {}) => {
+    const wide = opt.wide;
+    for (let r = 0; r < 4; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+      const tx = x + dx, ty = y + dy;
+      if (!free(tx, ty) || (wide && !free(tx + 1, ty))) continue;
+      const tiles = wide ? [{ x: tx, y: ty }, { x: tx + 1, y: ty }] : [{ x: tx, y: ty }];
+      prop('decor', tiles, { art: key, name, flat: !!opt.flat, blocks: !opt.walk, interact: [text] });
+      return;
+    }
+  };
+  // 1. the Crawling Pit: eggs, shed shells and slime
+  for (const [x, y] of [[5, 29], [15, 36]]) decor('crawlerEggs', x, y, 'crawler eggs', 'A clutch of pale crawler eggs, soft and faintly warm.');
+  for (const [x, y] of [[9, 26], [17, 31]]) decor('crawlerHusk', x, y, 'shed shell', 'A crawler\'s shed shell, split down the back.');
+  for (const [x, y] of [[8, 31], [13, 34], [4, 34]]) decor('slimePuddle', x, y, 'slime', 'A puddle of green slime. It smells of rot.', { flat: true, walk: true });
+  for (const [x, y] of [[12, 27], [6, 37]]) decor('dripStalagmite', x, y, 'stalagmite', 'A stalagmite, slick with dripping water.');
+  for (const [x, y] of [[10, 33], [16, 28]]) decor('glowMoss', x, y, 'glowing moss', 'Moss that glows faintly green. Tiny worms wriggle in it.', { walk: true });
+  decor('gnawedRocks', 13, 37, 'gnawed rocks', 'Rocks and bones, gnawed smooth.');
+  // 2. the Roost: nests, skulls and blood
+  for (const [x, y] of [[6, 7], [17, 12]]) decor('boneNest', x, y, 'bone nest', 'A nest of twigs and bones. Something red lies in the middle.');
+  for (const [x, y] of [[15, 6], [5, 13]]) decor('skullPile', x, y, 'skulls', 'A heap of skulls, picked clean.');
+  for (const [x, y] of [[10, 9], [14, 12], [8, 13]]) decor('bloodPool', x, y, 'blood', 'A dark pool of blood. Still wet.', { flat: true, walk: true });
+  for (const [x, y] of [[11, 5], [18, 9]]) decor('clawedStalagmite', x, y, 'stalagmite', 'Deep claw marks score this stalagmite.');
+  decor('roostRock', 4, 9, 'fallen rock', 'A lump of the roof that fell, streaked red.');
+  for (const [x, y] of [[12, 15], [7, 10]]) decor('featherHeap', x, y, 'fur and bones', 'Fur, bones and feathers: what the bloodbats left.', { flat: true, walk: true });
+  // 3. the Wraith Gallery: statues, graves and spectral candles
+  decor('hoodedStatue', 30, 6, 'hooded statue', 'A statue of a hooded figure, broken at the knees. Its face is worn away.', { wide: true });
+  decor('hoodedStatue', 38, 12, 'hooded statue', 'Another hooded statue. This one has fallen to its knees.', { wide: true });
+  for (const [x, y] of [[33, 5], [28, 11]]) decor('graveSlab', x, y, 'grave slab', 'A grave slab. The name has been scratched out.');
+  for (const [x, y] of [[40, 7], [35, 12]]) decor('runePillar', x, y, 'rune pillar', 'A pillar carved with runes that glow a cold blue.');
+  for (const [x, y] of [[31, 10], [37, 6]]) decor('ghostCandles', x, y, 'ghost candles', 'Candles burning with pale blue flame. They give no heat.', { walk: true });
+  for (const [x, y] of [[26, 8], [41, 10]]) decor('masonryRubble', x, y, 'rubble', 'Broken masonry from the walls.', { walk: true });
+  decor('spiritUrn', 36, 9, 'spirit urn', 'A stone urn. Blue mist curls out of it and won\'t blow away.');
+  // 4. the Wyrm's Hearth: lava, embers and the wyrms' hoard
+  decor('lavaPool', 53, 23, 'lava pool', 'A pool of bubbling lava. Don\'t.', { wide: true, flat: true });
+  decor('lavaPool', 47, 32, 'lava pool', 'A pool of bubbling lava. The air shimmers over it.', { wide: true, flat: true });
+  for (const [x, y] of [[49, 26], [55, 31]]) decor('emberVent', x, y, 'ember vent', 'A crack in the floor, breathing smoke and sparks.', { walk: true });
+  for (const [x, y] of [[44, 28], [57, 28]]) decor('charredSkeleton', x, y, 'charred skeleton', 'Someone who came for the treasure.', { flat: true, walk: true });
+  decor('dragonEgg', 58, 24, 'scorched egg', 'A huge scorched egg, hot to the touch. Something inside shifts.');
+  decor('scorchedHoard', 59, 30, 'scorched hoard', 'Coins and gems, fused together by the heat. Not worth the burns.', { walk: true });
+  for (const [x, y] of [[45, 24], [52, 34]]) decor('obsidianCluster', x, y, 'obsidian', 'Jagged black glass, grown from cooled lava.');
   for (const [x, y] of [[46, 25], [56, 25], [51, 33]]) put('campfire', x, y, { action: 'cook', interact: ['A brazier of glowing coals. The wyrms keep it lit. You could cook on it.'] });
-  for (const [x, y] of [[48, 30], [54, 29], [50, 22], [57, 31]]) put('bones', x, y, { blocks: false });
   put('ore', 58, 27, { variant: 'gem' });
 
-  // Rubble scattered through the caves, never in the hall's doorway
+  const zones0 = (x, y) => SECTIONS.some((s) => ((x - s.cx) / s.rx) ** 2 + ((y - s.cy) / s.ry) ** 2 < 1.2);
+  // Rubble scattered through the caves (less in the sections), never in the hall's doorway
   for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
     if (!isFloor(x, y) || (y >= 40 && Math.abs(x - 32) <= 2)) continue;
-    if (rng() < 0.05) one('rubble', x, y, { blocks: false });
+    if (rng() < (zones0(x, y) ? 0.02 : 0.05)) one('rubble', x, y, { blocks: false });
   }
 
   // ---- Monsters: spread out in the middle of each section --------------------------------
@@ -130,10 +161,24 @@ export function buildSlayerCave() {
     for (const p of took) spawns.push({ enemy: s.enemy, x: p.x, y: p.y });
   }
 
+  // ---- Zones: each section's own floor and wall textures (v0.48.1) ---------------------
+  // Every tile takes the look of the nearest section (or the hall's plain cave).
+  const zones = new Uint8Array(W * H);
+  const centres = [{ cx: 32, cy: 38, rx: 10, ry: 7, z: 0 }, ...SECTIONS.map((s, k) => ({ ...s, z: k + 1 }))];
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    let best = 0, bd = Infinity;
+    for (const c of centres) {
+      const d = Math.hypot((x - c.cx) / c.rx, (y - c.cy) / c.ry);
+      if (d < bd) { bd = d; best = c.z; }
+    }
+    zones[i(x, y)] = best;
+  }
+
   return {
     id: 'slayerCave',
     name: 'The Slayer Caverns',
     W, H, ground, blocked, props, indoors: true,
+    zones, zoneTex: ['Crawl', 'Roost', 'Wraith', 'Wyrm'],
     spawn: { x: 32, y: H - 3, facing: Math.PI },
     exits: [
       { tiles: [{ x: 32, y: H - 2 }], to: 'route1', at: { x: 38, y: 76 }, facing: 0 },

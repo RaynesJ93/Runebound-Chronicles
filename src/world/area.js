@@ -21,6 +21,11 @@ export class Area {
     this.theme = def.theme || null; // a different look for the ground and scenery (e.g. 'vale')
     this.neat = def.neat || []; // [x0, y0, x1, y1] squares of paving kept crisp and straight-edged
     this.dark = !!def.dark; // night-time: only lights and glowing things show up
+    // Zones with their own cave floor and wall textures (the Slayer Caverns'
+    // sections): zones[tile] is 0 for the usual look, else 1.. into zoneTex,
+    // the texture name suffixes (tex:cave<suffix>, tex:rockwall<suffix>).
+    this.zones = def.zones || null;
+    this.zoneTex = def.zoneTex || [];
     // Things that move (villagers, later enemies) and block tiles while they stand on them.
     this.dynamicBlock = null;
     this.exitAt = new Map();
