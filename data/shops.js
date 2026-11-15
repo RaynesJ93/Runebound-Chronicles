@@ -19,6 +19,9 @@ export const SHOPS = {
     name: "Kesta's slayer shop", currency: 'slayerPoints', buyOnly: true, unlimited: true,
     stock: [
       { id: 'slayerHelmet', price: 300 },
+      // needs: an item Kesta takes in part exchange (your old helmet, in your bag)
+      { id: 'superiorSlayerHelmet', price: 800, needs: 'slayerHelmet' },
+      { id: 'slayerRing', price: 150 },
       { id: 'slayerGem', price: 1 },
     ],
   },

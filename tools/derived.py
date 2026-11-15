@@ -851,8 +851,8 @@ def slayer_gem(im, get=None):
     return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
 
 
-def slayer_helm(im, get=None):
-    """The iron full helm, blackened, with a glowing red eye-slit."""
+def slayer_helm(im, get=None, ramp=('#0e0e12', '#24242c', '#3e3e48', '#6a6a78')):
+    """The iron full helm, blackened (or another dark ramp), with a glowing red eye-slit."""
     from scipy import ndimage
     rgba = np.array(im.convert('RGBA')).astype(np.float32)
     m = rgba[..., 3] > 0
@@ -860,7 +860,7 @@ def slayer_helm(im, get=None):
     lo, hi = np.percentile(l[m], 2), np.percentile(l[m], 99)
     t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
     out = rgba.copy()
-    out[m, :3] = J.ramp(['#0e0e12', '#24242c', '#3e3e48', '#6a6a78'], t)[m]
+    out[m, :3] = J.ramp(list(ramp), t)[m]
     inner = ndimage.binary_erosion(m, iterations=1)
     ys, xs = np.nonzero(m)
     yy, xx = np.mgrid[0:m.shape[0], 0:m.shape[1]]
@@ -951,7 +951,10 @@ for part in STEEL:
     DERIVED[f'steel{part}'] = dict(icon=(f'iron{part}', steel), small=(f'iron{part}', steel), gear=(f'iron{part}', steel))
 DERIVED['slayerGem'] = dict(icon=('uncutRuby', lambda im, g=None: slayer_gem(im, g)), small=('uncutRuby', lambda im, g=None: slayer_gem(im, g)))
 DERIVED['slayerHelmet'] = dict(icon=('ironFullHelm', lambda im, g=None: slayer_helm(im, g)), small=('ironFullHelm', lambda im, g=None: slayer_helm(im, g)), gear=('ironFullHelm', lambda im, g=None: slayer_helm(im, g)))
+SUPERIOR = lambda im, g=None: slayer_helm(im, g, ramp=('#0a1018', '#1a2c40', '#33557a', '#7aa8d8'))
+DERIVED['superiorSlayerHelmet'] = dict(icon=('runeFullHelm', SUPERIOR), small=('runeFullHelm', SUPERIOR), gear=('runeFullHelm', SUPERIOR))
 DERIVED['bloodfangAmulet'] = dict(icon=('goldRubyAmulet', BLOODFANG), small=('goldRubyAmulet', BLOODFANG), gear=('goldRubyAmulet', BLOODFANG))
+DERIVED['slayerRing'] = dict(icon=('goldEmeraldRing', ramp_to(['#06140c', '#123a22', '#2a7a44', '#9af0b0'])), small=('goldEmeraldRing', ramp_to(['#06140c', '#123a22', '#2a7a44', '#9af0b0'])))
 DERIVED['wraithstoneRing'] = dict(icon=('goldSapphireRing', WRAITHSTONE), small=('goldSapphireRing', WRAITHSTONE))
 DERIVED['emberScimitar'] = dict(icon=('runeScimitar', EMBER), small=('runeScimitar', EMBER), gear=('runeScimitar', EMBER))
 DERIVED['holtsSword'] = dict(icon=('steelLongsword', holts_blade), small=('steelLongsword', holts_blade), gear=('steelLongsword', holts_blade))
