@@ -43,11 +43,11 @@ export const SKIP_COST = 30;
 export const BLOCK_COST = 100;
 export const MAX_BLOCKS = 4;
 
-// Points for finishing a task, by how many you've done in a row.
-export function pointsFor(streak) {
-  if (streak % 50 === 0) return 150;
-  if (streak % 10 === 0) return 50;
-  return 10;
+// Points for finishing a task, by how many you've done in a row; x1.5 once
+// you've read the Hunter's scroll (from Kesta's shop).
+export function pointsFor(streak, scroll = false) {
+  const base = streak % 50 === 0 ? 150 : streak % 10 === 0 ? 50 : 10;
+  return scroll ? Math.round(base * 1.5) : base;
 }
 
 // How far below your combat level a task can be before it's too easy to give.

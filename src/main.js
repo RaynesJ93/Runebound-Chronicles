@@ -430,6 +430,7 @@ function boot() {
     if (id === 'coalBag' || id === 'gemBag') return () => openBag(i);
     if (def.read) return () => readItem(id);
     if (id === 'slayerGem') return () => hud.showDialog([taskText()], null, 'Slayer gem');
+    if (id === 'huntersScroll') return () => readScroll(i);
     if (id === 'slayerRing') return () => hud.showMenu(x, y, 'Slayer ring', [{ label: 'Wear', fn: () => wear(i) }, ...ringOptions(), { label: 'Cancel', fn: () => {} }]);
     if (/Mould$/.test(id)) return () => hud.message('Use a mould at a furnace, with a silver or gold bar, to cast jewellery.');
     if (id === 'silverBar' || id === 'goldBar') return () => hud.message('Cast it into rings and amulets at a furnace, with a ring or amulet mould.');
@@ -453,6 +454,7 @@ function boot() {
     if (s.id === 'steelStuds') options.push({ label: 'Stud leather', fn: () => studMenu(x, y) });
     if (s.id === 'coalBag' || s.id === 'gemBag') options.push({ label: 'Open', fn: () => openBag(i) });
     if (def.read) options.push({ label: 'Read', fn: () => readItem(s.id) });
+    if (s.id === 'huntersScroll') options.push({ label: 'Read', fn: () => readScroll(i) });
     if (s.id === 'slayerGem') options.push({ label: 'Check task', fn: () => hud.showDialog([taskText()], null, 'Slayer gem') });
     if (s.id === 'slayerRing') options.push(...ringOptions());
     if (def.food) options.push({ label: 'Eat', fn: () => eat(i) });
@@ -883,10 +885,12 @@ function boot() {
       return typeof v === 'function' ? v.bind(inv) : v;
     },
   });
+  // This shop's entry for an item in data/shops.js (for needs and hideFlag).
+  const shopEntry = (id) => SHOPS[Object.keys(shops).find((k) => shops[k] === shop)]?.stock.find((x) => x.id === id);
   const refreshTrade = () => {
     if (!hud.tradeOpen) return;
     if (hud.tradeMode === 'bank') hud.renderTrade(bank.items, inventory.slots);
-    else hud.renderTrade(shop.stock.filter((x) => x.base > 0 || x.qty > 0).map((x) => ({ id: x.id, qty: shop.unlimited ? null : x.qty, price: shop.buyPrice(x.id), currency: itemName(shop.currency).toLowerCase() })), inventory.slots, (id) => shop.sellPrice(id));
+    else hud.renderTrade(shop.stock.filter((x) => (x.base > 0 || x.qty > 0) && !(shopEntry(x.id)?.hideFlag && state.flags[shopEntry(x.id).hideFlag])).map((x) => ({ id: x.id, qty: shop.unlimited ? null : x.qty, price: shop.buyPrice(x.id), currency: itemName(shop.currency).toLowerCase() })), inventory.slots, (id) => shop.sellPrice(id));
   };
   const runAction = (name) => {
     combat.stop();
@@ -907,7 +911,12 @@ function boot() {
       else hud.tradeStatus(`Withdrew ${itemName(id)} × ${n}.`);
     } else {
       // Part exchange (a stock entry's `needs`): the old item must be in your bag, and goes.
-      const needs = SHOPS[Object.keys(shops).find((k) => shops[k] === shop)]?.stock.find((x) => x.id === id)?.needs;
+      const needs = shopEntry(id)?.needs;
+      if (shopEntry(id)?.hideFlag && (state.flags[shopEntry(id).hideFlag] || inventory.count(id))) {
+        hud.tradeStatus(state.flags[shopEntry(id).hideFlag] ? 'You already know what that teaches.' : 'You already have one. Read it first.');
+        refreshTrade();
+        return;
+      }
       if (needs && !inventory.count(needs)) {
         hud.tradeStatus(`Kesta needs your ${itemName(needs).toLowerCase()} to upgrade. Have it in your bag (not worn).`);
         refreshTrade();
@@ -1105,7 +1114,7 @@ function boot() {
     book.add('slayer', e.maxHp);
     if (t.left > 0) { if (t.left % 5 === 0 || t.left <= 3) hud.message(`Slayer task: ${t.left} ${taskById(t.id).name} left.`); return; }
     const st = (sl().streak += 1);
-    const pts = pointsFor(st);
+    const pts = pointsFor(st, !!state.flags.huntersScroll);
     sl().points += pts;
     sl().last = t.id;
     sl().task = null;
@@ -1197,6 +1206,18 @@ function boot() {
   };
   // Books and letters: tap to read, one page per dialogue box.
   const readItem = (id) => hud.showDialog(ITEMS[id].read, null, ITEMS[id].name);
+  // The Hunter's scroll (Kesta's shop): read once for +50% slayer points per task, for good.
+  const readScroll = (i) => {
+    if (state.flags.huntersScroll) { hud.message("You already know Kesta's secrets. The scroll has nothing more to teach you."); return; }
+    hud.showDialog(['You unroll the scroll and read Kesta\'s cramped notes: where each beast sleeps, how to track it, when to strike.',
+      'You\'ll earn 50% more slayer points from every task from now on.'], () => {
+      if (inventory.slots[i]?.id === 'huntersScroll') inventory.removeSlot(i); else inventory.remove('huntersScroll', 1);
+      state.flags.huntersScroll = true;
+      hud.message("The scroll crumbles to dust. +50% slayer points per task, for good.");
+      refreshInventory();
+      save();
+    }, "Hunter's scroll");
+  };
   player.onStep = (tile) => {
     if (!player.path.length) { marker = null; if (!player.interact) goal = null; }
     const exit = area.exitAt.get(area.idx(tile.x, tile.y));
