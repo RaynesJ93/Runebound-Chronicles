@@ -62,5 +62,21 @@
  "gear:bronzeThrowingKnife:up": [
   -4,
   11
+ ],
+ "gear:superiorSlayerHelmet:down": [
+  6,
+  30
+ ],
+ "gear:superiorSlayerHelmet:left": [
+  6,
+  26
+ ],
+ "gear:superiorSlayerHelmet:right": [
+  4,
+  26
+ ],
+ "gear:superiorSlayerHelmet:up": [
+  8,
+  28
  ]
 }

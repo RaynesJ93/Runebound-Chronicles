@@ -13,6 +13,9 @@ Sets:
   monsters01-12 (15 Nov 2026) Kesta and eleven monsters. Reads the sheets
                 themselves (grid_cells): 12 frames each, loose bits (a leaf,
                 smoke) kept with their frame.
+  slayergear    (15 Nov 2026) One 3 x 2 sheet: the superior slayer helmet's
+                icon, the slayer ring's icon, then the helmet worn facing down,
+                up, left and right (sized and placed like the rune full helm).
   slayercaves   (15 Nov 2026) The Slayer Caverns' four sections: for each,
                 a sheet of floor + wall textures (1A, 2A...) and a 3 x 2
                 sheet of decorations (1B, 2B...).
@@ -118,6 +121,36 @@ if SET == 'monsters01-12':
         save_frames(key, frames)
         print(key, frames[0].size, frames[6].size)
 
+elif SET == 'slayergear':
+    path = glob.glob(os.path.join(SRC, '*.png'))[0]
+    cells = [im for row in grid_cells(path, rows=2, cols=3) for im in row]
+
+    def boxed(im, size, fit):
+        k = min(fit / im.width, fit / im.height)
+        sm = scaled(im, k)
+        c = Image.new('RGBA', (size, size))
+        c.alpha_composite(sm, ((size - sm.width) // 2, (size - sm.height) // 2))
+        return c
+
+    for n, item in ((0, 'superiorSlayerHelmet'), (1, 'slayerRing')):
+        boxed(cells[n], 32, 28).save(os.path.join(OUT, f'icon__{item}.png'))
+        boxed(cells[n], 16, 15).save(os.path.join(OUT, f'iconS__{item}.png'))
+    # Worn: as wide as the rune full helm in each direction, bottoms lined up
+    # (the crest of spikes sticks up above it).
+    meta = json.load(open(os.path.join(ROOT, 'assets', 'art.json')))
+    anchors = {}
+    for d, n in zip(DIRS, (2, 3, 4, 5)):
+        x, y, w, h, ax, ay = meta[f'gear:runeFullHelm:{d}'][0]
+        im = cells[n]
+        sm = scaled(im, (w + 1) / im.width)
+        key = f'gear:superiorSlayerHelmet:{d}'
+        sm.save(os.path.join(OUT, key.replace(':', '__') + '.png'))
+        anchors[key] = [round(sm.width / 2 + (ax - w / 2)), sm.height + (ay - h)]
+    path = os.path.join(OUT, 'anchors.json')
+    old = json.load(open(path)) if os.path.exists(path) else {}
+    old.update(anchors)
+    json.dump(old, open(path, 'w'), indent=1, sort_keys=True)
+
 elif SET == 'slayercaves':
     from seamless import seamless
     from scipy import ndimage
@@ -219,5 +252,5 @@ elif SET == 'images01-09':
     old.update(anchors)
     json.dump(old, open(path, 'w'), indent=1, sort_keys=True)
 else:
-    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12 or slayercaves')
+    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves or slayergear')
 print('done')
