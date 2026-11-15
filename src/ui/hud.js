@@ -947,6 +947,9 @@ export class Hud {
     if (node.give && this.ctx.give && !this.ctx.give(node.give) && node.giveFail) { this.goto(node.giveFail); return; }
     // take: [{ item, qty }] — the NPC takes things from your bag (all or nothing).
     if (node.take && this.ctx.take && !this.ctx.take(node.take) && node.takeFail) { this.goto(node.takeFail); return; }
+    // run(ctx): game code to run before the text (e.g. give a slayer task). If it
+    // returns a node id, go there instead.
+    if (node.run) { const to = node.run(this.ctx); if (typeof to === 'string') { this.goto(to); return; } }
     this.node = node;
     if (node.set) Object.assign(this.ctx.flags, node.set);
     // reward: { xp: { skill: base XP }, quest: 'name' } — after the flags are set.
@@ -1007,7 +1010,7 @@ export class Hud {
     this.visibleChoices.forEach((c, i) => {
       const b = document.createElement('button');
       b.className = 'choice';
-      b.textContent = c.text;
+      b.textContent = typeof c.text === 'function' ? c.text(this.ctx) : c.text;
       b.dataset.key = String(i + 1);
       b.addEventListener('click', (e) => { e.stopPropagation(); this.pickChoice(i); });
       box.appendChild(b);

@@ -50,6 +50,7 @@ export const SKILLS = [
   { id: 'cooking', name: 'Cooking', about: 'Cook raw food on a fire. Higher levels burn less and unlock better fish.' },
   { id: 'crafting', name: 'Crafting', about: 'Tan hides into leather, then sew leather armour with a needle and thread.' },
   { id: 'runecrafting', name: 'Runecrafting', about: 'Bind rune essence into runes at altars. Higher levels give more runes per essence.' },
+  { id: 'slayer', name: 'Slayer', about: 'Kill the monsters Kesta the Huntress gives you as tasks, at the Hunters\' camp in Thornwood. Only monsters on your task give Slayer XP.' },
 ];
 
 export const SKILL_NAME = Object.fromEntries(SKILLS.map((s) => [s.id, s.name]));

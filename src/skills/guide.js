@@ -16,6 +16,8 @@ import { COOKING } from '../../data/cooking.js';
 import { TANNING, SEWING, CUTTING, JEWELLERY, STUDDING } from '../../data/crafting.js';
 import { ALTARS } from '../../data/runecrafting.js';
 import { SPELLS } from '../../data/spells.js';
+import { TASKS } from '../../data/slayer.js';
+import { ENEMIES } from '../../data/enemies.js';
 import { SKILLS, XP_RATE } from './skills.js';
 
 const name = (id) => ITEMS[id]?.name || id;
@@ -98,6 +100,14 @@ const BUILD = {
     { title: 'Gem cutting (chisel)', rows: recipes(CUTTING) },
     { title: 'Silver jewellery (furnace and mould)', rows: recipes(JEWELLERY.filter((r) => r.metal === 'silverBar')) },
     { title: 'Gold jewellery (furnace and mould)', rows: recipes(JEWELLERY.filter((r) => r.metal === 'goldBar')) },
+  ],
+  slayer: () => [
+    { title: 'How it works', note: 'Get a task from Kesta the Huntress at the Hunters\' camp, by the lake in south-west Thornwood. Monsters on your task give Slayer XP equal to their hitpoints. Finishing a task gives slayer points: 10, or 50 for every 10th in a row and 150 for every 50th. Spend them with Kesta on skips (30), blocks (100) and her shop.', rows: [] },
+    { title: 'Tasks Kesta gives', rows: byLevel(TASKS.map((t) => ({
+      level: t.slayer || 1, icon: 'slayerGem', name: t.name[0].toUpperCase() + t.name.slice(1),
+      sub: [`combat ${t.combat}+${t.maxCombat ? ` (until ${t.maxCombat})` : ''}`, `${t.amount[0]}–${t.amount[1]} kills`, t.monsters.map((m) => ENEMIES[m]?.name).join(', ')].join(' · '),
+    }))) },
+    { title: 'Gear', rows: [{ level: 1, icon: 'slayerHelmet', name: 'Slayer helmet', sub: '300 slayer points · Defence 20 · +15% accuracy and damage on task' }] },
   ],
   runecrafting: () => {
     const altars = Object.values(ALTARS);

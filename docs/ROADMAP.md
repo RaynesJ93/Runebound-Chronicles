@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 15 Nov 2026 | v0.45.0: Slayer — a new skill and Kesta the Huntress, slayer master at the Hunters' camp. Tasks to kill monsters that suit your level, Slayer XP for each kill, slayer points for each task (bonuses every 10th and 50th), skips and blocks, a slayer gem, and the slayer helmet (+15% against your task). New monsters and slayer-only monsters come next. |
 | 7 Nov 2026 | v0.44.0: lodestones — six ancient rune stones (Brambleford, Thornwood, Copperdeep Mine, the Sunken Forge, Whispering Vale, Goblin Warrens) for teleporting between areas. Woken by Aldric's side quest The Sleeping Stones (Runecrafting 5, 20 air runes and 10 essence); each one is attuned by touching it once. |
 | 7 Nov 2026 | v0.43.0: new painted art. Lyra the Stargazer finally has a sprite; Tobin, the warren goblins, the Goblin Digmaster and Grubnak (with his own club-swinging attack) have their own art instead of recolours; the ten Runebound story items have painted icons; the rune door is painted; and pickaxes, darts, throwing knives and javelins now show in your hand when wielded, in every metal. |
 | 7 Nov 2026 | v0.42.1: Echoes of the War says who to find: once you have Holt's journal, the journal step names Tobin and his hut in north-west Thornwood, Maren points you to him, and the journal's last page says where he went. |

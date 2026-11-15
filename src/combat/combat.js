@@ -308,7 +308,7 @@ export class Combat {
     const st = this.rangedStyle;
     const b = this.gear.bonuses();
     const dmg = resolveAttack(this.rng,
-      { attack: s.ranged, strength: s.ranged, attackBonus: b.att.ranged, strengthBonus: b.rangedStr, attackStyle: st.bonus.ranged || 0, strengthStyle: st.bonus.ranged || 0 },
+      { attack: s.ranged, strength: s.ranged, attackBonus: b.att.ranged, strengthBonus: b.rangedStr, attackStyle: st.bonus.ranged || 0, strengthStyle: st.bonus.ranged || 0, boost: this.on.taskBoost?.(e) },
       { defence: e.def.defence, defenceBonus: e.def.defenceBonus });
     const ticks = this.flightTicks(e, false);
     this.launch(e, 'arrow', ticks);
@@ -338,7 +338,7 @@ export class Combat {
     for (const [id, n] of Object.entries(spell.runes)) this.inv.remove(id, n);
     const b = this.gear.bonuses();
     const dmg = resolveAttack(this.rng,
-      { attack: s.magic, attackBonus: b.att.magic, maxHit: spell.maxHit },
+      { attack: s.magic, attackBonus: b.att.magic, maxHit: spell.maxHit, boost: this.on.taskBoost?.(e) },
       { defence: e.def.defence, defenceBonus: e.def.defenceBonus });
     const ticks = this.flightTicks(e, true);
     this.launch(e, spell.colour, ticks);
@@ -369,7 +369,7 @@ export class Combat {
     const s = this.skills;
     const style = this.style;
     const dmg = resolveAttack(this.rng,
-      { attack: s.attack, strength: s.strength, ...this.meleeBonuses(), attackStyle: style.bonus.attack || 0, strengthStyle: style.bonus.strength || 0 },
+      { attack: s.attack, strength: s.strength, ...this.meleeBonuses(), attackStyle: style.bonus.attack || 0, strengthStyle: style.bonus.strength || 0, boost: this.on.taskBoost?.(e) },
       { defence: e.def.defence, defenceBonus: e.def.defenceBonus });
     this.playerLungeAt = this.now;
     this.playerAttackKind = 'slash';

@@ -14,6 +14,7 @@ import { SLOTS } from '../items/equipment.js';
 import { SKILLS } from '../skills/skills.js';
 import { defaultState } from './state.js';
 import { STAR_SITES, DUST_PER_SIZE } from '../../data/stars.js';
+import { taskById, MAX_BLOCKS } from '../../data/slayer.js';
 
 const INV_SIZE = 28;
 
@@ -125,6 +126,16 @@ export function sanitize(state) {
   state.star = site && [1, 2, 3, 4, 5].includes(st.size) && num(st.dust, 0) > 0
     ? { area: st.area, x: st.x, y: st.y, size: st.size, dust: Math.min(DUST_PER_SIZE, Math.ceil(st.dust)), landedAt: num(st.landedAt, 0) } : null;
   state.nextStarAt = num(state.nextStarAt, 0, 0);
+  // Slayer: a real task with a sensible count, points and streak, known blocks.
+  const sl = state.slayer && typeof state.slayer === 'object' ? state.slayer : def.slayer;
+  const t = sl.task;
+  state.slayer = {
+    task: t && typeof t === 'object' && taskById(t.id) ? { id: t.id, total: Math.floor(num(t.total, 1, 1, 1000)), left: Math.floor(num(t.left, 0, 0, 1000)) } : null,
+    streak: Math.floor(num(sl.streak, 0, 0)),
+    points: Math.floor(num(sl.points, 0, 0, 1_000_000)),
+    blocked: Array.isArray(sl.blocked) ? [...new Set(sl.blocked.filter((id) => taskById(id)))].slice(0, MAX_BLOCKS) : [],
+    last: taskById(sl.last) ? sl.last : null,
+  };
 
   return state;
 }

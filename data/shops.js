@@ -15,6 +15,13 @@ export const SHOPS = {
       { id: 'gemBag', price: 40 },
     ],
   },
+  slayerShop: {
+    name: "Kesta's slayer shop", currency: 'slayerPoints', buyOnly: true, unlimited: true,
+    stock: [
+      { id: 'slayerHelmet', price: 300 },
+      { id: 'slayerGem', price: 1 },
+    ],
+  },
   generalStore: {
     name: "Pell's General Store",
     stock: [

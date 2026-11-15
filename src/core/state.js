@@ -20,6 +20,7 @@ export function defaultState() {
     star: null, // the shooting star that's down right now (see data/stars.js)
     nextStarAt: 0, // play time (seconds) when the next star falls
     stats: { playTimeSec: 0, tilesWalked: 0, deaths: 0, kills: 0 },
+    slayer: { task: null, streak: 0, points: 0, blocked: [], last: null }, // see data/slayer.js
     flags: { seenMoveHint: false },
     createdAt: Date.now(),
   };
