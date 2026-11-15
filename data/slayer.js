@@ -7,7 +7,7 @@
 // Each task type:
 //   id, name (plural, as Kesta says it), monsters (enemy ids that count),
 //   combat: the combat level you need; maxCombat: she stops giving it after this,
-//   slayer: the Slayer level you need (for slayer-only monsters, batch 3),
+//   slayer: the Slayer level you need (for the slayer monsters),
 //   flag: a story flag that must be set (the monsters' area must be open),
 //   amount: [min, max] kills, weight: how often she picks it.
 
@@ -27,6 +27,11 @@ export const TASKS = [
   { id: 'undead', name: 'skeletons and ghosts', monsters: ['skeleton', 'restlessGhost'], combat: 13, amount: [20, 40], weight: 8 },
   { id: 'airElementals', name: 'air elementals', monsters: ['airElemental'], combat: 24, amount: [20, 40], weight: 6 },
   { id: 'fireImps', name: 'fire imps', monsters: ['fireImp'], combat: 28, amount: [20, 40], weight: 7 },
+  // v0.47.0: slayer monsters, only once you have the Slayer level
+  { id: 'caveCrawlers', name: 'cave crawlers', monsters: ['caveCrawler'], combat: 15, slayer: 10, amount: [20, 40], weight: 8 },
+  { id: 'bloodbats', name: 'bloodbats', monsters: ['bloodbat'], combat: 30, slayer: 25, amount: [20, 40], weight: 8 },
+  { id: 'stoneWraiths', name: 'stone wraiths', monsters: ['stoneWraith'], combat: 45, slayer: 45, amount: [20, 40], weight: 8 },
+  { id: 'emberWyrms', name: 'ember wyrms', monsters: ['emberWyrm'], combat: 60, slayer: 60, amount: [15, 30], weight: 8 },
 ];
 
 export const taskById = (id) => TASKS.find((t) => t.id === id);

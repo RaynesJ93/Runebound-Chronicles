@@ -137,12 +137,30 @@ export class Combat {
 
   attack(enemy) {
     if (!enemy || enemy.dead) return;
+    if (!this.canFight(enemy)) {
+      this.on.message?.(`You need a Slayer level of ${enemy.def.slayer} to fight the ${enemy.def.name.toLowerCase()}.`);
+      return;
+    }
     this.target = enemy;
     this.approach(true);
   }
 
   stop() {
     this.target = null;
+  }
+
+  // Slayer monsters (def.slayer) need that Slayer level to fight.
+  canFight(e) {
+    return !e.def.slayer || (this.on.slayerLevel?.() ?? 1) >= e.def.slayer;
+  }
+
+  // Stone skin and the like (def.resist): some attack types do less damage.
+  // A hit that lands still does at least 1.
+  resisted(e, dmg, kind) {
+    const k = e.def.resist?.[kind];
+    if (!dmg || k == null || k === 1) return dmg;
+    if (!e.resistTold) { e.resistTold = true; this.on.message?.(e.def.resistText || `The ${e.def.name.toLowerCase()} shrugs off some of the damage.`); }
+    return Math.max(1, Math.floor(dmg * k));
   }
 
   // Walk to a tile right next to the target.
@@ -355,7 +373,7 @@ export class Combat {
     const e = h.target;
     if (h.mode === 'ranged' && h.keepArrow && !e.dead) this.on.arrowLanded?.(h.arrow, e.standTile.x, e.standTile.y);
     if (e.dead) return;
-    const dealt = Math.min(h.dmg, e.hp);
+    const dealt = Math.min(this.resisted(e, h.dmg, h.mode), e.hp);
     this.hurtEnemy(e, dealt);
     if (dealt > 0) {
       if (h.mode === 'ranged') for (const [skill, share] of Object.entries(this.rangedStyle.xp)) this.book.add(skill, dealt * XP_PER_DAMAGE * share);
@@ -373,7 +391,7 @@ export class Combat {
       { defence: e.def.defence, defenceBonus: e.def.defenceBonus });
     this.playerLungeAt = this.now;
     this.playerAttackKind = 'slash';
-    const dealt = Math.min(dmg, e.hp); // can't do more damage than it has health
+    const dealt = Math.min(this.resisted(e, dmg, this.weapon.type || 'crush'), e.hp); // can't do more damage than it has health
     this.hurtEnemy(e, dealt);
     // XP: 4 per damage shared by the style's skills, plus 1.33 Hitpoints.
     if (dealt > 0) {
@@ -435,9 +453,12 @@ export class Combat {
     const playerUp = st.player.hp > 0;
     const def = e.def;
 
+    // Regenerating monsters (def.regen = [hp, ticks]) heal even mid-fight.
+    if (def.regen && e.hp < e.maxHp && (e.regenT = (e.regenT || 0) + 1) >= def.regen[1]) { e.regenT = 0; e.hp = Math.min(e.maxHp, e.hp + def.regen[0]); }
+
     if (e.state === 'idle') {
       const near = cheb(e.tile, pt) <= (def.aggroRange ?? 0);
-      if (def.aggressive && playerUp && near && this.level < def.level * 2 && cheb(pt, e.spawn) <= def.leash) {
+      if (def.aggressive && playerUp && near && this.level < def.level * 2 && this.canFight(e) && cheb(pt, e.spawn) <= def.leash) {
         e.state = 'fight';
         e.cooldown = Math.max(e.cooldown, 1);
         this.on.message?.(`The ${def.name} attacks you!`);
@@ -452,12 +473,18 @@ export class Combat {
         e.faceTowards(pt.x, pt.y);
         if (e.cooldown <= 0) {
           const f = this.fightStats(e);
+          // Fire breath (def.breath): every Nth attack, a bigger magic hit.
+          const br = def.breath && (e.swings = (e.swings || 0) + 1) % def.breath.every === 0 ? def.breath : null;
+          if (br) this.on.message?.(br.text || `The ${def.name.toLowerCase()} breathes fire!`);
           const dmg = resolveAttack(this.rng,
-            { attack: f.attack, strength: f.strength, attackBonus: f.attackBonus, maxHit: f.maxHit },
-            { defence: this.skills.defence, defenceBonus: this.defenceAgainst(def.attackType || 'crush'), defenceStyle: this.defenceStyleBonus() });
+            { attack: f.attack, strength: f.strength, attackBonus: f.attackBonus, maxHit: br ? br.maxHit : f.maxHit },
+            { defence: this.skills.defence, defenceBonus: this.defenceAgainst(br ? 'magic' : def.attackType || 'crush'), defenceStyle: this.defenceStyleBonus() });
           e.lungeAt = this.now;
+          if (br) this.impacts.push({ x: pt.x, y: pt.y, time: this.now });
           e.cooldown = f.speed;
           this.hurtPlayer(e, dmg);
+          // Drinking blood (def.drain): it heals by a share of what it hit.
+          if (def.drain && dmg > 0 && e.hp < e.maxHp) e.hp = Math.min(e.maxHp, e.hp + Math.max(1, Math.floor(dmg * def.drain)));
         }
       } else this.chase(e, pt);
       return;

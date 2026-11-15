@@ -95,6 +95,11 @@ export function buildDepths() {
       { enemy: 'caveBeast', x: 32, y: 13 },
       { enemy: 'caveBeast', x: 11, y: 17 },
       { enemy: 'caveBeast', x: 29, y: 17 },
+      // Cave crawlers (Slayer 10) in the side caverns
+      { enemy: 'caveCrawler', x: 9, y: 10 },
+      { enemy: 'caveCrawler', x: 6, y: 15 },
+      { enemy: 'caveCrawler', x: 33, y: 11 },
+      { enemy: 'caveCrawler', x: 35, y: 15 },
     ],
   };
 }

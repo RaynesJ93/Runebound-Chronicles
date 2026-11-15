@@ -802,6 +802,19 @@ export const ITEMS = {
     equip: { slot: 'cape', req: { defence: 30 }, att: { stab: 3, slash: 3, crush: 3, ranged: 3, magic: 3 }, def: { stab: 5, slash: 5, crush: 5, ranged: 5, magic: 4 }, str: 3, look: {} },
   },
   // ---- Slayer (data/slayer.js) ---------------------------------------------------------
+  // Unique drops from the slayer monsters (v0.47.0)
+  bloodfangAmulet: {
+    name: 'Bloodfang amulet', value: 6000, rare: true, examine: 'A bloodbat fang on a black cord. Still sharp, still thirsty.',
+    equip: { slot: 'neck', req: {}, att: { stab: 5, slash: 5, crush: 5 }, str: 6 },
+  },
+  wraithstoneRing: {
+    name: 'Wraithstone ring', value: 6000, rare: true, examine: 'A band of grey stone that glows faintly blue. A little of the wraith is still inside.',
+    equip: { slot: 'ring', req: {}, att: { magic: 8 }, def: { stab: 3, slash: 3, crush: 3, ranged: 3, magic: 3 } },
+  },
+  emberScimitar: {
+    name: 'Ember scimitar', value: 15000, rare: true, examine: 'A curved blade forged from an ember wyrm\'s scale. It never quite stops glowing.',
+    equip: { slot: 'weapon', req: { attack: 50 }, type: 'slash', speed: 4, att: { stab: 9, slash: 42, crush: -2 }, def: { slash: 3 }, str: 38, look: { weapon: 'rune', blade: 7 } },
+  },
   slayerPoints: { name: 'Slayer points', value: 0, examine: 'Points from finishing slayer tasks. Spend them with Kesta.' }, // a currency, never in your bag
   slayerGem: { name: 'Slayer gem', value: 0, examine: 'An enchanted gem from Kesta. Tap it to check your slayer task.' },
   slayerHelmet: {
