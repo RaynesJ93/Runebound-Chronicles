@@ -36,6 +36,7 @@ import { STAR_SITES, DUST_PER_SIZE, FIRST_STAR, NEXT_STAR, STAR_LIFETIME, rollSi
 import { MAP_NAME } from '../data/mapLabels.js';
 import { QUESTS, questStatus, QUEST_HOOKS, QUEST_DROPS } from '../data/quests.js';
 import { LODESTONES } from '../data/lodestones.js';
+import { TASKS, taskById, pickTask, pointsFor, SKIP_COST, BLOCK_COST, MAX_BLOCKS } from '../data/slayer.js';
 import { SMELTING, SMITHING, saveBarChance } from '../data/smithing.js';
 import { SPOTS, FISH_TICKS, spotLevel } from '../data/fishing.js';
 import { COOKING } from '../data/cooking.js';
@@ -157,6 +158,7 @@ function boot() {
       enemyDied: (e) => {
         hud.message(`You defeated the ${e.name}!`);
         state.stats.kills = (state.stats.kills || 0) + 1;
+        slayerKill(e);
         if (e.summoned) return; // a boss's adds drop nothing
         // Story bosses set a flag when they fall (def.defeatFlag).
         if (e.def.defeatFlag && !state.flags[e.def.defeatFlag]) {
@@ -414,6 +416,7 @@ function boot() {
     if (id === 'steelStuds') return () => studMenu(x, y);
     if (id === 'coalBag' || id === 'gemBag') return () => openBag(i);
     if (def.read) return () => readItem(id);
+    if (id === 'slayerGem') return () => hud.showDialog([taskText()], null, 'Slayer gem');
     if (/Mould$/.test(id)) return () => hud.message('Use a mould at a furnace, with a silver or gold bar, to cast jewellery.');
     if (id === 'silverBar' || id === 'goldBar') return () => hud.message('Cast it into rings and amulets at a furnace, with a ring or amulet mould.');
     if (id === 'knife') return () => fletchMenu(inventory.count('logs') ? 'logs' : inventory.count('oakLogs') ? 'oakLogs' : null, x, y);
@@ -436,6 +439,7 @@ function boot() {
     if (s.id === 'steelStuds') options.push({ label: 'Stud leather', fn: () => studMenu(x, y) });
     if (s.id === 'coalBag' || s.id === 'gemBag') options.push({ label: 'Open', fn: () => openBag(i) });
     if (def.read) options.push({ label: 'Read', fn: () => readItem(s.id) });
+    if (s.id === 'slayerGem') options.push({ label: 'Check task', fn: () => hud.showDialog([taskText()], null, 'Slayer gem') });
     if (def.food) options.push({ label: 'Eat', fn: () => eat(i) });
     if (def.potion) options.push({ label: 'Drink', fn: () => eat(i) });
     if (def.equip) {
@@ -854,6 +858,16 @@ function boot() {
   const shops = Object.fromEntries(Object.entries(SHOPS).map(([id, d]) => [id, new Shop(d)]));
   let shop = shops.generalStore; // the one that's open
 
+  // Slayer points aren't an item, so Kesta's shop takes them from a "wallet"
+  // that looks like the bag for everything else.
+  const pointsWallet = new Proxy(inventory, {
+    get(inv, k) {
+      if (k === 'count') return (id) => (id === 'slayerPoints' ? state.slayer.points : inv.count(id));
+      if (k === 'remove') return (id, n) => { if (id === 'slayerPoints') state.slayer.points -= n; else inv.remove(id, n); };
+      const v = inv[k];
+      return typeof v === 'function' ? v.bind(inv) : v;
+    },
+  });
   const refreshTrade = () => {
     if (!hud.tradeOpen) return;
     if (hud.tradeMode === 'bank') hud.renderTrade(bank.items, inventory.slots);
@@ -865,6 +879,7 @@ function boot() {
     if (name === 'bank') hud.openTrade('bank', lastStation?.type === 'campChest' ? lastStation.title || 'Supply chest' : 'Bank of Brambleford');
     else if (name === 'shop') { shop = shops.generalStore; hud.openTrade('shop', shop.name); }
     else if (name === 'starShop') { shop = shops.starShop; hud.openTrade('shop', shop.name, 'Tap a reward to buy it with stardust. Lyra doesn\'t buy anything.'); }
+    else if (name === 'slayerShop') { shop = shops.slayerShop; hud.openTrade('shop', shop.name, `Tap a reward to buy it with slayer points. You have ${state.slayer.points}.`); }
     refreshTrade();
   };
   hud.onTradeClose = () => { refreshInventory(); save(); };
@@ -876,7 +891,7 @@ function boot() {
       if (!n) hud.tradeStatus('Your bag is full.');
       else hud.tradeStatus(`Withdrew ${itemName(id)} × ${n}.`);
     } else {
-      const r = shop.buy(id, q === Infinity ? 1000 : q, inventory);
+      const r = shop.buy(id, q === Infinity ? 1000 : q, shop.currency === 'slayerPoints' ? pointsWallet : inventory);
       const cur = itemName(shop.currency).toLowerCase();
       if (!r.n) hud.tradeStatus(r.why === 'coins' ? `You don't have enough ${cur}.` : r.why === 'space' ? 'Your bag is full.' : "That's out of stock.");
       else hud.tradeStatus(`Bought ${itemName(id)} × ${r.n} for ${r.cost} ${cur}.`);
@@ -892,7 +907,7 @@ function boot() {
       const real = ITEMS[slot.id].noted;
       hud.tradeStatus(real ? `Deposited ${n} notes: they turn back into ${itemName(real).toLowerCase()} in the bank.` : `Deposited ${itemName(slot.id)} × ${n}.`);
     } else {
-      if (shop.buyOnly) { hud.tradeStatus("Lyra doesn't buy anything. She only trades stardust for rewards."); return; }
+      if (shop.buyOnly) { hud.tradeStatus(`${shop.name.replace(/'s .*/, '')} doesn't buy anything. It's rewards only.`); return; }
       if (slot.id === 'coins') { hud.tradeStatus("You can't sell coins!"); return; }
       const r = shop.sell(i, q, inventory);
       hud.tradeStatus(`Sold ${itemName(slot.id)} × ${r.n} for ${r.earned} coins.`);
@@ -978,7 +993,7 @@ function boot() {
       talkTarget = null;
       npc.busy = true;
       hud.startConversation({ name: npc.name, ...npc.def.talk }, {
-        flags: state.flags, give: giveItems(npc), action: runAction, starNews,
+        flags: state.flags, give: giveItems(npc), action: runAction, starNews, slayer: slayerCtx,
         level: (skill) => book.level(skill),
         count: (id) => inventory.count(id),
         have: (id) => haveAnywhere(id),
@@ -1053,6 +1068,51 @@ function boot() {
   function syncCaves() { // (a function declaration, so refreshQuests can call it from the start)
     for (const w of worlds.values()) for (const p of w.area.props) if (p.openable) p.opened = !!state.flags[p.openFlag || 'caveOpen'];
   }
+  // ---- Slayer (data/slayer.js) -------------------------------------------------------
+  const sl = () => state.slayer;
+  const taskText = () => {
+    const t = sl().task, def = t && taskById(t.id);
+    return def ? `${t.left} ${def.name} left to kill, out of ${t.total}.` : 'You have no slayer task. Ask Kesta at the Hunters\' camp for one.';
+  };
+  const onTask = (e) => !!sl().task && taskById(sl().task.id)?.monsters.includes(e.def.id);
+  const slayerKill = (e) => {
+    const t = sl().task;
+    if (!t || !onTask(e) || t.left <= 0) return;
+    t.left--;
+    book.add('slayer', e.maxHp);
+    if (t.left > 0) { if (t.left % 5 === 0 || t.left <= 3) hud.message(`Slayer task: ${t.left} ${taskById(t.id).name} left.`); return; }
+    const st = (sl().streak += 1);
+    const pts = pointsFor(st);
+    sl().points += pts;
+    sl().last = t.id;
+    sl().task = null;
+    hud.message(`You've finished your slayer task! ${st} in a row: +${pts} slayer points (you have ${sl().points}). Go back to Kesta for another.`);
+    save();
+  };
+  // What Kesta's dialogue can do (her nodes in data/npcs.js).
+  const slayerCtx = {
+    get task() { const t = sl().task; return t && { ...t, name: taskById(t.id).name }; },
+    get points() { return sl().points; },
+    get streak() { return sl().streak; },
+    get blocked() { return sl().blocked.map((id) => taskById(id)); },
+    text: taskText,
+    assign() {
+      const t = pickTask({ combat: combat.level, slayer: book.level('slayer'), flags: state.flags, blocked: sl().blocked, last: sl().last });
+      sl().task = t;
+      if (!inventory.count('slayerGem') && !bank.count?.('slayerGem') && inventory.add('slayerGem', 1)) { hud.message('Kesta gives you a slayer gem. Tap it to check your task.'); refreshInventory(); }
+      save();
+      return t;
+    },
+    skip() { if (sl().points < SKIP_COST || !sl().task) return false; sl().points -= SKIP_COST; sl().last = sl().task.id; sl().task = null; save(); return true; },
+    block() {
+      if (sl().points < BLOCK_COST || !sl().task || sl().blocked.length >= MAX_BLOCKS) return false;
+      sl().points -= BLOCK_COST; sl().blocked.push(sl().task.id); sl().last = sl().task.id; sl().task = null; save(); return true;
+    },
+    unblock(id) { sl().blocked = sl().blocked.filter((b) => b !== id); save(); },
+  };
+  // The slayer helmet: more accuracy and damage against monsters on your task.
+  combat.on.taskBoost = (e) => (onTask(e) ? 1 + (ITEMS[state.equipment.head?.id]?.equip?.slayerBoost || 0) : 1);
+
   // ---- Lodestones (data/lodestones.js) ---------------------------------------------
   // Dormant until The Sleeping Stones; then touch one once to attune it, and any
   // awake stone lists the attuned ones to travel to.

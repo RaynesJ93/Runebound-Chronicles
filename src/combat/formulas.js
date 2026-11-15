@@ -18,10 +18,13 @@ export function maxHit(effectiveStrength, strengthBonus) {
 // attacker: { attack, strength, attackBonus, strengthBonus, attackStyle, strengthStyle, maxHit? }
 // defender: { defence, defenceBonus, defenceStyle }
 // Returns the damage: 0 is a miss (blue splat); a successful hit does 1..max.
+// attacker.boost (e.g. 1.15 from the slayer helmet on task) multiplies the
+// attack roll and the max hit.
 export function resolveAttack(rng, attacker, defender) {
-  const a = roll(effectiveLevel(attacker.attack, attacker.attackStyle || 0), attacker.attackBonus || 0);
+  const k = attacker.boost || 1;
+  const a = roll(effectiveLevel(attacker.attack, attacker.attackStyle || 0), attacker.attackBonus || 0) * k;
   const d = roll(effectiveLevel(defender.defence, defender.defenceStyle || 0), defender.defenceBonus || 0);
-  const max = attacker.maxHit ?? maxHit(effectiveLevel(attacker.strength, attacker.strengthStyle || 0), attacker.strengthBonus || 0);
+  const max = Math.floor((attacker.maxHit ?? maxHit(effectiveLevel(attacker.strength, attacker.strengthStyle || 0), attacker.strengthBonus || 0)) * k);
   if (rng() >= hitChance(a, d)) return 0;
   return 1 + Math.floor(rng() * max);
 }

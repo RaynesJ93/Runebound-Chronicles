@@ -7,7 +7,21 @@
 // are the saved story flags). Nodes have say / choices / next / set — see
 // startConversation in src/ui/hud.js.
 
+import { SKIP_COST as SKIP, BLOCK_COST as BLOCK, MAX_BLOCKS as MAXB } from './slayer.js';
+
 const pickLine = (lines) => () => lines[Math.floor(Math.random() * lines.length)];
+
+// Kesta's tip for each slayer task.
+const TIPS = {
+  farm: 'Chickens and cows, in Brambleford. Everyone starts somewhere.',
+  goblins: 'Goblins: the camp in west Thornwood, or the tunnel goblins in Copperdeep Mine. Brutes count too.',
+  wolves: 'Wolves roam the hills in north-east Thornwood. Leave the Alpha alone unless you fancy it.',
+  essenceGolems: 'Essence golems guard the quarry in Whispering Vale.',
+  caveBeasts: 'Cave beasts: down in Copperdeep Depths. Take food.',
+  warrenGoblins: 'Warren goblins, down in the Goblin Warrens under the old cave.',
+  nightStalkers: 'Night stalkers hunt in Copperdeep Hollow. They hit hard. Bring plenty of food.',
+  forgeGolems: 'Forge golems, in the Sunken Forge. Bring your best armour.',
+};
 
 export const NPCS = [
   // ---- Brambleford -------------------------------------------------------------
@@ -624,6 +638,74 @@ export const NPCS = [
           say: (c) => (c.flags.grubnakDown ? (c.flags.tobinThanked ? ['Tell Maren. Then let an old man sleep.'] : ["You did it! But don't stand about here. Come back to the chamber. It isn't finished."])
             : c.flags.chamberOpen ? ['What are you doing back here? Grubnak is through that door!'] : ["Get Aldric's help with the door. I'll meet you there."]),
         },
+      },
+    },
+  },
+
+  {
+    // The slayer master (data/slayer.js; her task code is slayerCtx in main.js).
+    examine: 'A lean, scarred huntress with a longbow and a necklace of teeth. She has killed one of everything, and two of most things.',
+    id: 'kesta', name: 'Kesta the Huntress', short: 'Kesta', area: 'route1', x: 30, y: 78, radius: 1, wander: 0.1,
+    look: { hair: '#2a1a12', tunic: '#5a6a3a', pants: '#4a3a28', belt: '#2a1a12', hat: 'hood', hatColor: '#3a4a2a', skin: '#c99a72' },
+    talk: {
+      start: (c) => (c.flags.metKesta ? 'menu' : 'hello'),
+      nodes: {
+        hello: {
+          set: { metKesta: true },
+          say: ['Stop there. Don\'t step on my snares.', "Kesta. I hunt monsters for anyone who pays, and I teach anyone with the nerve.",
+            "Slayer, we call it. I give you a task: a kind of monster, and how many. You go and kill them. You learn how they move, where they're soft.",
+            'Do it well and I pay you in slayer points. Spend them here, on things you won\'t find in any shop.'],
+          next: 'menu',
+        },
+        menu: {
+          say: (c) => [c.slayer.task ? `Your task: ${c.slayer.text()}` : 'Looking for work?'],
+          choices: [
+            { text: 'I need a slayer task.', next: 'assign', if: (c) => !c.slayer.task },
+            { text: 'How am I doing?', next: 'progress', if: (c) => !!c.slayer.task },
+            { text: `Skip this task. (${SKIP} points)`, next: 'skip', if: (c) => !!c.slayer.task },
+            { text: `Never give me this task again. (${BLOCK} points)`, next: 'block', if: (c) => !!c.slayer.task },
+            { text: 'Unblock a task.', next: 'unblockList', if: (c) => c.slayer.blocked.length > 0 },
+            { text: "What's for sale?", action: 'slayerShop' },
+            { text: 'Tell me about Slayer.', next: 'about' },
+            { text: 'Goodbye.', next: 'bye' },
+          ],
+        },
+        assign: {
+          run: (c) => (c.slayer.assign() ? undefined : 'none'),
+          say: (c) => [pickLine([`Right. Kill ${c.slayer.task.total} ${c.slayer.task.name}.`, `${c.slayer.task.total} ${c.slayer.task.name}. Off you go.`, `I've got ${c.slayer.task.total} ${c.slayer.task.name} that need killing.`])(),
+            ...(TIPS[c.slayer.task.id] ? [TIPS[c.slayer.task.id]] : []), 'Come back when it\'s done.'],
+          next: 'menu',
+        },
+        none: { say: "I've nothing for you right now. Train up a bit and come back.", next: 'menu' },
+        progress: { say: (c) => [c.slayer.text(), `You've done ${c.slayer.streak} tasks in a row, and you have ${c.slayer.points} slayer points.`], next: 'menu' },
+        skip: {
+          run: (c) => (c.slayer.skip() ? undefined : 'tooPoor'),
+          say: 'Fine. Forget that one. Ask me for another.',
+          next: 'menu',
+        },
+        block: {
+          run: (c) => (c.slayer.blocked.length >= MAXB ? 'blockFull' : c.slayer.block() ? undefined : 'tooPoor'),
+          say: "Done. I'll never give you that one again.",
+          next: 'menu',
+        },
+        blockFull: { say: `You can only block ${MAXB} tasks. Unblock one first.`, next: 'menu' },
+        tooPoor: { say: (c) => [`You've only got ${c.slayer.points} slayer points. Finish a few more tasks.`], next: 'menu' },
+        unblockList: {
+          say: 'Which one?',
+          choices: [
+            ...[0, 1, 2, 3].map((k) => ({ text: (c) => `Unblock ${c.slayer.blocked[k]?.name}.`, next: `unblock${k}`, if: (c) => !!c.slayer.blocked[k] })),
+            { text: 'Never mind.', next: 'menu' },
+          ],
+        },
+        ...Object.fromEntries([0, 1, 2, 3].map((k) => [`unblock${k}`, { run: (c) => { c.slayer.unblock(c.slayer.blocked[k]?.id); }, say: 'Unblocked.', next: 'menu' }])),
+        about: {
+          say: ['Ask me for a task and I\'ll pick something that suits you. Only monsters on your task count, and only they teach you Slayer.',
+            'The gem I gave you tells you how many are left, wherever you are. Lose it and I\'ll sell you another.',
+            'Every task you finish earns points. Every tenth in a row earns a lot more. Skip one and the streak still stands.',
+            "And the slayer helmet: wear it on task and you'll hit harder and truer. It's worth every point."],
+          next: 'menu',
+        },
+        bye: { say: 'Happy hunting.' },
       },
     },
   },

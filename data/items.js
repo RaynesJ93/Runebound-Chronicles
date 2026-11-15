@@ -801,6 +801,13 @@ export const ITEMS = {
     name: 'Runebound cape', value: 0, rare: true, examine: 'A deep blue cloak with a glowing rune. Worn by the one who bound Grubnak for ever.',
     equip: { slot: 'cape', req: { defence: 30 }, att: { stab: 3, slash: 3, crush: 3, ranged: 3, magic: 3 }, def: { stab: 5, slash: 5, crush: 5, ranged: 5, magic: 4 }, str: 3, look: {} },
   },
+  // ---- Slayer (data/slayer.js) ---------------------------------------------------------
+  slayerPoints: { name: 'Slayer points', value: 0, examine: 'Points from finishing slayer tasks. Spend them with Kesta.' }, // a currency, never in your bag
+  slayerGem: { name: 'Slayer gem', value: 0, examine: 'An enchanted gem from Kesta. Tap it to check your slayer task.' },
+  slayerHelmet: {
+    name: 'Slayer helmet', value: 0, examine: 'A blackened full helm with a hunter\'s red eye-slit. +15% accuracy and damage against monsters on your slayer task.',
+    equip: { slot: 'head', req: { defence: 20 }, att: { magic: -3, ranged: -1 }, def: { stab: 7, slash: 8, crush: 6, ranged: 7, magic: -1 }, slayerBoost: 0.15, look: { hat: 'helmet', hatColor: '#2a2a30' } },
+  },
   runeKey: { name: 'Rune key', value: 0, examine: 'A slim stone key from Aldric, carved with the same runes as the door of Grubnak\'s chamber. It opens the door without breaking the binding.' },
   digmastersOrders: {
     name: "Digmaster's orders", value: 0, examine: 'A filthy scroll from the Goblin Digmaster. Tap it to read.',

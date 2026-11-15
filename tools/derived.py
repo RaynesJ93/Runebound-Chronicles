@@ -837,6 +837,42 @@ def lodestone_lit(im, get=None):
     return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA'), 2  # 2 px bigger on each side
 
 
+# ---- Slayer: Kesta's gem and the slayer helmet ----
+
+def slayer_gem(im, get=None):
+    """The uncut ruby, cut smooth and turned a deep violet."""
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    m = rgba[..., 3] > 0
+    l = lum(rgba[..., :3]) / 255
+    lo, hi = np.percentile(l[m], 2), np.percentile(l[m], 99)
+    t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+    out = rgba.copy()
+    out[m, :3] = J.ramp(['#1a0a24', '#4a1a6a', '#8a3ab0', '#e0b0ff'], t)[m]
+    return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
+def slayer_helm(im, get=None):
+    """The iron full helm, blackened, with a glowing red eye-slit."""
+    from scipy import ndimage
+    rgba = np.array(im.convert('RGBA')).astype(np.float32)
+    m = rgba[..., 3] > 0
+    l = lum(rgba[..., :3]) / 255
+    lo, hi = np.percentile(l[m], 2), np.percentile(l[m], 99)
+    t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+    out = rgba.copy()
+    out[m, :3] = J.ramp(['#0e0e12', '#24242c', '#3e3e48', '#6a6a78'], t)[m]
+    inner = ndimage.binary_erosion(m, iterations=1)
+    ys, xs = np.nonzero(m)
+    yy, xx = np.mgrid[0:m.shape[0], 0:m.shape[1]]
+    h, w = ys.max() - ys.min() + 1, xs.max() - xs.min() + 1
+    band = (yy >= ys.min() + h * 0.36) & (yy <= ys.min() + h * 0.52) & (xx >= xs.min() + w * 0.2) & (xx <= xs.max() - w * 0.2)
+    face = inner & band
+    slit = face & (l <= np.percentile(l[face], 35)) if face.any() else face
+    out[slit, :3] = (210, 40, 30)
+    return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+
+
+
 # Sprites made at a different size: new key <- source key, every frame, scale.
 # (Grubnak used to be the chief at twice the size; he has his own painted art
 # now, in tools/sprites/, so nothing is scaled at the moment.)
@@ -888,6 +924,8 @@ STEEL = ['Dagger', 'Axe', 'Pickaxe', 'Mace', 'MedHelm', 'Sword', 'Scimitar', 'Lo
          'Boots', 'Gauntlets', 'Spear', 'Warhammer', '2hSword', 'Dart', 'DartTip', 'ThrowingKnife', 'Javelin', 'JavelinHeads']
 for part in STEEL:
     DERIVED[f'steel{part}'] = dict(icon=(f'iron{part}', steel), small=(f'iron{part}', steel), gear=(f'iron{part}', steel))
+DERIVED['slayerGem'] = dict(icon=('uncutRuby', lambda im, g=None: slayer_gem(im, g)), small=('uncutRuby', lambda im, g=None: slayer_gem(im, g)))
+DERIVED['slayerHelmet'] = dict(icon=('ironFullHelm', lambda im, g=None: slayer_helm(im, g)), small=('ironFullHelm', lambda im, g=None: slayer_helm(im, g)), gear=('ironFullHelm', lambda im, g=None: slayer_helm(im, g)))
 DERIVED['holtsSword'] = dict(icon=('steelLongsword', holts_blade), small=('steelLongsword', holts_blade), gear=('steelLongsword', holts_blade))
 DERIVED['runeboundCape'] = dict(icon=('wolfCloak', runebound_cape), small=('wolfCloak', runebound_cape), gear=('wolfCloak', runebound_cape))
 DERIVED['coal'] = dict(icon=('ironOre', coal_lump), small=('ironOre', coal_lump))

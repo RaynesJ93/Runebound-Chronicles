@@ -654,6 +654,32 @@ A map button (top right, or M on a keyboard) opens the map of the area you're in
 
 The map shows the ground, trees, water and buildings drawn small, and on top: place names (from `data/mapLabels.js`), villagers (yellow dots) and monsters (red; the Alpha Wolf ringed in gold) where they are right now, the ways out to other areas, and icons for the bank and shop, fishing, mining, smithing, cooking, tanning and runecrafting altars. Tap any marker to see what it is. Everything except the place names is read from the area data, so new areas and skilling spots show up by themselves; a new area only needs adding to `MAP_AREAS` and its labels.
 
+### Slayer (v0.45.0)
+
+A new skill, **Slayer** (1–99), trained only by killing monsters on a task.
+
+**The slayer master: Kesta the Huntress**, at the Hunters' camp by the lake in south-west Thornwood. Ask her for a task and she picks one that suits your combat level (and, later, your Slayer level): "Kill 23 wolves". She also gives you a **slayer gem** the first time, which tells you your task anywhere (tap it in your bag). Kills of the task's monsters count down; each kill gives Slayer XP equal to the monster's hitpoints (base, x12 like all XP). When the task is done you get **slayer points**: 10 per task, 50 for every 10th in a row, 150 for every 50th. Then go back to Kesta for a new one.
+
+| Task | Monsters | Needs combat | Kills |
+| --- | --- | --- | --- |
+| Chickens and cows | chicken, cow | 1 (not after combat 20) | 10–20 |
+| Goblins | goblin, goblin brute, tunnel goblin | 3 | 15–30 |
+| Wolves | wolf | 10 | 15–30 |
+| Essence golems | essence golem | 15 | 15–30 |
+| Cave beasts | cave beast | 20 | 20–40 |
+| Warren goblins | warren goblin (once the sealed cave is open) | 22 | 20–40 |
+| Night stalkers | night stalker | 32 | 20–40 |
+| Forge golems | forge golem | 45 | 20–40 |
+
+You never get the same task twice in a row, a blocked one, or one more than 25 combat levels below you (unless nothing else is left). Bosses aren't tasks. New monsters (batches 2 and 3) add more tasks, and slayer-only monsters will need a Slayer level.
+
+**Spending points** (talk to Kesta):
+- **Skip** your task: 30 points.
+- **Block** your task, so she never gives it again: 100 points, up to 4 blocks. You can unblock for free.
+- **Kesta's shop:** the **slayer helmet** (300 points; head slot, needs Defence 20; armour like an iron full helm, and **+15% accuracy and max hit against monsters on your task**, with melee, ranged or magic), and a spare **slayer gem** (1 point).
+
+State: `state.slayer = { task: { id, left, total }, streak, points, blocked: [] }`.
+
 ### Lodestones (v0.44.0)
 
 Ancient standing stones the runekeepers raised long ago, one in each main area, that let you teleport between them. They have been dormant since the Goblin War. A short side quest from Aldric, **The Sleeping Stones** (needs Runecrafting 5), wakes them: bring him **20 air runes and 10 rune essence**, and he wakes the Vale's stone and sends you to wake the one in Brambleford's square. Waking it finishes the quest (Runecrafting and Magic XP) and switches the network on.

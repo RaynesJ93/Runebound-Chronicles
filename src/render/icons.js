@@ -267,6 +267,24 @@ const ART = {
     '.....oooooo.....',
     '................',
   ],
+  slayer: [ // a skull
+    '................',
+    '.....oooooo.....',
+    '...ooWWWWWWoo...',
+    '..oWWWWWWWWWwo..',
+    '..oWWWWWWWWWwo..',
+    '.oWWooWWWooWWwo.',
+    '.oWorrWWWorrWwo.',
+    '.oWooRoWoRooWwo.',
+    '.oWWWooWooWWWwo.',
+    '..oWWWWoWWWWwo..',
+    '...owWWWWWWwo...',
+    '....oWoWoWoWo...',
+    '....owowowowo...',
+    '.....oooooooo...',
+    '................',
+    '................',
+  ],
 };
 ART.controlled = ART.attack;
 ART.accurate = ART.attack;
