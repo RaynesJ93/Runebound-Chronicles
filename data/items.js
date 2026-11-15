@@ -821,6 +821,15 @@ export const ITEMS = {
     name: 'Slayer helmet', value: 0, examine: 'A blackened full helm with a hunter\'s red eye-slit. +15% accuracy and damage against monsters on your slayer task.',
     equip: { slot: 'head', req: { defence: 20 }, att: { magic: -3, ranged: -1 }, def: { stab: 7, slash: 8, crush: 6, ranged: 7, magic: -1 }, slayerBoost: 0.15, look: { hat: 'helmet', hatColor: '#2a2a30' } },
   },
+  // Kesta's shop, v0.48.5
+  superiorSlayerHelmet: {
+    name: 'Superior slayer helmet', value: 0, examine: 'Kesta\'s best work: your slayer helmet, rebuilt in dark rune steel. +20% accuracy and damage against monsters on your slayer task.',
+    equip: { slot: 'head', req: { defence: 60 }, att: { magic: -3, ranged: -1 }, def: { stab: 25, slash: 28, crush: 19, ranged: 25, magic: 1 }, str: 1, slayerBoost: 0.2, look: { hat: 'helmet', hatColor: '#1e2a3a' } },
+  },
+  slayerRing: {
+    name: 'Slayer ring', value: 0, examine: 'A dark green ring set with a sliver of slayer gem. It can take you to Kesta\'s camp or the Slayer Caverns, and tells you your task.',
+    equip: { slot: 'ring', req: {}, def: { stab: 2, slash: 2, crush: 2 } },
+  },
   runeKey: { name: 'Rune key', value: 0, examine: 'A slim stone key from Aldric, carved with the same runes as the door of Grubnak\'s chamber. It opens the door without breaking the binding.' },
   digmastersOrders: {
     name: "Digmaster's orders", value: 0, examine: 'A filthy scroll from the Goblin Digmaster. Tap it to read.',

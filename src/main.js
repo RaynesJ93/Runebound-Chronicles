@@ -380,11 +380,24 @@ function boot() {
     refreshSkills();
     save();
   };
+  // The slayer ring (Kesta's shop): check your task, or teleport to her camp or
+  // the Slayer Caverns, as often as you like (not mid-fight). Worn or in the bag.
+  const ringOptions = () => [
+    { label: 'Check task', fn: () => hud.showDialog([taskText()], null, 'Slayer ring') },
+    { label: "Teleport: Hunters' camp", fn: () => ringTeleport('route1', 31, 80, "Kesta's camp") },
+    { label: 'Teleport: Slayer Caverns', fn: () => ringTeleport('slayerCave', 32, 41, 'the Slayer Caverns') },
+  ];
+  const ringTeleport = (to, x, y, name) => {
+    if (combat.target || enemies.some((e) => !e.dead && e.state === 'fight')) { hud.message("You can't teleport while you're fighting."); return; }
+    hud.message(`The gem in the ring flashes green, and you're pulled away to ${name}.`);
+    travel({ to, at: { x, y }, offset: 0, facing: Math.PI });
+  };
   hud.onGearTap = (slot, x, y) => {
     const s = equipment.slots[slot];
     if (!s) return;
     const def = ITEMS[s.id];
     hud.showMenu(x, y, describe({ item: s.id, qty: s.qty }), [
+      ...(s.id === 'slayerRing' ? ringOptions() : []),
       { label: 'Remove', fn: () => {
         const r = equipment.unequip(slot);
         if (!r.ok && r.msg) hud.message(r.msg);
@@ -417,6 +430,7 @@ function boot() {
     if (id === 'coalBag' || id === 'gemBag') return () => openBag(i);
     if (def.read) return () => readItem(id);
     if (id === 'slayerGem') return () => hud.showDialog([taskText()], null, 'Slayer gem');
+    if (id === 'slayerRing') return () => hud.showMenu(x, y, 'Slayer ring', [{ label: 'Wear', fn: () => wear(i) }, ...ringOptions(), { label: 'Cancel', fn: () => {} }]);
     if (/Mould$/.test(id)) return () => hud.message('Use a mould at a furnace, with a silver or gold bar, to cast jewellery.');
     if (id === 'silverBar' || id === 'goldBar') return () => hud.message('Cast it into rings and amulets at a furnace, with a ring or amulet mould.');
     if (id === 'knife') return () => fletchMenu(inventory.count('logs') ? 'logs' : inventory.count('oakLogs') ? 'oakLogs' : null, x, y);
@@ -440,6 +454,7 @@ function boot() {
     if (s.id === 'coalBag' || s.id === 'gemBag') options.push({ label: 'Open', fn: () => openBag(i) });
     if (def.read) options.push({ label: 'Read', fn: () => readItem(s.id) });
     if (s.id === 'slayerGem') options.push({ label: 'Check task', fn: () => hud.showDialog([taskText()], null, 'Slayer gem') });
+    if (s.id === 'slayerRing') options.push(...ringOptions());
     if (def.food) options.push({ label: 'Eat', fn: () => eat(i) });
     if (def.potion) options.push({ label: 'Drink', fn: () => eat(i) });
     if (def.equip) {
@@ -879,7 +894,7 @@ function boot() {
     if (name === 'bank') hud.openTrade('bank', lastStation?.type === 'campChest' ? lastStation.title || 'Supply chest' : 'Bank of Brambleford');
     else if (name === 'shop') { shop = shops.generalStore; hud.openTrade('shop', shop.name); }
     else if (name === 'starShop') { shop = shops.starShop; hud.openTrade('shop', shop.name, 'Tap a reward to buy it with stardust. Lyra doesn\'t buy anything.'); }
-    else if (name === 'slayerShop') { shop = shops.slayerShop; hud.openTrade('shop', shop.name, `Tap a reward to buy it with slayer points. You have ${state.slayer.points}.`); }
+    else if (name === 'slayerShop') { shop = shops.slayerShop; hud.openTrade('shop', shop.name, `Tap a reward to buy it with slayer points. You have ${state.slayer.points}. The superior helmet is an upgrade: bring your slayer helmet in your bag.`); }
     refreshTrade();
   };
   hud.onTradeClose = () => { refreshInventory(); save(); };
@@ -891,7 +906,15 @@ function boot() {
       if (!n) hud.tradeStatus('Your bag is full.');
       else hud.tradeStatus(`Withdrew ${itemName(id)} × ${n}.`);
     } else {
-      const r = shop.buy(id, q === Infinity ? 1000 : q, shop.currency === 'slayerPoints' ? pointsWallet : inventory);
+      // Part exchange (a stock entry's `needs`): the old item must be in your bag, and goes.
+      const needs = SHOPS[Object.keys(shops).find((k) => shops[k] === shop)]?.stock.find((x) => x.id === id)?.needs;
+      if (needs && !inventory.count(needs)) {
+        hud.tradeStatus(`Kesta needs your ${itemName(needs).toLowerCase()} to upgrade. Have it in your bag (not worn).`);
+        refreshTrade();
+        return;
+      }
+      const r = shop.buy(id, needs ? 1 : q === Infinity ? 1000 : q, shop.currency === 'slayerPoints' ? pointsWallet : inventory);
+      if (needs && r.n) inventory.remove(needs, 1);
       const cur = itemName(shop.currency).toLowerCase();
       if (!r.n) hud.tradeStatus(r.why === 'coins' ? `You don't have enough ${cur}.` : r.why === 'space' ? 'Your bag is full.' : "That's out of stock.");
       else hud.tradeStatus(`Bought ${itemName(id)} × ${r.n} for ${r.cost} ${cur}.`);

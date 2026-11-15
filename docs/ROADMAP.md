@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 15 Nov 2026 | v0.48.5: Kesta's shop adds the superior slayer helmet (800 points + your slayer helmet; Defence 60; better than rune, +20% on task) and the slayer ring (150 points; teleports to her camp or the Slayer Caverns, checks your task). |
 | 15 Nov 2026 | v0.48.4: slayer task counter on screen, under Quests: kills left, counting down on every task kill, "Task done!" when finished. Tap it to see your task. |
 | 15 Nov 2026 | v0.48.3: map names no longer overlap: they're nudged into free space, or hidden until you zoom in; slightly smaller when zoomed out. |
 | 15 Nov 2026 | v0.48.2: slayer tasks spread out by Slayer level (1: chickens and cows, goblins, spiders; then wolves 5, crabs 8, bandits and cave crawlers 10, essence golems 12, undead 15, cave beasts 18, warren goblins 20, air elementals and bloodbats 25, fire imps 30, night stalkers 35, forge golems 40, stone wraiths 45, ember wyrms 60). |

@@ -693,6 +693,10 @@ You never get the same task twice in a row, a blocked one, or one more than 25 c
 - **Skip** your task: 30 points.
 - **Block** your task, so she never gives it again: 100 points, up to 4 blocks. You can unblock for free.
 - **Kesta's shop:** the **slayer helmet** (300 points; head slot, needs Defence 20; armour like an iron full helm, and **+15% accuracy and max hit against monsters on your task**, with melee, ranged or magic), and a spare **slayer gem** (1 point).
+- *v0.48.5:* two more in Kesta's shop:
+  - **Superior slayer helmet**: 800 points **plus your slayer helmet** (in your bag; Kesta takes it in part exchange). Head slot, needs **Defence 60**. Stab +25, slash +28, crush +19, ranged +25, magic +1 defence; strength +1; magic −3 and ranged −1 attack; **+20% accuracy and max hit on task**. Better than a rune full helm even off task. Dark rune-blue with the red eye-slit.
+  - **Slayer ring**: 150 points. Ring slot, no level needed; +2 stab, slash and crush defence. Tap it (in the bag, or worn) to **check your task** or **teleport** to Kesta's camp or the Slayer Caverns entrance, as often as you like (not mid-fight).
+  - Shop stock can have `needs: <item id>`: that item must be in your bag and is taken when you buy (one at a time).
 
 State: `state.slayer = { task: { id, left, total }, streak, points, blocked: [] }`.
 
