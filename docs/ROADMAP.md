@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 15 Nov 2026 | v0.48.2: slayer tasks spread out by Slayer level (1: chickens and cows, goblins, spiders; then wolves 5, crabs 8, bandits and cave crawlers 10, essence golems 12, undead 15, cave beasts 18, warren goblins 20, air elementals and bloodbats 25, fire imps 30, night stalkers 35, forge golems 40, stone wraiths 45, ember wyrms 60). |
 | 15 Nov 2026 | v0.48.1: painted art for the Slayer Caverns: each section has its own floor, walls and decorations to match its monster (mossy slime pit, blood-stained roost, haunted carved gallery, lava hearth). |
 | 15 Nov 2026 | v0.48.0: the Slayer Caverns, behind Kesta's camp: an entrance hall and corridors leading through four sections, deeper is tougher: cave crawlers (Slayer 10), bloodbats (25), stone wraiths (45), ember wyrms (60). On the map. |
 | 15 Nov 2026 | v0.47.2: finishing The Sleeping Stones opens every lodestone at once, so there's no need to walk to each one first. The Goblin Warrens stone joins once its cave is open. |

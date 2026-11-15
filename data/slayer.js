@@ -7,26 +7,28 @@
 // Each task type:
 //   id, name (plural, as Kesta says it), monsters (enemy ids that count),
 //   combat: the combat level you need; maxCombat: she stops giving it after this,
-//   slayer: the Slayer level you need (for the slayer monsters),
+//   slayer: the Slayer level Kesta wants before she gives it (v0.48.2: every
+//     task has one, rising with the monsters' level; the slayer monsters also
+//     need it to fight them),
 //   flag: a story flag that must be set (the monsters' area must be open),
 //   amount: [min, max] kills, weight: how often she picks it.
 
 export const TASKS = [
   { id: 'farm', name: 'chickens and cows', monsters: ['chicken', 'cow'], combat: 1, maxCombat: 20, amount: [10, 20], weight: 4 },
   { id: 'goblins', name: 'goblins', monsters: ['goblin', 'goblinBrute', 'tunnelGoblin'], combat: 3, amount: [15, 30], weight: 8 },
-  { id: 'wolves', name: 'wolves', monsters: ['wolf'], combat: 10, amount: [15, 30], weight: 8 },
-  { id: 'essenceGolems', name: 'essence golems', monsters: ['essenceGolem'], combat: 15, amount: [15, 30], weight: 6 },
-  { id: 'caveBeasts', name: 'cave beasts', monsters: ['caveBeast'], combat: 20, amount: [20, 40], weight: 8 },
-  { id: 'warrenGoblins', name: 'warren goblins', monsters: ['warrenGoblin'], combat: 22, flag: 'caveOpen', amount: [20, 40], weight: 7 },
-  { id: 'nightStalkers', name: 'night stalkers', monsters: ['nightStalker'], combat: 32, amount: [20, 40], weight: 7 },
-  { id: 'forgeGolems', name: 'forge golems', monsters: ['forgeGolem'], combat: 45, amount: [20, 40], weight: 6 },
+  { id: 'wolves', name: 'wolves', monsters: ['wolf'], combat: 10, slayer: 5, amount: [15, 30], weight: 8 },
+  { id: 'essenceGolems', name: 'essence golems', monsters: ['essenceGolem'], combat: 15, slayer: 12, amount: [15, 30], weight: 6 },
+  { id: 'caveBeasts', name: 'cave beasts', monsters: ['caveBeast'], combat: 20, slayer: 18, amount: [20, 40], weight: 8 },
+  { id: 'warrenGoblins', name: 'warren goblins', monsters: ['warrenGoblin'], combat: 22, slayer: 20, flag: 'caveOpen', amount: [20, 40], weight: 7 },
+  { id: 'nightStalkers', name: 'night stalkers', monsters: ['nightStalker'], combat: 32, slayer: 35, amount: [20, 40], weight: 7 },
+  { id: 'forgeGolems', name: 'forge golems', monsters: ['forgeGolem'], combat: 45, slayer: 40, amount: [20, 40], weight: 6 },
   // v0.46.0
   { id: 'spiders', name: 'giant spiders', monsters: ['giantSpider'], combat: 6, amount: [15, 30], weight: 7 },
-  { id: 'crabs', name: 'giant crabs', monsters: ['giantCrab'], combat: 8, amount: [15, 30], weight: 6 },
-  { id: 'bandits', name: 'bandits', monsters: ['bandit'], combat: 10, amount: [15, 30], weight: 7 },
-  { id: 'undead', name: 'skeletons and ghosts', monsters: ['skeleton', 'restlessGhost'], combat: 13, amount: [20, 40], weight: 8 },
-  { id: 'airElementals', name: 'air elementals', monsters: ['airElemental'], combat: 24, amount: [20, 40], weight: 6 },
-  { id: 'fireImps', name: 'fire imps', monsters: ['fireImp'], combat: 28, amount: [20, 40], weight: 7 },
+  { id: 'crabs', name: 'giant crabs', monsters: ['giantCrab'], combat: 8, slayer: 8, amount: [15, 30], weight: 6 },
+  { id: 'bandits', name: 'bandits', monsters: ['bandit'], combat: 10, slayer: 10, amount: [15, 30], weight: 7 },
+  { id: 'undead', name: 'skeletons and ghosts', monsters: ['skeleton', 'restlessGhost'], combat: 13, slayer: 15, amount: [20, 40], weight: 8 },
+  { id: 'airElementals', name: 'air elementals', monsters: ['airElemental'], combat: 24, slayer: 25, amount: [20, 40], weight: 6 },
+  { id: 'fireImps', name: 'fire imps', monsters: ['fireImp'], combat: 28, slayer: 30, amount: [20, 40], weight: 7 },
   // v0.47.0: slayer monsters, only once you have the Slayer level
   { id: 'caveCrawlers', name: 'cave crawlers', monsters: ['caveCrawler'], combat: 15, slayer: 10, amount: [20, 40], weight: 8 },
   { id: 'bloodbats', name: 'bloodbats', monsters: ['bloodbat'], combat: 30, slayer: 25, amount: [20, 40], weight: 8 },
@@ -61,7 +63,9 @@ export function eligibleTasks({ combat, slayer, flags, blocked = [], last = null
 export function pickTask(opts, rng = Math.random) {
   let pool = eligibleTasks(opts);
   if (!pool.length) pool = eligibleTasks({ ...opts, last: null });
-  if (!pool.length) pool = TASKS.filter((t) => opts.combat >= t.combat && (opts.slayer || 1) >= (t.slayer || 1) && !t.maxCombat && (!t.flag || opts.flags[t.flag])).slice(-2); // the toughest few
+  // Nothing fits (say, high combat but low Slayer): the toughest two she's allowed to give.
+  if (!pool.length) pool = TASKS.filter((t) => opts.combat >= t.combat && (opts.slayer || 1) >= (t.slayer || 1) && !t.maxCombat && (!t.flag || opts.flags[t.flag]))
+    .sort((a, b) => (b.slayer || 1) - (a.slayer || 1) || b.combat - a.combat).slice(0, 2);
   if (!pool.length) return null;
   let r = rng() * pool.reduce((n, t) => n + t.weight, 0);
   const t = pool.find((x) => (r -= x.weight) < 0) || pool.at(-1);

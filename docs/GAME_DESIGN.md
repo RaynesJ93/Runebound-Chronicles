@@ -660,26 +660,28 @@ A new skill, **Slayer** (1–99), trained only by killing monsters on a task.
 
 **The slayer master: Kesta the Huntress**, at the Hunters' camp by the lake in south-west Thornwood. Ask her for a task and she picks one that suits your combat level (and, later, your Slayer level): "Kill 23 wolves". She also gives you a **slayer gem** the first time, which tells you your task anywhere (tap it in your bag). Kills of the task's monsters count down; each kill gives Slayer XP equal to the monster's hitpoints (base, x12 like all XP). When the task is done you get **slayer points**: 10 per task, 50 for every 10th in a row, 150 for every 50th. Then go back to Kesta for a new one.
 
-| Task | Monsters | Needs combat | Kills |
-| --- | --- | --- | --- |
-| Chickens and cows | chicken, cow | 1 (not after combat 20) | 10–20 |
-| Goblins | goblin, goblin brute, tunnel goblin | 3 | 15–30 |
-| Wolves | wolf | 10 | 15–30 |
-| Essence golems | essence golem | 15 | 15–30 |
-| Cave beasts | cave beast | 20 | 20–40 |
-| Warren goblins | warren goblin (once the sealed cave is open) | 22 | 20–40 |
-| Night stalkers | night stalker | 32 | 20–40 |
-| Forge golems | forge golem | 45 | 20–40 |
-| Giant spiders | giant spider | 6 | 15–30 |
-| Giant crabs | giant crab | 8 | 15–30 |
-| Bandits | bandit | 10 | 15–30 |
-| Skeletons and ghosts | skeleton, restless ghost | 13 | 20–40 |
-| Air elementals | air elemental | 24 | 20–40 |
-| Fire imps | fire imp | 28 | 20–40 |
-| Cave crawlers | cave crawler (Slayer 10) | 15 | 20–40 |
-| Bloodbats | bloodbat (Slayer 25) | 30 | 20–40 |
-| Stone wraiths | stone wraith (Slayer 45) | 45 | 20–40 |
-| Ember wyrms | ember wyrm (Slayer 60) | 60 | 15–30 |
+| Task | Monsters | Needs Slayer | Needs combat | Kills |
+| --- | --- | --- | --- | --- |
+| Chickens and cows | chicken, cow | 1 | 1 (not after combat 20) | 10–20 |
+| Goblins | goblin, goblin brute, tunnel goblin | 1 | 3 | 15–30 |
+| Giant spiders | giant spider | 1 | 6 | 15–30 |
+| Wolves | wolf | 5 | 10 | 15–30 |
+| Giant crabs | giant crab | 8 | 8 | 15–30 |
+| Bandits | bandit | 10 | 10 | 15–30 |
+| Cave crawlers | cave crawler (Slayer 10) | 10 | 15 | 20–40 |
+| Essence golems | essence golem | 12 | 15 | 15–30 |
+| Skeletons and ghosts | skeleton, restless ghost | 15 | 13 | 20–40 |
+| Cave beasts | cave beast | 18 | 20 | 20–40 |
+| Warren goblins | warren goblin (once the sealed cave is open) | 20 | 22 | 20–40 |
+| Air elementals | air elemental | 25 | 24 | 20–40 |
+| Bloodbats | bloodbat (Slayer 25) | 25 | 30 | 20–40 |
+| Fire imps | fire imp | 30 | 28 | 20–40 |
+| Night stalkers | night stalker | 35 | 32 | 20–40 |
+| Forge golems | forge golem | 40 | 45 | 20–40 |
+| Stone wraiths | stone wraith (Slayer 45) | 45 | 45 | 20–40 |
+| Ember wyrms | ember wyrm (Slayer 60) | 60 | 60 | 15–30 |
+
+*v0.48.2:* every task has a Slayer level, rising with its monsters' level, so new tasks open steadily as you level (before, everything but the slayer monsters was Slayer 1). It only decides what Kesta gives you: you can fight regular monsters at any Slayer level. With high combat but a low Slayer level she gives the toughest tasks your Slayer level allows; a task you already have stays yours.
 
 You never get the same task twice in a row, a blocked one, or one more than 25 combat levels below you (unless nothing else is left). Bosses aren't tasks. New monsters add more tasks; slayer-only monsters (v0.47.0) also need a Slayer level.
 
