@@ -20,6 +20,13 @@ export const TASKS = [
   { id: 'warrenGoblins', name: 'warren goblins', monsters: ['warrenGoblin'], combat: 22, flag: 'caveOpen', amount: [20, 40], weight: 7 },
   { id: 'nightStalkers', name: 'night stalkers', monsters: ['nightStalker'], combat: 32, amount: [20, 40], weight: 7 },
   { id: 'forgeGolems', name: 'forge golems', monsters: ['forgeGolem'], combat: 45, amount: [20, 40], weight: 6 },
+  // v0.46.0
+  { id: 'spiders', name: 'giant spiders', monsters: ['giantSpider'], combat: 6, amount: [15, 30], weight: 7 },
+  { id: 'crabs', name: 'giant crabs', monsters: ['giantCrab'], combat: 8, amount: [15, 30], weight: 6 },
+  { id: 'bandits', name: 'bandits', monsters: ['bandit'], combat: 10, amount: [15, 30], weight: 7 },
+  { id: 'undead', name: 'skeletons and ghosts', monsters: ['skeleton', 'restlessGhost'], combat: 13, amount: [20, 40], weight: 8 },
+  { id: 'airElementals', name: 'air elementals', monsters: ['airElemental'], combat: 24, amount: [20, 40], weight: 6 },
+  { id: 'fireImps', name: 'fire imps', monsters: ['fireImp'], combat: 28, amount: [20, 40], weight: 7 },
 ];
 
 export const taskById = (id) => TASKS.find((t) => t.id === id);

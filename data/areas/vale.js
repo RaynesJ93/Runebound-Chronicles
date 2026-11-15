@@ -147,6 +147,11 @@ export function buildVale() {
     ],
     // Six essence golems, spread thinly across the vale.
     spawns: [
+      // v0.46.0: air elementals round the air altar
+      { enemy: 'airElemental', x: 60, y: 4 },
+      { enemy: 'airElemental', x: 67, y: 5 },
+      { enemy: 'airElemental', x: 58, y: 9 },
+      { enemy: 'airElemental', x: 68, y: 10 },
       { enemy: 'essenceGolem', x: 40, y: 16 },
       { enemy: 'essenceGolem', x: 44, y: 8 },
       { enemy: 'essenceGolem', x: 12, y: 24 },

@@ -21,6 +21,12 @@ const TIPS = {
   warrenGoblins: 'Warren goblins, down in the Goblin Warrens under the old cave.',
   nightStalkers: 'Night stalkers hunt in Copperdeep Hollow. They hit hard. Bring plenty of food.',
   forgeGolems: 'Forge golems, in the Sunken Forge. Bring your best armour.',
+  spiders: 'Giant spiders nest in the ruins of the old watchtower, north of the road.',
+  crabs: 'Giant crabs, on the sand round the lake here. Mind the big claw.',
+  bandits: 'Bandits have taken over the old farmstead in south-east Thornwood.',
+  undead: 'The old graveyard south of here is crawling: skeletons, and ghosts. Either counts.',
+  airElementals: 'Air elementals spin round the air altar in Whispering Vale. They hit with magic, so armour helps less.',
+  fireImps: 'Fire imps in the Sunken Forge. Small, quick, and they burn. Magic attacks.',
 };
 
 export const NPCS = [
