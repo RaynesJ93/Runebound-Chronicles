@@ -119,6 +119,22 @@ button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulat
 .icon-btn svg { width: 26px; height: 26px; }
 .icon-btn:active { transform: translateY(2px); }
 
+/* ---- Slayer task counter (under Quests) ---- */
+.slayer-chip {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 6px;
+  height: 36px; padding: 0 12px 0 6px; border-radius: 7px; cursor: pointer;
+  background: rgba(43, 29, 22, 0.82); border: 2px solid var(--wood-dark); color: #fff6dc; font: inherit;
+  box-shadow: 0 2px 0 rgba(30, 18, 8, 0.55);
+}
+.slayer-chip img.px { width: 24px; height: 24px; }
+.slayer-chip b { font-size: 18px; color: #ffd23a; min-width: 1ch; }
+.slayer-chip small { font-size: 13px; }
+.slayer-chip.bump b { animation: slayer-bump 0.5s ease; }
+@keyframes slayer-bump { 0% { transform: scale(1.7); color: #ff6a4a; } 100% { transform: scale(1); } }
+.slayer-chip.done { border-color: #ffd23a; }
+.slayer-chip.done b { color: #8ee07a; }
+.slayer-chip:active { transform: translateY(2px); }
+
 /* ---- Guide button (top left) ---- */
 .guide-btn {
   position: relative; z-index: 1; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px;

@@ -1086,9 +1086,11 @@ function boot() {
     sl().points += pts;
     sl().last = t.id;
     sl().task = null;
+    hud.slayerFinished = true;
     hud.message(`You've finished your slayer task! ${st} in a row: +${pts} slayer points (you have ${sl().points}). Go back to Kesta for another.`);
     save();
   };
+  hud.onSlayerChip = () => hud.showDialog([taskText()], null, 'Slayer task');
   // What Kesta's dialogue can do (her nodes in data/npcs.js).
   const slayerCtx = {
     get task() { const t = sl().task; return t && { ...t, name: taskById(t.id).name }; },
@@ -1723,6 +1725,7 @@ function boot() {
       hud.setGraveTimer(`Gravestone ${mm}:${ss}${freeLeft > 0 ? ' · free to reclaim' : ''}`);
     } else hud.setGraveTimer(null);
     hud.setHp(state.player.hp, combat.maxHp);
+    { const t = state.slayer?.task; hud.setSlayer(t && t.left > 0 ? { name: taskById(t.id).name, left: t.left, total: t.total } : null); }
     // A boss you're fighting keeps the bar, even while you deal with its adds.
     hud.setTarget(enemies.find((e) => e.def.mechanics && !e.dead && e.state === 'fight') || combat.target || enemies.find((e) => !e.dead && e.state === 'fight') || null, combat.level);
     requestAnimationFrame(frame);
