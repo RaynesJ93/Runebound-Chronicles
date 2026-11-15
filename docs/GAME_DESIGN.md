@@ -734,11 +734,11 @@ Ancient standing stones the runekeepers raised long ago, one in each main area, 
 | Whispering Vale | By the runekeepers' camp |
 | Goblin Warrens | The landing (once the sealed cave is open) |
 
-- Each other stone has to be **attuned** once, by touching it: you have to walk there the first time.
-- Touch any awake lodestone to open the list of attuned stones and pick one. You arrive standing just south of it, with the usual fade.
+- *v0.47.2:* finishing the quest opens **every** lodestone at once (it used to be one at a time, by walking to each and touching it). The Goblin Warrens stone joins the list once the sealed cave is open (`needs: 'caveOpen'`).
+- Touch any awake lodestone to open the list of the others and pick one. You arrive standing just south of it, with the usual fade.
 - Teleporting is free and works any time you're not in a fight.
-- Dormant stones (quest not done) are drawn dull grey; awake ones glow blue. Attuned lodestones show on the map.
-- Flags: `lodeQuest` ('started'/'done') and `lodestones` (the attuned stones, by id).
+- Dormant stones (quest not done) are drawn dull grey; awake ones glow blue. Lodestones you can travel to show on the map.
+- Flags: `lodeQuest` ('started'/'done') and `lodeOn` (the network is awake). Old saves may still have `lodestones` (stones attuned one by one); it's no longer used.
 
 ### Quest journal (v0.36.0)
 

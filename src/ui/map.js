@@ -7,6 +7,7 @@ import { AREAS } from '../../data/areas/index.js';
 import { NPCS } from '../../data/npcs.js';
 import { ENEMIES } from '../../data/enemies.js';
 import { LABELS, MAP_NAME, INSIDE } from '../../data/mapLabels.js';
+import { LODESTONES, lodestoneOpen } from '../../data/lodestones.js';
 import { iconUrl } from '../render/icons.js';
 import { itemIcon } from '../render/items.js';
 
@@ -109,8 +110,8 @@ export function markers(id, live, star = null, flags = {}) {
     if (out.some((m) => m.kind === kind && Math.hypot(m.x - p.x, m.y - p.y) < 6)) continue;
     out.push({ type: 'spot', kind, x: p.x + (p.tiles.length > 1 ? 1 : 0.5), y: p.y + 0.5, icon: s.icon(), name: s.name });
   }
-  // Lodestones you've attuned.
-  for (const p of a.props) if (p.type === 'lodestone' && flags?.lodestones?.[p.lodestone]) out.push({ type: 'spot', kind: 'lodestone', x: p.x + 0.5, y: p.y + 0.5, icon: iconUrl('runecrafting'), name: 'Lodestone' });
+  // Lodestones you can travel to.
+  for (const p of a.props) if (p.type === 'lodestone' && lodestoneOpen(LODESTONES.find((l) => l.id === p.lodestone), flags)) out.push({ type: 'spot', kind: 'lodestone', x: p.x + 0.5, y: p.y + 0.5, icon: iconUrl('runecrafting'), name: 'Lodestone' });
   for (const b of a.buildings) {
     const s = BUILDING_SPOT[b.kind];
     if (s) out.push({ type: 'spot', kind: b.kind, x: b.x + b.w / 2, y: b.y + b.h / 2, icon: s.icon(), name: s.name });

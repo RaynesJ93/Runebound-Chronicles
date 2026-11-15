@@ -35,7 +35,7 @@ import { ROCKS, PICKAXES, MINE_TICKS, gemChance, rollGem } from '../data/mining.
 import { STAR_SITES, DUST_PER_SIZE, FIRST_STAR, NEXT_STAR, STAR_LIFETIME, rollSize } from '../data/stars.js';
 import { MAP_NAME } from '../data/mapLabels.js';
 import { QUESTS, questStatus, QUEST_HOOKS, QUEST_DROPS } from '../data/quests.js';
-import { LODESTONES } from '../data/lodestones.js';
+import { LODESTONES, lodestoneOpen } from '../data/lodestones.js';
 import { TASKS, taskById, pickTask, pointsFor, SKIP_COST, BLOCK_COST, MAX_BLOCKS } from '../data/slayer.js';
 import { SMELTING, SMITHING, saveBarChance } from '../data/smithing.js';
 import { SPOTS, FISH_TICKS, spotLevel } from '../data/fishing.js';
@@ -1115,8 +1115,8 @@ function boot() {
   combat.on.slayerLevel = () => book.level('slayer');
 
   // ---- Lodestones (data/lodestones.js) ---------------------------------------------
-  // Dormant until The Sleeping Stones; then touch one once to attune it, and any
-  // awake stone lists the attuned ones to travel to.
+  // Dormant until The Sleeping Stones; then every stone whose area is open is
+  // on the list from any awake stone.
   const useLodestone = (p) => {
     const f = state.flags;
     const here = LODESTONES.find((l) => l.id === p.lodestone);
@@ -1126,12 +1126,11 @@ function boot() {
           'Then it flares blue, and you feel it: a hum, running away under your feet in every direction at once, to stones you cannot see.',
           'One by one, far away, they answer. The lodestones are awake.'], () => {
           Object.assign(f, { lodeOn: true, lodeQuest: 'done' });
-          f.lodestones = { ...(f.lodestones || {}), vale: true, brambleford: true };
           book.add('runecrafting', 300);
           book.add('magic', 200);
           hud.message('Quest complete: The Sleeping Stones!');
           hud.toast?.('Quest complete: The Sleeping Stones!');
-          hud.message('Touch a lodestone to travel. Touch each new one once to attune to it.');
+          hud.message('Every lodestone is awake. Touch any of them to travel to the others.');
           syncCaves();
           refreshQuests();
           save();
@@ -1142,14 +1141,8 @@ function boot() {
       hud.showDialog([...p.interact, f.lodeQuest ? 'It is dormant. Aldric knows how to wake these.' : "Its rune is dull and cold. The runekeepers in Whispering Vale might know what it's for."]);
       return;
     }
-    const tuned = (f.lodestones ||= {});
-    if (!tuned[here.id]) {
-      tuned[here.id] = true;
-      hud.message(`The rune flares under your hand. You are attuned to the ${here.name} lodestone.`);
-      save();
-    }
-    const dests = LODESTONES.filter((l) => l.id !== here.id && tuned[l.id]);
-    if (!dests.length) { hud.message('No other lodestones are attuned yet. Touch each one once to add it.'); return; }
+    const dests = LODESTONES.filter((l) => l.id !== here.id && lodestoneOpen(l, f));
+    if (!dests.length) { hud.message('No other lodestones are open yet.'); return; }
     if (combat.target) { hud.message("You can't travel while you're fighting."); return; }
     const r = canvas.getBoundingClientRect();
     hud.showMenu(r.width / 2, r.height / 2, 'Travel by lodestone', [

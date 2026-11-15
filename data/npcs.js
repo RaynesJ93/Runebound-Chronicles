@@ -906,7 +906,7 @@ export const NPCS = [
         // ---- Side quest: The Sleeping Stones (lodestones, data/lodestones.js) ----------
         lode: {
           say: ['The lodestones? Ah. My order raised them, long before I was born. One in every corner of the land.',
-            'Touch one, and it would carry you to any other you had touched before. Merchants, healers, runekeepers: everyone used them.',
+            'Touch one, and it would carry you to any other in the land. Merchants, healers, runekeepers: everyone used them.',
             'When Grubnak came, we put them to sleep, so his horde could not use them. And nobody ever woke them again.',
             'I could. With enough runes to give them a push, and a pair of hands to wake the one in Brambleford, where the network meets.'],
           choices: [
