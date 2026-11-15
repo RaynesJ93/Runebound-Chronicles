@@ -953,6 +953,7 @@ DERIVED['slayerGem'] = dict(icon=('uncutRuby', lambda im, g=None: slayer_gem(im,
 DERIVED['slayerHelmet'] = dict(icon=('ironFullHelm', lambda im, g=None: slayer_helm(im, g)), small=('ironFullHelm', lambda im, g=None: slayer_helm(im, g)), gear=('ironFullHelm', lambda im, g=None: slayer_helm(im, g)))
 # superiorSlayerHelmet and slayerRing: painted (tools/new_art.py slayergear)
 DERIVED['bloodfangAmulet'] = dict(icon=('goldRubyAmulet', BLOODFANG), small=('goldRubyAmulet', BLOODFANG), gear=('goldRubyAmulet', BLOODFANG))
+DERIVED['huntersScroll'] = dict(icon=('digmastersOrders', ramp_to(['#1a0a08', '#5a2410', '#b8742a', '#f6e2b0'])), small=('digmastersOrders', ramp_to(['#1a0a08', '#5a2410', '#b8742a', '#f6e2b0'])))
 DERIVED['wraithstoneRing'] = dict(icon=('goldSapphireRing', WRAITHSTONE), small=('goldSapphireRing', WRAITHSTONE))
 DERIVED['emberScimitar'] = dict(icon=('runeScimitar', EMBER), small=('runeScimitar', EMBER), gear=('runeScimitar', EMBER))
 DERIVED['holtsSword'] = dict(icon=('steelLongsword', holts_blade), small=('steelLongsword', holts_blade), gear=('steelLongsword', holts_blade))

@@ -826,6 +826,9 @@ export const ITEMS = {
     name: 'Superior slayer helmet', value: 0, examine: 'Kesta\'s best work: your slayer helmet, rebuilt in dark rune steel. +20% accuracy and damage against monsters on your slayer task.',
     equip: { slot: 'head', req: { defence: 60 }, att: { magic: -3, ranged: -1 }, def: { stab: 25, slash: 28, crush: 19, ranged: 25, magic: 1 }, str: 1, slayerBoost: 0.2, look: { hat: 'helmet', hatColor: '#1e2a3a' } },
   },
+  huntersScroll: {
+    name: "Hunter's scroll", value: 0, examine: "One of Kesta's hunting secrets, written in a hurried hand. Read it to earn 50% more slayer points from every task, for good.",
+  },
   slayerRing: {
     name: 'Slayer ring', value: 0, examine: 'A dark green ring set with a sliver of slayer gem. It can take you to Kesta\'s camp or the Slayer Caverns, and tells you your task.',
     equip: { slot: 'ring', req: {}, def: { stab: 2, slash: 2, crush: 2 } },
