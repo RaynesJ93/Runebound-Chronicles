@@ -323,6 +323,18 @@ export function buildGround(area) {
     return (x, y) => out[(y >> shift) * bw + (x >> shift)];
   };
   const wobX = blockNoise(1, 7, 23), wobY = blockNoise(1, 7, 24);
+
+  // Zoned caves: each zone's floor and wall textures. Where two zones meet, the
+  // border wanders (looked up at a point nudged by big smooth noise, plus a
+  // little grain), so one look fades raggedly into the next.
+  const ZT = area.zones ? [null, ...area.zoneTex.map((s) => ({ cave: texture('cave' + s), rockwall: texture('rockwall' + s) }))] : null;
+  const zoneX = ZT && blockNoise(2, 34, 211), zoneY = ZT && blockNoise(2, 34, 212);
+  const zoneAt = (x, y) => {
+    const zx = Math.floor((x + (zoneX(x, y) - 0.5) * 70 + (rnd(x, y, 213) - 0.5) * 6) / 16);
+    const zy = Math.floor((y + (zoneY(x, y) - 0.5) * 70 + (rnd(x, y, 214) - 0.5) * 6) / 16);
+    const z = area.zones[Math.max(0, Math.min(area.H - 1, zy)) * area.W + Math.max(0, Math.min(area.W - 1, zx))];
+    return z ? ZT[z] : null;
+  };
   const meadow = [blockNoise(3, 56, 140), blockNoise(3, 56, 141)];
 
   for (let y = 0; y < H; y++) {
@@ -430,6 +442,8 @@ export function buildGround(area) {
           break;
         }
         case GROUND.CAVE: {
+          const Z = ZT && zoneAt(x, y);
+          if (Z?.cave) { c = px(Z.cave, x, y); break; }
           if (T.cave) { c = px(T.cave, x, y); break; }
           // packed earth and grit on the mine floor
           const r = rnd(x, y, 97);
@@ -442,7 +456,9 @@ export function buildGround(area) {
           // (the lit lip and shadow at its edge are added after, per pixel)
           const row = Math.floor(y / 4);
           const facet = rnd(Math.floor((x + (row % 2) * 3) / 6), row, 99);
-          if (T.rockwall) c = px(T.rockwall, x, y);
+          const Z = ZT && zoneAt(x, y);
+          if (Z?.rockwall) c = px(Z.rockwall, x, y);
+          else if (T.rockwall) c = px(T.rockwall, x, y);
           else if (rnd(x, y, 100) < 0.035 || y % 4 === 3 && rnd(x >> 1, row, 101) < 0.5) c = P.rockwallTop;
           else c = P.rockwall[Math.floor(facet * 3)];
           break;

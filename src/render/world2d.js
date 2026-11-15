@@ -280,6 +280,14 @@ export function createWorldView(canvasEl, area) {
       case 'anvil': place(lib.anvil, f.x, f.y); break;
       case 'rubble': { const spr = pick(lib.rubble, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
       case 'rug': decals.push({ img: lib.rug.img, x: (p.x + 0.5) * TILE - lib.rug.ax, y: (p.y + 0.5) * TILE - lib.rug.ay }); break;
+      // Painted decorations (art key decor:<p.art>): flat ones lie on the ground, the rest stand
+      case 'decor': {
+        const spr = art('decor:' + p.art)?.[0];
+        if (!spr) break;
+        if (p.flat) decals.push({ img: spr.img, x: Math.round(f.x - spr.w / 2), y: Math.round(p.y * TILE + 8 - spr.h / 2) });
+        else place(spr, f.x, f.y);
+        break;
+      }
       case 'bones': decals.push({ img: pick(lib.bones, p).img, x: p.x * TILE + jit(p, 5), y: p.y * TILE + 4 + jit(p, 6) / 2 }); break;
       case 'mushrooms': { const spr = pick(lib.mushrooms, p); decals.push({ img: spr.img, x: p.x * TILE + jit(p, 7), y: p.y * TILE + jit(p, 8) / 2 }); break; }
       default: break; // doors are drawn as part of their building

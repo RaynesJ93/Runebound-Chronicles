@@ -13,6 +13,9 @@ Sets:
   monsters01-12 (15 Nov 2026) Kesta and eleven monsters. Reads the sheets
                 themselves (grid_cells): 12 frames each, loose bits (a leaf,
                 smoke) kept with their frame.
+  slayercaves   (15 Nov 2026) The Slayer Caverns' four sections: for each,
+                a sheet of floor + wall textures (1A, 2A...) and a 3 x 2
+                sheet of decorations (1B, 2B...).
 
 File names in tools/sprites/ are atlas keys with ':' written as '__'. A folder
 holds the frames of one key (0.png, 1.png, ...). tools/sprites/anchors.json
@@ -115,6 +118,44 @@ if SET == 'monsters01-12':
         save_frames(key, frames)
         print(key, frames[0].size, frames[6].size)
 
+elif SET == 'slayercaves':
+    from seamless import seamless
+    from scipy import ndimage
+
+    def calm(im, k, sat=1.0):
+        a = np.array(im).astype(np.float32)
+        if sat != 1:
+            g = a[..., :3].mean(2, keepdims=True)
+            a[..., :3] = g + (a[..., :3] - g) * sat
+        mean = a[..., :3].reshape(-1, 3).mean(0)
+        a[..., :3] = a[..., :3] * (1 - k) + mean * k
+        return Image.fromarray(a.clip(0, 255).astype(np.uint8))
+
+    # Each section: (sheet number, texture name, decorations as (key, width in game px, flat?))
+    SECTIONS = {
+        1: ('Crawl', [('crawlerEggs', 18), ('crawlerHusk', 20), ('slimePuddle', 20), ('dripStalagmite', 13), ('glowMoss', 20), ('gnawedRocks', 18)]),
+        2: ('Roost', [('boneNest', 20), ('skullPile', 18), ('bloodPool', 20), ('clawedStalagmite', 15), ('roostRock', 18), ('featherHeap', 20)]),
+        3: ('Wraith', [('hoodedStatue', 30), ('graveSlab', 13), ('runePillar', 11), ('ghostCandles', 14), ('masonryRubble', 20), ('spiritUrn', 13)]),
+        4: ('Wyrm', [('lavaPool', 30), ('emberVent', 14), ('charredSkeleton', 22), ('dragonEgg', 15), ('scorchedHoard', 17), ('obsidianCluster', 17)]),
+    }
+    for n, (tex, decor) in SECTIONS.items():
+        # A: two squares (floor left, wall right); trim a few px off each edge
+        path = glob.glob(os.path.join(SRC, f'{n}A_*.png'))[0]
+        rgb, alpha = key_magenta(np.array(Image.open(path).convert('RGB')))
+        lab, k = ndimage.label(alpha > 0)
+        boxes = sorted(ndimage.find_objects(lab), key=lambda b: -(b[0].stop - b[0].start) * (b[1].stop - b[1].start))[:2]
+        boxes.sort(key=lambda b: b[1].start)
+        for (sy, sx), name, (kk, sat) in zip(boxes, (f'cave{tex}', f'rockwall{tex}'), ((0.12, 0.9), (0.08, 0.9))):
+            im = Image.fromarray(rgb[sy.start + 6:sy.stop - 6, sx.start + 6:sx.stop - 6].astype(np.uint8))
+            t = calm(shrink(seamless(im).convert('RGBA'), w=64, h=64, outline=False, colors=32), kk, sat)
+            t.save(os.path.join(OUT, f'tex__{name}.png'))
+        # B: six decorations, 2 rows x 3
+        path = glob.glob(os.path.join(SRC, f'{n}B_*.png'))[0]
+        cells = [im for row in grid_cells(path, rows=2, cols=3) for im in row]
+        for im, (key, w) in zip(cells, decor):
+            scaled(im, w / im.width).save(os.path.join(OUT, f'decor__{key}.png'))
+            print(key, scaled(im, w / im.width).size)
+
 elif SET == 'images01-09':
     def src(sheet, n):
         return Image.open(os.path.join(SRC, sheet, f'{n}.png')).convert('RGBA')
@@ -178,5 +219,5 @@ elif SET == 'images01-09':
     old.update(anchors)
     json.dump(old, open(path, 'w'), indent=1, sort_keys=True)
 else:
-    sys.exit(f'Unknown set {SET!r}: images01-09 or monsters01-12')
+    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12 or slayercaves')
 print('done')
