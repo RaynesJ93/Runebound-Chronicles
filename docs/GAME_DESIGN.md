@@ -676,8 +676,12 @@ A new skill, **Slayer** (1–99), trained only by killing monsters on a task.
 | Skeletons and ghosts | skeleton, restless ghost | 13 | 20–40 |
 | Air elementals | air elemental | 24 | 20–40 |
 | Fire imps | fire imp | 28 | 20–40 |
+| Cave crawlers | cave crawler (Slayer 10) | 15 | 20–40 |
+| Bloodbats | bloodbat (Slayer 25) | 30 | 20–40 |
+| Stone wraiths | stone wraith (Slayer 45) | 45 | 20–40 |
+| Ember wyrms | ember wyrm (Slayer 60) | 60 | 15–30 |
 
-You never get the same task twice in a row, a blocked one, or one more than 25 combat levels below you (unless nothing else is left). Bosses aren't tasks. New monsters (batches 2 and 3) add more tasks, and slayer-only monsters will need a Slayer level.
+You never get the same task twice in a row, a blocked one, or one more than 25 combat levels below you (unless nothing else is left). Bosses aren't tasks. New monsters add more tasks; slayer-only monsters (v0.47.0) also need a Slayer level.
 
 **Spending points** (talk to Kesta):
 - **Skip** your task: 30 points.
@@ -702,7 +706,20 @@ Seven monsters fill the gaps between the old ones' levels, each with painted art
 
 New slayer tasks: giant spiders (combat 6+), giant crabs (8+), bandits (10+), skeletons and ghosts (13+), air elementals (24+), fire imps (28+). Kesta has painted art now too.
 
-The slayer-only monsters' art (cave crawler, bloodbat, stone wraith, ember wyrm) is already in the atlas, ready for batch 3.
+### Slayer monsters (v0.47.0)
+
+Four monsters you can only fight with a high enough **Slayer level**. Below it, attacking one says "You need a Slayer level of N to fight the cave crawler", and they leave you alone (they're only aggressive to players who could fight back). Each has a trick of its own and a unique drop. Painted art from the "monsters 01-12" sheets.
+
+| Monster | Slayer | Level | HP | Max hit | Attack | Where | Its trick | Unique drop |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Cave crawler | 10 | 23 | 34 | 3 | stab | Copperdeep Depths (the side caverns) | **Regenerates**: heals 1 HP every 6 ticks, even mid-fight, so hit it hard | none; good for ores and uncut gems |
+| Bloodbat | 25 | 38 | 44 | 7 | slash, fast | Copperdeep Hollow | **Drinks blood**: heals by half of every hit it lands on you | **Bloodfang amulet** (1/128): +5 stab/slash/crush accuracy, +6 strength |
+| Stone wraith | 45 | 55 | 60 | 7 | magic | Goblin Warrens (the deep side tunnels) | **Stone skin**: stab, slash and ranged hits do half damage; crush and magic do full | **Wraithstone ring** (1/128): +8 magic, +3 to every defence |
+| Ember wyrm | 60 | 72 | 90 | 10 | slash | The Sunken Forge (the east hall) | **Fire breath**: every 4th attack is a blast of fire, up to 15, that your magic defence blocks | **Ember scimitar** (1/200): needs Attack 50; better than a rune scimitar (+42 slash, +38 strength) |
+
+Balance check (simulated duels, player 3 levels higher in the best armour they can wear): about half to two-thirds of your hitpoints per kill, like the other monsters — but a stone wraith fought with a scimitar wins most of the time; take crush or magic. Their other drops are better versions of their area's loot (ores, bars, gems, coins, runes). New slayer tasks, which Kesta only gives once you have the Slayer level: cave crawlers (combat 15, Slayer 10), bloodbats (30, 25), stone wraiths (45, 45), ember wyrms (60, 60). Kills give Slayer XP like any monster (its hitpoints), so these are the best Slayer XP at their level.
+
+Enemy fields: `slayer` (level needed), `regen: [hp, ticks]`, `drain` (share of damage healed), `resist: { stab, slash, ranged }` (damage multipliers), `breath: { every, maxHit, text }`.
 
 ### Lodestones (v0.44.0)
 

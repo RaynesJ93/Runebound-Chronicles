@@ -1112,6 +1112,7 @@ function boot() {
   };
   // The slayer helmet: more accuracy and damage against monsters on your task.
   combat.on.taskBoost = (e) => (onTask(e) ? 1 + (ITEMS[state.equipment.head?.id]?.equip?.slayerBoost || 0) : 1);
+  combat.on.slayerLevel = () => book.level('slayer');
 
   // ---- Lodestones (data/lodestones.js) ---------------------------------------------
   // Dormant until The Sleeping Stones; then touch one once to attune it, and any

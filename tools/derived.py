@@ -873,6 +873,31 @@ def slayer_helm(im, get=None):
 
 
 
+# ---- Slayer monster drops (v0.47.0) ----
+
+def ramp_to(colours, light_only=False):
+    """Recolour an item along a dark-to-light colour ramp, keeping its shading.
+    light_only: only the lighter half (a blade, not its hilt)."""
+    def fn(im, get=None):
+        rgba = np.array(im.convert('RGBA')).astype(np.float32)
+        m = rgba[..., 3] > 0
+        if not m.any():
+            return im
+        l = lum(rgba[..., :3]) / 255
+        if light_only:
+            m = m & (l > np.percentile(l[m], 40))
+        lo, hi = np.percentile(l[m], 2), np.percentile(l[m], 99)
+        t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+        out = rgba.copy()
+        out[m, :3] = J.ramp(colours, t)[m]
+        return Image.fromarray(out.clip(0, 255).astype(np.uint8), 'RGBA')
+    return fn
+
+
+BLOODFANG = ramp_to(['#14060a', '#4a0c14', '#a01c26', '#f2dcc4'])
+WRAITHSTONE = ramp_to(['#1a1e26', '#4a525c', '#8a949e', '#b8f4ff'])
+EMBER = ramp_to(['#4a0c04', '#b8320a', '#ff8a2a', '#ffe68a'], light_only=True)
+
 # Sprites made at a different size: new key <- source key, every frame, scale.
 # (Grubnak used to be the chief at twice the size; he has his own painted art
 # now, in tools/sprites/, so nothing is scaled at the moment.)
@@ -926,6 +951,9 @@ for part in STEEL:
     DERIVED[f'steel{part}'] = dict(icon=(f'iron{part}', steel), small=(f'iron{part}', steel), gear=(f'iron{part}', steel))
 DERIVED['slayerGem'] = dict(icon=('uncutRuby', lambda im, g=None: slayer_gem(im, g)), small=('uncutRuby', lambda im, g=None: slayer_gem(im, g)))
 DERIVED['slayerHelmet'] = dict(icon=('ironFullHelm', lambda im, g=None: slayer_helm(im, g)), small=('ironFullHelm', lambda im, g=None: slayer_helm(im, g)), gear=('ironFullHelm', lambda im, g=None: slayer_helm(im, g)))
+DERIVED['bloodfangAmulet'] = dict(icon=('goldRubyAmulet', BLOODFANG), small=('goldRubyAmulet', BLOODFANG), gear=('goldRubyAmulet', BLOODFANG))
+DERIVED['wraithstoneRing'] = dict(icon=('goldSapphireRing', WRAITHSTONE), small=('goldSapphireRing', WRAITHSTONE))
+DERIVED['emberScimitar'] = dict(icon=('runeScimitar', EMBER), small=('runeScimitar', EMBER), gear=('runeScimitar', EMBER))
 DERIVED['holtsSword'] = dict(icon=('steelLongsword', holts_blade), small=('steelLongsword', holts_blade), gear=('steelLongsword', holts_blade))
 DERIVED['runeboundCape'] = dict(icon=('wolfCloak', runebound_cape), small=('wolfCloak', runebound_cape), gear=('wolfCloak', runebound_cape))
 DERIVED['coal'] = dict(icon=('ironOre', coal_lump), small=('ironOre', coal_lump))

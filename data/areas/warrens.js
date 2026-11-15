@@ -105,6 +105,10 @@ export function buildWarrens() {
       { enemy: 'warrenGoblin', x: 17, y: 7 },
       { enemy: 'warrenGoblin', x: 27, y: 7 },
       { enemy: 'goblinDigmaster', x: 22, y: 6 },
+      // Stone wraiths (Slayer 45), in the side tunnels
+      { enemy: 'stoneWraith', x: 35, y: 14 },
+      { enemy: 'stoneWraith', x: 9, y: 17 },
+      { enemy: 'stoneWraith', x: 40, y: 18 },
     ],
   }, PAD);
 }

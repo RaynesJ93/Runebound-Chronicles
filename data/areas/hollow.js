@@ -96,6 +96,11 @@ export function buildHollow() {
       { enemy: 'nightStalker', x: 35, y: 23 },
       { enemy: 'nightStalker', x: 9, y: 21 },
       { enemy: 'nightStalker', x: 21, y: 12 },
+      // Bloodbats (Slayer 25)
+      { enemy: 'bloodbat', x: 8, y: 6 },
+      { enemy: 'bloodbat', x: 36, y: 6 },
+      { enemy: 'bloodbat', x: 8, y: 23 },
+      { enemy: 'bloodbat', x: 37, y: 24 },
     ],
   };
 }

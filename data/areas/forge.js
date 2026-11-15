@@ -107,6 +107,9 @@ export function buildForge() {
       { enemy: 'forgeGolem', x: 37, y: 22 },
       { enemy: 'forgeGolem', x: 10, y: 25 },
       { enemy: 'forgeGolem', x: 35, y: 20 },
+      // Ember wyrms (Slayer 60), in the east hall
+      { enemy: 'emberWyrm', x: 40, y: 24 },
+      { enemy: 'emberWyrm', x: 34, y: 26 },
       { enemy: 'moltenBeast', x: 39, y: 7 },
     ],
   };
