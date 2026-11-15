@@ -736,10 +736,27 @@ export class Hud {
         <span class="guide-title"><b>${g.name}</b><small>Level ${lvl}${next ? ` · next unlock at ${next.level}` : ''}</small></span>
       </div>
       <p class="muted small">${g.about}</p>
-      ${g.sections.map((s) => `
-        <h3 class="guide-sec">${s.title}</h3>
+      ${g.sections.map((s, k) => {
+        const got = s.rows.filter((r) => lvl >= r.level).length;
+        return `<details class="guide-drop" data-sec="${k}" ${this.guideOpenSec(g, k, next) ? 'open' : ''}>
+        <summary class="guide-sec"><span>${s.title}</span>${s.rows.length ? `<small>${got}/${s.rows.length}</small>` : ''}</summary>
         ${s.note ? `<p class="muted small">${s.note}</p>` : ''}
-        ${s.rows.map(row).join('')}`).join('')}`;
+        ${s.rows.map(row).join('')}</details>`;
+      }).join('')}`;
+    for (const d of this.$('skill-guide').querySelectorAll('details[data-sec]')) {
+      d.addEventListener('toggle', () => { this.guideSecOpen[`${g.id}:${d.dataset.sec}`] = d.open; });
+    }
+  }
+
+  // Each guide section is a dropdown. Until you open or close one yourself,
+  // only the section with your next unlock starts open (or the only section).
+  guideOpenSec(g, k, next) {
+    this.guideSecOpen ??= {};
+    const saved = this.guideSecOpen[`${g.id}:${k}`];
+    if (saved !== undefined) return saved;
+    if (g.sections.length === 1) return true;
+    const at = next ? g.sections.findIndex((s) => s.rows.includes(next)) : -1;
+    return at >= 0 ? k === at : k === 0;
   }
 
   showTab(name) {
