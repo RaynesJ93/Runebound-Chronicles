@@ -394,7 +394,7 @@ As before, shortbows are quick (4 ticks, range 7) and longbows reach further (6 
 | Shark | 80 | 20 | 210 | 99 |
 | Cave eel | 88 | 22 | 230 | 99 |
 
-Art: stand-in recolours (the trees from the oak and pine, logs, bows, fish and tools from the existing ones) until painted art arrives.
+Art: *v0.50.1*, painted (the "RPG Trees Items Bows Fish" sheets): the five trees, the logs, lobster pot, harpoon, hunter's stew, burnt pie (and stew), all ten bow icons and all ten fish (raw and cooked). Bows in your hand are still recoloured oak bows. tools/derived.py now skips its recoloured icon when a painted one is in tools/sprites, but still derives the held art.
 
 ### Woodcutting and Fletching (shipped in v0.11.0)
 
