@@ -102,7 +102,7 @@ const BUILD = {
     { title: 'Gold jewellery (furnace and mould)', rows: recipes(JEWELLERY.filter((r) => r.metal === 'goldBar')) },
   ],
   slayer: () => [
-    { title: 'How it works', note: 'Get a task from Kesta the Huntress at the Hunters\' camp, by the lake in south-west Thornwood. Monsters on your task give Slayer XP equal to their hitpoints. Finishing a task gives slayer points: 10, or 50 for every 10th in a row and 150 for every 50th. Spend them with Kesta on skips (30), blocks (100) and her shop. Her Hunter's scroll (150) gives 50% more points per task, for good.', rows: [] },
+    { title: 'How it works', note: 'Get a task from Kesta the Huntress at the Hunters\' camp, by the lake in south-west Thornwood. Monsters on your task give Slayer XP equal to their hitpoints. Finishing a task gives slayer points: 10, or 50 for every 10th in a row and 150 for every 50th. Spend them with Kesta on skips (30), blocks (100) and her shop. Her Hunter\'s scroll (150) gives 50% more points per task, for good.', rows: [] },
     { title: 'Tasks Kesta gives', rows: byLevel(TASKS.map((t) => ({
       level: t.slayer || 1, icon: 'slayerGem', name: t.name[0].toUpperCase() + t.name.slice(1),
       sub: [`combat ${t.combat}+${t.maxCombat ? ` (until ${t.maxCombat})` : ''}`, `${t.amount[0]}–${t.amount[1]} kills`, t.monsters.map((m) => ENEMIES[m]?.name).join(', ')].join(' · '),
