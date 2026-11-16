@@ -344,6 +344,59 @@ Dying in tutorial or story-critical fights never costs items.
 
 Woodcutting, Fletching, Mining, Smithing, Fishing and Cooking are in the game (v0.13.0). The rest are planned, and listed so the systems built now leave room for them.
 
+### Skill review, batch 2: Magic, Runecrafting and Lumenhaven (v0.51.0)
+
+The review found Runecrafting had only three runes and Magic only two spells. Batch 2 adds eight runes, sixteen combat spells, teleports and alchemy, and a new area for the higher altars.
+
+**Runes and altars** (essence → runes; more runes per essence at the listed levels):
+
+| Rune | Runecrafting | XP | Extra rune at | Altar |
+| --- | --- | --- | --- | --- |
+| Earth | 9 | 6.5 | 26, 52, 78 | Copperdeep Mine |
+| Fire | 14 | 7 | 35, 70 | The Sunken Forge |
+| Body | 20 | 7.5 | 46, 92 | Thornwood, by the stone shrine |
+| Cosmic | 27 | 8 | 59 | Lumenhaven: an island in the starlit pool |
+| Chaos | 35 | 8.5 | 74 | Lumenhaven: the broken temple (west) |
+| Nature | 44 | 9 | 91 | Lumenhaven: the great tree glade (north-west) |
+| Law | 54 | 9.5 | — | Lumenhaven: the crystal shrine (east) |
+| Death | 65 | 10 | — | Lumenhaven: the shadow hollow (far north, deepest) |
+
+**Lumenhaven, the hidden fae city** (inspired by OSRS's Zanaris). Step into the fairy ring in south-east Thornwood and you're pulled into a hidden realm: always night, lit by glowing toadstools, crystals and fae lanterns; winding paths between still dark pools; a market square of stalls at the centre where you arrive. The five high altars are spread around it, the deadliest furthest in. It's dangerous: three fae monsters roam it, and their drops are the way to get high runes (and extra essence) before you can craft them yourself.
+
+| Monster | Level | HP | Max hit | Attack | Where | Drops (highlights) |
+| --- | --- | --- | --- | --- | --- | --- |
+| Glimmerwisp | 44 | 48 | 6 | magic | The market and pools | Rune essence (2–5), cosmic, chaos, earth and fire runes, a little nature |
+| Fae sentinel | 58 | 70 | 8 | slash | The glade and crystal shrine | Rune essence (3–5), nature, law and cosmic runes, coins, gems |
+| Hollow shade | 70 | 90 | 9 | magic | The shadow hollow | Rune essence (3–5), death, law, chaos and nature runes, uncut diamonds |
+
+All three are aggressive (until you're twice their level, as usual). Placeholder art: recolours of the air elemental, bandit and restless ghost.
+
+**Combat spells** (choose one in the Combat tab while holding a staff):
+
+| Tier | Wind | Water | Earth | Fire | Runes (each) |
+| --- | --- | --- | --- | --- | --- |
+| Strike | 1 (2) | 5 (4) | 9 (6) | 13 (8) | 1 mind + element |
+| Bolt | 17 (9) | 23 (10) | 29 (11) | 35 (12) | 1 chaos + element |
+| Blast | 41 (13) | 47 (14) | 53 (15) | 59 (16) | 1 death + element |
+| Wave | 62 (17) | 65 (18) | 70 (19) | 75 (20) | 1 death + 1 body + element |
+
+(Magic level, then max hit in brackets.) The element costs grow with the tier, and every spell also needs air runes, as in OSRS.
+
+**Other spells**, in a new "Spellbook" list in the Combat tab (any weapon):
+
+| Spell | Magic | Runes | Does |
+| --- | --- | --- | --- |
+| Low alchemy | 21 | 1 nature, 3 fire | Turns an item into coins (40% of its value) |
+| Brambleford teleport | 25 | 1 law, 3 air, 1 fire | Teleports you to Brambleford square |
+| Thornwood teleport | 31 | 1 law, 3 air, 1 water | To the Thornwood crossroads |
+| Copperdeep teleport | 37 | 1 law, 1 air, 3 earth | To the mine entrance |
+| Vale teleport | 45 | 2 law, 2 air, 2 water | To the Whispering Vale |
+| High alchemy | 55 | 1 nature, 5 fire | Turns an item into coins (60% of its value) |
+
+Teleports don't work mid-fight. Alchemy: cast it, then tap the item in your bag. (Jewellery enchanting is left for a later batch.)
+
+Earth and fire runes are also sold in the magic shop. Art: recoloured stand-ins (runes, altars, monsters, spell icons) until painted art is done.
+
 ### Skill review, batch 1: trees, bows, fish and food (v0.50.0)
 
 The skill review (16 Nov 2026) found Woodcutting stopped at 15, bows at Fletching 25, Fishing at 30 and Cooking at 25 (the best food healed 9). Batch 1 takes all four to the high levels. (Batch 2: Magic and Runecrafting; batch 3: Crafting and ranged armour; batch 4: polish.)

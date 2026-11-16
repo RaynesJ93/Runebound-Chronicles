@@ -238,6 +238,9 @@ export function buildRoute1() {
   one('scarecrow', 98, 85, { interact: ['A scarecrow, slumped over. Its straw is chewed.'] });
   one('well', 86, 79, { interact: ['The farm well. The rope has been cut.'] });
 
+  // The body altar (v0.51.0), by the old graveyard: Runecrafting 20
+  prop('altar', [{ x: 35, y: 89 }, { x: 36, y: 89 }], { variant: 'body' });
+
   // The stone shrine
   clearArea(92, 34, 108, 49);
   // An odd-sized square of paving, so the shrine sits right in the middle,
@@ -258,7 +261,7 @@ export function buildRoute1() {
   }
 
   // A glowing rune stone stands in the middle of the ring
-  one('runeStone', 70, 89, { interact: ['A standing stone carved with a glowing rune.', 'The mushrooms around it grow in a perfect circle. Nobody planted them.'] });
+  one('runeStone', 70, 89, { interact: ['A standing stone carved with a glowing rune.', 'The mushrooms around it grow in a perfect circle. Nobody planted them.', 'Step into the ring beside it and the air shimmers: it leads somewhere else.'] });
 
   // ---- The mine entrance: a timbered tunnel in a rock face at the end of the north-west road ----
   for (let x = 24; x <= 37; x++) for (let y = 0; y <= 1; y++) {
@@ -325,6 +328,8 @@ export function buildRoute1() {
       // The sealed cave: only once you've broken the boulders (The Runebound, chapter 5)
       { tiles: [{ x: 7, y: 7 }], to: 'warrens', at: { x: 22, y: 35 }, facing: Math.PI, when: (f) => !!f.caveOpen },
       { tiles: [{ x: 38, y: 75 }], to: 'slayerCave', at: { x: 32, y: 42 }, facing: Math.PI },
+      // v0.51.0: step into the fairy ring and you're pulled into Lumenhaven
+      { tiles: [{ x: 69, y: 89 }, { x: 71, y: 89 }, { x: 70, y: 88 }, { x: 70, y: 90 }], to: 'lumenhaven', at: { x: 36, y: 49 }, facing: Math.PI },
     ],
     spawns: [
       // v0.46.0: giant spiders in the watchtower ruins, crabs on the lake shore,

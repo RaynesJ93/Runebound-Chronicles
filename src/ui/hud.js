@@ -7,6 +7,9 @@ import { iconUrl, paintedIconUrl } from '../render/icons.js';
 const uiIcon = (name, svg, size) => { const u = paintedIconUrl(name); return u ? `<img class="px ui-ic" src="${u}" alt="" width="${size}" height="${size}" id="ic-${name}">` : svg; };
 import { itemIcon, stackLabel } from '../render/items.js';
 import { ITEMS } from '../../data/items.js';
+
+// An item's icon if it's an item (a rune, for spells), else a skill/style icon.
+const anyIcon = (name) => (ITEMS[name] ? itemIcon(name).url : iconUrl(name));
 import { BANK_TABS, tabOf } from '../../data/bankTabs.js';
 import { GUIDE } from '../../data/startGuide.js';
 import { QUESTS, questStatus, questById, questsDone } from '../../data/quests.js';
@@ -164,6 +167,9 @@ export class Hud {
               <div class="style-list" id="style-list"></div>
               <div class="row"><span>Auto retaliate</span><button class="chip" id="set-retaliate2"></button></div>
               <p class="muted small" id="combat-stats"></p>
+              <h3 class="guide-sec">Spellbook</h3>
+              <p class="muted small">Teleports and alchemy: tap to cast, with any weapon.</p>
+              <div class="style-list" id="util-list"></div>
             </div>
           </div>
         </div>
@@ -312,6 +318,8 @@ export class Hud {
       if (tab) this.showTab(tab.dataset.tab);
       const st = e.target.closest('[data-style]');
       if (st) this.onStylePick?.(st.dataset.style);
+      const cast = e.target.closest('[data-cast]');
+      if (cast) this.onCast?.(cast.dataset.cast);
       const sk = e.target.closest('[data-skill]');
       if (sk) this.openGuide(sk.dataset.skill);
       if (e.target.closest('[data-guide-back]')) this.openGuide(null);
@@ -831,11 +839,20 @@ export class Hud {
     this.$('style-intro').textContent = intro;
     this.$('style-list').innerHTML = list.map((st) => `
       <button class="style ${st.id === currentId ? 'on' : ''} ${st.locked ? 'locked' : ''}" data-style="${st.id}" aria-pressed="${st.id === currentId}">
-        <img class="px" src="${iconUrl(st.icon || st.id)}" alt="">
+        <img class="px" src="${anyIcon(st.icon || st.id)}" alt="">
         <span><b>${st.name}</b><small>${st.sub}</small></span>
       </button>`).join('');
     this.$('set-retaliate2').textContent = retaliate ? 'On' : 'Off';
     this.$('combat-stats').textContent = stats;
+  }
+
+  // The Spellbook (v0.51.0): teleports and alchemy, cast with a tap.
+  renderUtility(list) {
+    this.$('util-list').innerHTML = list.map((sp) => `
+      <button class="style ${sp.locked ? 'locked' : ''}" data-cast="${sp.id}">
+        <img class="px" src="${anyIcon(sp.icon || sp.id)}" alt="">
+        <span><b>${sp.name}</b><small>${sp.sub}</small></span>
+      </button>`).join('');
   }
 
   // Floating "+20" with the skill's icon, near the top-right. XP from the same

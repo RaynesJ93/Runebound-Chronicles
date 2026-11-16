@@ -5,7 +5,7 @@
 // Tiles are (x, y) in the area's own grid. Keep labels short.
 
 // The outdoor maps, in the order of the map's tabs.
-export const MAP_AREAS = ['brambleford', 'route1', 'mine', 'depths', 'hollow', 'forge', 'vale', 'warrens', 'chamber', 'slayerCave'];
+export const MAP_AREAS = ['brambleford', 'route1', 'mine', 'depths', 'hollow', 'forge', 'vale', 'warrens', 'chamber', 'slayerCave', 'lumenhaven'];
 
 // Maps the story hasn't opened yet stay off the map until this flag is set.
 export const MAP_HIDDEN = { warrens: 'caveOpen', chamber: 'chamberOpen' };
@@ -22,10 +22,11 @@ export const MAP_NAME = {
   warrens: 'Goblin Warrens',
   chamber: "Grubnak's chamber",
   slayerCave: 'Slayer Caverns',
+  lumenhaven: 'Lumenhaven',
 };
 
 // Even shorter names for the map's tabs.
-export const MAP_TAB = { brambleford: 'Brambleford', route1: 'Thornwood', mine: 'Mine', depths: 'Depths', hollow: 'Hollow', forge: 'Forge', vale: 'Vale', warrens: 'Warrens', chamber: 'Chamber', slayerCave: 'Slayer' };
+export const MAP_TAB = { brambleford: 'Brambleford', route1: 'Thornwood', mine: 'Mine', depths: 'Depths', hollow: 'Hollow', forge: 'Forge', vale: 'Vale', warrens: 'Warrens', chamber: 'Chamber', slayerCave: 'Slayer', lumenhaven: 'Lumenhaven' };
 
 // Rooms you walk into from another map. Inside them the map shows the
 // outside, with you at the door.
@@ -97,6 +98,15 @@ export const LABELS = {
     { x: 9, y: 19, text: 'West den' },
     { x: 35, y: 16, text: 'East den' },
     { x: 22, y: 30, text: 'Landing' },
+  ],
+  lumenhaven: [
+    { x: 36, y: 46, text: 'Fairy ring' },
+    { x: 36, y: 31, text: 'Market' },
+    { x: 57, y: 5, text: 'Cosmic altar' },
+    { x: 12, y: 27, text: 'Chaos temple' },
+    { x: 14, y: 3, text: 'Nature glade' },
+    { x: 61, y: 29, text: 'Crystal shrine' },
+    { x: 36, y: 1, text: 'Shadow hollow' },
   ],
   slayerCave: [
     { x: 32, y: 34, text: 'Entrance hall' },

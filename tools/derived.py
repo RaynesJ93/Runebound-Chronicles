@@ -978,6 +978,13 @@ DERIVED['harpoon'] = dict(icon=('ironSpear', ramp_to(['#101418', '#3a4650', '#8a
 DERIVED['huntersStew'] = dict(icon=('meatPie', ramp_to(['#1a0a04', '#5a2a10', '#a8602a', '#f0c080'])), small=('meatPie', ramp_to(['#1a0a04', '#5a2a10', '#a8602a', '#f0c080'])))
 DERIVED['burntPie'] = dict(icon=('meatPie', ramp_to(['#080606', '#1e1814', '#3a302a', '#5a4e44'])), small=('meatPie', ramp_to(['#080606', '#1e1814', '#3a302a', '#5a4e44'])))
 DERIVED['burntStew'] = dict(icon=('meatPie', ramp_to(['#060606', '#1a1614', '#34302c', '#504a44'])), small=('meatPie', ramp_to(['#060606', '#1a1614', '#34302c', '#504a44'])))
+# v0.51.0 runes and spells: recoloured from the air rune and Wind Strike
+RUNES = {'earth': ['#1a1006', '#5a3a1a', '#8ac04a', '#e8f0b0'], 'fire': ['#2a0604', '#a8240a', '#ff8a2a', '#fff0a0'],
+         'body': ['#140e20', '#4a3a7a', '#a890d0', '#f0e8f8'], 'cosmic': ['#100c24', '#3a2e6a', '#e0c050', '#fff8c0'],
+         'chaos': ['#1a0606', '#6a1a1a', '#e85a2a', '#ffe0a0'], 'nature': ['#061406', '#1a5a2a', '#5ad05a', '#e8ffd0'],
+         'law': ['#0a1020', '#2a4a9a', '#a8c8ff', '#ffffff'], 'death': ['#060608', '#24242c', '#6a6a7a', '#e0e0e8']}
+for _r, _ramp in RUNES.items():
+    DERIVED[f'{_r}Rune'] = dict(icon=('airRune', ramp_to(_ramp)), small=('airRune', ramp_to(_ramp)))
 DERIVED['wraithstoneRing'] = dict(icon=('goldSapphireRing', WRAITHSTONE), small=('goldSapphireRing', WRAITHSTONE))
 DERIVED['emberScimitar'] = dict(icon=('runeScimitar', EMBER), small=('runeScimitar', EMBER), gear=('runeScimitar', EMBER))
 DERIVED['holtsSword'] = dict(icon=('steelLongsword', holts_blade), small=('steelLongsword', holts_blade), gear=('steelLongsword', holts_blade))
@@ -1098,6 +1105,12 @@ EXTRA = [
     ('grubnakStatue', 'chars:enemy:grubnak', stone_statue),
     ('lodestone', 'standingStone', lodestone_dormant),
     ('lodestoneLit', 'standingStone', lodestone_lit),
+    # v0.51.0 altars: the air altar recoloured (stand-ins)
+    *[(f'altar:{_v}', 'altar:air', ramp_to(_c)) for _v, _c in (
+        ('earth', ['#1a1006', '#5a3a1a', '#8ac04a', '#e8f0b0']), ('fire', ['#1a0604', '#6a1a0a', '#ff8a2a', '#fff0a0']),
+        ('body', ['#140e20', '#4a3a7a', '#a890d0', '#f0e8f8']), ('cosmic', ['#100c24', '#3a2e6a', '#e0c050', '#fff8c0']),
+        ('chaos', ['#1a0606', '#5a1a1a', '#e85a2a', '#ffe0a0']), ('nature', ['#061406', '#1a5a2a', '#5ad05a', '#e8ffd0']),
+        ('law', ['#0a1020', '#2a4a9a', '#a8c8ff', '#ffffff']), ('death', ['#040406', '#141418', '#4a4a5a', '#b0b0c0']))],
 ]
 
 # Side-on shields stay as they are (a kite shape only reads from the front or back).

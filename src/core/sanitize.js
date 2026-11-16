@@ -10,6 +10,7 @@ import { ITEMS, maxStack } from '../../data/items.js';
 const LEGACY_NOTES = { runeEssenceNoted: 'runeEssence' };
 const unNote = (s) => (s && typeof s === 'object' && LEGACY_NOTES[s.id] ? { ...s, id: LEGACY_NOTES[s.id] } : s);
 import { AREAS, START_AREA } from '../../data/areas/index.js';
+import { SPELLS } from '../../data/spells.js';
 import { SLOTS } from '../items/equipment.js';
 import { SKILLS } from '../skills/skills.js';
 import { defaultState } from './state.js';
@@ -34,7 +35,7 @@ const ENUMS = {
   dpad: ['auto', 'on', 'off'],
   attackStyle: ['accurate', 'aggressive', 'defensive', 'controlled'],
   rangedStyle: ['accurate', 'rapid', 'longrange'],
-  spell: ['windStrike', 'waterStrike'],
+  spell: SPELLS.map((s) => s.id), // every combat spell (v0.51.0 added 14)
   itemTap: ['use', 'menu'],
   textSpeed: ['normal', 'fast', 'instant'],
 };
