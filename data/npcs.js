@@ -31,6 +31,7 @@ const TIPS = {
   bloodbats: 'Bloodbats roost in Copperdeep Hollow. Every bite heals them. Kill them fast, and eat early. Or the Roost, in the Slayer Caverns.',
   stoneWraiths: 'Stone wraiths haunt the deep tunnels of the Goblin Warrens. Blades and arrows barely scratch them: take a mace or a warhammer, or cast. Or the Wraith Gallery, deep in the Slayer Caverns.',
   emberWyrms: 'Ember wyrms, in the far hall of the Sunken Forge. Every few bites, fire. Magic defence helps with the breath. Bring your best food. Or the Wyrm\'s Hearth, at the very bottom of the Slayer Caverns.',
+  vinegrasp: 'Vinegrasp horrors, in the Overgrowth, past the Wyrm\'s Hearth. Every few lashes they root you to the floor, so never fight one when you\'re low. Eat first.',
 };
 
 export const NPCS = [

@@ -748,6 +748,25 @@ A cave system behind Kesta's camp in south-west Thornwood: the mouth is in a roc
 - The caverns are on the map ("Slayer Caverns" tab). The monsters' old spots (Depths, Hollow, Warrens, Forge) stay too.
 - Kesta's tips for these tasks mention the caverns.
 
+### Slayer gear and the Overgrowth (v0.49.0)
+
+Six new pieces of high-end gear, mostly from slayer monsters, plus a fifth and deepest section of the Slayer Caverns for the best of them.
+
+| Item | Needs | Stats | From |
+| --- | --- | --- | --- |
+| Crawler-shell boots | Defence 30 | +9 stab/slash/crush, +6 ranged defence | Cave crawler (1/64) |
+| Bloodbat gloves | Attack 35 | +6 stab/slash/crush accuracy, +3 strength, +3 stab/slash/crush defence | Kesta's shop, 400 points |
+| Wraithbone staff | Magic 45 | Magic weapon: +14 magic accuracy, +5 magic defence, +3 crush | Stone wraith (1/128) |
+| Wyrmscale boots | Defence 60 | +13 stab/slash/crush, +10 ranged, +2 magic defence; +2 strength | Ember wyrm (1/128) |
+| Hunter's gauntlets | Attack 60 and Defence 60 | +9 stab/slash/crush accuracy, +7 strength, +8 stab/slash/crush and +6 ranged defence | Kesta's shop, 1,500 points |
+| **Vine whip** | **Attack 70** | Slash weapon, **speed 3 ticks (1.8 s; a scimitar is 4)**, +62 slash, +12 stab, +40 strength; about 55% more damage than a rune scimitar | Vinegrasp horror (1/256) |
+
+**The vinegrasp horror** (Slayer 70, level 85, 110 HP, max hit 10, slash, an attack every 4 ticks). A knot of thorny vines with a maw. Its trick: **rooting**. Every 5th attack, vines burst from the floor and hold your legs for 3 seconds: you can still fight (and eat), but you can't walk away. Drops: coins, rune bars, runite ore, uncut diamonds, coal; rare: the vine whip.
+
+**The Overgrowth**: the fifth section of the Slayer Caverns, past the Wyrm's Hearth (a corridor leads on from the hearth's north-east). A cavern choked with roots, moss and thorns, with its own floor and wall look (recoloured for now). 5 vinegrasp horrors. Sign: "THE OVERGROWTH — SLAYER 70". New slayer task: vinegrasp horrors (Slayer 70, combat 70, 15–30 kills).
+
+Enemy field `root: { every, ticks, text }` (every Nth attack holds you in place for that many ticks). Loot `each` entries can be `rare: true` (shown as a rare drop). Placeholder art: recolours of existing gear (and of the stone wraith for the horror) until painted art arrives.
+
 Enemy fields: `slayer` (level needed), `regen: [hp, ticks]`, `drain` (share of damage healed), `resist: { stab, slash, ranged }` (damage multipliers), `breath: { every, maxHit, text }`.
 
 ### Lodestones (v0.44.0)

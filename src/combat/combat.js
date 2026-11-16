@@ -483,6 +483,11 @@ export class Combat {
           if (br) this.impacts.push({ x: pt.x, y: pt.y, time: this.now });
           e.cooldown = f.speed;
           this.hurtPlayer(e, dmg);
+          // Rooting (def.root): every Nth attack holds you in place for a few ticks.
+          if (def.root && (e.roots = (e.roots || 0) + 1) % def.root.every === 0) {
+            this.rootUntil = this.now + def.root.ticks * 0.6;
+            this.on.message?.(def.root.text || `The ${def.name.toLowerCase()} roots you in place!`);
+          }
           // Drinking blood (def.drain): it heals by a share of what it hit.
           if (def.drain && dmg > 0 && e.hp < e.maxHp) e.hp = Math.min(e.maxHp, e.hp + Math.max(1, Math.floor(dmg * def.drain)));
         }

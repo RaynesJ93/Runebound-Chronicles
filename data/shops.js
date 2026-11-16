@@ -22,6 +22,8 @@ export const SHOPS = {
       // needs: an item Kesta takes in part exchange (your old helmet, in your bag)
       { id: 'superiorSlayerHelmet', price: 800, needs: 'slayerHelmet' },
       { id: 'slayerRing', price: 150 },
+      { id: 'bloodbatGloves', price: 400 },
+      { id: 'huntersGauntlets', price: 1500 },
       // hideFlag: gone from the shop once this flag is set (you've read it)
       { id: 'huntersScroll', price: 150, hideFlag: 'huntersScroll' },
       { id: 'slayerGem', price: 1 },

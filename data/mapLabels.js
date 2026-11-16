@@ -104,6 +104,7 @@ export const LABELS = {
     { x: 13, y: 2, text: 'Roost (Slayer 25)' },
     { x: 38, y: 2, text: 'Wraith Gallery (Slayer 45)' },
     { x: 51, y: 18, text: "Wyrm's Hearth (Slayer 60)" },
+    { x: 72, y: 5, text: 'Overgrowth (Slayer 70)' },
   ],
   chamber: [
     { x: 15, y: 3, text: "Grubnak's chamber" },

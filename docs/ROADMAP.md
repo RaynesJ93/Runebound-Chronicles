@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 16 Nov 2026 | v0.49.0: slayer gear: vine whip (Attack 70, faster than a scimitar), wyrmscale boots, crawler-shell boots, wraithbone staff (drops), bloodbat gloves and hunter's gauntlets (Kesta's shop). The Overgrowth, a fifth Slayer Caverns section, with the vinegrasp horror (Slayer 70; roots you in place). |
 | 15 Nov 2026 | v0.48.7: the Hunter's scroll in Kesta's shop (150 points): read it once for 50% more slayer points from every task, for good. |
 | 15 Nov 2026 | v0.48.6: painted art for the superior slayer helmet (icon and worn, all four directions) and the slayer ring. |
 | 15 Nov 2026 | v0.48.5: Kesta's shop adds the superior slayer helmet (800 points + your slayer helmet; Defence 60; better than rune, +20% on task) and the slayer ring (150 points; teleports to her camp or the Slayer Caverns, checks your task). |

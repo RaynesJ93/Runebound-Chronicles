@@ -108,9 +108,10 @@ const BUILD = {
       sub: [`combat ${t.combat}+${t.maxCombat ? ` (until ${t.maxCombat})` : ''}`, `${t.amount[0]}–${t.amount[1]} kills`, t.monsters.map((m) => ENEMIES[m]?.name).join(', ')].join(' · '),
     }))) },
     { title: 'Slayer monsters (you need the level to fight them)', rows: byLevel(Object.values(ENEMIES).filter((e) => e.slayer).map((e) => {
-      const u = e.loot?.rare?.table?.[0]?.item;
-      const unique = u && ITEMS[u]?.equip ? ` · rare drop: ${ITEMS[u].name.toLowerCase()}` : '';
-      return { level: e.slayer, icon: unique ? u : 'slayerGem', name: e.name, sub: `level ${e.level}${unique}` };
+      // its gear drops: the rare table, and rare 'each' rolls
+      const gear = [...(e.loot?.rare?.table || []), ...(e.loot?.each || []).filter((x) => x.rare)].map((x) => x.item).filter((id) => ITEMS[id]?.equip);
+      const unique = gear.length ? ` · rare drops: ${gear.map((id) => ITEMS[id].name.toLowerCase()).join(', ')}` : '';
+      return { level: e.slayer, icon: gear[0] || 'slayerGem', name: e.name, sub: `level ${e.level}${unique}` };
     })) },
     { title: 'Gear', rows: [{ level: 1, icon: 'slayerHelmet', name: 'Slayer helmet', sub: '300 slayer points · Defence 20 · +15% accuracy and damage on task' }] },
   ],

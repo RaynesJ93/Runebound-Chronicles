@@ -330,6 +330,7 @@ export const ENEMIES = {
         { item: 'uncutEmerald', qty: 1, chance: 1 / 24 },
         { item: 'uncutRuby', qty: 1, chance: 1 / 64 },
       ],
+      each: [{ item: 'crawlerShellBoots', qty: 1, chance: 1 / 64, rare: true }],
       rare: { chance: 1 / 128, table: [{ item: 'uncutDiamond', qty: 1 }, { item: 'warCharm', qty: 1 }] },
     },
   },
@@ -374,6 +375,7 @@ export const ENEMIES = {
         { item: 'uncutRuby', qty: 1, chance: 1 / 30 },
         { item: 'uncutDiamond', qty: 1, chance: 1 / 80 },
       ],
+      each: [{ item: 'wraithboneStaff', qty: 1, chance: 1 / 128, rare: true }],
       rare: { chance: 1 / 128, table: [{ item: 'wraithstoneRing', qty: 1 }] },
     },
   },
@@ -395,7 +397,31 @@ export const ENEMIES = {
         { item: 'uncutRuby', qty: 1, chance: 1 / 16 },
         { item: 'uncutDiamond', qty: 1, chance: 1 / 40 },
       ],
+      each: [{ item: 'wyrmscaleBoots', qty: 1, chance: 1 / 128, rare: true }],
       rare: { chance: 1 / 200, table: [{ item: 'emberScimitar', qty: 1 }] },
+    },
+  },
+  // v0.49.0: the deepest section of the Slayer Caverns, the Overgrowth.
+  // root: every Nth attack holds you in place for some ticks.
+  vinegraspHorror: {
+    id: 'vinegraspHorror', name: 'Vinegrasp horror', level: 85, hp: 110, slayer: 70,
+    attack: 66, strength: 66, defence: 56, attackBonus: 30, strengthBonus: 25, defenceBonus: 40, maxHit: 10,
+    speed: 4, attackType: 'slash', aggressive: true, aggroRange: 3, wander: 2, leash: 7, respawn: 60,
+    root: { every: 5, ticks: 5, text: 'Vines burst from the floor and wrap around your legs!' },
+    look: { skin: '#2a5a1a', hair: '#123a0a', tunic: '#2a5a1a', pants: '#123a0a', eyes: '#f0dc50' },
+    examine: 'A knot of thorny vines around a hungry maw. The roots under your feet move when it does.',
+    loot: {
+      always: [{ item: 'bones', qty: 1 }],
+      main: [
+        { item: 'coins', min: 200, max: 600, chance: 1 / 3 },
+        { item: 'coal', min: 6, max: 12, chance: 1 / 5 },
+        { item: 'runiteOre', min: 1, max: 2, chance: 1 / 10 },
+        { item: 'runeBar', qty: 1, chance: 1 / 16 },
+        { item: 'uncutRuby', qty: 1, chance: 1 / 16 },
+        { item: 'uncutDiamond', min: 1, max: 2, chance: 1 / 30 },
+        { item: 'oakLogs', min: 10, max: 20, chance: 1 / 8 },
+      ],
+      rare: { chance: 1 / 256, table: [{ item: 'vineWhip', qty: 1 }] },
     },
   },
   alphaWolf: {
