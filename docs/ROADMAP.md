@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 16 Nov 2026 | v0.49.5: vinegrasp horrors drop 2–4 cooked salmon (1/8) instead of oak logs. |
 | 16 Nov 2026 | v0.49.4: you can walk through monsters, so they can't corner you (they still block each other; villagers still block you). |
 | 16 Nov 2026 | v0.49.3: the health box of the monster you're fighting moved to the top-left column, under the slayer counter, so it no longer covers the XP drops. |
 | 16 Nov 2026 | v0.49.2: painted art for the Overgrowth: root-and-moss floor, vine-choked walls, root arches, thorny tendrils, glowing pods and fungus, vine-wrapped bones and boulders. |
