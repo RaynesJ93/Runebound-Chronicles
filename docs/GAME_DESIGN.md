@@ -767,7 +767,7 @@ Six new pieces of high-end gear, mostly from slayer monsters, plus a fifth and d
 | Hunter's gauntlets | Attack 60 and Defence 60 | +9 stab/slash/crush accuracy, +7 strength, +8 stab/slash/crush and +6 ranged defence | Kesta's shop, 1,500 points |
 | **Vine whip** | **Attack 70** | Slash weapon, **speed 3 ticks (1.8 s; a scimitar is 4)**, +62 slash, +12 stab, +40 strength; about 55% more damage than a rune scimitar | Vinegrasp horror (1/256) |
 
-**The vinegrasp horror** (Slayer 70, level 85, 110 HP, max hit 10, slash, an attack every 4 ticks). A knot of thorny vines with a maw. Its trick: **rooting**. Every 5th attack, vines burst from the floor and hold your legs for 3 seconds: you can still fight (and eat), but you can't walk away. Drops: coins, rune bars, runite ore, uncut diamonds, coal; rare: the vine whip.
+**The vinegrasp horror** (Slayer 70, level 85, 110 HP, max hit 10, slash, an attack every 4 ticks). A knot of thorny vines with a maw. Its trick: **rooting**. Every 5th attack, vines burst from the floor and hold your legs for 3 seconds: you can still fight (and eat), but you can't walk away. Drops: coins, rune bars, runite ore, uncut rubies and diamonds, coal, cooked salmon (2–4; v0.49.5, was oak logs); rare: the vine whip.
 
 **The Overgrowth**: the fifth section of the Slayer Caverns, past the Wyrm's Hearth (a corridor leads on from the hearth's north-east). A cavern choked with roots, moss and thorns, with its own floor and wall look (recoloured for now). 5 vinegrasp horrors. Sign: "THE OVERGROWTH — SLAYER 70". New slayer task: vinegrasp horrors (Slayer 70, combat 70, 15–30 kills).
 

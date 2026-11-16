@@ -419,7 +419,7 @@ export const ENEMIES = {
         { item: 'runeBar', qty: 1, chance: 1 / 16 },
         { item: 'uncutRuby', qty: 1, chance: 1 / 16 },
         { item: 'uncutDiamond', min: 1, max: 2, chance: 1 / 30 },
-        { item: 'oakLogs', min: 10, max: 20, chance: 1 / 8 },
+        { item: 'salmon', min: 2, max: 4, chance: 1 / 8 }, // food for a fight that holds you in place
       ],
       rare: { chance: 1 / 256, table: [{ item: 'vineWhip', qty: 1 }] },
     },
