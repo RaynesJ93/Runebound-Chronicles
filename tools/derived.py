@@ -1098,11 +1098,6 @@ EXTRA = [
     ('grubnakStatue', 'chars:enemy:grubnak', stone_statue),
     ('lodestone', 'standingStone', lodestone_dormant),
     ('lodestoneLit', 'standingStone', lodestone_lit),
-    ('willowTree', 'oak', canopy_to(['#1c2a10', '#3e5a1c', '#7a9a34', '#c8d86a'])),
-    ('mapleTree', 'oak', canopy_to(['#3a0e06', '#8a2a0e', '#d0601c', '#f8b04a'])),
-    ('yewTree', 'pine', canopy_to(['#06120e', '#12301e', '#244a30', '#4a7048'])),
-    ('magicTree', 'oak', canopy_to(['#06142a', '#123c5a', '#2a7a9a', '#8ae0f0'], glow='#d8fbff')),
-    ('elderTree', 'oak', canopy_to(['#1a0a1e', '#4a1a4a', '#8a3a7a', '#e8a8d8'])),
 ]
 
 # Side-on shields stay as they are (a kite shape only reads from the front or back).
@@ -1166,10 +1161,15 @@ def derive(get0):
         src, fn = spec['icon']
         icons = get(f'icon:{src}')
         if not icons: continue
+        # A painted icon in tools/sprites wins: then only the worn/held art is derived.
+        painted = os.path.exists(os.path.join(SPRITE_DIR, f'icon__{new}.png'))
         k, im, ax, ay = icons[0]
         icon = fn(im, get)
-        emit((f'icon:{new}', 0, icon, ax, ay))
-        if spec.get('small'):
+        if not painted:
+            emit((f'icon:{new}', 0, icon, ax, ay))
+        if painted:
+            pass
+        elif spec.get('small'):
             s2, f2 = spec['small']
             for k, im, ax, ay in get(f'iconS:{s2}'):
                 emit((f'iconS:{new}', k, f2(im, get), ax, ay))

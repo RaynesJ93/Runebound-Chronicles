@@ -21,6 +21,10 @@ Sets:
   vinegrasp-art (16 Nov 2026) The vinegrasp horror (1_), the six slayer gear
                 icons (2_, 3 x 2) and the whip, staff and two boots worn or
                 held facing down/up/left/right (3_, 4 x 4).
+  batch1        (16 Nov 2026) Skill review batch 1: five trees (1_, a row),
+                item icons (2_, 3 x 3: logs, lobster pot, harpoon, stew,
+                burnt pie), bows (3_, 5 x 2: shortbows, longbows) and fish
+                (4_, 5 x 2: raw, cooked). Held bows stay derived.
   slayercaves   (15 Nov 2026) The Slayer Caverns' four sections: for each,
                 a sheet of floor + wall textures (1A, 2A...) and a 3 x 2
                 sheet of decorations (1B, 2B...).
@@ -192,6 +196,37 @@ elif SET == 'vinegrasp-art':
     old.update(anchors)
     json.dump(old, open(p, 'w'), indent=1, sort_keys=True)
 
+elif SET == 'batch1':
+    path = lambda p: glob.glob(os.path.join(SRC, p + '*.png'))[0]
+
+    def boxed(im, size, fit):
+        k = min(fit / im.width, fit / im.height)
+        sm = scaled(im, k)
+        c = Image.new('RGBA', (size, size))
+        c.alpha_composite(sm, ((size - sm.width) // 2, (size - sm.height) // 2))
+        return c
+
+    def icon(im, item):
+        boxed(im, 32, 28).save(os.path.join(OUT, f'icon__{item}.png'))
+        boxed(im, 16, 15).save(os.path.join(OUT, f'iconS__{item}.png'))
+
+    # Trees: about the oak's size (52 wide); the elder is bigger
+    trees = grid_cells(path('1_'), rows=1, cols=5, grow=2)[0]
+    for im, (name, width) in zip(trees, (('willow', 50), ('maple', 50), ('yew', 50), ('magic', 48), ('elder', 66))):
+        scaled(im, width / im.width).save(os.path.join(OUT, f'{name}Tree.png'))
+    items = [im for row in grid_cells(path('2_'), rows=3, cols=3, grow=10) for im in row]
+    for im, item in zip(items, ('willowLogs', 'mapleLogs', 'yewLogs', 'magicLogs', 'elderLogs', 'lobsterPot', 'harpoon', 'huntersStew', 'burntPie')):
+        icon(im, item)
+    icon(items[8], 'burntStew')
+    bows = grid_cells(path('3_'), rows=2, cols=5, grow=8)
+    for row, kind in zip(bows, ('Shortbow', 'Longbow')):
+        for im, wood in zip(row, ('willow', 'maple', 'yew', 'magic', 'elder')):
+            icon(im, f'{wood}{kind}')
+    fish = grid_cells(path('4_'), rows=2, cols=5, grow=8)
+    for row, raw in zip(fish, (True, False)):
+        for im, f in zip(row, ('Lobster', 'Swordfish', 'Monkfish', 'Shark', 'CaveEel')):
+            icon(im, f'raw{f}' if raw else f[0].lower() + f[1:])
+
 elif SET in ('slayercaves', 'overgrowth'):
     from seamless import seamless
     from scipy import ndimage
@@ -293,5 +328,5 @@ elif SET == 'images01-09':
     old.update(anchors)
     json.dump(old, open(path, 'w'), indent=1, sort_keys=True)
 else:
-    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, overgrowth, slayergear or vinegrasp-art')
+    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, overgrowth, slayergear, vinegrasp-art or batch1')
 print('done')
