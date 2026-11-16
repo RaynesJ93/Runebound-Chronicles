@@ -750,6 +750,10 @@ A cave system behind Kesta's camp in south-west Thornwood: the mouth is in a roc
 - The caverns are on the map ("Slayer Caverns" tab). The monsters' old spots (Depths, Hollow, Warrens, Forge) stay too.
 - Kesta's tips for these tasks mention the caverns.
 
+### Walking through monsters (v0.49.4)
+
+You can walk through monsters (tapping or holding a direction), so a crowd can't corner you. Monsters still don't overlap each other, and villagers still block you (you wait, then go round). Tech: `area.isFree`/`canStep` take `who`; `'player'` ignores monsters in `dynamicBlock` (player moves and the player's pathfinding).
+
 ### Slayer gear and the Overgrowth (v0.49.0)
 
 Six new pieces of high-end gear, mostly from slayer monsters, plus a fifth and deepest section of the Slayer Caverns for the best of them.
