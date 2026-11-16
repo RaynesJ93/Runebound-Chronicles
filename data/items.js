@@ -826,6 +826,31 @@ export const ITEMS = {
     name: 'Superior slayer helmet', value: 0, examine: 'Kesta\'s best work: your slayer helmet, rebuilt in dark rune steel. +20% accuracy and damage against monsters on your slayer task.',
     equip: { slot: 'head', req: { defence: 60 }, att: { magic: -3, ranged: -1 }, def: { stab: 25, slash: 28, crush: 19, ranged: 25, magic: 1 }, str: 1, slayerBoost: 0.2, look: { hat: 'helmet', hatColor: '#1e2a3a' } },
   },
+  // ---- Slayer gear (v0.49.0) ----
+  crawlerShellBoots: {
+    name: 'Crawler-shell boots', value: 6000, rare: true, examine: 'Boots plated with cave crawler shell. Light, and harder than adamant.',
+    equip: { slot: 'feet', req: { defence: 30 }, att: { magic: -1 }, def: { stab: 9, slash: 9, crush: 9, ranged: 6 } },
+  },
+  bloodbatGloves: {
+    name: 'Bloodbat gloves', value: 0, examine: 'Gloves of dark bat-leather, stitched by Kesta. They grip like claws.',
+    equip: { slot: 'hands', req: { attack: 35 }, att: { stab: 6, slash: 6, crush: 6 }, def: { stab: 3, slash: 3, crush: 3 }, str: 3 },
+  },
+  wraithboneStaff: {
+    name: 'Wraithbone staff', value: 12000, rare: true, examine: 'A staff of pale bone, carved from a stone wraith. Cold to hold, and it hums when you cast.',
+    equip: { slot: 'weapon', req: { magic: 45 }, style: 'magic', range: 8, type: 'crush', speed: 5, att: { magic: 14, crush: 3 }, def: { magic: 5, crush: 2 }, str: 3, look: { weaponKind: 'staff' } },
+  },
+  wyrmscaleBoots: {
+    name: 'Wyrmscale boots', value: 16000, rare: true, examine: 'Boots of ember wyrm scale. Still warm.',
+    equip: { slot: 'feet', req: { defence: 60 }, def: { stab: 13, slash: 13, crush: 13, ranged: 10, magic: 2 }, str: 2 },
+  },
+  huntersGauntlets: {
+    name: "Hunter's gauntlets", value: 0, examine: "Kesta's own design: hard leather and steel, made for gripping a blade and finishing the hunt.",
+    equip: { slot: 'hands', req: { attack: 60, defence: 60 }, att: { stab: 9, slash: 9, crush: 9 }, def: { stab: 8, slash: 8, crush: 8, ranged: 6 }, str: 7 },
+  },
+  vineWhip: {
+    name: 'Vine whip', value: 40000, rare: true, examine: 'A living vine, cut from a vinegrasp horror. It still twitches, and it cracks faster than any blade.',
+    equip: { slot: 'weapon', req: { attack: 70 }, type: 'slash', speed: 3, att: { stab: 12, slash: 62 }, str: 40, look: { weapon: 'rune', blade: 7 } },
+  },
   huntersScroll: {
     name: "Hunter's scroll", value: 0, examine: "One of Kesta's hunting secrets, written in a hurried hand. Read it to earn 50% more slayer points from every task, for good.",
   },

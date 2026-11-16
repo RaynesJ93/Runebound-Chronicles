@@ -33,6 +33,7 @@ export const TASKS = [
   { id: 'caveCrawlers', name: 'cave crawlers', monsters: ['caveCrawler'], combat: 15, slayer: 10, amount: [20, 40], weight: 8 },
   { id: 'bloodbats', name: 'bloodbats', monsters: ['bloodbat'], combat: 30, slayer: 25, amount: [20, 40], weight: 8 },
   { id: 'stoneWraiths', name: 'stone wraiths', monsters: ['stoneWraith'], combat: 45, slayer: 45, amount: [20, 40], weight: 8 },
+  { id: 'vinegrasp', name: 'vinegrasp horrors', monsters: ['vinegraspHorror'], combat: 70, slayer: 70, amount: [15, 30], weight: 8 },
   { id: 'emberWyrms', name: 'ember wyrms', monsters: ['emberWyrm'], combat: 60, slayer: 60, amount: [15, 30], weight: 8 },
 ];
 

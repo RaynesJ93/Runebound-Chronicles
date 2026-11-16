@@ -95,6 +95,7 @@ export class PlayerController {
 
   nextStep(heldDir) {
     if (this.frozen) return null; // e.g. while the screen fades to a new area
+    if (this.rooted?.()) return null; // held in place by a vinegrasp horror's vines
     if (this.path.length) {
       const n = this.path[0];
       if (this.area.canStep(this.tile.x, this.tile.y, n.x, n.y)) {

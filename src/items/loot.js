@@ -14,7 +14,7 @@ export function rollLoot(loot, rng) {
     }
   }
   // each: every entry rolls on its own, so a kill can give several (or none).
-  for (const e of loot.each || []) if (rng() < e.chance) out.push({ item: e.item, qty: qtyOf(e, rng), rare: false });
+  for (const e of loot.each || []) if (rng() < e.chance) out.push({ item: e.item, qty: qtyOf(e, rng), rare: !!e.rare });
   if (loot.rare && rng() < loot.rare.chance) {
     const t = loot.rare.table;
     const e = t[Math.floor(rng() * t.length)];

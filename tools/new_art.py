@@ -16,6 +16,9 @@ Sets:
   slayergear    (15 Nov 2026) One 3 x 2 sheet: the superior slayer helmet's
                 icon, the slayer ring's icon, then the helmet worn facing down,
                 up, left and right (sized and placed like the rune full helm).
+  vinegrasp     (16 Nov 2026) A stand-in for the vinegrasp horror until it has
+                painted art: the stone wraith's frames recoloured to thorny
+                vine greens (no sheet needed: pass any folder).
   slayercaves   (15 Nov 2026) The Slayer Caverns' four sections: for each,
                 a sheet of floor + wall textures (1A, 2A...) and a 3 x 2
                 sheet of decorations (1B, 2B...).
@@ -151,6 +154,40 @@ elif SET == 'slayergear':
     old.update(anchors)
     json.dump(old, open(path, 'w'), indent=1, sort_keys=True)
 
+elif SET == 'vinegrasp':
+    src = os.path.join(OUT, 'chars__enemy__stoneWraith')
+    frames = []
+    for k in range(len(os.listdir(src))):
+        a = np.array(Image.open(os.path.join(src, f'{k}.png')).convert('RGBA')).astype(np.float32)
+        m = a[..., 3] > 0
+        lum = (a[..., 0] * 0.3 + a[..., 1] * 0.59 + a[..., 2] * 0.11) / 255
+        lo, hi = np.percentile(lum[m], 2), np.percentile(lum[m], 98)
+        t = np.clip((lum - lo) / max(1e-3, hi - lo), 0, 1)
+        ramp = np.array([[10, 20, 8], [34, 70, 22], [70, 128, 40], [150, 210, 90], [230, 240, 150]], np.float32)
+        x = t * (len(ramp) - 1)
+        i0 = np.clip(np.floor(x).astype(int), 0, len(ramp) - 2)
+        f = (x - i0)[..., None]
+        col = ramp[i0] * (1 - f) + ramp[i0 + 1] * f
+        # the brightest bits (its glowing eyes) go a sickly yellow
+        col[t > 0.93] = [240, 220, 80]
+        a[m, :3] = col[m]
+        frames.append(Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA'))
+    save_frames('chars:enemy:vinegraspHorror', frames)
+    # The Overgrowth's floor and walls: the Crawling Pit's, gone to deep moss and roots
+    for name, ramp in (('caveVine', [[16, 22, 10], [36, 52, 20], [62, 86, 34], [110, 140, 60]]),
+                       ('rockwallVine', [[10, 12, 6], [28, 34, 16], [52, 60, 30], [96, 104, 58]])):
+        src_tex = name.replace('Vine', 'Crawl')
+        a = np.array(Image.open(os.path.join(OUT, f'tex__{src_tex}.png')).convert('RGBA')).astype(np.float32)
+        lum = (a[..., 0] * 0.3 + a[..., 1] * 0.59 + a[..., 2] * 0.11) / 255
+        lo, hi = np.percentile(lum, 2), np.percentile(lum, 98)
+        t = np.clip((lum - lo) / max(1e-3, hi - lo), 0, 1)
+        r = np.array(ramp, np.float32)
+        x = t * (len(r) - 1)
+        i0 = np.clip(np.floor(x).astype(int), 0, len(r) - 2)
+        f = (x - i0)[..., None]
+        a[..., :3] = r[i0] * (1 - f) + r[i0 + 1] * f
+        Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA').save(os.path.join(OUT, f'tex__{name}.png'))
+
 elif SET == 'slayercaves':
     from seamless import seamless
     from scipy import ndimage
@@ -252,5 +289,5 @@ elif SET == 'images01-09':
     old.update(anchors)
     json.dump(old, open(path, 'w'), indent=1, sort_keys=True)
 else:
-    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves or slayergear')
+    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, slayergear or vinegrasp')
 print('done')

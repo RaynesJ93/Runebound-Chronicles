@@ -4,13 +4,14 @@
 // tougher the deeper you go:
 //   entrance hall (south) → 1. the Crawling Pit (west, cave crawlers, Slayer 10)
 //   → 2. the Roost (north-west, bloodbats, 25) → 3. the Wraith Gallery
-//   (north, stone wraiths, 45) → 4. the Wyrm's Hearth (east, ember wyrms, 60).
+//   (north, stone wraiths, 45) → 4. the Wyrm's Hearth (east, ember wyrms, 60)
+//   → 5. the Overgrowth (far north-east, vinegrasp horrors, 70; v0.49.0).
 // Corridors join them; a sign at each section's mouth says what's inside.
 
 import { GROUND } from '../../src/world/area.js';
 import { mulberry32 } from '../../src/core/rng.js';
 
-const W = 64;
+const W = 84; // v0.49.0: wider, for the Overgrowth (east)
 const H = 46;
 
 // The four sections: centre, size, monster, how many, sign text.
@@ -22,7 +23,9 @@ const SECTIONS = [
   { name: 'THE WRAITH GALLERY', cx: 34, cy: 9, rx: 8.5, ry: 5.5, enemy: 'stoneWraith', n: 5, slayer: 45,
     sign: { x: 24, y: 11 }, text: 'Stone wraiths. Blades and arrows barely scratch them. Bring a hammer, or cast.' },
   { name: "THE WYRM'S HEARTH", cx: 51, cy: 28, rx: 9, ry: 8, enemy: 'emberWyrm', n: 4, slayer: 60,
-    sign: { x: 46, y: 17 }, text: 'Ember wyrms. Every few bites, fire. The deepest and the deadliest.' },
+    sign: { x: 46, y: 17 }, text: 'Ember wyrms. Every few bites, fire. Past them, something worse.' },
+  { name: 'THE OVERGROWTH', cx: 72, cy: 14, rx: 8.5, ry: 7, enemy: 'vinegraspHorror', n: 5, slayer: 70,
+    sign: { x: 61, y: 21 }, text: 'Vinegrasp horrors. Their vines will hold you in place. The deepest and the deadliest.' },
 ];
 
 export function buildSlayerCave() {
@@ -64,6 +67,7 @@ export function buildSlayerCave() {
   corridor([10, 28], [8, 22], [12, 19], [12, 14]);  // Crawling Pit → Roost
   corridor([17, 10], [23, 12], [29, 9]);            // Roost → Wraith Gallery
   corridor([39, 10], [44, 14], [47, 17], [49, 23]); // Wraith Gallery → Wyrm's Hearth
+  corridor([56, 24], [60, 21], [64, 18], [68, 15]); // Wyrm's Hearth → the Overgrowth
 
   const prop = (type, tiles, extra = {}) => {
     props.push({ type, tiles, x: tiles[0].x, y: tiles[0].y, ...extra });
@@ -137,6 +141,15 @@ export function buildSlayerCave() {
   for (const [x, y] of [[45, 24], [52, 34]]) decor('obsidianCluster', x, y, 'obsidian', 'Jagged black glass, grown from cooled lava.');
   for (const [x, y] of [[46, 25], [56, 25], [51, 33]]) put('campfire', x, y, { action: 'cook', interact: ['A brazier of glowing coals. The wyrms keep it lit. You could cook on it.'] });
   put('ore', 58, 27, { variant: 'gem' });
+  // 5. the Overgrowth: roots, thorns, glowing fungus and rotting wood
+  for (const [x, y] of [[66, 10], [77, 9], [79, 16], [68, 19], [74, 20], [64, 14]]) put('thornBush', x, y);
+  for (const [x, y] of [[70, 9], [76, 13], [67, 16], [72, 19]]) put('glowShrooms', x, y, { blocks: false });
+  for (const [x, y] of [[73, 8], [65, 17], [78, 19]]) put('glowFlowers', x, y, { blocks: false });
+  for (const [x, y] of [[71, 12], [77, 17]]) put('mushrooms', x, y, { blocks: false });
+  put('hollowLog', 74, 16);
+  put('skeleton', 69, 13, { blocks: false, interact: ['A skeleton, wound tight in old vines.'] });
+  for (const [x, y] of [[66, 12], [75, 11], [70, 17], [79, 13]]) put('tallGrass', x, y, { blocks: false });
+  for (const [x, y] of [[62, 19], [79, 11]]) put('lamp', x, y);
 
   const zones0 = (x, y) => SECTIONS.some((s) => ((x - s.cx) / s.rx) ** 2 + ((y - s.cy) / s.ry) ** 2 < 1.2);
   // Rubble scattered through the caves (less in the sections), never in the hall's doorway
@@ -178,7 +191,7 @@ export function buildSlayerCave() {
     id: 'slayerCave',
     name: 'The Slayer Caverns',
     W, H, ground, blocked, props, indoors: true,
-    zones, zoneTex: ['Crawl', 'Roost', 'Wraith', 'Wyrm'],
+    zones, zoneTex: ['Crawl', 'Roost', 'Wraith', 'Wyrm', 'Vine'],
     spawn: { x: 32, y: H - 3, facing: Math.PI },
     exits: [
       { tiles: [{ x: 32, y: H - 2 }], to: 'route1', at: { x: 38, y: 76 }, facing: 0 },
