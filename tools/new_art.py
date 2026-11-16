@@ -16,8 +16,8 @@ Sets:
   slayergear    (15 Nov 2026) One 3 x 2 sheet: the superior slayer helmet's
                 icon, the slayer ring's icon, then the helmet worn facing down,
                 up, left and right (sized and placed like the rune full helm).
-  vinegrasp     (16 Nov 2026) The Overgrowth's floor and wall textures: the
-                Crawling Pit's recoloured to moss and roots (pass any folder).
+  overgrowth    (16 Nov 2026) The Overgrowth (the Slayer Caverns' fifth
+                section): A_ textures, B_ decorations, like slayercaves.
   vinegrasp-art (16 Nov 2026) The vinegrasp horror (1_), the six slayer gear
                 icons (2_, 3 x 2) and the whip, staff and two boots worn or
                 held facing down/up/left/right (3_, 4 x 4).
@@ -156,22 +156,6 @@ elif SET == 'slayergear':
     old.update(anchors)
     json.dump(old, open(path, 'w'), indent=1, sort_keys=True)
 
-elif SET == 'vinegrasp':
-    # The Overgrowth's floor and walls: the Crawling Pit's, gone to deep moss and roots
-    for name, ramp in (('caveVine', [[16, 22, 10], [36, 52, 20], [62, 86, 34], [110, 140, 60]]),
-                       ('rockwallVine', [[10, 12, 6], [28, 34, 16], [52, 60, 30], [96, 104, 58]])):
-        src_tex = name.replace('Vine', 'Crawl')
-        a = np.array(Image.open(os.path.join(OUT, f'tex__{src_tex}.png')).convert('RGBA')).astype(np.float32)
-        lum = (a[..., 0] * 0.3 + a[..., 1] * 0.59 + a[..., 2] * 0.11) / 255
-        lo, hi = np.percentile(lum, 2), np.percentile(lum, 98)
-        t = np.clip((lum - lo) / max(1e-3, hi - lo), 0, 1)
-        r = np.array(ramp, np.float32)
-        x = t * (len(r) - 1)
-        i0 = np.clip(np.floor(x).astype(int), 0, len(r) - 2)
-        f = (x - i0)[..., None]
-        a[..., :3] = r[i0] * (1 - f) + r[i0 + 1] * f
-        Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA').save(os.path.join(OUT, f'tex__{name}.png'))
-
 elif SET == 'vinegrasp-art':
     path = lambda p: glob.glob(os.path.join(SRC, p + '*.png'))[0]
     frames, _ = walk_frames(grid_cells(path('1_')), ('left', 'right'), 30)
@@ -208,7 +192,7 @@ elif SET == 'vinegrasp-art':
     old.update(anchors)
     json.dump(old, open(p, 'w'), indent=1, sort_keys=True)
 
-elif SET == 'slayercaves':
+elif SET in ('slayercaves', 'overgrowth'):
     from seamless import seamless
     from scipy import ndimage
 
@@ -222,7 +206,7 @@ elif SET == 'slayercaves':
         return Image.fromarray(a.clip(0, 255).astype(np.uint8))
 
     # Each section: (sheet number, texture name, decorations as (key, width in game px, flat?))
-    SECTIONS = {
+    SECTIONS = {'': ('Vine', [('rootArch', 30), ('thornTendrils', 14), ('glowPod', 12), ('glowFungus', 18), ('vineBones', 20), ('vineBoulder', 17)])} if SET == 'overgrowth' else {
         1: ('Crawl', [('crawlerEggs', 18), ('crawlerHusk', 20), ('slimePuddle', 20), ('dripStalagmite', 13), ('glowMoss', 20), ('gnawedRocks', 18)]),
         2: ('Roost', [('boneNest', 20), ('skullPile', 18), ('bloodPool', 20), ('clawedStalagmite', 15), ('roostRock', 18), ('featherHeap', 20)]),
         3: ('Wraith', [('hoodedStatue', 30), ('graveSlab', 13), ('runePillar', 11), ('ghostCandles', 14), ('masonryRubble', 20), ('spiritUrn', 13)]),
@@ -309,5 +293,5 @@ elif SET == 'images01-09':
     old.update(anchors)
     json.dump(old, open(path, 'w'), indent=1, sort_keys=True)
 else:
-    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, slayergear, vinegrasp or vinegrasp-art')
+    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, overgrowth, slayergear or vinegrasp-art')
 print('done')

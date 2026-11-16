@@ -141,14 +141,15 @@ export function buildSlayerCave() {
   for (const [x, y] of [[45, 24], [52, 34]]) decor('obsidianCluster', x, y, 'obsidian', 'Jagged black glass, grown from cooled lava.');
   for (const [x, y] of [[46, 25], [56, 25], [51, 33]]) put('campfire', x, y, { action: 'cook', interact: ['A brazier of glowing coals. The wyrms keep it lit. You could cook on it.'] });
   put('ore', 58, 27, { variant: 'gem' });
-  // 5. the Overgrowth: roots, thorns, glowing fungus and rotting wood
-  for (const [x, y] of [[66, 10], [77, 9], [79, 16], [68, 19], [74, 20], [64, 14]]) put('thornBush', x, y);
-  for (const [x, y] of [[70, 9], [76, 13], [67, 16], [72, 19]]) put('glowShrooms', x, y, { blocks: false });
-  for (const [x, y] of [[73, 8], [65, 17], [78, 19]]) put('glowFlowers', x, y, { blocks: false });
-  for (const [x, y] of [[71, 12], [77, 17]]) put('mushrooms', x, y, { blocks: false });
-  put('hollowLog', 74, 16);
-  put('skeleton', 69, 13, { blocks: false, interact: ['A skeleton, wound tight in old vines.'] });
-  for (const [x, y] of [[66, 12], [75, 11], [70, 17], [79, 13]]) put('tallGrass', x, y, { blocks: false });
+  // 5. the Overgrowth: root arches, thorny tendrils, glowing pods and fungus (painted, v0.49.2)
+  decor('rootArch', 69, 9, 'root arch', 'A great root, bursting up out of the floor and diving back in.', { wide: true });
+  decor('rootArch', 76, 18, 'root arch', 'Roots as thick as your body. They creak when the horrors move.', { wide: true });
+  for (const [x, y] of [[66, 10], [77, 9], [79, 16], [68, 19], [64, 14]]) decor('thornTendrils', x, y, 'thorny tendrils', 'Thorny tendrils, curling as if they can feel you.');
+  for (const [x, y] of [[73, 8], [65, 17], [79, 12]]) decor('glowPod', x, y, 'glowing pod', 'A seed pod glowing yellow-green. Something moves inside.');
+  for (const [x, y] of [[70, 12], [76, 13], [67, 16], [72, 19]]) decor('glowFungus', x, y, 'glowing fungus', 'Teal fungus, glowing softly.', { flat: true, walk: true });
+  for (const [x, y] of [[69, 14], [78, 20]]) decor('vineBones', x, y, 'vine-wrapped bones', 'Bones, half swallowed by creeping vines. The vines are winning.', { flat: true, walk: true });
+  for (const [x, y] of [[74, 16], [63, 18]]) decor('vineBoulder', x, y, 'vine-wrapped boulder', 'A boulder wrapped in vines, with a few pale flowers.');
+  for (const [x, y] of [[71, 17], [75, 11]]) put('glowShrooms', x, y, { blocks: false });
   for (const [x, y] of [[62, 19], [79, 11]]) put('lamp', x, y);
 
   const zones0 = (x, y) => SECTIONS.some((s) => ((x - s.cx) / s.rx) ** 2 + ((y - s.cy) / s.ry) ** 2 < 1.2);
