@@ -683,6 +683,8 @@ A new skill, **Slayer** (1–99), trained only by killing monsters on a task.
 | Stone wraiths | stone wraith (Slayer 45) | 45 | 45 | 20–40 |
 | Ember wyrms | ember wyrm (Slayer 60) | 60 | 60 | 15–30 |
 
+*v0.49.3:* the health box of the monster you're fighting (name, level colour and health bar; bosses too) sits in the top-left column under the slayer counter, instead of top-centre where it covered the XP drops.
+
 *v0.48.4, task counter:* while you have a task, a small counter sits under the Quests button: the slayer gem, the kills left in big gold numbers and the monster ("12 giant spiders left"). It counts down with a little bump on every task kill, says "Task done!" for a few seconds when you finish, then hides. Tap it to see your task. (Skipping or blocking a task just hides it.)
 
 *v0.48.2:* every task has a Slayer level, rising with its monsters' level, so new tasks open steadily as you level (before, everything but the slayer monsters was Slayer 1). It only decides what Kesta gives you: you can fight regular monsters at any Slayer level. With high combat but a low Slayer level she gives the toughest tasks your Slayer level allows; a task you already have stays yours.
