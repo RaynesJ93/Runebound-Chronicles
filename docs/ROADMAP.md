@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 16 Nov 2026 | v0.48.8: hotfix: a stray apostrophe in the Slayer guide text (v0.48.7) stopped the game loading. New test: every module must parse (tests/modules_load.test.mjs). |
 | 15 Nov 2026 | v0.48.7: the Hunter's scroll in Kesta's shop (150 points): read it once for 50% more slayer points from every task, for good. |
 | 15 Nov 2026 | v0.48.6: painted art for the superior slayer helmet (icon and worn, all four directions) and the slayer ring. |
 | 15 Nov 2026 | v0.48.5: Kesta's shop adds the superior slayer helmet (800 points + your slayer helmet; Defence 60; better than rune, +20% on task) and the slayer ring (150 points; teleports to her camp or the Slayer Caverns, checks your task). |
