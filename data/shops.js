@@ -64,6 +64,8 @@ export const SHOPS = {
       { id: 'smallNet', base: 5 },
       { id: 'fishingRod', base: 5 },
       { id: 'flyFishingRod', base: 3 },
+      { id: 'lobsterPot', base: 3 },
+      { id: 'harpoon', base: 2 },
       { id: 'fishingBait', base: 500 },
       { id: 'needle', base: 5 },
       { id: 'thread', base: 200 },

@@ -344,6 +344,58 @@ Dying in tutorial or story-critical fights never costs items.
 
 Woodcutting, Fletching, Mining, Smithing, Fishing and Cooking are in the game (v0.13.0). The rest are planned, and listed so the systems built now leave room for them.
 
+### Skill review, batch 1: trees, bows, fish and food (v0.50.0)
+
+The skill review (16 Nov 2026) found Woodcutting stopped at 15, bows at Fletching 25, Fishing at 30 and Cooking at 25 (the best food healed 9). Batch 1 takes all four to the high levels. (Batch 2: Magic and Runecrafting; batch 3: Crafting and ranged armour; batch 4: polish.)
+
+**Trees** (any axe; a better axe chops faster):
+
+| Tree | Woodcutting | XP per log | Where |
+| --- | --- | --- | --- |
+| Willow | 30 | 67.5 | By the river and the lake in Thornwood |
+| Maple | 45 | 100 | South-west of the Whispering Vale |
+| Yew | 60 | 175 | East of the oak grove in Thornwood |
+| Magic | 75 | 250 | By the air altar in the Whispering Vale |
+| Elder (rare: one tree) | 90 | 325 | Deep in the Overgrowth, Slayer Caverns |
+
+Higher trees give logs more slowly, last longer before they fall, and take longer to grow back.
+
+**Fletching** (knife), from the new logs:
+
+| Logs | Arrow shafts | Shortbow | Longbow | Bows need Ranged | Bow accuracy |
+| --- | --- | --- | --- | --- | --- |
+| Willow | 30 (45 shafts) | 35 | 40 | 20 | +20 |
+| Maple | 45 (60) | 50 | 55 | 30 | +29 |
+| Yew | 60 (75) | 65 | 70 | 40 | +47 |
+| Magic | 75 (90) | 80 | 85 | 50 | +69 |
+| Elder | 90 (105) | 92 | 95 | 60 | +85 |
+
+As before, shortbows are quick (4 ticks, range 7) and longbows reach further (6 ticks, range 9).
+
+**Fishing**: new spots and two new tools (the lobster pot and harpoon, from the general store):
+
+| Fish | Fishing | XP | Spot (tool) | Where |
+| --- | --- | --- | --- | --- |
+| Lobster | 40 | 90 | Cage (lobster pot) | The lake by the Hunters' camp |
+| Swordfish | 50 | 100 | Harpoon (harpoon) | The lake, and Brambleford's pond |
+| Monkfish | 62 | 120 | Deep net (small fishing net) | Brambleford's pond |
+| Shark | 76 | 110 | Harpoon (harpoon) | Same harpoon spots (sharks from 76) |
+| Cave eel | 85 | 130 | Cave pool (fishing rod and bait) | A pool in the Overgrowth, Slayer Caverns |
+
+**Cooking**:
+
+| Food | Cooking | Heals | XP | Stops burning |
+| --- | --- | --- | --- | --- |
+| Meat pie (raw beef + bread) | 20 | 6 | 110 | 54 |
+| Hunter's stew (raw beef + raw chicken) | 35 | 11 | 117 | 68 |
+| Lobster | 40 | 12 | 120 | 74 |
+| Swordfish | 45 | 14 | 140 | 86 |
+| Monkfish | 62 | 16 | 150 | 92 |
+| Shark | 80 | 20 | 210 | 99 |
+| Cave eel | 88 | 22 | 230 | 99 |
+
+Art: stand-in recolours (the trees from the oak and pine, logs, bows, fish and tools from the existing ones) until painted art arrives.
+
 ### Woodcutting and Fletching (shipped in v0.11.0)
 
 **Woodcutting.** Tap a tree to walk up and chop it. You swing every 4 ticks (2.4 s); each swing has a chance to give a log, which rises with your level and a better axe. An axe works from your bag or in your hand.

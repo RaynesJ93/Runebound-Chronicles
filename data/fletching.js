@@ -15,6 +15,17 @@ export const RECIPES = [
   { id: 'oakShafts', name: 'Arrow shafts', level: 15, xp: 10, uses: { oakLogs: 1 }, gives: { arrowShaft: 30 }, tool: 'knife', ticks: 3, group: 'oakLogs' },
   { id: 'oakShortbow', name: 'Oak shortbow', level: 20, xp: 33, uses: { oakLogs: 1 }, gives: { oakShortbow: 1 }, tool: 'knife', ticks: 3, group: 'oakLogs' },
   { id: 'oakLongbow', name: 'Oak longbow', level: 25, xp: 50, uses: { oakLogs: 1 }, gives: { oakLongbow: 1 }, tool: 'knife', ticks: 3, group: 'oakLogs' },
+  // v0.50.0: willow, maple, yew, magic and elder (shafts, shortbow, longbow)
+  ...[['willow', 'Willow', 30, 45, 66, 83], ['maple', 'Maple', 45, 60, 100, 116], ['yew', 'Yew', 60, 75, 135, 150], ['magic', 'Magic', 75, 90, 166, 183], ['elder', 'Elder', 90, 105, 200, 220]]
+    .flatMap(([id, Name, lv, shafts, sxp, lxp]) => {
+      const logs = `${id}Logs`;
+      const bowLv = id === 'elder' ? [92, 95] : [lv + 5, lv + 10];
+      return [
+        { id: `${id}Shafts`, name: 'Arrow shafts', level: lv, xp: Math.round(lv / 3), uses: { [logs]: 1 }, gives: { arrowShaft: shafts }, tool: 'knife', ticks: 3, group: logs },
+        { id: `${id}Shortbow`, name: `${Name} shortbow`, level: bowLv[0], xp: sxp, uses: { [logs]: 1 }, gives: { [`${id}Shortbow`]: 1 }, tool: 'knife', ticks: 3, group: logs },
+        { id: `${id}Longbow`, name: `${Name} longbow`, level: bowLv[1], xp: lxp, uses: { [logs]: 1 }, gives: { [`${id}Longbow`]: 1 }, tool: 'knife', ticks: 3, group: logs },
+      ];
+    }),
   { id: 'headless', name: 'Headless arrows', level: 1, xp: 1, uses: { arrowShaft: 1, feather: 1 }, gives: { headlessArrow: 1 }, batch: 15, ticks: 2, group: 'arrows' },
   { id: 'bronzeArrows', name: 'Bronze arrows', level: 1, xp: 1.3, uses: { headlessArrow: 1, bronzeArrowtips: 1 }, gives: { bronzeArrow: 1 }, batch: 15, ticks: 2, group: 'arrows' },
   { id: 'ironArrows', name: 'Iron arrows', level: 15, xp: 2.5, uses: { headlessArrow: 1, ironArrowtips: 1 }, gives: { ironArrow: 1 }, batch: 15, ticks: 2, group: 'arrows' },
@@ -38,7 +49,7 @@ export const RECIPES = [
 
 // Which recipe group an item belongs to when you tap it.
 export const GROUP_OF = {
-  logs: 'logs', oakLogs: 'oakLogs',
+  logs: 'logs', oakLogs: 'oakLogs', willowLogs: 'willowLogs', mapleLogs: 'mapleLogs', yewLogs: 'yewLogs', magicLogs: 'magicLogs', elderLogs: 'elderLogs',
   arrowShaft: 'arrows', feather: 'arrows', headlessArrow: 'arrows', bronzeArrowtips: 'arrows', ironArrowtips: 'arrows', steelArrowtips: 'arrows', mithrilArrowtips: 'arrows',
   adamantArrowtips: 'arrows', runeArrowtips: 'arrows', adamantDartTip: 'thrown', adamantJavelinHeads: 'thrown', runeDartTip: 'thrown', runeJavelinHeads: 'thrown',
   bronzeDartTip: 'thrown', bronzeJavelinHeads: 'thrown', ironDartTip: 'thrown', ironJavelinHeads: 'thrown', steelDartTip: 'thrown', steelJavelinHeads: 'thrown', mithrilDartTip: 'thrown', mithrilJavelinHeads: 'thrown',

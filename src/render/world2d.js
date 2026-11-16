@@ -162,7 +162,9 @@ export function createWorldView(canvasEl, area) {
     const f = footOf(p);
     switch (p.type) {
       case 'tree': {
-        const spr = pick(p.variant === 'oak' ? lib.oak : p.variant === 'dead' ? lib.deadTree : p.variant === 'gloom' ? lib.gloomTree
+        // v0.50.0 trees have their own art: <variant>Tree (willowTree, yewTree...)
+        const own = art(p.variant + 'Tree');
+        const spr = pick(own?.length ? own : p.variant === 'oak' ? lib.oak : p.variant === 'dead' ? lib.deadTree : p.variant === 'gloom' ? lib.gloomTree
           : p.variant === 'birch' ? lib.birch || lib.oak : p.variant === 'oldOak' ? lib.oldOak || lib.oak : lib.pine, p);
         shadows.push({ spr: lib.treeShadow, x: f.x, y: f.y, prop: p });
         place(spr, f.x, f.y, { fade: true, prop: p, fx: f.x, fy: f.y });

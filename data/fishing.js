@@ -32,6 +32,34 @@ export const SPOTS = {
     ],
     examine: 'Fast water where trout and salmon swim. (Fly fishing rod and feathers: trout from 20, salmon at 30.)',
   },
+  // v0.50.0 (skill review batch 1)
+  cage: {
+    name: 'Fishing spot', verb: 'Cage', tool: 'lobsterPot', toolName: 'lobster pot',
+    start: 'You lower your lobster pot into the water...',
+    catches: [{ item: 'rawLobster', level: 40, xp: 90, chance: 0.18 }],
+    examine: 'Deep water by the rocks, where lobsters crawl. (Lobster pot: lobsters at Fishing 40.)',
+  },
+  harpoon: {
+    name: 'Fishing spot', verb: 'Harpoon', tool: 'harpoon', toolName: 'harpoon',
+    start: 'You ready your harpoon...',
+    catches: [
+      { item: 'rawShark', level: 76, xp: 110, chance: 0.1 },
+      { item: 'rawSwordfish', level: 50, xp: 100, chance: 0.14 },
+    ],
+    examine: 'Big fins cut the water here. (Harpoon: swordfish at Fishing 50, sharks at 76.)',
+  },
+  deepNet: {
+    name: 'Fishing spot', verb: 'Net', tool: 'smallNet', toolName: 'small fishing net',
+    start: 'You cast your net into the deep water...',
+    catches: [{ item: 'rawMonkfish', level: 62, xp: 120, chance: 0.16 }],
+    examine: 'Dark, deep water. Something ugly lurks at the bottom. (Small net: monkfish at Fishing 62.)',
+  },
+  cave: {
+    name: 'Fishing spot', verb: 'Bait', tool: 'fishingRod', toolName: 'fishing rod', bait: 'fishingBait',
+    start: 'You lower your line into the black water...',
+    catches: [{ item: 'rawCaveEel', level: 85, xp: 130, chance: 0.12 }],
+    examine: 'A still, black pool. Long shapes glide under the surface. (Fishing rod and bait: cave eels at Fishing 85.)',
+  },
 };
 
 export const FISH_TICKS = 5;

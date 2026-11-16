@@ -135,6 +135,10 @@ export function buildVale() {
     else if (r < 0.105) one('bones', x, y, { blocks: false });
   }
 
+  // v0.50.0: maples in the south-west, magic trees by the air altar
+  for (const [x, y] of [[6, 35], [10, 35], [4, 38], [13, 37]]) placeIfFree('tree', x, y, { variant: 'maple' });
+  for (const [x, y] of [[54, 13], [60, 15], [67, 14]]) if (free(x, y) && ground[i(x, y)] === GROUND.GRASS) one('tree', x, y, { variant: 'magic' }); // at the edge of the altar's clearing
+
   return {
     id: 'vale',
     name: 'Whispering Vale',

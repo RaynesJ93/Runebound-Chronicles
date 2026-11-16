@@ -71,7 +71,7 @@ export function buildBrambleford() {
     if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => inB(x + dx, y + dy) && ground[i(x + dx, y + dy)] === GROUND.SAND)) shoreWater.push({ x, y });
   }
   const nearest = (tx, ty) => shoreWater.slice().sort((a, b) => Math.hypot(a.x - tx, a.y - ty) - Math.hypot(b.x - tx, b.y - ty))[0];
-  for (const [tx, ty, variant] of [[12, 30, 'net'], [9, 27, 'net'], [5, 27, 'bait'], [2, 30, 'bait']]) {
+  for (const [tx, ty, variant] of [[12, 30, 'net'], [9, 27, 'net'], [5, 27, 'bait'], [2, 30, 'bait'], [7, 31, 'deepNet'], [11, 26, 'harpoon']]) {
     const t = nearest(tx, ty);
     shoreWater.splice(shoreWater.indexOf(t), 1);
     prop('fishingSpot', [t], { variant });

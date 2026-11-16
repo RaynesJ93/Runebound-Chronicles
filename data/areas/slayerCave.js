@@ -150,6 +150,11 @@ export function buildSlayerCave() {
   for (const [x, y] of [[69, 14], [78, 20]]) decor('vineBones', x, y, 'vine-wrapped bones', 'Bones, half swallowed by creeping vines. The vines are winning.', { flat: true, walk: true });
   for (const [x, y] of [[74, 16], [63, 18]]) decor('vineBoulder', x, y, 'vine-wrapped boulder', 'A boulder wrapped in vines, with a few pale flowers.');
   for (const [x, y] of [[71, 17], [75, 11]]) put('glowShrooms', x, y, { blocks: false });
+  // The elder tree (v0.50.0): the only one, Woodcutting 90
+  put('tree', 78, 14, { variant: 'elder' });
+  // A black pool with cave eels in it (Fishing 85), in the Overgrowth's south-west corner
+  for (const [x, y] of [[66, 19], [67, 19], [66, 20], [67, 20], [68, 20]]) if (isFloor(x, y)) { ground[i(x, y)] = GROUND.WATER; blocked[i(x, y)] = 1; }
+  if (ground[i(67, 19)] === GROUND.WATER) prop('fishingSpot', [{ x: 67, y: 19 }], { variant: 'cave' });
   for (const [x, y] of [[62, 19], [79, 11]]) put('lamp', x, y);
 
   const zones0 = (x, y) => SECTIONS.some((s) => ((x - s.cx) / s.rx) ** 2 + ((y - s.cy) / s.ry) ** 2 < 1.2);
