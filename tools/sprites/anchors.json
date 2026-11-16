@@ -63,6 +63,22 @@
   -4,
   11
  ],
+ "gear:crawlerShellBoots:down": [
+  3,
+  5
+ ],
+ "gear:crawlerShellBoots:left": [
+  4,
+  5
+ ],
+ "gear:crawlerShellBoots:right": [
+  4,
+  5
+ ],
+ "gear:crawlerShellBoots:up": [
+  4,
+  5
+ ],
  "gear:superiorSlayerHelmet:down": [
   6,
   30
@@ -78,5 +94,53 @@
  "gear:superiorSlayerHelmet:up": [
   8,
   28
+ ],
+ "gear:vineWhip:down": [
+  12,
+  9
+ ],
+ "gear:vineWhip:left": [
+  10,
+  8
+ ],
+ "gear:vineWhip:right": [
+  4,
+  8
+ ],
+ "gear:vineWhip:up": [
+  1,
+  9
+ ],
+ "gear:wraithboneStaff:down": [
+  9,
+  18
+ ],
+ "gear:wraithboneStaff:left": [
+  7,
+  18
+ ],
+ "gear:wraithboneStaff:right": [
+  0,
+  18
+ ],
+ "gear:wraithboneStaff:up": [
+  -2,
+  17
+ ],
+ "gear:wyrmscaleBoots:down": [
+  4,
+  5
+ ],
+ "gear:wyrmscaleBoots:left": [
+  4,
+  5
+ ],
+ "gear:wyrmscaleBoots:right": [
+  4,
+  5
+ ],
+ "gear:wyrmscaleBoots:up": [
+  4,
+  5
  ]
 }

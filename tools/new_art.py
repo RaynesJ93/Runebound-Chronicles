@@ -16,9 +16,11 @@ Sets:
   slayergear    (15 Nov 2026) One 3 x 2 sheet: the superior slayer helmet's
                 icon, the slayer ring's icon, then the helmet worn facing down,
                 up, left and right (sized and placed like the rune full helm).
-  vinegrasp     (16 Nov 2026) A stand-in for the vinegrasp horror until it has
-                painted art: the stone wraith's frames recoloured to thorny
-                vine greens (no sheet needed: pass any folder).
+  vinegrasp     (16 Nov 2026) The Overgrowth's floor and wall textures: the
+                Crawling Pit's recoloured to moss and roots (pass any folder).
+  vinegrasp-art (16 Nov 2026) The vinegrasp horror (1_), the six slayer gear
+                icons (2_, 3 x 2) and the whip, staff and two boots worn or
+                held facing down/up/left/right (3_, 4 x 4).
   slayercaves   (15 Nov 2026) The Slayer Caverns' four sections: for each,
                 a sheet of floor + wall textures (1A, 2A...) and a 3 x 2
                 sheet of decorations (1B, 2B...).
@@ -78,7 +80,7 @@ def walk_frames(grid, sides, height):
     return [scaled(dirs[d][c], k) for d in DIRS for c in (1, 0, 2)], k
 
 
-def grid_cells(path, rows=4, cols=3):
+def grid_cells(path, rows=4, cols=3, grow=6):
     """Cut a magenta sheet into rows x cols frames. Each frame is a blob of art
     (with nearby loose bits like a leaf or smoke joined on); the blobs are
     sorted into rows by height on the sheet, then left to right."""
@@ -86,7 +88,7 @@ def grid_cells(path, rows=4, cols=3):
     rgb = np.array(Image.open(path).convert('RGB'))
     rgb, alpha = key_magenta(rgb)
     on = alpha > 0
-    lab, n = ndimage.label(ndimage.binary_dilation(on, iterations=6))
+    lab, n = ndimage.label(ndimage.binary_dilation(on, iterations=grow))
     boxes = ndimage.find_objects(lab)
     sizes = ndimage.sum(on, lab, range(1, n + 1))
     keep = sorted(range(n), key=lambda i: -sizes[i])[:rows * cols]
@@ -155,24 +157,6 @@ elif SET == 'slayergear':
     json.dump(old, open(path, 'w'), indent=1, sort_keys=True)
 
 elif SET == 'vinegrasp':
-    src = os.path.join(OUT, 'chars__enemy__stoneWraith')
-    frames = []
-    for k in range(len(os.listdir(src))):
-        a = np.array(Image.open(os.path.join(src, f'{k}.png')).convert('RGBA')).astype(np.float32)
-        m = a[..., 3] > 0
-        lum = (a[..., 0] * 0.3 + a[..., 1] * 0.59 + a[..., 2] * 0.11) / 255
-        lo, hi = np.percentile(lum[m], 2), np.percentile(lum[m], 98)
-        t = np.clip((lum - lo) / max(1e-3, hi - lo), 0, 1)
-        ramp = np.array([[10, 20, 8], [34, 70, 22], [70, 128, 40], [150, 210, 90], [230, 240, 150]], np.float32)
-        x = t * (len(ramp) - 1)
-        i0 = np.clip(np.floor(x).astype(int), 0, len(ramp) - 2)
-        f = (x - i0)[..., None]
-        col = ramp[i0] * (1 - f) + ramp[i0 + 1] * f
-        # the brightest bits (its glowing eyes) go a sickly yellow
-        col[t > 0.93] = [240, 220, 80]
-        a[m, :3] = col[m]
-        frames.append(Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA'))
-    save_frames('chars:enemy:vinegraspHorror', frames)
     # The Overgrowth's floor and walls: the Crawling Pit's, gone to deep moss and roots
     for name, ramp in (('caveVine', [[16, 22, 10], [36, 52, 20], [62, 86, 34], [110, 140, 60]]),
                        ('rockwallVine', [[10, 12, 6], [28, 34, 16], [52, 60, 30], [96, 104, 58]])):
@@ -187,6 +171,42 @@ elif SET == 'vinegrasp':
         f = (x - i0)[..., None]
         a[..., :3] = r[i0] * (1 - f) + r[i0 + 1] * f
         Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA').save(os.path.join(OUT, f'tex__{name}.png'))
+
+elif SET == 'vinegrasp-art':
+    path = lambda p: glob.glob(os.path.join(SRC, p + '*.png'))[0]
+    frames, _ = walk_frames(grid_cells(path('1_')), ('left', 'right'), 30)
+    save_frames('chars:enemy:vinegraspHorror', frames)
+
+    def boxed(im, size, fit):
+        k = min(fit / im.width, fit / im.height)
+        sm = scaled(im, k)
+        c = Image.new('RGBA', (size, size))
+        c.alpha_composite(sm, ((size - sm.width) // 2, (size - sm.height) // 2))
+        return c
+
+    icons = [im for row in grid_cells(path('2_'), rows=2, cols=3, grow=14) for im in row]
+    for im, item in zip(icons, ('vineWhip', 'wraithboneStaff', 'crawlerShellBoots', 'wyrmscaleBoots', 'bloodbatGloves', 'huntersGauntlets')):
+        boxed(im, 32, 28).save(os.path.join(OUT, f'icon__{item}.png'))
+        boxed(im, 16, 15).save(os.path.join(OUT, f'iconS__{item}.png'))
+
+    # Worn/held: each sized like the item it's modelled on, bottoms lined up with it.
+    meta = json.load(open(os.path.join(ROOT, 'assets', 'art.json')))
+    anchors = {}
+    views = grid_cells(path('3_'), rows=4, cols=4, grow=14)
+    for row, (item, ref, fit) in zip(views, (('vineWhip', 'runeScimitar', 'long'), ('wraithboneStaff', 'apprenticeStaff', 'long'),
+                                             ('crawlerShellBoots', 'runeBoots', 'wide'), ('wyrmscaleBoots', 'runeBoots', 'wide'))):
+        for im, d in zip(row, DIRS):
+            x, y, w, h, ax, ay = meta[f'gear:{ref}:{d}'][0]
+            # long things (whip, staff) as long as the reference; boots fit inside its box
+            k = (max(w, h) + 1) / max(im.width, im.height) if fit == 'long' else min((w + 1) / im.width, (h + 1) / im.height)
+            sm = scaled(im, k)
+            key = f'gear:{item}:{d}'
+            sm.save(os.path.join(OUT, key.replace(':', '__') + '.png'))
+            anchors[key] = [round(sm.width / 2 + (ax - w / 2)), sm.height + (ay - h)]
+    p = os.path.join(OUT, 'anchors.json')
+    old = json.load(open(p)) if os.path.exists(p) else {}
+    old.update(anchors)
+    json.dump(old, open(p, 'w'), indent=1, sort_keys=True)
 
 elif SET == 'slayercaves':
     from seamless import seamless
@@ -289,5 +309,5 @@ elif SET == 'images01-09':
     old.update(anchors)
     json.dump(old, open(path, 'w'), indent=1, sort_keys=True)
 else:
-    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, slayergear or vinegrasp')
+    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, slayergear, vinegrasp or vinegrasp-art')
 print('done')
