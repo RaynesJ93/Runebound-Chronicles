@@ -12,6 +12,17 @@ export const TREES = {
     examine: 'A tall pine. Good for logs.' },
   oak: { name: 'Oak tree', level: 15, xp: 37.5, log: 'oakLogs', chance: 0.2, deplete: 1 / 8, respawn: [40, 70],
     examine: 'A sturdy old oak. Its wood is strong.' },
+  // v0.50.0 (skill review batch 1)
+  willow: { name: 'Willow tree', level: 30, xp: 67.5, log: 'willowLogs', chance: 0.17, deplete: 1 / 8, respawn: [45, 75],
+    examine: 'A willow, trailing its branches in the water.' },
+  maple: { name: 'Maple tree', level: 45, xp: 100, log: 'mapleLogs', chance: 0.12, deplete: 1 / 10, respawn: [60, 90],
+    examine: 'A maple, its leaves turning red and gold.' },
+  yew: { name: 'Yew tree', level: 60, xp: 175, log: 'yewLogs', chance: 0.09, deplete: 1 / 12, respawn: [80, 120],
+    examine: 'An ancient, dark yew. Bowyers prize its wood.' },
+  magic: { name: 'Magic tree', level: 75, xp: 250, log: 'magicLogs', chance: 0.06, deplete: 1 / 14, respawn: [100, 150],
+    examine: 'A tree that glows faintly blue. The air around it hums.' },
+  elder: { name: 'Elder tree', level: 90, xp: 325, log: 'elderLogs', chance: 0.05, deplete: 1 / 16, respawn: [120, 180],
+    examine: 'An elder tree, older than the caverns around it. Its roots go down forever.' },
 };
 
 // Best first. An axe works from your bag or in your hand.

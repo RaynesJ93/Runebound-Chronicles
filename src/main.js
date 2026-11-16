@@ -1548,7 +1548,8 @@ function boot() {
       const cl = book.level('cooking');
       hud.showMenu(pos.x, pos.y, 'Cook', [
         ...have.map((r) => ({
-          label: `${r.name} (${inventory.count(r.raw)} raw)${cl < r.level ? ` — needs level ${r.level}` : ''}`,
+          // one raw thing: how many you have; a recipe (pie, stew): what goes in
+          label: `${r.name} (${Object.keys(r.uses).length > 1 ? Object.keys(r.uses).map((id) => itemName(id).toLowerCase()).join(' + ') : `${inventory.count(r.raw)} raw`})${cl < r.level ? ` — needs level ${r.level}` : ''}`,
           icon: itemIcon(r.id).url,
           fn: () => startMake(r),
         })),

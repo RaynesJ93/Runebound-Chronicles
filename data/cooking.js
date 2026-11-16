@@ -17,4 +17,12 @@ export const COOKING = [
   cook('rawHerring', 'herring', 'burntFish', 'Herring', 5, 50, 41),
   cook('rawTrout', 'cookedTrout', 'burntFish', 'Trout', 15, 70, 50),
   cook('rawSalmon', 'salmon', 'burntFish', 'Salmon', 25, 90, 58),
+  // v0.50.0 (skill review batch 1)
+  { ...cook('rawBeef', 'meatPie', 'burntPie', 'Meat pie', 20, 110, 54), uses: { rawBeef: 1, bread: 1 } },
+  { ...cook('rawBeef', 'huntersStew', 'burntStew', "Hunter's stew", 35, 117, 68), id: 'huntersStew', uses: { rawBeef: 1, rawChicken: 1 } },
+  cook('rawLobster', 'lobster', 'burntFish', 'Lobster', 40, 120, 74),
+  cook('rawSwordfish', 'swordfish', 'burntFish', 'Swordfish', 45, 140, 86),
+  cook('rawMonkfish', 'monkfish', 'burntFish', 'Monkfish', 62, 150, 92),
+  cook('rawShark', 'shark', 'burntFish', 'Shark', 80, 210, 99),
+  cook('rawCaveEel', 'caveEel', 'burntFish', 'Cave eel', 88, 230, 99),
 ];

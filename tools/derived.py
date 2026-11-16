@@ -955,6 +955,29 @@ DERIVED['slayerHelmet'] = dict(icon=('ironFullHelm', lambda im, g=None: slayer_h
 DERIVED['bloodfangAmulet'] = dict(icon=('goldRubyAmulet', BLOODFANG), small=('goldRubyAmulet', BLOODFANG), gear=('goldRubyAmulet', BLOODFANG))
 DERIVED['huntersScroll'] = dict(icon=('digmastersOrders', ramp_to(['#1a0a08', '#5a2410', '#b8742a', '#f6e2b0'])), small=('digmastersOrders', ramp_to(['#1a0a08', '#5a2410', '#b8742a', '#f6e2b0'])))
 # Slayer gear (v0.49.0): painted (tools/new_art.py vinegrasp-art)
+# v0.50.0 logs and bows: the oak ones recoloured by wood
+WOODS = {'willow': ['#2a1c0c', '#6a5a2a', '#b0a050', '#e8e0a0'], 'maple': ['#2a0e06', '#7a2e12', '#c86a2a', '#f8c070'],
+         'yew': ['#140a06', '#3a1e10', '#6a3a1c', '#b07a4a'], 'magic': ['#06142a', '#1a4a6a', '#3a9ab8', '#c8f4ff'],
+         'elder': ['#1a0a18', '#4a1a3a', '#8a4a6a', '#e8b8c8']}
+for _w, _ramp in WOODS.items():
+    _f = ramp_to(_ramp)
+    DERIVED[f'{_w}Logs'] = dict(icon=('oakLogs', _f), small=('oakLogs', _f))
+    DERIVED[f'{_w}Shortbow'] = dict(icon=('oakShortbow', _f), small=('oakShortbow', _f), gear=('oakShortbow', _f))
+    DERIVED[f'{_w}Longbow'] = dict(icon=('oakLongbow', _f), small=('oakLongbow', _f), gear=('oakLongbow', _f))
+# v0.50.0 fish, food and fishing tools: recoloured from the salmon, trout and friends
+FISH = {'Lobster': ['#2a0604', '#7a1a0a', '#d0482a', '#ffb08a'], 'Swordfish': ['#0a1420', '#2a4a6a', '#6a9ac0', '#d8eef8'],
+        'Monkfish': ['#14100a', '#4a3a24', '#8a7048', '#d8c08a'], 'Shark': ['#0e1418', '#3a4a54', '#7a8c98', '#e0e8ec'],
+        'CaveEel': ['#120a14', '#3a2a40', '#7a6a88', '#e4dcef']}
+for _f, _ramp in FISH.items():
+    _cook = ramp_to([_c for _c in _ramp]); _rawf = ramp_to(_ramp)
+    _id = _f[0].lower() + _f[1:]
+    DERIVED[f'raw{_f}'] = dict(icon=('rawSalmon', _rawf), small=('rawSalmon', _rawf))
+    DERIVED[_id] = dict(icon=('salmon', ramp_to([_ramp[0], _ramp[1], '#b07a3a', '#f0d08a'])), small=('salmon', ramp_to([_ramp[0], _ramp[1], '#b07a3a', '#f0d08a'])))
+DERIVED['lobsterPot'] = dict(icon=('smallNet', ramp_to(['#1a0e06', '#5a3a1a', '#a0703a', '#e8c890'])), small=('smallNet', ramp_to(['#1a0e06', '#5a3a1a', '#a0703a', '#e8c890'])))
+DERIVED['harpoon'] = dict(icon=('ironSpear', ramp_to(['#101418', '#3a4650', '#8a9aa8', '#e8f0f4'])), small=('ironSpear', ramp_to(['#101418', '#3a4650', '#8a9aa8', '#e8f0f4'])))
+DERIVED['huntersStew'] = dict(icon=('meatPie', ramp_to(['#1a0a04', '#5a2a10', '#a8602a', '#f0c080'])), small=('meatPie', ramp_to(['#1a0a04', '#5a2a10', '#a8602a', '#f0c080'])))
+DERIVED['burntPie'] = dict(icon=('meatPie', ramp_to(['#080606', '#1e1814', '#3a302a', '#5a4e44'])), small=('meatPie', ramp_to(['#080606', '#1e1814', '#3a302a', '#5a4e44'])))
+DERIVED['burntStew'] = dict(icon=('meatPie', ramp_to(['#060606', '#1a1614', '#34302c', '#504a44'])), small=('meatPie', ramp_to(['#060606', '#1a1614', '#34302c', '#504a44'])))
 DERIVED['wraithstoneRing'] = dict(icon=('goldSapphireRing', WRAITHSTONE), small=('goldSapphireRing', WRAITHSTONE))
 DERIVED['emberScimitar'] = dict(icon=('runeScimitar', EMBER), small=('runeScimitar', EMBER), gear=('runeScimitar', EMBER))
 DERIVED['holtsSword'] = dict(icon=('steelLongsword', holts_blade), small=('steelLongsword', holts_blade), gear=('steelLongsword', holts_blade))
@@ -1020,6 +1043,29 @@ DERIVED['prospectorLegs'] = dict(icon=('leatherChaps', lum_to(CANVAS_DARK)), sma
 DERIVED['prospectorBoots'] = dict(icon=('leatherBoots', lum_to(BOOT_LEATHER)), small=('leatherBoots', lum_to(BOOT_LEATHER)), gear=('leatherBoots', lum_to(BOOT_LEATHER)))
 
 # Other sprites: new key <- source key, every frame.
+
+# ---- v0.50.0 trees: the oak's and pine's canopies recoloured (trunks kept) ----
+def canopy_to(colours, glow=None):
+    """Recolour a tree's leaves (the greenish pixels) along a ramp; trunk stays.
+    glow: a colour the brightest leaves lean towards (the magic tree)."""
+    def fn(im, get=None):
+        a = np.array(im.convert('RGBA')).astype(np.float32)
+        r, g, b, al = a[..., 0], a[..., 1], a[..., 2], a[..., 3]
+        leaf = (al > 0) & (g > r * 0.95) & (g >= b * 0.9)
+        if not leaf.any():
+            return im
+        l = lum(a[..., :3]) / 255
+        lo, hi = np.percentile(l[leaf], 2), np.percentile(l[leaf], 99)
+        t = np.clip((l - lo) / max(1e-3, hi - lo), 0, 1)
+        col = J.ramp(colours, t)
+        if glow is not None:
+            gl = np.array(J.hex2rgb(glow) if hasattr(J, 'hex2rgb') else [int(glow[i:i + 2], 16) for i in (1, 3, 5)], np.float32)
+            k = np.clip((t - 0.7) / 0.3, 0, 1)[..., None]
+            col = col * (1 - k) + gl * k
+        a[leaf, :3] = col[leaf]
+        return Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA')
+    return fn
+
 EXTRA = [
     ('ore:coal', 'ore:copper', coal),
     ('ore:silver', 'ore:copper', veins_to(J.METAL['silver'])),
@@ -1052,6 +1098,11 @@ EXTRA = [
     ('grubnakStatue', 'chars:enemy:grubnak', stone_statue),
     ('lodestone', 'standingStone', lodestone_dormant),
     ('lodestoneLit', 'standingStone', lodestone_lit),
+    ('willowTree', 'oak', canopy_to(['#1c2a10', '#3e5a1c', '#7a9a34', '#c8d86a'])),
+    ('mapleTree', 'oak', canopy_to(['#3a0e06', '#8a2a0e', '#d0601c', '#f8b04a'])),
+    ('yewTree', 'pine', canopy_to(['#06120e', '#12301e', '#244a30', '#4a7048'])),
+    ('magicTree', 'oak', canopy_to(['#06142a', '#123c5a', '#2a7a9a', '#8ae0f0'], glow='#d8fbff')),
+    ('elderTree', 'oak', canopy_to(['#1a0a1e', '#4a1a4a', '#8a3a7a', '#e8a8d8'])),
 ]
 
 # Side-on shields stay as they are (a kite shape only reads from the front or back).

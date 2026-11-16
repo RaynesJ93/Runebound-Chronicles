@@ -149,6 +149,9 @@ export function buildRoute1() {
   // ---- Oak grove (east) -------------------------------------------------------------------------
   clearArea(70, 54, 92, 62);
   for (let x = 72; x <= 90; x += 3) for (let y = 55; y <= 61; y += 3) if (!(x === 81 && y <= 58)) at('tree', x, y, { variant: 'oak' });
+  // v0.50.0: yews east of the oak grove, willows by the river and the lake
+  for (const [x, y] of [[93, 55], [96, 57], [93, 60], [97, 61]]) at('tree', x, y, { variant: 'yew' });
+  for (const [x, y] of [[12, 70], [17, 70], [23, 69], [4, 83], [23, 87]]) at('tree', x, y, { variant: 'willow' });
   one('sign', 82, 53, { interact: ['THE OAK GROVE', 'Old oaks, good timber. Woodcutting 15.'] });
 
   // ---- Lake and the hunters' camp (south-west) -----------------------------------------------------
@@ -165,7 +168,7 @@ export function buildRoute1() {
     if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => ground[i(x + dx, y + dy)] !== GROUND.WATER)) shore.push({ x, y });
   }
   const near = (tx, ty) => shore.sort((a, b) => Math.hypot(a.x - tx, a.y - ty) - Math.hypot(b.x - tx, b.y - ty)).shift();
-  for (const [tx, ty, variant] of [[22, 82, 'net'], [14, 78, 'bait'], [20, 88, 'lure']]) { const t = near(tx, ty); props.push({ type: 'fishingSpot', tiles: [t], x: t.x, y: t.y, variant }); }
+  for (const [tx, ty, variant] of [[22, 82, 'net'], [14, 78, 'bait'], [20, 88, 'lure'], [6, 80, 'cage'], [10, 89, 'harpoon']]) { const t = near(tx, ty); props.push({ type: 'fishingSpot', tiles: [t], x: t.x, y: t.y, variant }); }
   prop('tent', [{ x: 27, y: 76 }, { x: 28, y: 76 }], { interact: ["A hunter's tent. Snares and a bow hang inside."] });
   one('campfire', 28, 79, { action: 'cook', interact: ["The hunters' cooking fire, still burning."] });
   prop('logPile', [{ x: 31, y: 77 }, { x: 32, y: 77 }], { interact: ['Firewood, neatly stacked.'] });
