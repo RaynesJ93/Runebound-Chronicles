@@ -42,6 +42,10 @@ export class Hud {
         <button class="guide-btn ui" id="btn-guide" aria-label="Guide: how to play and where to get your first tools">${BOOK_SVG}<span>Guide</span></button>
         <button class="guide-btn ui" id="btn-quests" aria-label="Quests">${SCROLL_SVG}<span>Quests</span></button>
         <button class="slayer-chip ui hidden" id="slayer-chip" aria-label="Slayer task"><img class="px" src="${itemIcon('slayerGem').url}" alt=""><b id="slayer-left"></b><small id="slayer-name"></small></button>
+        <div class="target hidden" id="target" aria-live="polite">
+          <div class="target-name" id="target-name"></div>
+          <div class="target-bar"><span id="target-fill"></span></div>
+        </div>
         <div class="area-banner" id="area-banner"></div>
         <div class="grave-timer hidden" id="grave-timer"></div>
         <div class="messages" id="messages" aria-live="polite"></div>
@@ -163,10 +167,6 @@ export class Hud {
             </div>
           </div>
         </div>
-      </div>
-      <div class="target hidden" id="target" aria-live="polite">
-        <div class="target-name" id="target-name"></div>
-        <div class="target-bar"><span id="target-fill"></span></div>
       </div>
       <div class="hud-bottom-right">
         <div class="hp-orb" id="hp-orb" aria-label="Hitpoints">
