@@ -98,7 +98,7 @@ export class PlayerController {
     if (this.rooted?.()) return null; // held in place by a vinegrasp horror's vines
     if (this.path.length) {
       const n = this.path[0];
-      if (this.area.canStep(this.tile.x, this.tile.y, n.x, n.y)) {
+      if (this.area.canStep(this.tile.x, this.tile.y, n.x, n.y, false, 'player')) {
         this.path.shift();
         this.waited = 0;
         return n;
@@ -118,7 +118,7 @@ export class PlayerController {
       // Diagonal blocked? Slide along whichever straight direction is open.
       if (heldDir.dx && heldDir.dy) tries.push([heldDir.dx, 0], [0, heldDir.dy]);
       for (const [dx, dy] of tries) {
-        if (this.area.canStep(x, y, x + dx, y + dy)) return { x: x + dx, y: y + dy };
+        if (this.area.canStep(x, y, x + dx, y + dy, false, 'player')) return { x: x + dx, y: y + dy };
       }
       this.faceTowards(x + heldDir.dx, y + heldDir.dy); // bump: turn to face the wall
     }

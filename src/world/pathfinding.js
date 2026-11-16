@@ -38,7 +38,7 @@ export function findPath(area, sx, sy, isGoal, fallback = null) {
     for (const [dx, dy] of DIRS) {
       const nx = cx + dx;
       const ny = cy + dy;
-      if (!area.canStep(cx, cy, nx, ny)) continue;
+      if (!area.canStep(cx, cy, nx, ny, false, 'player')) continue; // only the player paths: monsters don't block
       const n = area.idx(nx, ny);
       if (dist[n] !== -1) continue;
       dist[n] = dist[c] + 1;

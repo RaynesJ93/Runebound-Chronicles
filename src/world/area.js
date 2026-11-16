@@ -49,17 +49,19 @@ export class Area {
     return this.inBounds(x, y) && !this.blocked[this.idx(x, y)];
   }
 
-  isFree(x, y) {
-    return this.isWalkable(x, y) && !(this.dynamicBlock && this.dynamicBlock(x, y));
+  // who: 'player' when the player is moving: you can walk through monsters
+  // (v0.49.4, so they can't corner you), but not through villagers.
+  isFree(x, y, who = null) {
+    return this.isWalkable(x, y) && !(this.dynamicBlock && this.dynamicBlock(x, y, who));
   }
 
   // One step, 8 directions. Diagonals may not cut corners.
   // staticOnly: ignore villagers (used to tell "wall" from "someone in the way").
-  canStep(fx, fy, tx, ty, staticOnly = false) {
+  canStep(fx, fy, tx, ty, staticOnly = false, who = null) {
     const dx = tx - fx;
     const dy = ty - fy;
     if (Math.abs(dx) > 1 || Math.abs(dy) > 1 || (dx === 0 && dy === 0)) return false;
-    const ok = staticOnly ? (x, y) => this.isWalkable(x, y) : (x, y) => this.isFree(x, y);
+    const ok = staticOnly ? (x, y) => this.isWalkable(x, y) : (x, y) => this.isFree(x, y, who);
     if (!ok(tx, ty)) return false;
     if (dx !== 0 && dy !== 0) return ok(fx + dx, fy) && ok(fx, fy + dy);
     return true;

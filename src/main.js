@@ -75,7 +75,8 @@ function boot() {
     // Spawns with `when(flags)` only appear once it's true (quest monsters).
     const live = new Set(a.spawns.filter((sp) => ENEMIES[sp.enemy] && (!sp.when || sp.when(state.flags))));
     const foes = [...live].map((sp) => new Enemy(ENEMIES[sp.enemy], sp, a));
-    a.dynamicBlock = (x, y) => people.some((n) => n.occupies(x, y)) || foes.some((e) => e.occupies(x, y));
+    // Villagers block everyone; monsters block each other but not you.
+    a.dynamicBlock = (x, y, who) => people.some((n) => n.occupies(x, y)) || (who !== 'player' && foes.some((e) => e.occupies(x, y)));
     // Tiles you can tap to look at something: props with text, and every
     // tile of a building (which shows its door text).
     const look = new Map();
