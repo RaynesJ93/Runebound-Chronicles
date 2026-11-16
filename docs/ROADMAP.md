@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 16 Nov 2026 | v0.49.2: painted art for the Overgrowth: root-and-moss floor, vine-choked walls, root arches, thorny tendrils, glowing pods and fungus, vine-wrapped bones and boulders. |
 | 16 Nov 2026 | v0.49.1: painted art for the vinegrasp horror and the six slayer gear items (icons, and the whip, staff and boots on the character). |
 | 16 Nov 2026 | v0.49.0: slayer gear: vine whip (Attack 70, faster than a scimitar), wyrmscale boots, crawler-shell boots, wraithbone staff (drops), bloodbat gloves and hunter's gauntlets (Kesta's shop). The Overgrowth, a fifth Slayer Caverns section, with the vinegrasp horror (Slayer 70; roots you in place). |
 | 16 Nov 2026 | v0.48.8: hotfix: a stray apostrophe in the Slayer guide text (v0.48.7) stopped the game loading. New test: every module must parse (tests/modules_load.test.mjs). |
