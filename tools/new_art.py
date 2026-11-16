@@ -21,6 +21,9 @@ Sets:
   vinegrasp-art (16 Nov 2026) The vinegrasp horror (1_), the six slayer gear
                 icons (2_, 3 x 2) and the whip, staff and two boots worn or
                 held facing down/up/left/right (3_, 4 x 4).
+  fae-standins  (16 Nov 2026) Stand-in sprites for Lumenhaven's monsters until
+                they have painted art: the air elemental, bandit and restless
+                ghost recoloured (pass any folder).
   batch1        (16 Nov 2026) Skill review batch 1: five trees (1_, a row),
                 item icons (2_, 3 x 3: logs, lobster pot, harpoon, stew,
                 burnt pie), bows (3_, 5 x 2: shortbows, longbows) and fish
@@ -196,6 +199,30 @@ elif SET == 'vinegrasp-art':
     old.update(anchors)
     json.dump(old, open(p, 'w'), indent=1, sort_keys=True)
 
+elif SET == 'fae-standins':
+    def recolour(src_key, dst_key, ramp, glow=None):
+        src = os.path.join(OUT, src_key.replace(':', '__'))
+        frames = []
+        for k in range(len(os.listdir(src))):
+            a = np.array(Image.open(os.path.join(src, f'{k}.png')).convert('RGBA')).astype(np.float32)
+            m = a[..., 3] > 0
+            lum = (a[..., 0] * 0.3 + a[..., 1] * 0.59 + a[..., 2] * 0.11) / 255
+            lo, hi = np.percentile(lum[m], 2), np.percentile(lum[m], 98)
+            t = np.clip((lum - lo) / max(1e-3, hi - lo), 0, 1)
+            r = np.array(ramp, np.float32)
+            x = t * (len(r) - 1)
+            i0 = np.clip(np.floor(x).astype(int), 0, len(r) - 2)
+            f = (x - i0)[..., None]
+            col = r[i0] * (1 - f) + r[i0 + 1] * f
+            if glow is not None:
+                col[t > 0.9] = glow
+            a[m, :3] = col[m]
+            frames.append(Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA'))
+        save_frames(dst_key, frames)
+    recolour('chars:enemy:airElemental', 'chars:enemy:glimmerwisp', [[20, 60, 90], [60, 150, 200], [150, 225, 245], [235, 252, 255]], glow=[255, 255, 255])
+    recolour('chars:enemy:bandit', 'chars:enemy:faeSentinel', [[10, 30, 20], [30, 90, 60], [90, 160, 100], [220, 210, 130], [250, 245, 210]], glow=[170, 255, 210])
+    recolour('chars:enemy:restlessGhost', 'chars:enemy:hollowShade', [[8, 6, 14], [30, 22, 48], [70, 56, 100], [140, 120, 190]], glow=[200, 168, 255])
+
 elif SET == 'batch1':
     path = lambda p: glob.glob(os.path.join(SRC, p + '*.png'))[0]
 
@@ -328,5 +355,5 @@ elif SET == 'images01-09':
     old.update(anchors)
     json.dump(old, open(path, 'w'), indent=1, sort_keys=True)
 else:
-    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, overgrowth, slayergear, vinegrasp-art or batch1')
+    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, overgrowth, slayergear, vinegrasp-art, batch1 or fae-standins')
 print('done')

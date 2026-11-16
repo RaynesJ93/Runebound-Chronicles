@@ -16,7 +16,7 @@ import { Enemy } from './entities/enemy.js';
 import { ENEMIES } from '../data/enemies.js';
 import { Combat } from './combat/combat.js';
 import { SkillBook, SKILL_NAME, MELEE_STYLES, RANGED_STYLES } from './skills/skills.js';
-import { SPELLS } from '../data/spells.js';
+import { SPELLS, UTILITY } from '../data/spells.js';
 import { maxHit, effectiveLevel } from './combat/formulas.js';
 import { Inventory } from './items/inventory.js';
 import { Equipment, verb } from './items/equipment.js';
@@ -310,7 +310,8 @@ function boot() {
       return {
         intro: 'Choose a spell. Every attack casts it, using its runes from your bag.',
         current: combat.spell.id,
-        list: SPELLS.map((sp) => ({ id: sp.id, name: sp.name, icon: sp.id, locked: lv.magic < sp.level, sub: `Magic ${sp.level} · max hit ${sp.maxHit} · ${runes(sp)}` })),
+        // icon: the spell's element rune (spells have no pictures of their own yet)
+        list: SPELLS.map((sp) => ({ id: sp.id, name: sp.name, icon: { wind: 'airRune', water: 'waterRune', earth: 'earthRune', fire: 'fireRune' }[sp.colour] || 'magic', locked: lv.magic < sp.level, sub: `Magic ${sp.level} · max hit ${sp.maxHit} · ${runes(sp)}` })),
       };
     }
     if (combat.mode === 'ranged') {
@@ -336,6 +337,54 @@ function boot() {
     const reach = combat.mode === 'melee' ? 'melee' : `range ${combat.range} tiles`;
     hud.renderStyles(c.list, c.current, state.settings.autoRetaliate !== false,
       `Max hit: ${currentMaxHit()} · Combat level: ${combat.level} · ${w.name} (${reach}, ${(combat.speed * 0.6).toFixed(1)} s per attack).`, c.intro);
+    const runes = (sp) => Object.entries(sp.runes).map(([id, n]) => `${n} ${ITEMS[id].name.replace(' rune', '').toLowerCase()}`).join(', ');
+    hud.renderUtility(UTILITY.map((sp) => ({ id: sp.id, name: sp.name, icon: sp.teleport ? 'lawRune' : 'natureRune', locked: combat.skills.magic < sp.level,
+      sub: `Magic ${sp.level} · ${runes(sp)}${sp.alch ? ` · ${Math.round(sp.alch * 100)}% of an item's value` : ''}` })));
+  };
+
+  // Spellbook spells (v0.51.0). Teleports go at once; alchemy waits for you
+  // to tap an item in your bag (pendingAlch).
+  let pendingAlch = null;
+  const payRunes = (sp) => {
+    if (combat.skills.magic < sp.level) { hud.message(`You need a Magic level of ${sp.level} to cast ${sp.name}.`); return false; }
+    const missing = Object.entries(sp.runes).find(([id, n]) => inventory.count(id) < n);
+    if (missing) { hud.message(`You don't have enough ${ITEMS[missing[0]].name.toLowerCase()}s to cast ${sp.name}.`); return false; }
+    return true;
+  };
+  hud.onCast = (id) => {
+    const sp = UTILITY.find((x) => x.id === id);
+    if (!sp || !payRunes(sp)) return;
+    if (sp.teleport) {
+      if (combat.target || enemies.some((e) => !e.dead && e.state === 'fight')) { hud.message("You can't teleport while you're fighting."); return; }
+      for (const [rid, n] of Object.entries(sp.runes)) inventory.remove(rid, n);
+      book.add('magic', sp.xp);
+      hud.closeSkills();
+      hud.message(`You cast ${sp.name}.`);
+      travel({ to: sp.teleport.to, at: { x: sp.teleport.x, y: sp.teleport.y }, offset: 0, facing: Math.PI });
+      return;
+    }
+    pendingAlch = { sp, at: Date.now() };
+    hud.closeSkills();
+    hud.openInventory();
+    hud.message(`${sp.name}: tap the item to turn into coins.`);
+  };
+  const alchemy = (i) => {
+    const sp = pendingAlch.sp;
+    pendingAlch = null;
+    const s = inventory.slots[i];
+    if (!s) return;
+    const def = ITEMS[s.id];
+    if (s.id === 'coins') { hud.message("You can't turn coins into coins."); return; }
+    if (!def.value) { hud.message(`The ${def.name.toLowerCase()} has no value. Alchemy can't touch it.`); return; }
+    if (!payRunes(sp)) return;
+    for (const [rid, n] of Object.entries(sp.runes)) inventory.remove(rid, n);
+    const coins = Math.max(1, Math.floor(def.value * sp.alch));
+    if (s.qty > 1) inventory.remove(s.id, 1); else inventory.removeSlot(i);
+    inventory.add('coins', coins);
+    book.add('magic', sp.xp);
+    hud.message(`The ${def.name.toLowerCase()} melts into ${coins} coins.`);
+    refreshInventory();
+    save();
   };
   hud.onSkillsOpen = () => refreshSkills();
   // Map: where you are, and the people and monsters around you right now.
@@ -441,6 +490,8 @@ function boot() {
     return null;
   };
   hud.onSlotTap = (i, x, y) => {
+    if (pendingAlch && Date.now() - pendingAlch.at < 30000) { alchemy(i); return; } // the next tap after casting alchemy
+    pendingAlch = null;
     const use = state.settings.itemTap === 'menu' ? null : quickUse(i, x, y);
     if (use) use(); else hud.onSlotMenu(i, x, y);
   };

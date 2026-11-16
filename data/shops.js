@@ -50,6 +50,8 @@ export const SHOPS = {
       { id: 'apprenticeStaff', base: 2 },
       { id: 'airRune', base: 300 },
       { id: 'mindRune', base: 300 },
+      { id: 'earthRune', base: 300 },
+      { id: 'fireRune', base: 300 },
       { id: 'waterRune', base: 200 },
       { id: 'bronzeAxe', base: 5 },
       { id: 'ironAxe', base: 2 },

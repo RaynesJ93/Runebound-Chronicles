@@ -424,6 +424,66 @@ export const ENEMIES = {
       rare: { chance: 1 / 256, table: [{ item: 'vineWhip', qty: 1 }] },
     },
   },
+  // ---- Lumenhaven, the hidden fae city (v0.51.0) -----------------------------------------
+  // Their drops are where high runes and extra essence come from before you can craft them.
+  glimmerwisp: {
+    id: 'glimmerwisp', name: 'Glimmerwisp', level: 44, hp: 48, glow: '#b8f0ff',
+    attack: 36, strength: 30, defence: 30, attackBonus: 20, strengthBonus: 10, defenceBonus: 25, maxHit: 6,
+    speed: 4, attackType: 'magic', aggressive: true, aggroRange: 3, wander: 4, leash: 8, respawn: 35,
+    look: { skin: '#b8f0ff', hair: '#e8fbff', tunic: '#7ac8e8', pants: '#7ac8e8', eyes: '#ffffff' },
+    examine: 'A drifting light with a face in it, if you look too long. It does not like visitors.',
+    loot: {
+      main: [
+        { item: 'runeEssence', min: 2, max: 5, chance: 1 / 3 },
+        { item: 'cosmicRune', min: 3, max: 8, chance: 1 / 5 },
+        { item: 'chaosRune', min: 3, max: 8, chance: 1 / 5 },
+        { item: 'earthRune', min: 10, max: 25, chance: 1 / 6 },
+        { item: 'fireRune', min: 10, max: 25, chance: 1 / 6 },
+        { item: 'natureRune', min: 1, max: 4, chance: 1 / 16 },
+        { item: 'coins', min: 30, max: 120, chance: 1 / 8 },
+      ],
+      rare: { chance: 1 / 128, table: [{ item: 'uncutRuby', qty: 1 }, { item: 'uncutDiamond', qty: 1 }] },
+    },
+  },
+  faeSentinel: {
+    id: 'faeSentinel', name: 'Fae sentinel', level: 58, hp: 70,
+    attack: 52, strength: 50, defence: 55, attackBonus: 25, strengthBonus: 20, defenceBonus: 40, maxHit: 8,
+    speed: 4, attackType: 'slash', aggressive: true, aggroRange: 3, wander: 3, leash: 7, respawn: 45,
+    look: { skin: '#d8f0d0', hair: '#e8d878', tunic: '#3a7a5a', pants: '#2a4a3a', eyes: '#a8ffd0' },
+    examine: 'A fae knight in leaf-green armour, guarding the altars of the hidden city.',
+    loot: {
+      always: [{ item: 'bones', qty: 1 }],
+      main: [
+        { item: 'runeEssence', min: 3, max: 5, chance: 1 / 3 },
+        { item: 'natureRune', min: 3, max: 8, chance: 1 / 5 },
+        { item: 'lawRune', min: 2, max: 6, chance: 1 / 6 },
+        { item: 'cosmicRune', min: 5, max: 10, chance: 1 / 6 },
+        { item: 'coins', min: 100, max: 300, chance: 1 / 4 },
+        { item: 'uncutEmerald', qty: 1, chance: 1 / 20 },
+        { item: 'uncutRuby', qty: 1, chance: 1 / 40 },
+      ],
+      rare: { chance: 1 / 128, table: [{ item: 'uncutDiamond', qty: 1 }, { item: 'warCharm', qty: 1 }] },
+    },
+  },
+  hollowShade: {
+    id: 'hollowShade', name: 'Hollow shade', level: 70, hp: 90,
+    attack: 46, strength: 48, defence: 55, attackBonus: 18, strengthBonus: 20, defenceBonus: 45, maxHit: 9,
+    speed: 4, attackType: 'magic', aggressive: true, aggroRange: 3, wander: 3, leash: 7, respawn: 50,
+    look: { skin: '#2a2438', hair: '#141020', tunic: '#2a2438', pants: '#141020', eyes: '#c8a8ff' },
+    examine: 'A shadow with nothing to cast it. The death altar\'s cold has soaked into it.',
+    loot: {
+      main: [
+        { item: 'runeEssence', min: 3, max: 5, chance: 1 / 3 },
+        { item: 'deathRune', min: 3, max: 8, chance: 1 / 5 },
+        { item: 'lawRune', min: 3, max: 8, chance: 1 / 6 },
+        { item: 'chaosRune', min: 10, max: 20, chance: 1 / 6 },
+        { item: 'natureRune', min: 5, max: 10, chance: 1 / 8 },
+        { item: 'coins', min: 150, max: 400, chance: 1 / 5 },
+        { item: 'uncutDiamond', qty: 1, chance: 1 / 40 },
+      ],
+      rare: { chance: 1 / 128, table: [{ item: 'uncutDiamond', min: 1, max: 2 }] },
+    },
+  },
   alphaWolf: {
     id: 'alphaWolf', name: 'Alpha Wolf', level: 14, hp: 40, sprite: 'wolf', boss: true,
     attack: 10, strength: 10, defence: 8,

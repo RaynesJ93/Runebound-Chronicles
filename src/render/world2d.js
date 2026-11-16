@@ -62,7 +62,8 @@ function getLib() {
     ore: { ...Object.fromEntries(['copper', 'tin', 'iron', 'coal', 'silver', 'gold', 'mithril', 'gem', 'adamantite', 'runite'].map((v, k) => [v, [S.oreRock(v, 101 + k * 3), S.oreRock(v, 102 + k * 3)]])),
       essence: [S.essenceRock(1), S.essenceRock(2)] },
     // painted ore rocks replace the drawn ones where the atlas has them
-    altar: Object.fromEntries(['air', 'mind', 'water'].map((v) => [v, art('altar:' + v) || [S.altar(v, 0), S.altar(v, 1)]])),
+    altar: Object.fromEntries(['air', 'mind', 'water', 'earth', 'fire', 'body', 'cosmic', 'chaos', 'nature', 'law', 'death']
+      .map((v) => [v, art('altar:' + v) || [S.altar(['air', 'mind', 'water'].includes(v) ? v : 'air', 0), S.altar(['air', 'mind', 'water'].includes(v) ? v : 'air', 1)]])),
     standingStone: art('standingStone') || [S.standingStone(1), S.standingStone(2.5), S.standingStone(4)],
     campChest: art('campChest')?.[0] || S.campChest(),
     ruinWall: art('ruinWall') || [S.ruinWall(1), S.ruinWall(2), S.ruinWall(3), S.ruinWall(4)],
@@ -304,7 +305,8 @@ export function createWorldView(canvasEl, area) {
   // Everything outside a light is in deep shadow. Glowing things light up the
   // ground around them; altars and fires also cast coloured light.
   const LIGHT = {
-    altar: { air: ['#d8ecff', 84], mind: ['#ff9a3a', 84], water: ['#6fb8ff', 84] },
+    altar: { air: ['#d8ecff', 84], mind: ['#ff9a3a', 84], water: ['#6fb8ff', 84], earth: ['#a8d06a', 84], fire: ['#ff8a3a', 90],
+      body: ['#c0a8f0', 84], cosmic: ['#ffe680', 90], chaos: ['#ff6a3a', 84], nature: ['#7af07a', 90], law: ['#c8dcff', 90], death: ['#9a8ab8', 70] },
     furnace: ['#ff9a3a', 60, true], campfire: ['#ff9a3a', 64, true], cookingPit: ['#ff9a3a', 64, true], lamp: ['#ffd890', 52, true], campChest: ['#ffd890', 30, true],
     ore: ['#8ab8ff', 32], crystalShard: ['#8ab8ff', 16], glowShrooms: ['#5fd8ff', 18], glowFlowers: ['#c8b8ff', 12],
   };
@@ -739,7 +741,8 @@ export function createWorldView(canvasEl, area) {
           ctx.fillStyle = '#f4f2e6';
           ctx.fillRect(Math.round(x - dx * 5), Math.round(y - dy * 5), 1, 1);
         } else {
-          const col = pr.kind === 'water' ? ['#2f6fd0', '#8fd0ff', '#e8f8ff'] : ['#8fd06a', '#d8f5c0', '#ffffff'];
+          const col = pr.kind === 'water' ? ['#2f6fd0', '#8fd0ff', '#e8f8ff'] : pr.kind === 'earth' ? ['#5a3a1a', '#8ac04a', '#d8f0a0']
+            : pr.kind === 'fire' ? ['#c8301a', '#ff9a3a', '#fff0a0'] : ['#8fd06a', '#d8f5c0', '#ffffff'];
           for (let i = 3; i >= 1; i--) {
             ctx.globalAlpha = 0.25 * (4 - i);
             ctx.fillStyle = col[0];

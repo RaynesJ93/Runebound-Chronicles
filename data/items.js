@@ -67,6 +67,15 @@ export const ITEMS = {
   airRune: { name: 'Air rune', stackable: true, value: 4, examine: 'One of the four basic elemental runes.' },
   waterRune: { name: 'Water rune', stackable: true, value: 4, examine: 'One of the four basic elemental runes.' },
   mindRune: { name: 'Mind rune', stackable: true, value: 3, examine: 'Used for basic missile spells.' },
+  // v0.51.0 (skill review batch 2)
+  earthRune: { name: 'Earth rune', stackable: true, value: 4, examine: 'One of the four basic elemental runes.' },
+  fireRune: { name: 'Fire rune', stackable: true, value: 4, examine: 'One of the four basic elemental runes. Warm to the touch.' },
+  bodyRune: { name: 'Body rune', stackable: true, value: 8, examine: 'A rune of living flesh. Wave spells need it.' },
+  cosmicRune: { name: 'Cosmic rune', stackable: true, value: 20, examine: 'A rune holding a sliver of the night sky.' },
+  chaosRune: { name: 'Chaos rune', stackable: true, value: 30, examine: 'A rune that never quite holds still. Bolt spells need it.' },
+  natureRune: { name: 'Nature rune', stackable: true, value: 60, examine: 'A rune of growing things. Alchemy needs it.' },
+  lawRune: { name: 'Law rune', stackable: true, value: 80, examine: 'A rune of order. Teleports need it.' },
+  deathRune: { name: 'Death rune', stackable: true, value: 120, examine: 'A cold, dark rune. Blast and wave spells need it.' },
   bronzeArrow: {
     name: 'Bronze arrow', stackable: true, value: 1, examine: 'Arrows with bronze heads. Wear them in your ammo slot to fire them from a bow.',
     equip: { slot: 'ammo', req: {}, rangedStr: 7, ammo: 'arrow' },
