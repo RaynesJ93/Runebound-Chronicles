@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 17 Nov 2026 | v0.51.4: Lumenhaven's fairy ring moved up into the open (it was half hidden behind the edge trees); you arrive just above it. |
 | 17 Nov 2026 | v0.51.3: painted art for batch 2: Lumenhaven's own ground, stalls, starlight well, glowing lanterns, toadstools and crystals, the fairy ring, a glowing bridge to the cosmic island; the eight new altars, eight rune icons and the three fae monsters. |
 | 17 Nov 2026 | v0.51.2: no more "You swing your pickaxe..." / "You manage to mine some iron." messages: what you gather or make pops up as "+1 Iron ore" (with its icon) under the XP drop. Covers mining, woodcutting, fishing, gems, runecrafting, smelting, smithing, cooking (burns too), fletching and crafting. Messages you need (full bag, level, tool) stay. |
 | 17 Nov 2026 | v0.51.1: Lumenhaven has half as many trees scattered through it (8% of open ground, was 16%), so it's easier to get around. |
