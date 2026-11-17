@@ -329,7 +329,7 @@ export function buildRoute1() {
       { tiles: [{ x: 7, y: 7 }], to: 'warrens', at: { x: 22, y: 35 }, facing: Math.PI, when: (f) => !!f.caveOpen },
       { tiles: [{ x: 38, y: 75 }], to: 'slayerCave', at: { x: 32, y: 42 }, facing: Math.PI },
       // v0.51.0: step into the fairy ring and you're pulled into Lumenhaven
-      { tiles: [{ x: 69, y: 89 }, { x: 71, y: 89 }, { x: 70, y: 88 }, { x: 70, y: 90 }], to: 'lumenhaven', at: { x: 36, y: 49 }, facing: Math.PI },
+      { tiles: [{ x: 69, y: 89 }, { x: 71, y: 89 }, { x: 70, y: 88 }, { x: 70, y: 90 }], to: 'lumenhaven', at: { x: 36, y: 46 }, facing: Math.PI },
     ],
     spawns: [
       // v0.46.0: giant spiders in the watchtower ruins, crabs on the lake shore,

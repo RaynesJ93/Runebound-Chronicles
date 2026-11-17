@@ -100,7 +100,7 @@ export const LABELS = {
     { x: 22, y: 30, text: 'Landing' },
   ],
   lumenhaven: [
-    { x: 36, y: 46, text: 'Fairy ring' },
+    { x: 36, y: 51, text: 'Fairy ring' },
     { x: 36, y: 31, text: 'Market' },
     { x: 57, y: 5, text: 'Cosmic altar' },
     { x: 12, y: 27, text: 'Chaos temple' },

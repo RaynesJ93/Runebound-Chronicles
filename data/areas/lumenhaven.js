@@ -71,7 +71,7 @@ export function buildLumenhaven() {
   water(26, 24, 3, 2);
 
   // ---- Places -------------------------------------------------------------------------
-  disc(36, 52, 4, 3, GROUND.GRASS);              // the fairy ring clearing
+  disc(36, 49, 4.5, 3, GROUND.GRASS);            // the fairy ring clearing (v0.51.4: moved up, clear of the edge trees)
   rect(29, 33, 43, 42, GROUND.PLAZA);            // the market square
   disc(57, 14, 2.6, 2.2, GROUND.GRASS);          // the cosmic island
   disc(12, 34, 6, 5, GROUND.PATH);               // the broken temple floor
@@ -80,7 +80,7 @@ export function buildLumenhaven() {
   disc(36, 7, 9, 5, GROUND.GRASS);               // the shadow hollow
 
   // ---- Paths between them ---------------------------------------------------------------
-  path([35, 49], [36, 44], [35, 42]);                         // ring → market
+  path([35, 46], [36, 44], [35, 42]);                         // ring → market
   path([29, 37], [22, 36], [17, 34]);                         // market → temple
   path([14, 30], [11, 24], [13, 18]);                         // temple → glade
   path([42, 37], [50, 38], [56, 36]);                         // market → crystal shrine
@@ -98,9 +98,9 @@ export function buildLumenhaven() {
     prop('decor', tiles, { art: key, name, flat: !!opt.flat, blocks: !opt.walk, light: opt.light, interact: [text] });
   };
   const LANTERN = ['#bfe8ff', 52, true];
-  decor('fairyRing', 36, 53, 'fairy ring', 'A ring of glowing toadstools. Step into it to go home.', { wide: true, flat: true, walk: true, light: ['#9fe8ff', 40] });
+  decor('fairyRing', 36, 49, 'fairy ring', 'A ring of glowing toadstools. Step into it to go home.', { wide: true, flat: true, walk: true, light: ['#9fe8ff', 40] });
   for (let x = 47; x <= 53; x += 2) decor('faeBridge', x, 14, 'bridge of light', 'A bridge of glowing moonstone over the starlit pool.', { wide: true, flat: true, walk: true, light: ['#9fd8ff', 22] });
-  one('sign', 39, 49, { interact: ['LUMENHAVEN', 'The hidden city of the fae. Step back into the ring to go home.', 'The altars lie beyond the market. Beware: the fae do not welcome visitors.'] });
+  one('sign', 40, 46, { interact: ['LUMENHAVEN', 'The hidden city of the fae. Step back into the ring to go home.', 'The altars lie beyond the market. Beware: the fae do not welcome visitors.'] });
 
   // ---- The market square -------------------------------------------------------------------
   [[30, 34], [33, 34], [39, 34], [41, 34], [30, 41], [41, 41]].forEach(([x, y], k) => decor(k % 2 ? 'faeStallSilk' : 'faeStallLeaf', x, y, 'fae stall',
@@ -168,10 +168,10 @@ export function buildLumenhaven() {
     W, H, ground, blocked, props,
     theme: 'fae', // its own painted ground (v0.51.3)
     dark: true,
-    spawn: { x: 36, y: 49, facing: Math.PI },
+    spawn: { x: 36, y: 46, facing: Math.PI },
     exits: [
       // step back into the fairy ring
-      { tiles: [{ x: 36, y: 53 }], to: 'route1', at: { x: 70, y: 92 }, facing: 0 },
+      { tiles: [{ x: 36, y: 49 }, { x: 37, y: 49 }], to: 'route1', at: { x: 70, y: 92 }, facing: 0 },
     ],
     spawns: [
       // glimmerwisps: the market's edges and the pools
