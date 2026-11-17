@@ -369,7 +369,7 @@ The review found Runecrafting had only three runes and Magic only two spells. Ba
 | Fae sentinel | 58 | 70 | 8 | slash | The glade and crystal shrine | Rune essence (3–5), nature, law and cosmic runes, coins, gems |
 | Hollow shade | 70 | 90 | 9 | magic | The shadow hollow | Rune essence (3–5), death, law, chaos and nature runes, uncut diamonds |
 
-All three are aggressive (until you're twice their level, as usual). Placeholder art: recolours of the air elemental, bandit and restless ghost.
+*v0.51.1:* half as many trees are scattered through the city as at first, so it's more open. All three are aggressive (until you're twice their level, as usual). Placeholder art: recolours of the air elemental, bandit and restless ghost.
 
 **Combat spells** (choose one in the Combat tab while holding a staff):
 

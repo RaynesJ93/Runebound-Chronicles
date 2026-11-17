@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 17 Nov 2026 | v0.51.1: Lumenhaven has half as many trees scattered through it (8% of open ground, was 16%), so it's easier to get around. |
 | 16 Nov 2026 | v0.51.0: skill review batch 2: earth, fire, body, cosmic, chaos, nature, law and death runes (Runecrafting 9–65); Lumenhaven, a hidden fae city through the Thornwood fairy ring (inspired by Zanaris) with the five high altars and three dangerous fae monsters that drop high runes and essence; 16 combat spells (strike, bolt, blast and wave), four teleports, low and high alchemy. |
 | 16 Nov 2026 | v0.50.1: painted art for batch 1: the five new trees, logs, bows, fish, lobster pot, harpoon and stew. |
 | 16 Nov 2026 | v0.50.0: skill review batch 1: willow, maple, yew, magic and elder trees (Woodcutting 30–90); bows from them (Fletching 35–95, Ranged 20–60); lobster, swordfish, monkfish, shark and cave eel (Fishing 40–85) with the lobster pot and harpoon; cooking for them plus meat pie and hunter's stew (Cooking 20–88, healing up to 22). |

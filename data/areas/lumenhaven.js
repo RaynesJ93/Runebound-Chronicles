@@ -143,10 +143,11 @@ export function buildLumenhaven() {
     if (!free(x, y) || keep[i(x, y)] || ground[i(x, y)] !== GROUND.GRASS) continue;
     const edge = x < 2 || y < 2 || x >= W - 2 || y >= H - 2;
     const r = rng();
-    if (edge || r < 0.16) one('tree', x, y, { variant: r < 0.05 ? 'magic' : r < 0.11 ? 'gloom' : 'pine' });
-    else if (r < 0.2) one('glowShrooms', x, y, { blocks: false });
-    else if (r < 0.225) one('glowFlowers', x, y, { blocks: false });
-    else if (r < 0.235) one('crystalShard', x, y);
+    // v0.51.1: half as many trees as before (8% of open grass, was 16%)
+    if (edge || r < 0.08) one('tree', x, y, { variant: r < 0.025 ? 'magic' : r < 0.055 ? 'gloom' : 'pine' });
+    else if (r < 0.12) one('glowShrooms', x, y, { blocks: false });
+    else if (r < 0.145) one('glowFlowers', x, y, { blocks: false });
+    else if (r < 0.155) one('crystalShard', x, y);
   }
 
   return {
