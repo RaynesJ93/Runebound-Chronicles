@@ -219,6 +219,9 @@ export function buildBrambleford() {
     const edge = x === 44 || x === 58 || y === 36 || y === 42;
     if (edge && !(x === 44 && y === 38)) one('fence', x, y);
   }
+  // v0.53.0: Old Bessie's pen, fenced off at the east end, gate in the middle
+  for (let y = 37; y <= 41; y++) if (y !== 39) one('fence', 53, y);
+  one('sign', 52, 41, { interact: ["OLD BESSIE'S PEN", 'Keep out! She bites. And stomps. (A boss: Slayer 20.)'] });
   one('crate', 57, 37, { interact: ['A trough of fresh hay.'] });
   one('sign', 43, 40, { interact: ['COW FIELD', 'Cows give beef for cooking, and hides for crafting.'] });
   // Hilda's tanning rack, just west of the south road
@@ -269,7 +272,8 @@ export function buildBrambleford() {
     spawns: [
       { enemy: 'cow', x: 48, y: 39 },
       { enemy: 'cow', x: 52, y: 38 },
-      { enemy: 'cow', x: 55, y: 40 },
+      { enemy: 'cow', x: 49, y: 38 },
+      { enemy: 'oldBessie', x: 55, y: 39 },
       { enemy: 'cow', x: 50, y: 41 },
       { enemy: 'cow', x: 46, y: 40 },
       { enemy: 'chicken', x: 20, y: 29 },

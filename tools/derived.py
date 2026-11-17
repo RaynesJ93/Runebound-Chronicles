@@ -902,6 +902,12 @@ EMBER = ramp_to(['#4a0c04', '#b8320a', '#ff8a2a', '#ffe68a'], light_only=True)
 # (Grubnak used to be the chief at twice the size; he has his own painted art
 # now, in tools/sprites/, so nothing is scaled at the moment.)
 SCALED = []
+# Old Bessie (v0.53.0): the cow, 1.4x bigger and toffee-brown, until she's painted.
+def bessie(im, get=None):
+    im = ramp_to(['#1c0e06', '#5a3014', '#a8682e', '#f0d2a0'])(im, get)
+    return im.resize((round(im.width * 1.4), round(im.height * 1.4)), Image.NEAREST)
+for _k in ('chars:enemy:cow', 'anim:cow:hit', 'anim:cow:fall', *(f'anim:cow:attack:{d}' for d in ('down', 'up', 'left', 'right'))):
+    SCALED.append((_k.replace('cow', 'oldBessie'), _k, bessie, 1.4))
 
 
 # ---- What to make ------------------------------------------------------------------
@@ -1062,6 +1068,8 @@ def red_to_violet(im, get=None):
     out = rgba.copy(); out[..., :3] = np.where(gem[..., None], rgb, rgba[..., :3])
     return Image.fromarray(out, 'RGBA')
 
+BRASS = ramp_to(['#2a1a06', '#6a4a14', '#b08a30', '#f0dc8a'])
+DERIVED['bessiesCowbell'] = dict(icon=('goldAmulet', BRASS), gear=('goldAmulet', BRASS))
 STALKER = ramp_to(['#0c0814', '#241a38', '#45386a', '#8a7cb8'])
 WYRMHIDE = ramp_to(['#200604', '#5e140a', '#a83018', '#f0884a'])
 DERIVED['uncutDragonstone'] = dict(icon=('uncutRuby', red_to_violet))

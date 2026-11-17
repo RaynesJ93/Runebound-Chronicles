@@ -273,9 +273,9 @@ export class Combat {
       for (const t of w.tiles) this.impacts.push({ x: t.x, y: t.y, time: this.now });
       if (w.tiles.some((t) => t.x === pt.x && t.y === pt.y) && this.state.player.hp > 0) {
         const [lo, hi] = w.dmg;
-        this.on.message?.('The slam hits you!');
+        this.on.message?.(w.by.def.mechanics?.hitText || 'The slam hits you!');
         this.hurtPlayer(w.by, lo + Math.floor(this.rng() * (hi - lo + 1)));
-      } else this.on.message?.('You get clear of the slam!');
+      } else this.on.message?.(w.by.def.mechanics?.clearText || 'You get clear of the slam!');
     }
   }
 
