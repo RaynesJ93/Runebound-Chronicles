@@ -387,7 +387,7 @@ export const ENEMIES = {
     look: { skin: '#a83a1a', hair: '#5a1a0a', tunic: '#a83a1a', pants: '#5a1a0a', eyes: '#ffd040' },
     examine: 'A wingless dragon, long as a cart, with coals for scales. The forge never cooled because of it.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }],
+      always: [{ item: 'bones', qty: 1 }, { item: 'wyrmHide', qty: 1 }],
       main: [
         { item: 'coins', min: 150, max: 450, chance: 1 / 3 },
         { item: 'coal', min: 5, max: 10, chance: 1 / 4 },
@@ -396,6 +396,7 @@ export const ENEMIES = {
         { item: 'runeBar', qty: 1, chance: 1 / 32 },
         { item: 'uncutRuby', qty: 1, chance: 1 / 16 },
         { item: 'uncutDiamond', qty: 1, chance: 1 / 40 },
+        { item: 'uncutDragonstone', qty: 1, chance: 1 / 64 },
       ],
       each: [{ item: 'wyrmscaleBoots', qty: 1, chance: 1 / 128, rare: true }],
       rare: { chance: 1 / 200, table: [{ item: 'emberScimitar', qty: 1 }] },
@@ -419,6 +420,7 @@ export const ENEMIES = {
         { item: 'runeBar', qty: 1, chance: 1 / 16 },
         { item: 'uncutRuby', qty: 1, chance: 1 / 16 },
         { item: 'uncutDiamond', min: 1, max: 2, chance: 1 / 30 },
+        { item: 'uncutDragonstone', qty: 1, chance: 1 / 48 },
         { item: 'salmon', min: 2, max: 4, chance: 1 / 8 }, // food for a fight that holds you in place
       ],
       rare: { chance: 1 / 256, table: [{ item: 'vineWhip', qty: 1 }] },
@@ -575,7 +577,7 @@ export const ENEMIES = {
     look: { skin: '#3a2a5a', hair: '#1a1028', tunic: '#2a1e40', pants: '#1a1028', belt: '#1a1028', eyes: '#5ff0ff' },
     examine: 'A thing made of shadow, with eyes like cold fire. It moves too quickly.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }],
+      always: [{ item: 'bones', qty: 1 }, { item: 'stalkerHide', qty: 1 }],
       main: [
         { item: 'coins', min: 40, max: 150, chance: 1 / 3 },
         { item: 'coal', min: 2, max: 4, chance: 1 / 4 },

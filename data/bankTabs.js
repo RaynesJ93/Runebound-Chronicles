@@ -17,7 +17,7 @@ export const BANK_TABS = [
 
 // Things that aren't weapons or armour but live with the tools.
 const TOOLS = new Set(['hammer', 'knife', 'chisel', 'needle', 'thread', 'ringMould', 'amuletMould', 'smallNet', 'fishingRod', 'flyFishingRod', 'fishingBait']);
-const GEMS = new Set(['sapphire', 'emerald', 'ruby', 'diamond', 'gemBag']);
+const GEMS = new Set(['sapphire', 'emerald', 'ruby', 'diamond', 'dragonstone', 'gemBag']);
 
 export function tabOf(id) {
   const def = ITEMS[id];

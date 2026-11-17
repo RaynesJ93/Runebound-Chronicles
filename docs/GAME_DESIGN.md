@@ -399,6 +399,28 @@ Earth and fire runes are also sold in the magic shop.
 
 *v0.51.3, painted art* (the "Lumenhaven Images 01–07" sheets): Lumenhaven has its own ground (`theme: 'fae'`: fae grass, violet paths, moonstone market paving and a starlit pool); painted fae stalls, a well of starlight, fae lanterns, giant toadstools and crystal clusters, all glowing in the dark (decor props can have `light`); the fairy ring you arrive by (v0.51.4: moved up into the open, clear of the edge trees); and a straight bridge of glowing moonstone across the pool to the cosmic island (it replaces the wooden causeway). The eight new altars (two frames: the second glows brighter), the eight new rune icons (spells use them too) and the glimmerwisp, fae sentinel and hollow shade are all painted.
 
+### Skill review, batch 3: dragonstone and ranged hide armour (v0.52.0)
+
+**Dragonstone.** The top gem. Uncut dragonstones drop from ember wyrms (1 in 64) and vinegrasp horrors (1 in 48). Cut with a chisel at **Crafting 55** (137.5 XP). Cast at a furnace with a mould, like the other gems:
+
+| Item | Crafting | XP | Bonus |
+| --- | --- | --- | --- |
+| Silver dragonstone ring | 70 | 90 | +2 all attack and defence, +1 Strength |
+| Silver dragonstone amulet | 72 | 95 | +4 all, +2 Strength |
+| Gold dragonstone ring | 76 | 100 | +4 all, +2 Strength |
+| Gold dragonstone amulet | 80 | 105 | +8 all, +4 Strength |
+
+**Ranged hide armour, two new tiers** (filling the gap between studded at Ranged 15 and the top bows). Both tan at Hilda's tanning rack; the rack menu only shows the special hides when you carry them. Chaps take 2 leather and bodies 3 (one thread each). Leather and hides stack to 20.
+
+| Tier | Hide from | Tan | Vambraces | Chaps | Body | Wear |
+| --- | --- | --- | --- | --- | --- | --- |
+| Stalkerhide | Night stalkers (lvl 35, the Hollow), always 1 | Crafting 38 | 40 | 44 | 48 | Ranged 30 (body also Defence 25) |
+| Wyrmhide | Ember wyrms (lvl 72, Slayer 60), always 1 | Crafting 57 | 60 | 65 | 72 | Ranged 50 (body also Defence 40) |
+
+Stats: stalkerhide vambraces Ranged +6; chaps Ranged +8, ranged def 12; body Ranged +11, ranged def 32. Wyrmhide vambraces Ranged +9; chaps Ranged +10, ranged def 18; body Ranged +15, ranged def 40. (Studded body: Ranged +8, ranged def 26.)
+
+Art is recoloured stand-ins (ruby art turned violet; leather art in shadow-purple and wyrm-red) until painted sheets arrive.
+
 ### Skill review, batch 1: trees, bows, fish and food (v0.50.0)
 
 The skill review (16 Nov 2026) found Woodcutting stopped at 15, bows at Fletching 25, Fishing at 30 and Cooking at 25 (the best food healed 9). Batch 1 takes all four to the high levels. (Batch 2: Magic and Runecrafting; batch 3: Crafting and ranged armour; batch 4: polish.)
