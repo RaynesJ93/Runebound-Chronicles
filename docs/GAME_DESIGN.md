@@ -403,7 +403,7 @@ Earth and fire runes are also sold in the magic shop.
 
 Old Bessie lives in her own pen at the east end of Brambleford's cow field (fenced off at x 53, gate in the middle; sign "OLD BESSIE'S PEN"). She's a big toffee-brown cow (stand-in art: the cow, 1.4x and recoloured).
 
-- **Level 18, 30 HP, needs Slayer 20.** Max hit 3 (crush), slow (6 ticks), not aggressive, respawns in 2 minutes. Shows as a boss on the map and gets the gold boss health bar.
+- **Level 18, 30 HP, needs Slayer 20.** Max hit 3 (crush), slow (6 ticks), not aggressive, respawns in 30 seconds (v0.53.1; was 2 minutes). Shows as a boss on the map and gets the gold boss health bar.
 - **Stomp:** every 10 ticks she moos and the ground goes red under you and the four tiles next to you (2 ticks of warning). Step diagonally away; if it lands it hits 0–2. Uses the Grubnak slam code (`mechanics` in data/enemies.js).
 - **Balance:** sim: a level 20 with a steel scimitar always wins, losing about a quarter of their HP; level 15 with iron wins 19 in 20. In game, a level 20 in steel who never eats or dodges a stomp ends on 1–13 of 20 HP. Easier than the Alpha Wolf.
 - **Drops.** Always bones, **2–5 cowhides** and 2–3 raw beef. Main table (one roll): coins 80–250 (1/5), steel bars 2–4 (1/8), steel med helm and scimitar (1/10 each), steel chainbody (1/12), steel platelegs and kiteshield (1/14 each), steel platebody (1/18), mithril arrowtips 10–25 (1/20), mithril med helm and dagger (1/28 each). Rare roll 1 in 24: **15 cowhides**, a **mithril scimitar** or a mithril sq shield. Unique 1 in 128: **Bessie's cowbell** (neck: +3 all defences, +1 Strength).
