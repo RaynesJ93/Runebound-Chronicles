@@ -1407,19 +1407,17 @@ function boot() {
   // rock for a while.
   const GATHER = {
     tree: { skill: 'woodcutting', defs: TREES, tools: AXES, ticks: SWING_TICKS, tool: 'axe', item: (d) => d.log,
-      start: 'You swing your axe at the tree.', noTool: 'You need an axe to chop down this tree. Bram might lend you one.',
+      noTool: 'You need an axe to chop down this tree. Bram might lend you one.',
       levelMsg: (d) => `You need a Woodcutting level of ${d.level} to chop down this tree.`, gone: 'This tree has been chopped down. It will grow back soon.',
-      got: (d) => `You get some ${itemName(d.log).toLowerCase()}.`,
       fell: (d) => (d.deplete >= 1 ? 'The tree falls. It will grow back in a little while.' : 'The oak has no more good wood for now.') },
     ore: { skill: 'mining', defs: ROCKS, tools: PICKAXES, ticks: MINE_TICKS, tool: 'pickaxe', item: (d) => d.ore,
-      start: 'You swing your pickaxe at the rock.', noTool: 'You need a pickaxe to mine this rock. Dorrin might lend you one.',
+      noTool: 'You need a pickaxe to mine this rock. Dorrin might lend you one.',
       levelMsg: (d) => `You need a Mining level of ${d.level} to mine this rock.`, gone: 'There is no ore left in this rock right now.',
-      got: (d) => `You manage to mine some ${itemName(d.ore).toLowerCase().replace(' ore', '')}.`,
       fell: (d) => (d.lasts ? 'The rock is mined out for now.' : null) },
     // Fishing: each spot has its own tool (and bait), and several fish.
     fishingSpot: { skill: 'fishing', defs: SPOTS, ticks: FISH_TICKS, tool: 'fishing gear', perSpot: true,
       item: (d) => d.catches.at(-1).item, levelMsg: (d) => `You need a Fishing level of ${spotLevel(d)} to fish here.`,
-      gone: '', got: () => '', fell: () => null },
+      gone: '', fell: () => null },
   };
   // What a fishing attempt catches, if anything: the best fish you can, else lesser ones.
   const rollCatch = (d) => {
@@ -1457,7 +1455,7 @@ function boot() {
     combat.stop();
     player.faceTowards(trunk(prop).x, trunk(prop).y);
     activity = { kind: 'gather', prop, g, d, next: ticker.count + 2, since: time };
-    hud.message(g.perSpot ? d.start : g.start);
+    // (no "You swing your pickaxe..." message: the animation shows it, v0.51.2)
   };
 
   const gatherStep = (a) => {
@@ -1471,13 +1469,13 @@ function boot() {
     if (rng() >= chance) return;
     const item = d.gems ? rollGem(rng) : g.item(d);
     if (!inventory.add(item, 1)) { hud.message(fullBag(g)); stopActivity(); return; }
-    hud.message(d.gems ? `You find an ${itemName(item).toLowerCase()}!` : g.got(d));
+    hud.itemDrop(item, 1);
     book.add(g.skill, d.xp);
     if (prop.star) { refreshInventory(); starMined(a); return; }
     // Mining sometimes turns up a gem too.
     if (g.skill === 'mining' && d.ore !== 'runeEssence' && !d.gems && rng() < gemChance(book.level('mining'))) {
       const gem = rollGem(rng);
-      if (inventory.add(gem, 1)) hud.message(`You find an ${itemName(gem).toLowerCase()}!`);
+      if (inventory.add(gem, 1)) hud.itemDrop(gem, 1);
     }
     refreshInventory();
     // Some rocks give several ores before they empty (a random number each refill).
@@ -1510,8 +1508,7 @@ function boot() {
     if (!inventory.room(c.item, 1)) { hud.message(fullBag(a.g)); stopActivity(); return; }
     if (d.bait) inventory.remove(d.bait, 1);
     inventory.add(c.item, 1);
-    const name = itemName(c.item).toLowerCase().replace('raw ', '');
-    hud.message(/s$/.test(name) ? `You catch some ${name}.` : `You catch ${/^[aeiou]/.test(name) ? 'an' : 'a'} ${name}.`);
+    hud.itemDrop(c.item, 1);
     book.add('fishing', c.xp);
     refreshInventory();
     // stop once none of the fish you can catch here would fit
@@ -1533,7 +1530,7 @@ function boot() {
     combat.stop();
     player.faceTowards(prop.tiles[0].x, prop.tiles[0].y);
     activity = { kind: 'runecraft', prop, alt, next: ticker.count + 2, since: time };
-    hud.message(`You hold the essence up to the ${alt.name.toLowerCase()}...`);
+    // (no "You hold the essence up..." message: the runes pop up when they're made)
   };
   const runecraftStep = (a) => {
     const n = inventory.count('runeEssence');
@@ -1543,7 +1540,7 @@ function boot() {
     inventory.remove('runeEssence', n);
     inventory.add(a.alt.rune, n * per);
     const total = n * per;
-    hud.message(`You bind the essence into ${total.toLocaleString('en-GB')} ${itemName(a.alt.rune).toLowerCase()}${total === 1 ? '' : 's'}.`);
+    hud.itemDrop(a.alt.rune, total);
     book.add('runecrafting', a.alt.xp * n);
     refreshInventory();
     save();
@@ -1718,28 +1715,23 @@ function boot() {
     // Some makes can fail (burnt food): the materials are used up anyway.
     if (r.success && rng() >= r.success(book.level(skillOf(r)))) {
       for (const [id, q] of Object.entries(r.failGives || {})) inventory.add(id, q * k);
-      hud.message(r.fail || 'You fail.');
+      // a burn shows as "+1 Burnt fish"; a fail with nothing to show keeps its message
+      const failOut = Object.entries(r.failGives || {})[0];
+      if (failOut) hud.itemDrop(failOut[0], failOut[1] * k); else hud.message(r.fail || 'You fail.');
       refreshInventory();
       return;
     }
     for (const [id, q] of Object.entries(r.gives)) inventory.add(id, q * k);
     const [outId, outQ] = Object.entries(r.gives)[0];
     const n = outQ * k;
-    const name = itemName(outId).toLowerCase();
-    const an = /^[aeiou]/.test(name) ? 'an' : 'a';
+    // v0.51.2: what you made pops up ("+1 Steel bar"); special makes keep their line
     if (r.msg && k === 1) hud.message(r.msg);
-    else if (n > 1) hud.message(`You make ${n} ${name}${/s$/.test(name) ? '' : 's'}.`);
-    else if (r.station === 'furnace') hud.message(`You smelt the ore into ${an} ${name}.`);
-    else if (r.station === 'anvil') hud.message(`You hammer the metal into ${an} ${name}.`);
-    else if (r.station === 'fire') hud.message(`You cook the ${r.name.toLowerCase()}.`);
-    else if (r.station === 'tan') hud.message(`You tan the hide into ${name}.`);
-    else if (r.skill === 'crafting') hud.message(`You sew ${/s$/.test(name) ? 'some' : an} ${name}.`);
-    else hud.message(`You carve the logs into ${an} ${name}.`);
+    else hud.itemDrop(outId, n);
     book.add(skillOf(r), r.xp * k);
     // From Smithing 40, the anvil sometimes gives a bar back.
     if (r.station === 'anvil' && r.bar && rng() < saveBarChance(book.level('smithing'))) {
       inventory.add(r.bar, 1);
-      hud.message(`You manage to save ${/^[aeiou]/i.test(itemName(r.bar)) ? 'an' : 'a'} ${itemName(r.bar).toLowerCase()}.`);
+      hud.itemDrop(r.bar, 1); // a bar saved at the anvil
     }
     a.made++;
     refreshInventory();
