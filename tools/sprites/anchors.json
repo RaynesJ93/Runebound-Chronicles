@@ -79,6 +79,54 @@
   4,
   5
  ],
+ "gear:goldDragonstoneAmulet:down": [
+  3,
+  17
+ ],
+ "gear:goldDragonstoneAmulet:up": [
+  4,
+  14
+ ],
+ "gear:silverDragonstoneAmulet:down": [
+  3,
+  17
+ ],
+ "gear:silverDragonstoneAmulet:up": [
+  4,
+  14
+ ],
+ "gear:stalkerhideBody:down": [
+  4,
+  15
+ ],
+ "gear:stalkerhideBody:left": [
+  4,
+  15
+ ],
+ "gear:stalkerhideBody:right": [
+  4,
+  15
+ ],
+ "gear:stalkerhideBody:up": [
+  4,
+  15
+ ],
+ "gear:stalkerhideChaps:down": [
+  4,
+  9
+ ],
+ "gear:stalkerhideChaps:left": [
+  4,
+  9
+ ],
+ "gear:stalkerhideChaps:right": [
+  2,
+  9
+ ],
+ "gear:stalkerhideChaps:up": [
+  6,
+  9
+ ],
  "gear:superiorSlayerHelmet:down": [
   6,
   30
@@ -126,6 +174,38 @@
  "gear:wraithboneStaff:up": [
   -2,
   17
+ ],
+ "gear:wyrmhideBody:down": [
+  4,
+  15
+ ],
+ "gear:wyrmhideBody:left": [
+  4,
+  15
+ ],
+ "gear:wyrmhideBody:right": [
+  4,
+  15
+ ],
+ "gear:wyrmhideBody:up": [
+  4,
+  15
+ ],
+ "gear:wyrmhideChaps:down": [
+  4,
+  9
+ ],
+ "gear:wyrmhideChaps:left": [
+  4,
+  9
+ ],
+ "gear:wyrmhideChaps:right": [
+  2,
+  9
+ ],
+ "gear:wyrmhideChaps:up": [
+  6,
+  9
  ],
  "gear:wyrmscaleBoots:down": [
   4,

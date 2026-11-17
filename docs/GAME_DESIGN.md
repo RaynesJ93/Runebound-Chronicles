@@ -419,7 +419,7 @@ Earth and fire runes are also sold in the magic shop.
 
 Stats: stalkerhide vambraces Ranged +6; chaps Ranged +8, ranged def 12; body Ranged +11, ranged def 32. Wyrmhide vambraces Ranged +9; chaps Ranged +10, ranged def 18; body Ranged +15, ranged def 40. (Studded body: Ranged +8, ranged def 26.)
 
-Art is recoloured stand-ins (ruby art turned violet; leather art in shadow-purple and wyrm-red) until painted sheets arrive.
+Art: painted sheets (v0.52.1, set `batch3` in tools/new_art.py, which keys magenta strictly so the violet gems survive). Amulets facing left/right stay recoloured from the ruby amulet.
 
 ### Skill review, batch 1: trees, bows, fish and food (v0.50.0)
 

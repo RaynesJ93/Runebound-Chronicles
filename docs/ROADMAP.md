@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 17 Nov 2026 | v0.52.1: Painted art for batch 3: dragonstone gems and jewellery, stalker and wyrm hides and leathers, stalkerhide and wyrmhide armour (icons, plus the bodies, chaps and dragonstone amulets as worn). |
 | 17 Nov 2026 | v0.52.0: Skill review batch 3. Dragonstone (cut at Crafting 55, jewellery 70–80, from ember wyrms and vinegrasp horrors) and two tiers of ranged hide armour: stalkerhide (night stalkers, wear at Ranged 30) and wyrmhide (ember wyrms, wear at Ranged 50). Stand-in art. |
 | 17 Nov 2026 | v0.51.6: Willow, maple, yew, magic and elder logs now stack to 20 like other skilling materials (logs, ores and bars stack by name pattern, so new ones always will); loose stacks in your bag merge when the game loads. |
 | 17 Nov 2026 | v0.51.5: Thornwood's fairy ring nudged up a row and the trees just south of it cleared, so the whole ring shows instead of hiding behind the southern tree line. |

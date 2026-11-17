@@ -28,6 +28,11 @@ Sets:
                 item icons (2_, 3 x 3: logs, lobster pot, harpoon, stew,
                 burnt pie), bows (3_, 5 x 2: shortbows, longbows) and fish
                 (4_, 5 x 2: raw, cooked). Held bows stay derived.
+  batch3        (17 Nov 2026) Skill review batch 3: item icons (1_, rows of
+                5/5/3/3: dragonstone gems and jewellery, hides, leathers,
+                stalkerhide and wyrmhide armour) and worn views (2_, 5 x 4:
+                the two bodies and chaps facing down/up/left/right, then the
+                gold and silver dragonstone amulets facing down and up).
   slayercaves   (15 Nov 2026) The Slayer Caverns' four sections: for each,
                 a sheet of floor + wall textures (1A, 2A...) and a 3 x 2
                 sheet of decorations (1B, 2B...).
@@ -283,6 +288,83 @@ elif SET == 'batch1':
     for row, raw in zip(fish, (True, False)):
         for im, f in zip(row, ('Lobster', 'Swordfish', 'Monkfish', 'Shark', 'CaveEel')):
             icon(im, f'raw{f}' if raw else f[0].lower() + f[1:])
+
+elif SET == 'batch3':
+    from scipy import ndimage
+    path = lambda p: glob.glob(os.path.join(SRC, p + '*.png'))[0]
+
+    def boxed(im, size, fit):
+        k = min(fit / im.width, fit / im.height)
+        sm = scaled(im, k)
+        c = Image.new('RGBA', (size, size))
+        c.alpha_composite(sm, ((size - sm.width) // 2, (size - sm.height) // 2))
+        return c
+
+    def strict_key(rgb):
+        """Violet gems sit close to magenta, so only near-pure magenta is keyed
+        out, and only pixels touching the background are despilled."""
+        r, g, b = [rgb[..., k].astype(np.int32) for k in range(3)]
+        m = np.minimum(r, b) - g - np.abs(r - b) // 2
+        bg = m > 170
+        edge = ndimage.binary_dilation(bg, iterations=1) & ~bg & (m > 40)
+        out = rgb.copy()
+        out[..., 0][edge] = np.minimum(r[edge], g[edge] + 40)
+        out[..., 2][edge] = np.minimum(b[edge], g[edge] + 40)
+        return out, np.where(bg, 0, 255).astype(np.uint8)
+
+    def rows_of(p, n, grow):
+        """Blobs grouped into rows by height on the sheet (rows can differ in length)."""
+        rgb, alpha = strict_key(np.array(Image.open(p).convert('RGB')))
+        on = alpha > 0
+        lab, m = ndimage.label(ndimage.binary_dilation(on, iterations=grow))
+        boxes = ndimage.find_objects(lab)
+        sizes = ndimage.sum(on, lab, range(1, m + 1))
+        blobs = []
+        for i in sorted(range(m), key=lambda i: -sizes[i])[:n]:
+            sy, sx = boxes[i]
+            a = np.where((lab[sy, sx] == i + 1) & on[sy, sx], alpha[sy, sx], 0)
+            im = Image.fromarray(np.dstack([rgb[sy, sx], a]).astype(np.uint8), 'RGBA')
+            blobs.append(((sy.start + sy.stop) / 2, (sx.start + sx.stop) / 2, im.crop(im.getbbox())))
+        blobs.sort(key=lambda b: b[0])
+        rows, gap = [], on.shape[0] / 12
+        for b in blobs:
+            if rows and b[0] - rows[-1][-1][0] < gap: rows[-1].append(b)
+            else: rows.append([b])
+        return [[b[2] for b in sorted(r, key=lambda b: b[1])] for r in rows]
+
+    names = [['uncutDragonstone', 'dragonstone', 'silverDragonstoneRing', 'goldDragonstoneRing', 'goldDragonstoneAmulet'],
+             ['silverDragonstoneAmulet', 'stalkerHide', 'wyrmHide', 'stalkerLeather', 'wyrmhideLeather'],
+             ['stalkerhideVambraces', 'stalkerhideChaps', 'stalkerhideBody'],
+             ['wyrmhideVambraces', 'wyrmhideChaps', 'wyrmhideBody']]
+    rows = rows_of(path('1_'), 16, 10)
+    assert [len(r) for r in rows] == [5, 5, 3, 3], [len(r) for r in rows]
+    for row, ns in zip(rows, names):
+        for im, item in zip(row, ns):
+            boxed(im, 32, 28).save(os.path.join(OUT, f'icon__{item}.png'))
+            boxed(im, 16, 15).save(os.path.join(OUT, f'iconS__{item}.png'))
+
+    # Worn: each fits inside the box of the studded / gold amulet art it replaces, bottoms lined up.
+    meta = json.load(open(os.path.join(ROOT, 'assets', 'art.json')))
+    anchors = {}
+    views = rows_of(path('2_'), 20, 10)
+    assert [len(r) for r in views] == [4, 4, 4, 4, 4], [len(r) for r in views]
+    jobs = []
+    for row, item, ref in zip(views[:4], ('stalkerhideBody', 'stalkerhideChaps', 'wyrmhideBody', 'wyrmhideChaps'),
+                              ('studdedBody', 'studdedChaps', 'studdedBody', 'studdedChaps')):
+        jobs += [(im, item, ref, d) for im, d in zip(row, DIRS)]
+    am = views[4]
+    jobs += [(am[0], 'goldDragonstoneAmulet', 'goldRubyAmulet', 'down'), (am[1], 'goldDragonstoneAmulet', 'goldRubyAmulet', 'up'),
+             (am[2], 'silverDragonstoneAmulet', 'silverRubyAmulet', 'down'), (am[3], 'silverDragonstoneAmulet', 'silverRubyAmulet', 'up')]
+    for im, item, ref, d in jobs:
+        x, y, w, h, ax, ay = meta[f'gear:{ref}:{d}'][0]
+        sm = scaled(im, min((w + 1) / im.width, (h + 1) / im.height))
+        key = f'gear:{item}:{d}'
+        sm.save(os.path.join(OUT, key.replace(':', '__') + '.png'))
+        anchors[key] = [round(sm.width / 2 + (ax - w / 2)), sm.height + (ay - h)]
+    p = os.path.join(OUT, 'anchors.json')
+    old = json.load(open(p)) if os.path.exists(p) else {}
+    old.update(anchors)
+    json.dump(old, open(p, 'w'), indent=1, sort_keys=True)
 
 elif SET in ('slayercaves', 'overgrowth'):
     from seamless import seamless
