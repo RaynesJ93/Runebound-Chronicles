@@ -40,7 +40,7 @@ import { TASKS, taskById, pickTask, pointsFor, SKIP_COST, BLOCK_COST, MAX_BLOCKS
 import { SMELTING, SMITHING, saveBarChance } from '../data/smithing.js';
 import { SPOTS, FISH_TICKS, spotLevel } from '../data/fishing.js';
 import { COOKING } from '../data/cooking.js';
-import { TANNING, SEWING, CRAFT_GROUP, CUTTING, JEWELLERY, STUDDING } from '../data/crafting.js';
+import { TANNING, SEWING, CRAFT_GROUP, LEATHERS, CUTTING, JEWELLERY, STUDDING } from '../data/crafting.js';
 import { ALTARS, runesPerEssence } from '../data/runecrafting.js';
 import { mapPlace } from './ui/map.js';
 
@@ -469,11 +469,12 @@ function boot() {
     if (!def) return null;
     if (GROUP_OF[id]) return () => fletchMenu(GROUP_OF[id], x, y);
     if (id in CRAFT_GROUP) {
-      const group = CRAFT_GROUP[id] || (inventory.count('leather') ? 'leather' : inventory.count('hardLeather') ? 'hardLeather' : null);
+      const group = CRAFT_GROUP[id] || LEATHERS.find((l) => inventory.count(l)) || null;
       return () => sewMenu(group, x, y);
     }
     if (ITEMS[id]?.noted) return () => hud.message(`These are bank notes. Put them in a bank, or a supply chest (Copperdeep Mine or Whispering Vale), to turn them back into ${itemName(ITEMS[id].noted).toLowerCase()}.`);
     if (id === 'cowhide') return () => hud.message("Tan cowhides into leather at Hilda's tanning rack, by the cow field.");
+    if (id === 'stalkerHide' || id === 'wyrmHide') return () => hud.message(`Tan ${itemName(id).toLowerCase()}s at Hilda's tanning rack, by the cow field (Crafting ${TANNING.find((r) => r.uses[id]).level}).`);
     if (/^raw/.test(id)) return () => hud.message('Cook this on a fire: the cooking pit by the pond, or the goblins\' campfire.');
     if (CUT_FROM[id] || id === 'chisel') return () => cutMenu(x, y);
     if (id === 'steelStuds') return () => studMenu(x, y);
@@ -1582,10 +1583,13 @@ function boot() {
       fn: () => startMake(r),
     });
     if (kind === 'tan') {
-      if (!inventory.count('cowhide')) { hud.message('You need cowhides to tan. The cows in the field drop them.'); return; }
+      const hides = [...new Set(TANNING.map((r) => Object.keys(r.uses)[0]))];
+      const nHides = hides.reduce((n, h) => n + inventory.count(h), 0);
+      if (!nHides) { hud.message('You need hides to tan. Cows drop cowhides; night stalkers and ember wyrms drop tougher hides.'); return; }
       const cl = book.level('crafting');
-      hud.showMenu(pos.x, pos.y, `Tanning rack (${inventory.count('cowhide')} hides)`, [
-        ...TANNING.map((r) => ({ label: `${r.name}${cl < r.level ? ` — needs level ${r.level}` : ''}`, icon: itemIcon(r.id).url, fn: () => startMake(r) })),
+      hud.showMenu(pos.x, pos.y, `Tanning rack (${nHides} hides)`, [
+        // cowhide makes leather or hard leather; other hides only show if you have them
+        ...TANNING.filter((r) => Object.keys(r.uses)[0] === 'cowhide' || inventory.count(Object.keys(r.uses)[0])).map((r) => ({ label: `${r.name}${Object.keys(r.uses)[0] !== 'cowhide' ? ` (${inventory.count(Object.keys(r.uses)[0])} ${itemName(Object.keys(r.uses)[0]).toLowerCase()})` : ''}${cl < r.level ? ` — needs level ${r.level}` : ''}`, icon: itemIcon(r.id).url, fn: () => startMake(r) })),
         { label: 'Cancel', fn: () => {} },
       ]);
       return;
@@ -1672,13 +1676,13 @@ function boot() {
 
   // Sewing leather: tap leather (or the needle) and pick what to make.
   const sewMenu = (group, x, y) => {
-    if (!group) { hud.message('You need some leather to sew. Tan cowhides at the tanning rack.'); return; }
+    if (!group) { hud.message('You need some leather to sew. Tan hides at the tanning rack.'); return; }
     if (!inventory.count('needle')) { hud.message('You need a needle to sew leather. Hilda or Pell can help.'); return; }
     const lvl = book.level('crafting');
     const list = SEWING.filter((r) => r.group === group);
     hud.showMenu(x, y, `Sew ${itemName(group).toLowerCase()}`, [
       ...list.map((r) => ({
-        label: `${r.name}${lvl < r.level ? ` — needs level ${r.level}` : ''}`,
+        label: `${r.name}${r.uses[group] > 1 ? ` (${r.uses[group]} leather)` : ''}${lvl < r.level ? ` — needs level ${r.level}` : ''}`,
         icon: itemIcon(r.id).url,
         fn: () => (inventory.count('thread') ? startMake(r) : hud.message('You need some thread. Pell sells it.')),
       })),

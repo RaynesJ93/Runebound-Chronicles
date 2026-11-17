@@ -1049,6 +1049,33 @@ DERIVED['prospectorJacket'] = dict(icon=('leatherBody', lum_to(CANVAS)), small=(
 DERIVED['prospectorLegs'] = dict(icon=('leatherChaps', lum_to(CANVAS_DARK)), small=('leatherChaps', lum_to(CANVAS_DARK)), gear=('leatherChaps', lum_to(CANVAS_DARK)))
 DERIVED['prospectorBoots'] = dict(icon=('leatherBoots', lum_to(BOOT_LEATHER)), small=('leatherBoots', lum_to(BOOT_LEATHER)), gear=('leatherBoots', lum_to(BOOT_LEATHER)))
 
+# Skill review batch 3 (v0.52.0): dragonstone (ruby art turned violet) and two
+# tiers of ranged hide armour (leather art recoloured). Stand-ins until painted.
+def red_to_violet(im, get=None):
+    """Only the red gem pixels turn violet; gold, silver and outlines stay put."""
+    rgba = np.array(im.convert('RGBA'))
+    hsv = np.array(im.convert('RGB').convert('HSV')).astype(np.int16)
+    h, sat = hsv[..., 0], hsv[..., 1]
+    gem = (rgba[..., 3] > 0) & ((h < 14) | (h > 228)) & (sat > 70)
+    hsv[..., 0] = np.where(gem, 196, h)
+    rgb = np.array(Image.fromarray(hsv.clip(0, 255).astype(np.uint8), 'HSV').convert('RGB'))
+    out = rgba.copy(); out[..., :3] = np.where(gem[..., None], rgb, rgba[..., :3])
+    return Image.fromarray(out, 'RGBA')
+
+STALKER = ramp_to(['#0c0814', '#241a38', '#45386a', '#8a7cb8'])
+WYRMHIDE = ramp_to(['#200604', '#5e140a', '#a83018', '#f0884a'])
+DERIVED['uncutDragonstone'] = dict(icon=('uncutRuby', red_to_violet))
+DERIVED['dragonstone'] = dict(icon=('ruby', red_to_violet))
+for metal in ('silver', 'gold'):
+    DERIVED[f'{metal}DragonstoneRing'] = dict(icon=(f'{metal}RubyRing', red_to_violet))
+    DERIVED[f'{metal}DragonstoneAmulet'] = dict(icon=(f'{metal}RubyAmulet', red_to_violet), gear=(f'{metal}RubyAmulet', red_to_violet))
+for tier, fn in (('stalker', STALKER), ('wyrm', WYRMHIDE)):
+    DERIVED[f'{tier}Hide'] = dict(icon=('cowhide', fn))
+    DERIVED[f'{tier}{"hide" if tier == "wyrm" else ""}Leather'] = dict(icon=('hardLeather', fn))
+    DERIVED[f'{tier}hideVambraces'] = dict(icon=('leatherVambraces', fn))
+    DERIVED[f'{tier}hideChaps'] = dict(icon=('leatherChaps', fn), small=('leatherChaps', fn), gear=('leatherChaps', fn))
+    DERIVED[f'{tier}hideBody'] = dict(icon=('leatherBody', fn), small=('leatherBody', fn), gear=('leatherBody', fn))
+
 # Other sprites: new key <- source key, every frame.
 
 # ---- v0.50.0 trees: the oak's and pine's canopies recoloured (trunks kept) ----

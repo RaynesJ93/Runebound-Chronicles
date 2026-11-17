@@ -1044,6 +1044,53 @@ export const ITEMS = {
     name: 'Goblin war-charm', value: 250, rare: true, examine: 'A tooth-and-bead charm. Goblins swear it brings luck in battle.',
     equip: { slot: 'neck', req: {}, att: { stab: 3, slash: 3, crush: 3 }, def: { stab: 1, slash: 1, crush: 1 }, str: 2 },
   },
+  // ---- Skill review batch 3 (v0.52.0): dragonstone and two tiers of ranged hide armour ----
+  uncutDragonstone: { name: 'Uncut dragonstone', value: 2500, examine: 'A rough violet gem, warm from a wyrm\'s hoard. Cut it with a chisel (Crafting 55).' },
+  dragonstone: { name: 'Dragonstone', value: 3750, examine: 'A cut dragonstone. Set it in a ring or amulet at a furnace (Crafting 70+).' },
+  silverDragonstoneRing: {
+    name: 'Silver dragonstone ring', value: 4000, examine: 'A silver dragonstone ring. It makes you better at everything.',
+    equip: { slot: 'ring', req: {}, att: { stab: 2, slash: 2, crush: 2, ranged: 2, magic: 2 }, def: { stab: 2, slash: 2, crush: 2, ranged: 2, magic: 2 }, str: 1 },
+  },
+  silverDragonstoneAmulet: {
+    name: 'Silver dragonstone amulet', value: 4000, examine: 'A silver dragonstone amulet. It makes you better at everything.',
+    equip: { slot: 'neck', req: {}, att: { stab: 4, slash: 4, crush: 4, ranged: 4, magic: 4 }, def: { stab: 4, slash: 4, crush: 4, ranged: 4, magic: 4 }, str: 2 },
+  },
+  goldDragonstoneRing: {
+    name: 'Gold dragonstone ring', value: 4800, examine: 'A gold dragonstone ring. It makes you better at everything.',
+    equip: { slot: 'ring', req: {}, att: { stab: 4, slash: 4, crush: 4, ranged: 4, magic: 4 }, def: { stab: 4, slash: 4, crush: 4, ranged: 4, magic: 4 }, str: 2 },
+  },
+  goldDragonstoneAmulet: {
+    name: 'Gold dragonstone amulet', value: 4800, examine: 'A gold dragonstone amulet. It makes you better at everything.',
+    equip: { slot: 'neck', req: {}, att: { stab: 8, slash: 8, crush: 8, ranged: 8, magic: 8 }, def: { stab: 8, slash: 8, crush: 8, ranged: 8, magic: 8 }, str: 4 },
+  },
+  stalkerHide: { name: 'Stalker hide', value: 40, examine: 'A dark hide that drinks the light. Tan it at the tanning rack (Crafting 38).' },
+  stalkerLeather: { name: 'Stalker leather', value: 70, examine: 'Supple, shadow-dark leather. Sew it with a needle and thread.' },
+  stalkerhideVambraces: {
+    name: 'Stalkerhide vambraces', value: 300, examine: 'Dark leather arm guards. Needs Ranged 30.',
+    equip: { slot: 'hands', req: { ranged: 30 }, att: { ranged: 6 }, def: { stab: 3, slash: 3, crush: 3, ranged: 3, magic: 1 } },
+  },
+  stalkerhideChaps: {
+    name: 'Stalkerhide chaps', value: 600, examine: 'Leggings of shadow-dark leather. Needs Ranged 30.',
+    equip: { slot: 'legs', req: { ranged: 30 }, att: { ranged: 8, magic: -4 }, def: { stab: 8, slash: 9, crush: 10, ranged: 12, magic: 5 }, look: { pants: '#2a1e40' } },
+  },
+  stalkerhideBody: {
+    name: 'Stalkerhide body', value: 900, examine: 'A body of shadow-dark leather. Needs Ranged 30 and Defence 25.',
+    equip: { slot: 'body', req: { ranged: 30, defence: 25 }, att: { ranged: 11, magic: -7 }, def: { stab: 22, slash: 28, crush: 28, ranged: 32, magic: 12 }, look: { tunic: '#2a1e40' } },
+  },
+  wyrmHide: { name: 'Wyrm hide', value: 120, examine: 'A scaled hide, still warm. Tan it at the tanning rack (Crafting 57).' },
+  wyrmhideLeather: { name: 'Wyrmhide leather', value: 200, examine: 'Tough red scaled leather. Sew it with a needle and thread.' },
+  wyrmhideVambraces: {
+    name: 'Wyrmhide vambraces', value: 1000, examine: 'Scaled arm guards from an ember wyrm. Needs Ranged 50.',
+    equip: { slot: 'hands', req: { ranged: 50 }, att: { ranged: 9 }, def: { stab: 4, slash: 4, crush: 4, ranged: 4, magic: 2 } },
+  },
+  wyrmhideChaps: {
+    name: 'Wyrmhide chaps', value: 2000, examine: 'Scaled leggings from an ember wyrm. Needs Ranged 50.',
+    equip: { slot: 'legs', req: { ranged: 50 }, att: { ranged: 10, magic: -6 }, def: { stab: 12, slash: 14, crush: 16, ranged: 18, magic: 8 }, look: { pants: '#6a160c' } },
+  },
+  wyrmhideBody: {
+    name: 'Wyrmhide body', value: 3000, examine: 'A scaled body from an ember wyrm. Needs Ranged 50 and Defence 40.',
+    equip: { slot: 'body', req: { ranged: 50, defence: 40 }, att: { ranged: 15, magic: -10 }, def: { stab: 30, slash: 34, crush: 36, ranged: 40, magic: 20 }, look: { tunic: '#6a160c' } },
+  },
 };
 
 // Potions: 4, 3, 2 and 1 dose versions. Each dose boosts one skill by
@@ -1067,7 +1114,7 @@ for (const [skill, name, value] of [['attack', 'Attack', 60], ['strength', 'Stre
 // - weapons, armour, tools and potions: 1 (they don't stack)
 // The bank stacks everything without limit.
 // (by name pattern, so new logs, ores and bars stack too: v0.51.6 fixed willow to elder logs)
-const STACK_20 = /^(logs|[a-z]+Logs|[a-z]+Ore|coal|[a-z]+Bar|uncut[A-Z]\w*|sapphire|emerald|ruby|diamond|runeEssence|cowhide|wolfPelt|leather|hardLeather|raw[A-Z]\w*|burnt[A-Z]\w*)$/;
+const STACK_20 = /^(logs|[a-z]+Logs|[a-z]+Ore|coal|[a-z]+Bar|uncut[A-Z]\w*|sapphire|emerald|ruby|diamond|dragonstone|runeEssence|cowhide|wolfPelt|[a-z]+Hide|leather|hardLeather|[a-z]+Leather|raw[A-Z]\w*|burnt[A-Z]\w*)$/;
 for (const [id, it] of Object.entries(ITEMS)) {
   if (STACK_20.test(id) || it.food) { it.stackable = true; it.stack = 20; }
   else if (it.stackable) it.stack = id === 'coins' ? Infinity : 999;

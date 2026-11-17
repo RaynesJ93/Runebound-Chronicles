@@ -1,17 +1,19 @@
 // Crafting: tanning hides at a tanning rack, then sewing leather with a needle
 // and thread. Same recipe shape as fletching.js. Each sewn item uses 1 thread.
 
-const tan = (id, name, level, xp) => ({
-  id, name, level, xp, uses: { cowhide: 1 }, gives: { [id]: 1 }, ticks: 2, skill: 'crafting', station: 'tan',
+const tan = (id, name, level, xp, hide = 'cowhide') => ({
+  id, name, level, xp, uses: { [hide]: 1 }, gives: { [id]: 1 }, ticks: 2, skill: 'crafting', station: 'tan',
 });
-const sew = (id, name, level, xp, leather = 'leather') => ({
-  id, name, level, xp, uses: { [leather]: 1, thread: 1 }, gives: { [id]: 1 }, tool: 'needle', ticks: 3, skill: 'crafting',
-  group: leather === 'leather' ? 'leather' : 'hardLeather',
+const sew = (id, name, level, xp, leather = 'leather', n = 1) => ({
+  id, name, level, xp, uses: { [leather]: n, thread: 1 }, gives: { [id]: 1 }, tool: 'needle', ticks: 3, skill: 'crafting',
+  group: leather,
 });
 
 export const TANNING = [
   tan('leather', 'Leather', 1, 2),
   tan('hardLeather', 'Hard leather', 6, 4),
+  tan('stalkerLeather', 'Stalker leather', 38, 6, 'stalkerHide'),
+  tan('wyrmhideLeather', 'Wyrmhide leather', 57, 8, 'wyrmHide'),
 ];
 
 export const SEWING = [
@@ -26,10 +28,18 @@ export const SEWING = [
   sew('hardLeatherCowl', 'Hard leather cowl', 18, 31, 'hardLeather'),
   sew('hardLeatherBody', 'Hard leather body', 20, 35, 'hardLeather'),
   sew('hardLeatherChaps', 'Hard leather chaps', 22, 36, 'hardLeather'),
+  // v0.52.0: the bigger pieces take 2 or 3 leather (one thread each)
+  sew('stalkerhideVambraces', 'Stalkerhide vambraces', 40, 40, 'stalkerLeather'),
+  sew('stalkerhideChaps', 'Stalkerhide chaps', 44, 80, 'stalkerLeather', 2),
+  sew('stalkerhideBody', 'Stalkerhide body', 48, 120, 'stalkerLeather', 3),
+  sew('wyrmhideVambraces', 'Wyrmhide vambraces', 60, 62, 'wyrmhideLeather'),
+  sew('wyrmhideChaps', 'Wyrmhide chaps', 65, 124, 'wyrmhideLeather', 2),
+  sew('wyrmhideBody', 'Wyrmhide body', 72, 186, 'wyrmhideLeather', 3),
 ];
 
 // Tapping one of these items opens the sewing menu for that leather.
-export const CRAFT_GROUP = { leather: 'leather', hardLeather: 'hardLeather', needle: null, thread: null };
+export const CRAFT_GROUP = { leather: 'leather', hardLeather: 'hardLeather', stalkerLeather: 'stalkerLeather', wyrmhideLeather: 'wyrmhideLeather', needle: null, thread: null };
+export const LEATHERS = ['leather', 'hardLeather', 'stalkerLeather', 'wyrmhideLeather'];
 
 // Gem cutting: tap an uncut gem (or the chisel). One gem per cut.
 const cut = (gem, name, level, xp) => ({
@@ -41,11 +51,12 @@ export const CUTTING = [
   cut('emerald', 'Emerald', 27, 67.5),
   cut('ruby', 'Ruby', 34, 85),
   cut('diamond', 'Diamond', 43, 107.5),
+  cut('dragonstone', 'Dragonstone', 55, 137.5),
 ];
 
 // Jewellery: cast at a furnace with a ring or amulet mould. Silver or gold,
 // plain or set with a cut gem. Silver is easier; gold gives twice the bonus.
-const GEM_XP = { sapphire: 25, emerald: 35, ruby: 45, diamond: 60 };
+const GEM_XP = { sapphire: 25, emerald: 35, ruby: 45, diamond: 60, dragonstone: 75 };
 const jewel = (metal, gem, kind, level, xp) => {
   const cap = (w) => w[0].toUpperCase() + w.slice(1);
   const id = `${metal}${gem ? cap(gem) : ''}${cap(kind)}`;
@@ -67,6 +78,8 @@ export const JEWELLERY = [
   jewel('gold', 'emerald', 'ring', 32, 25), jewel('gold', 'emerald', 'amulet', 35, 30),
   jewel('gold', 'ruby', 'ring', 38, 25), jewel('gold', 'ruby', 'amulet', 42, 30),
   jewel('gold', 'diamond', 'ring', 47, 25), jewel('gold', 'diamond', 'amulet', 50, 30),
+  jewel('silver', 'dragonstone', 'ring', 70, 15), jewel('silver', 'dragonstone', 'amulet', 72, 20),
+  jewel('gold', 'dragonstone', 'ring', 76, 25), jewel('gold', 'dragonstone', 'amulet', 80, 30),
 ];
 
 // Studding: tap steel studs with a leather body or chaps in your bag.

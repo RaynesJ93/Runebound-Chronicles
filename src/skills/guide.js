@@ -96,6 +96,8 @@ const BUILD = {
     { title: 'Tanning (tanning rack)', rows: recipes(TANNING) },
     { title: 'Leather (needle and thread)', rows: recipes(SEWING.filter((r) => r.group === 'leather')) },
     { title: 'Hard leather (needle and thread)', rows: recipes(SEWING.filter((r) => r.group === 'hardLeather')) },
+    { title: 'Stalker leather (needle and thread)', rows: recipes(SEWING.filter((r) => r.group === 'stalkerLeather')) },
+    { title: 'Wyrmhide leather (needle and thread)', rows: recipes(SEWING.filter((r) => r.group === 'wyrmhideLeather')) },
     { title: 'Studded leather (steel studs)', rows: recipes(STUDDING) },
     { title: 'Gem cutting (chisel)', rows: recipes(CUTTING) },
     { title: 'Silver jewellery (furnace and mould)', rows: recipes(JEWELLERY.filter((r) => r.metal === 'silverBar')) },
