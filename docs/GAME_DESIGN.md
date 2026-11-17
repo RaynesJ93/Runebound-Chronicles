@@ -855,6 +855,10 @@ A cave system behind Kesta's camp in south-west Thornwood: the mouth is in a roc
 - The caverns are on the map ("Slayer Caverns" tab). The monsters' old spots (Depths, Hollow, Warrens, Forge) stay too.
 - Kesta's tips for these tasks mention the caverns.
 
+### Item pop-ups (v0.51.2)
+
+Gathering and making no longer print a line each time ("You swing your pickaxe at the rock.", "You manage to mine some iron.", "You smelt the ore into a bar."): the animation already shows what you're doing. Instead, what you get pops up as "+1 Iron ore" with its icon, just under its XP drop, top right (`hud.itemDrop`). It covers mining (and gems), woodcutting, fishing, runecrafting ("+20 Cosmic rune"), smelting, smithing (and saved bars), cooking (a burn shows as "+1 Burnt fish"), fletching and crafting. Messages you need to read stay: a full bag, a level or tool you're missing, a rock or tree running out. Hidden with the XP drops if you turn those off.
+
 ### Walking through monsters (v0.49.4)
 
 You can walk through monsters (tapping or holding a direction), so a crowd can't corner you. Monsters still don't overlap each other, and villagers still block you (you wait, then go round). Tech: `area.isFree`/`canStep` take `who`; `'player'` ignores monsters in `dynamicBlock` (player moves and the player's pathfinding).

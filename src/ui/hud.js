@@ -879,6 +879,19 @@ export class Hud {
     });
   }
 
+  // Floating "+1 Iron ore" with the item's icon, in the same corner as the XP
+  // drops (v0.51.2: instead of "You manage to mine some iron." messages).
+  itemDrop(id, qty = 1) {
+    if (this.showXpDrops === false || !qty) return;
+    const box = this.$('xp-drops');
+    const d = document.createElement('div');
+    d.className = 'xp-drop item-drop';
+    d.innerHTML = `<span class="xp-part"><img class="px" src="${itemIcon(id).url}" alt=""><span>+${qty.toLocaleString('en-GB')} ${ITEMS[id]?.name || id}</span></span>`;
+    box.appendChild(d);
+    while (box.children.length > 4) box.firstChild.remove();
+    setTimeout(() => d.remove(), 1900);
+  }
+
   levelUp(skillId, skillName, level) {
     const el = this.$('levelup');
     this.$('levelup-icon').src = iconUrl(skillId);
