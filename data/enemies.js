@@ -47,7 +47,7 @@ export const ENEMIES = {
     id: 'oldBessie', name: 'Old Bessie', level: 18, hp: 30, sprite: 'cow', slayer: 20, boss: true,
     attack: 8, strength: 8, defence: 8,
     attackBonus: 0, strengthBonus: 0, defenceBonus: 4, maxHit: 3,
-    speed: 6, attackType: 'crush', aggressive: false, wander: 1, leash: 4, respawn: 120,
+    speed: 6, attackType: 'crush', aggressive: false, wander: 1, leash: 4, respawn: 30,
     look: { hide: '#f2eee6', patch: '#2b2622' },
     examine: 'The biggest, oldest, grumpiest cow in Brambleford. Nobody milks Old Bessie.',
     // Boss mechanics (bossTick in src/combat/combat.js): a stomp you can step away from.
