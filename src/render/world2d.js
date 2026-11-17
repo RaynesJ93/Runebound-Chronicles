@@ -316,6 +316,7 @@ export function createWorldView(canvasEl, area) {
     for (const p of area.props) {
       let def = LIGHT[p.type];
       if (p.type === 'altar') def = LIGHT.altar[p.variant];
+      if (p.type === 'decor' && p.light) def = p.light; // a painted decoration that glows (fae lanterns...)
       if (p.type === 'ore' && ORE_GLOW[p.variant]) def = ORE_GLOW[p.variant];
       else if (p.type === 'ore' && p.variant !== 'essence') def = null;
       if (!def) continue;

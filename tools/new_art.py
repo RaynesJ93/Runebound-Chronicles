@@ -21,9 +21,9 @@ Sets:
   vinegrasp-art (16 Nov 2026) The vinegrasp horror (1_), the six slayer gear
                 icons (2_, 3 x 2) and the whip, staff and two boots worn or
                 held facing down/up/left/right (3_, 4 x 4).
-  fae-standins  (16 Nov 2026) Stand-in sprites for Lumenhaven's monsters until
-                they have painted art: the air elemental, bandit and restless
-                ghost recoloured (pass any folder).
+  lumenhaven    (17 Nov 2026) Lumenhaven (01_-07_): four ground textures, eight
+                decorations, the eight new altars (two frames: the second
+                glows brighter), eight rune icons and three monsters.
   batch1        (16 Nov 2026) Skill review batch 1: five trees (1_, a row),
                 item icons (2_, 3 x 3: logs, lobster pot, harpoon, stew,
                 burnt pie), bows (3_, 5 x 2: shortbows, longbows) and fish
@@ -199,29 +199,59 @@ elif SET == 'vinegrasp-art':
     old.update(anchors)
     json.dump(old, open(p, 'w'), indent=1, sort_keys=True)
 
-elif SET == 'fae-standins':
-    def recolour(src_key, dst_key, ramp, glow=None):
-        src = os.path.join(OUT, src_key.replace(':', '__'))
-        frames = []
-        for k in range(len(os.listdir(src))):
-            a = np.array(Image.open(os.path.join(src, f'{k}.png')).convert('RGBA')).astype(np.float32)
-            m = a[..., 3] > 0
-            lum = (a[..., 0] * 0.3 + a[..., 1] * 0.59 + a[..., 2] * 0.11) / 255
-            lo, hi = np.percentile(lum[m], 2), np.percentile(lum[m], 98)
-            t = np.clip((lum - lo) / max(1e-3, hi - lo), 0, 1)
-            r = np.array(ramp, np.float32)
-            x = t * (len(r) - 1)
-            i0 = np.clip(np.floor(x).astype(int), 0, len(r) - 2)
-            f = (x - i0)[..., None]
-            col = r[i0] * (1 - f) + r[i0 + 1] * f
-            if glow is not None:
-                col[t > 0.9] = glow
-            a[m, :3] = col[m]
-            frames.append(Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA'))
-        save_frames(dst_key, frames)
-    recolour('chars:enemy:airElemental', 'chars:enemy:glimmerwisp', [[20, 60, 90], [60, 150, 200], [150, 225, 245], [235, 252, 255]], glow=[255, 255, 255])
-    recolour('chars:enemy:bandit', 'chars:enemy:faeSentinel', [[10, 30, 20], [30, 90, 60], [90, 160, 100], [220, 210, 130], [250, 245, 210]], glow=[170, 255, 210])
-    recolour('chars:enemy:restlessGhost', 'chars:enemy:hollowShade', [[8, 6, 14], [30, 22, 48], [70, 56, 100], [140, 120, 190]], glow=[200, 168, 255])
+elif SET == 'lumenhaven':
+    from seamless import seamless
+    from scipy import ndimage
+    path = lambda p: glob.glob(os.path.join(SRC, p + '*.png'))[0]
+
+    def boxed(im, size, fit):
+        k = min(fit / im.width, fit / im.height)
+        sm = scaled(im, k)
+        c = Image.new('RGBA', (size, size))
+        c.alpha_composite(sm, ((size - sm.width) // 2, (size - sm.height) // 2))
+        return c
+
+    # 01: four textures, 2 x 2 (grass, path, market paving, starlit water)
+    rgb, alpha = key_magenta(np.array(Image.open(path('01_')).convert('RGB')))
+    lab, n = ndimage.label(alpha > 0)
+    boxes = sorted(ndimage.find_objects(lab), key=lambda b: -(b[0].stop - b[0].start) * (b[1].stop - b[1].start))[:4]
+    boxes.sort(key=lambda b: (round(b[0].start / 200), b[1].start))
+    for (sy, sx), name in zip(boxes, ('faeGrass', 'faePath', 'faePlaza', 'faeWater0')):
+        im = Image.fromarray(rgb[sy.start + 6:sy.stop - 6, sx.start + 6:sx.stop - 6].astype(np.uint8))
+        t = shrink(seamless(im).convert('RGBA'), w=64, h=64, outline=False, colors=40)
+        t.save(os.path.join(OUT, f'tex__{name}.png'))
+        if name == 'faeWater0':
+            # the second water frame: shifted a little, with the sparkles brighter
+            a = np.roll(np.array(t).astype(np.float32), (2, 3), axis=(0, 1))
+            lum = a[..., :3].mean(2)
+            a[lum > np.percentile(lum, 94), :3] *= 1.25
+            Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA').save(os.path.join(OUT, 'tex__faeWater1.png'))
+    # 02: eight decorations, 4 x 2 (game-pixel widths)
+    decor = [im for row in grid_cells(path('02_'), rows=2, cols=4, grow=10) for im in row]
+    for im, (key, w) in zip(decor, (('faeStallLeaf', 30), ('faeStallSilk', 30), ('starWell', 22), ('faeLantern', 17),
+                                    ('giantToadstool', 22), ('crystalCluster', 16), ('fairyRing', 32), ('faeBridge', 32))):
+        scaled(im, w / im.width).save(os.path.join(OUT, f'decor__{key}.png'))
+    # 03: eight altars, 4 x 2, as wide as the air altar; frame 2 glows brighter
+    altars = [im for row in grid_cells(path('03_'), rows=2, cols=4, grow=10) for im in row]
+    for im, v in zip(altars, ('earth', 'fire', 'body', 'cosmic', 'chaos', 'nature', 'law', 'death')):
+        a = scaled(im, 48 / im.width)
+        d = os.path.join(OUT, f'altar__{v}')
+        os.makedirs(d, exist_ok=True)
+        a.save(os.path.join(d, '0.png'))
+        b = np.array(a).astype(np.float32)
+        lum = b[..., :3].max(2)
+        glow = (b[..., 3] > 0) & (lum > np.percentile(lum[b[..., 3] > 0], 85))
+        b[glow, :3] = b[glow, :3] * 1.18 + 18
+        Image.fromarray(b.clip(0, 255).astype(np.uint8), 'RGBA').save(os.path.join(d, '1.png'))
+    # 04: eight rune icons, 4 x 2
+    runes = [im for row in grid_cells(path('04_'), rows=2, cols=4, grow=6) for im in row]
+    for im, r in zip(runes, ('earth', 'fire', 'body', 'cosmic', 'chaos', 'nature', 'law', 'death')):
+        boxed(im, 32, 28).save(os.path.join(OUT, f'icon__{r}Rune.png'))
+        boxed(im, 16, 15).save(os.path.join(OUT, f'iconS__{r}Rune.png'))
+    # 05-07: the three monsters (side rows: left, then right)
+    for prefix, key, height in (('05_', 'glimmerwisp', 20), ('06_', 'faeSentinel', 28), ('07_', 'hollowShade', 30)):
+        frames, _ = walk_frames(grid_cells(path(prefix), grow=10), ('left', 'right'), height)
+        save_frames(f'chars:enemy:{key}', frames)
 
 elif SET == 'batch1':
     path = lambda p: glob.glob(os.path.join(SRC, p + '*.png'))[0]
@@ -355,5 +385,5 @@ elif SET == 'images01-09':
     old.update(anchors)
     json.dump(old, open(path, 'w'), indent=1, sort_keys=True)
 else:
-    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, overgrowth, slayergear, vinegrasp-art, batch1 or fae-standins')
+    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, overgrowth, slayergear, vinegrasp-art, batch1 or lumenhaven')
 print('done')

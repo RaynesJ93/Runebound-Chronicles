@@ -65,7 +65,9 @@ const TEX = {};
 function textures(theme) {
   if (TEX[theme]) return TEX[theme];
   const t = (n) => texture(n);
-  TEX[theme] = theme === 'vale'
+  TEX[theme] = theme === 'fae' // Lumenhaven (v0.51.3)
+    ? { flowers: [], grass: t('faeGrass'), path: t('faePath'), plaza: t('faePlaza'), sand: t('faePath'), dirt: t('faePath'), water: [t('faeWater0'), t('faeWater1')], cave: t('cave'), rockwall: t('rockwall'), bridge: t('bridge'), floor: t('floor') }
+    : theme === 'vale'
     ? { flowers: flowerMasks([t('valeBlue'), t('valePurple')]), grass: t('valeGrass'), path: t('valePath'), sand: t('valePath'), water: [t('valeWater0'), t('valeWater1')], cave: t('cave'), rockwall: t('rockwall'), bridge: t('bridge'), floor: t('floor') }
     : { flowers: flowerMasks([t('grassPink'), t('grassYellow')]), wall: t('wall'), grass: t('grass'), path: t('path'), plaza: t('plaza'), sand: t('sand'), dirt: t('dirt'), water: [t('water0'), t('water1')], bridge: t('bridge'), floor: t('floor'), cave: t('cave'), rockwall: t('rockwall') };
   return TEX[theme];
@@ -287,8 +289,8 @@ function drawBridges(area, g, frames) {
 }
 
 export function buildGround(area) {
-  P = area.theme === 'vale' ? VALE : BASE;
-  const T = textures(area.theme === 'vale' ? 'vale' : 'base');
+  P = area.theme === 'vale' || area.theme === 'fae' ? VALE : BASE;
+  const T = textures(area.theme === 'vale' || area.theme === 'fae' ? area.theme : 'base');
   const W = area.W * TILE;
   const H = area.H * TILE;
   const frames = [new Bitmap(W, H), new Bitmap(W, H)];
