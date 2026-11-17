@@ -1216,6 +1216,7 @@ def derive(get0):
             gs, gf = spec['gear']
             for d in DIRS:
                 f = same if (d in ('left', 'right') and gf is kite) else gf
+                if os.path.exists(os.path.join(SPRITE_DIR, f'gear__{new}__{d}.png')): continue  # painted
                 for k, im, ax, ay in get(f'gear:{gs}:{d}'):
                     emit((f'gear:{new}:{d}', k, f(im, get), ax, ay))
     for new, src, fn in EXTRA:
