@@ -254,14 +254,15 @@ export function buildRoute1() {
   clearArea(36, 33, 42, 38);
 
   // A fairy ring of mushrooms, deep in the woods
-  clearArea(66, 86, 74, 92);
+  // (v0.51.5: nudged up a row and the trees south of it thinned, so it isn't hidden by the tree line)
+  clearArea(63, 86, 77, 93);
   for (let k = 0; k < 10; k++) {
     const a = (k / 10) * Math.PI * 2;
-    one('mushrooms', Math.round(70 + Math.cos(a) * 3), Math.round(89 + Math.sin(a) * 2.2), { blocks: false });
+    one('mushrooms', Math.round(70 + Math.cos(a) * 3), Math.round(88 + Math.sin(a) * 2.2), { blocks: false });
   }
 
   // A glowing rune stone stands in the middle of the ring
-  one('runeStone', 70, 89, { interact: ['A standing stone carved with a glowing rune.', 'The mushrooms around it grow in a perfect circle. Nobody planted them.', 'Step into the ring beside it and the air shimmers: it leads somewhere else.'] });
+  one('runeStone', 70, 88, { interact: ['A standing stone carved with a glowing rune.', 'The mushrooms around it grow in a perfect circle. Nobody planted them.', 'Step into the ring beside it and the air shimmers: it leads somewhere else.'] });
 
   // ---- The mine entrance: a timbered tunnel in a rock face at the end of the north-west road ----
   for (let x = 24; x <= 37; x++) for (let y = 0; y <= 1; y++) {
@@ -329,7 +330,7 @@ export function buildRoute1() {
       { tiles: [{ x: 7, y: 7 }], to: 'warrens', at: { x: 22, y: 35 }, facing: Math.PI, when: (f) => !!f.caveOpen },
       { tiles: [{ x: 38, y: 75 }], to: 'slayerCave', at: { x: 32, y: 42 }, facing: Math.PI },
       // v0.51.0: step into the fairy ring and you're pulled into Lumenhaven
-      { tiles: [{ x: 69, y: 89 }, { x: 71, y: 89 }, { x: 70, y: 88 }, { x: 70, y: 90 }], to: 'lumenhaven', at: { x: 36, y: 46 }, facing: Math.PI },
+      { tiles: [{ x: 69, y: 88 }, { x: 71, y: 88 }, { x: 70, y: 87 }, { x: 70, y: 89 }], to: 'lumenhaven', at: { x: 36, y: 46 }, facing: Math.PI },
     ],
     spawns: [
       // v0.46.0: giant spiders in the watchtower ruins, crabs on the lake shore,

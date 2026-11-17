@@ -361,7 +361,7 @@ The review found Runecrafting had only three runes and Magic only two spells. Ba
 | Law | 54 | 9.5 | — | Lumenhaven: the crystal shrine (east) |
 | Death | 65 | 10 | — | Lumenhaven: the shadow hollow (far north, deepest) |
 
-**Lumenhaven, the hidden fae city** (inspired by OSRS's Zanaris). Step into the fairy ring in south-east Thornwood and you're pulled into a hidden realm: always night, lit by glowing toadstools, crystals and fae lanterns; winding paths between still dark pools; a market square of stalls at the centre where you arrive. The five high altars are spread around it, the deadliest furthest in. It's dangerous: three fae monsters roam it, and their drops are the way to get high runes (and extra essence) before you can craft them yourself.
+**Lumenhaven, the hidden fae city** (inspired by OSRS's Zanaris). Step into the fairy ring in south-east Thornwood (just south of the road; v0.51.5 cleared the trees below it so the whole ring shows) and you're pulled into a hidden realm: always night, lit by glowing toadstools, crystals and fae lanterns; winding paths between still dark pools; a market square of stalls at the centre where you arrive. The five high altars are spread around it, the deadliest furthest in. It's dangerous: three fae monsters roam it, and their drops are the way to get high runes (and extra essence) before you can craft them yourself.
 
 | Monster | Level | HP | Max hit | Attack | Where | Drops (highlights) |
 | --- | --- | --- | --- | --- | --- | --- |

@@ -171,7 +171,7 @@ export function buildLumenhaven() {
     spawn: { x: 36, y: 46, facing: Math.PI },
     exits: [
       // step back into the fairy ring
-      { tiles: [{ x: 36, y: 49 }, { x: 37, y: 49 }], to: 'route1', at: { x: 70, y: 92 }, facing: 0 },
+      { tiles: [{ x: 36, y: 49 }, { x: 37, y: 49 }], to: 'route1', at: { x: 70, y: 91 }, facing: 0 },
     ],
     spawns: [
       // glimmerwisps: the market's edges and the pools

@@ -58,7 +58,7 @@ export const LABELS = {
     { x: 15, y: 21, text: "Hermit's hut" },
     { x: 93, y: 76, text: 'Old farmstead' },
     { x: 100, y: 37, text: 'Stone shrine' },
-    { x: 76, y: 88, text: 'Fairy ring' },
+    { x: 76, y: 87, text: 'Fairy ring' },
     { x: 7, y: 5, text: 'Sealed cave' },
   ],
   mine: [
