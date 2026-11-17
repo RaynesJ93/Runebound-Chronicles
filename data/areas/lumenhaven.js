@@ -85,21 +85,29 @@ export function buildLumenhaven() {
   path([14, 30], [11, 24], [13, 18]);                         // temple → glade
   path([42, 37], [50, 38], [56, 36]);                         // market → crystal shrine
   path([36, 33], [37, 26], [36, 20], [36, 12]);               // market → north → hollow
-  path([37, 26], [44, 23], [49, 21]);                         // → the causeway to the cosmic island
-  // the causeway across the pool (a bridge of fae light)
-  for (let k = 0; k <= 6; k++) { const x = 50 + k, y = 20 - Math.round(k * 0.5); for (const [dx, dy] of [[0, 0], [1, 0]]) { ground[i(x + dx, y + dy)] = GROUND.BRIDGE; blocked[i(x + dx, y + dy)] = 0; keep[i(x + dx, y + dy)] = 1; } }
+  path([37, 26], [42, 21], [45, 14]);                         // → the bridge to the cosmic island
+  // The bridge of fae light across the pool (v0.51.3: painted, straight across from the west):
+  // the water stays water underneath but you can walk on it.
+  for (let x = 47; x <= 54; x++) { blocked[i(x, 14)] = 0; keep[i(x, 14)] = 1; }
 
   // ---- The fairy ring you arrive by -------------------------------------------------------
-  for (let k = 0; k < 10; k++) {
-    const a = (k / 10) * Math.PI * 2;
-    one('glowShrooms', Math.round(36 + Math.cos(a) * 3), Math.round(53 + Math.sin(a) * 2.2), { blocks: false });
-  }
+  // Painted decorations (decor:<key>); light: they glow in the dark
+  const decor = (key, x, y, name, text, opt = {}) => {
+    const tiles = opt.wide ? [{ x, y }, { x: x + 1, y }] : [{ x, y }];
+    if (!tiles.every((t) => free(t.x, t.y))) return;
+    prop('decor', tiles, { art: key, name, flat: !!opt.flat, blocks: !opt.walk, light: opt.light, interact: [text] });
+  };
+  const LANTERN = ['#bfe8ff', 52, true];
+  decor('fairyRing', 36, 53, 'fairy ring', 'A ring of glowing toadstools. Step into it to go home.', { wide: true, flat: true, walk: true, light: ['#9fe8ff', 40] });
+  for (let x = 47; x <= 53; x += 2) decor('faeBridge', x, 14, 'bridge of light', 'A bridge of glowing moonstone over the starlit pool.', { wide: true, flat: true, walk: true, light: ['#9fd8ff', 22] });
   one('sign', 39, 49, { interact: ['LUMENHAVEN', 'The hidden city of the fae. Step back into the ring to go home.', 'The altars lie beyond the market. Beware: the fae do not welcome visitors.'] });
 
   // ---- The market square -------------------------------------------------------------------
-  for (const [x, y] of [[30, 34], [33, 34], [39, 34], [42, 34], [30, 41], [42, 41]]) one('stall', x, y, { interact: ['A fae market stall. Its wares shimmer and change when you look away.'] });
-  for (const [x, y] of [[29, 38], [43, 38], [36, 33], [36, 42]]) one('lamp', x, y);
-  one('well', 36, 37, { interact: ['A well of liquid starlight. Coins at the bottom glitter like stars.'] });
+  [[30, 34], [33, 34], [39, 34], [41, 34], [30, 41], [41, 41]].forEach(([x, y], k) => decor(k % 2 ? 'faeStallSilk' : 'faeStallLeaf', x, y, 'fae stall',
+    k % 2 ? 'Silks and hanging crystals. The fae trader watches you and says nothing.' : 'Glowing jars and trinkets. Its wares shimmer and change when you look away.', { wide: true, light: ['#ffe0a0', 26] }));
+  for (const [x, y] of [[29, 38], [43, 38], [36, 33], [36, 42]]) decor('faeLantern', x, y, 'fae lantern', 'A flower of light hangs from a curling silver post.', { light: LANTERN });
+  decor('starWell', 36, 37, 'well of starlight', 'A well of liquid starlight. Coins at the bottom glitter like stars.', { light: ['#9fd8ff', 44] });
+  for (const [x, y] of [[29, 33], [43, 42]]) decor('giantToadstool', x, y, 'giant toadstool', 'A toadstool taller than you, glowing softly.', { light: ['#c8a8ff', 34] });
   for (const [x, y] of [[31, 37], [41, 39], [33, 40]]) put('glowFlowers', x, y, { blocks: false });
 
   // ---- The altars ------------------------------------------------------------------------------
@@ -132,11 +140,13 @@ export function buildLumenhaven() {
   for (const [x, y] of [[29, 5], [43, 5], [28, 9], [44, 9], [32, 3], [40, 3]]) put('tree', x, y, { variant: k2(x) ? 'dead' : 'gloom' });
   for (const [x, y] of [[33, 8], [40, 8], [35, 10], [38, 4]]) put('bones', x, y, { blocks: false });
   put('skeleton', 31, 7, { blocks: false, interact: ['Someone who came for the death runes.'] });
-  for (const [x, y] of [[34, 11], [39, 11]]) put('lamp', x, y);
+  for (const [x, y] of [[34, 11], [39, 11]]) decor('faeLantern', x, y, 'fae lantern', 'Even here, a lantern. Its light looks smaller than it should.', { light: LANTERN });
   one('sign', 37, 13, { interact: ['THE SHADOW HOLLOW', 'Turn back.'] });
 
   // Lamps along the paths
-  for (const [x, y] of [[23, 37], [13, 26], [49, 37], [38, 24], [45, 22], [36, 16]]) put('lamp', x, y);
+  for (const [x, y] of [[23, 37], [13, 26], [49, 37], [38, 24], [44, 17], [36, 16]]) decor('faeLantern', x, y, 'fae lantern', 'A flower of light hangs from a curling silver post.', { light: LANTERN });
+  // The crystal shrine gets big crystal clusters too
+  for (const [x, y] of [[57, 32], [65, 33]]) decor('crystalCluster', x, y, 'crystals', 'Pink and blue crystals, humming faintly.', { light: ['#e0b8ff', 26] });
 
   // ---- The rest: a fae wood of glowing toadstools, crystals and trees ----------------------------
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
@@ -148,13 +158,15 @@ export function buildLumenhaven() {
     else if (r < 0.12) one('glowShrooms', x, y, { blocks: false });
     else if (r < 0.145) one('glowFlowers', x, y, { blocks: false });
     else if (r < 0.155) one('crystalShard', x, y);
+    else if (r < 0.163) decor('giantToadstool', x, y, 'giant toadstool', 'A toadstool taller than you, glowing softly.', { light: ['#c8a8ff', 34] });
+    else if (r < 0.169) decor('crystalCluster', x, y, 'crystals', 'Pink and blue crystals, humming faintly.', { light: ['#e0b8ff', 26] });
   }
 
   return {
     id: 'lumenhaven',
     name: 'Lumenhaven',
     W, H, ground, blocked, props,
-    theme: 'vale', // night colours (until it has its own art)
+    theme: 'fae', // its own painted ground (v0.51.3)
     dark: true,
     spawn: { x: 36, y: 49, facing: Math.PI },
     exits: [

@@ -1105,12 +1105,7 @@ EXTRA = [
     ('grubnakStatue', 'chars:enemy:grubnak', stone_statue),
     ('lodestone', 'standingStone', lodestone_dormant),
     ('lodestoneLit', 'standingStone', lodestone_lit),
-    # v0.51.0 altars: the air altar recoloured (stand-ins)
-    *[(f'altar:{_v}', 'altar:air', ramp_to(_c)) for _v, _c in (
-        ('earth', ['#1a1006', '#5a3a1a', '#8ac04a', '#e8f0b0']), ('fire', ['#1a0604', '#6a1a0a', '#ff8a2a', '#fff0a0']),
-        ('body', ['#140e20', '#4a3a7a', '#a890d0', '#f0e8f8']), ('cosmic', ['#100c24', '#3a2e6a', '#e0c050', '#fff8c0']),
-        ('chaos', ['#1a0606', '#5a1a1a', '#e85a2a', '#ffe0a0']), ('nature', ['#061406', '#1a5a2a', '#5ad05a', '#e8ffd0']),
-        ('law', ['#0a1020', '#2a4a9a', '#a8c8ff', '#ffffff']), ('death', ['#040406', '#141418', '#4a4a5a', '#b0b0c0']))],
+    # (v0.51.0 altars: painted, tools/new_art.py lumenhaven)
 ]
 
 # Side-on shields stay as they are (a kite shape only reads from the front or back).
