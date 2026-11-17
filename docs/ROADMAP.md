@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 17 Nov 2026 | v0.53.0: Old Bessie, a starter boss cow in her own pen in the Brambleford cow field: level 18, 30 HP, Slayer 20, a dodgeable stomp. Drops 2–5 cowhides every kill, steel gear, some mithril, a rare 15 cowhides or mithril scimitar, and Bessie's cowbell (1/128). Kesta gives her as a boss task. |
 | 17 Nov 2026 | v0.52.1: Painted art for batch 3: dragonstone gems and jewellery, stalker and wyrm hides and leathers, stalkerhide and wyrmhide armour (icons, plus the bodies, chaps and dragonstone amulets as worn). |
 | 17 Nov 2026 | v0.52.0: Skill review batch 3. Dragonstone (cut at Crafting 55, jewellery 70–80, from ember wyrms and vinegrasp horrors) and two tiers of ranged hide armour: stalkerhide (night stalkers, wear at Ranged 30) and wyrmhide (ember wyrms, wear at Ranged 50). Stand-in art. |
 | 17 Nov 2026 | v0.51.6: Willow, maple, yew, magic and elder logs now stack to 20 like other skilling materials (logs, ores and bars stack by name pattern, so new ones always will); loose stacks in your bag merge when the game loads. |

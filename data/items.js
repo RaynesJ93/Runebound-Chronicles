@@ -1044,6 +1044,10 @@ export const ITEMS = {
     name: 'Goblin war-charm', value: 250, rare: true, examine: 'A tooth-and-bead charm. Goblins swear it brings luck in battle.',
     equip: { slot: 'neck', req: {}, att: { stab: 3, slash: 3, crush: 3 }, def: { stab: 1, slash: 1, crush: 1 }, str: 2 },
   },
+  bessiesCowbell: {
+    name: "Bessie's cowbell", value: 500, rare: true, examine: "Old Bessie's brass cowbell, dented from a hundred stomps. It still rings loud and clear.",
+    equip: { slot: 'neck', req: {}, def: { stab: 3, slash: 3, crush: 3, ranged: 3, magic: 3 }, str: 1 },
+  },
   // ---- Skill review batch 3 (v0.52.0): dragonstone and two tiers of ranged hide armour ----
   uncutDragonstone: { name: 'Uncut dragonstone', value: 2500, examine: 'A rough violet gem, warm from a wyrm\'s hoard. Cut it with a chisel (Crafting 55).' },
   dragonstone: { name: 'Dragonstone', value: 3750, examine: 'A cut dragonstone. Set it in a ring or amulet at a furnace (Crafting 70+).' },

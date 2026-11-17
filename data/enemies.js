@@ -42,6 +42,39 @@ export const ENEMIES = {
       each: [{ item: 'rawBeef', qty: 1, chance: 1 / 2 }],
     },
   },
+  // v0.53.0: a starter boss in her own pen at the east end of the cow field.
+  oldBessie: {
+    id: 'oldBessie', name: 'Old Bessie', level: 18, hp: 30, sprite: 'cow', slayer: 20, boss: true,
+    attack: 8, strength: 8, defence: 8,
+    attackBonus: 0, strengthBonus: 0, defenceBonus: 4, maxHit: 3,
+    speed: 6, attackType: 'crush', aggressive: false, wander: 1, leash: 4, respawn: 120,
+    look: { hide: '#f2eee6', patch: '#2b2622' },
+    examine: 'The biggest, oldest, grumpiest cow in Brambleford. Nobody milks Old Bessie.',
+    // Boss mechanics (bossTick in src/combat/combat.js): a stomp you can step away from.
+    mechanics: {
+      slamEvery: 10, slamWindup: 2, slamShape: 'plus', slamDmg: [0, 2],
+      slamText: 'Old Bessie lowers her head and lets out a furious MOO! Step away before she stomps!',
+      hitText: 'Old Bessie stomps on you!', clearText: 'You dodge out of the way of her hooves!',
+    },
+    loot: {
+      always: [{ item: 'bones', qty: 1 }, { item: 'cowhide', min: 2, max: 5 }, { item: 'rawBeef', min: 2, max: 3 }],
+      main: [
+        { item: 'coins', min: 80, max: 250, chance: 1 / 5 },
+        { item: 'steelBar', min: 2, max: 4, chance: 1 / 8 },
+        { item: 'steelMedHelm', qty: 1, chance: 1 / 10 },
+        { item: 'steelScimitar', qty: 1, chance: 1 / 10 },
+        { item: 'steelChainbody', qty: 1, chance: 1 / 12 },
+        { item: 'steelPlatelegs', qty: 1, chance: 1 / 14 },
+        { item: 'steelKiteshield', qty: 1, chance: 1 / 14 },
+        { item: 'steelPlatebody', qty: 1, chance: 1 / 18 },
+        { item: 'mithrilArrowtips', min: 10, max: 25, chance: 1 / 20 },
+        { item: 'mithrilMedHelm', qty: 1, chance: 1 / 28 },
+        { item: 'mithrilDagger', qty: 1, chance: 1 / 28 },
+      ],
+      each: [{ item: 'bessiesCowbell', qty: 1, chance: 1 / 128, rare: true }],
+      rare: { chance: 1 / 24, table: [{ item: 'cowhide', qty: 15 }, { item: 'mithrilScimitar', qty: 1 }, { item: 'mithrilSqShield', qty: 1 }] },
+    },
+  },
   chicken: {
     id: 'chicken', name: 'Chicken', level: 1, hp: 3, sprite: 'chicken',
     attack: 1, strength: 1, defence: 1,

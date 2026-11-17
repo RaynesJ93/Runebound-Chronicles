@@ -34,6 +34,8 @@ export const TASKS = [
   { id: 'bloodbats', name: 'bloodbats', monsters: ['bloodbat'], combat: 30, slayer: 25, amount: [20, 40], weight: 8 },
   { id: 'stoneWraiths', name: 'stone wraiths', monsters: ['stoneWraith'], combat: 45, slayer: 45, amount: [20, 40], weight: 8 },
   { id: 'vinegrasp', name: 'vinegrasp horrors', monsters: ['vinegraspHorror'], combat: 70, slayer: 70, amount: [15, 30], weight: 8 },
+  // v0.53.0: a boss task
+  { id: 'oldBessie', name: 'Old Bessies', monsters: ['oldBessie'], combat: 15, slayer: 20, amount: [3, 6], weight: 3 },
   { id: 'emberWyrms', name: 'ember wyrms', monsters: ['emberWyrm'], combat: 60, slayer: 60, amount: [15, 30], weight: 8 },
 ];
 
