@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 17 Nov 2026 | v0.51.6: Willow, maple, yew, magic and elder logs now stack to 20 like other skilling materials (logs, ores and bars stack by name pattern, so new ones always will); loose stacks in your bag merge when the game loads. |
 | 17 Nov 2026 | v0.51.5: Thornwood's fairy ring nudged up a row and the trees just south of it cleared, so the whole ring shows instead of hiding behind the southern tree line. |
 | 17 Nov 2026 | v0.51.4: Lumenhaven's fairy ring moved up into the open (it was half hidden behind the edge trees); you arrive just above it. |
 | 17 Nov 2026 | v0.51.3: painted art for batch 2: Lumenhaven's own ground, stalls, starlight well, glowing lanterns, toadstools and crystals, the fairy ring, a glowing bridge to the cosmic island; the eight new altars, eight rune icons and the three fae monsters. |
