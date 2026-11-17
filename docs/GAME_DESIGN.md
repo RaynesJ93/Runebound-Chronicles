@@ -401,7 +401,7 @@ Earth and fire runes are also sold in the magic shop.
 
 ### Old Bessie, the starter boss (v0.53.0)
 
-Old Bessie lives in her own pen at the east end of Brambleford's cow field (fenced off at x 53, gate in the middle; sign "OLD BESSIE'S PEN"). She's a big toffee-brown cow (stand-in art: the cow, 1.4x and recoloured).
+Old Bessie lives in her own pen at the east end of Brambleford's cow field (fenced off at x 53, gate in the middle; sign "OLD BESSIE'S PEN"). She's a big toffee-brown cow with horns, a nose ring and a brass bell (painted in v0.53.2, set `bessie` in tools/new_art.py; the cowbell worn facing down is hand-pixelled in tools/sprites).
 
 - **Level 18, 30 HP, needs Slayer 20.** Max hit 3 (crush), slow (6 ticks), not aggressive, respawns in 30 seconds (v0.53.1; was 2 minutes). Shows as a boss on the map and gets the gold boss health bar.
 - **Stomp:** every 10 ticks she moos and the ground goes red under you and the four tiles next to you (2 ticks of warning). Step diagonally away; if it lands it hits 0–2. Uses the Grubnak slam code (`mechanics` in data/enemies.js).

@@ -1,4 +1,12 @@
 {
+ "gear:bessiesCowbell:down": [
+  4,
+  16
+ ],
+ "gear:bessiesCowbell:up": [
+  4,
+  15
+ ],
  "gear:bronzeDart:down": [
   8,
   11
