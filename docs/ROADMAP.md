@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 17 Nov 2026 | v0.53.2: Painted art for Old Bessie (all four directions, walking) and Bessie's cowbell (icon and worn). |
 | 17 Nov 2026 | v0.53.1: Old Bessie respawns in 30 seconds instead of 2 minutes. |
 | 17 Nov 2026 | v0.53.0: Old Bessie, a starter boss cow in her own pen in the Brambleford cow field: level 18, 30 HP, Slayer 20, a dodgeable stomp. Drops 2–5 cowhides every kill, steel gear, some mithril, a rare 15 cowhides or mithril scimitar, and Bessie's cowbell (1/128). Kesta gives her as a boss task. |
 | 17 Nov 2026 | v0.52.1: Painted art for batch 3: dragonstone gems and jewellery, stalker and wyrm hides and leathers, stalkerhide and wyrmhide armour (icons, plus the bodies, chaps and dragonstone amulets as worn). |

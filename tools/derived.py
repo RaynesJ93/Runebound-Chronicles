@@ -902,12 +902,7 @@ EMBER = ramp_to(['#4a0c04', '#b8320a', '#ff8a2a', '#ffe68a'], light_only=True)
 # (Grubnak used to be the chief at twice the size; he has his own painted art
 # now, in tools/sprites/, so nothing is scaled at the moment.)
 SCALED = []
-# Old Bessie (v0.53.0): the cow, 1.4x bigger and toffee-brown, until she's painted.
-def bessie(im, get=None):
-    im = ramp_to(['#1c0e06', '#5a3014', '#a8682e', '#f0d2a0'])(im, get)
-    return im.resize((round(im.width * 1.4), round(im.height * 1.4)), Image.NEAREST)
-for _k in ('chars:enemy:cow', 'anim:cow:hit', 'anim:cow:fall', *(f'anim:cow:attack:{d}' for d in ('down', 'up', 'left', 'right'))):
-    SCALED.append((_k.replace('cow', 'oldBessie'), _k, bessie, 1.4))
+# Old Bessie was a scaled brown cow here until she was painted (v0.53.2, set bessie).
 
 
 # ---- What to make ------------------------------------------------------------------

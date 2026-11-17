@@ -28,6 +28,10 @@ Sets:
                 item icons (2_, 3 x 3: logs, lobster pot, harpoon, stew,
                 burnt pie), bows (3_, 5 x 2: shortbows, longbows) and fish
                 (4_, 5 x 2: raw, cooked). Held bows stay derived.
+  bessie        (17 Nov 2026) Old Bessie (1_, the usual 4 x 3 monster sheet;
+                rows: down, up, left, right) and Bessie's cowbell (2_, 1 x 3:
+                icon, worn facing down, worn facing up; tops lined up with the
+                gold amulet's). Left/right worn stay derived from the amulet.
   batch3        (17 Nov 2026) Skill review batch 3: item icons (1_, rows of
                 5/5/3/3: dragonstone gems and jewellery, hides, leathers,
                 stalkerhide and wyrmhide armour) and worn views (2_, 5 x 4:
@@ -289,6 +293,32 @@ elif SET == 'batch1':
         for im, f in zip(row, ('Lobster', 'Swordfish', 'Monkfish', 'Shark', 'CaveEel')):
             icon(im, f'raw{f}' if raw else f[0].lower() + f[1:])
 
+elif SET == 'bessie':
+    path = lambda p: glob.glob(os.path.join(SRC, p + '*.png'))[0]
+    frames, k = walk_frames(grid_cells(path('1_')), ('left', 'right'), 31)
+    save_frames('chars:enemy:oldBessie', frames)
+    print('oldBessie', frames[0].size, frames[6].size)
+
+    cells = grid_cells(path('2_'), rows=1, cols=3, grow=14)[0]
+    k = min(28 / cells[0].width, 28 / cells[0].height)
+    for size, fit in ((32, 28), (16, 15)):
+        sm = scaled(cells[0], min(fit / cells[0].width, fit / cells[0].height))
+        c = Image.new('RGBA', (size, size)); c.alpha_composite(sm, ((size - sm.width) // 2, (size - sm.height) // 2))
+        c.save(os.path.join(OUT, f'{"icon" if size == 32 else "iconS"}__bessiesCowbell.png'))
+    meta = json.load(open(os.path.join(ROOT, 'assets', 'art.json')))
+    anchors = {}
+    # (facing down is hand-pixelled in tools/sprites: shrunk from the sheet the bell went muddy)
+    for im, d, box in ((cells[2], 'up', (8, 4)),):
+        x, y, w, h, ax, ay = meta[f'gear:goldAmulet:{d}'][0]
+        sm = scaled(im, min(box[0] / im.width, box[1] / im.height))
+        key = f'gear:bessiesCowbell:{d}'
+        sm.save(os.path.join(OUT, key.replace(':', '__') + '.png'))
+        anchors[key] = [round(sm.width / 2 + (ax - w / 2)), ay]   # tops lined up with the amulet
+    p = os.path.join(OUT, 'anchors.json')
+    old = json.load(open(p)) if os.path.exists(p) else {}
+    old.update(anchors)
+    json.dump(old, open(p, 'w'), indent=1, sort_keys=True)
+
 elif SET == 'batch3':
     from scipy import ndimage
     path = lambda p: glob.glob(os.path.join(SRC, p + '*.png'))[0]
@@ -467,5 +497,5 @@ elif SET == 'images01-09':
     old.update(anchors)
     json.dump(old, open(path, 'w'), indent=1, sort_keys=True)
 else:
-    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, overgrowth, slayergear, vinegrasp-art, batch1 or lumenhaven')
+    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, overgrowth, slayergear, vinegrasp-art, batch1, lumenhaven, batch3 or bessie')
 print('done')
