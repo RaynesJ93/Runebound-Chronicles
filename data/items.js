@@ -1066,7 +1066,8 @@ for (const [skill, name, value] of [['attack', 'Attack', 60], ['strength', 'Stre
 // - coins: no limit
 // - weapons, armour, tools and potions: 1 (they don't stack)
 // The bank stacks everything without limit.
-const STACK_20 = /^(logs|oakLogs|copperOre|tinOre|ironOre|coal|silverOre|goldOre|mithrilOre|adamantiteOre|runiteOre|bronzeBar|ironBar|steelBar|mithrilBar|adamantBar|runeBar|silverBar|goldBar|uncut[A-Z]\w*|sapphire|emerald|ruby|diamond|runeEssence|cowhide|wolfPelt|leather|hardLeather|raw[A-Z]\w*|burnt[A-Z]\w*)$/;
+// (by name pattern, so new logs, ores and bars stack too: v0.51.6 fixed willow to elder logs)
+const STACK_20 = /^(logs|[a-z]+Logs|[a-z]+Ore|coal|[a-z]+Bar|uncut[A-Z]\w*|sapphire|emerald|ruby|diamond|runeEssence|cowhide|wolfPelt|leather|hardLeather|raw[A-Z]\w*|burnt[A-Z]\w*)$/;
 for (const [id, it] of Object.entries(ITEMS)) {
   if (STACK_20.test(id) || it.food) { it.stackable = true; it.stack = 20; }
   else if (it.stackable) it.stack = id === 'coins' ? Infinity : 999;

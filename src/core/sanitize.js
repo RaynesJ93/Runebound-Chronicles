@@ -80,6 +80,21 @@ export function sanitize(state) {
   const merged = [];
   for (const b of state.bank) { const m = merged.find((x) => x.id === b.id); if (m) m.qty += b.qty; else merged.push(b); }
   state.bank = merged;
+  // Part-filled stacks of the same item are topped up from later ones (so items
+  // that only became stackable later, like willow logs in v0.51.6, merge on load).
+  for (let i = 0; i < INV_SIZE; i++) {
+    const s = state.inventory[i];
+    if (!s) continue;
+    const max = maxStack(s.id);
+    if (max === 1) continue;
+    for (let j = i + 1; j < INV_SIZE && s.qty < max; j++) {
+      const t = state.inventory[j];
+      if (!t || t.id !== s.id) continue;
+      const move = Math.min(t.qty, max - s.qty);
+      s.qty += move; t.qty -= move;
+      if (t.qty <= 0) state.inventory[j] = null;
+    }
+  }
   // Stacks bigger than a slot allows are split over free slots; anything that
   // doesn't fit goes to the bank, so nothing is ever lost.
   for (let i = 0; i < INV_SIZE; i++) {

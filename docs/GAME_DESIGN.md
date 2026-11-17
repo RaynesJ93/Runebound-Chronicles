@@ -277,7 +277,7 @@ Example — Goblin:
 ### Inventory
 
 - **28 slots** in a 4 × 7 grid.
-- **Stacks** (changed in v0.17.0): logs, ores, bars, essence, raw and cooked food, burnt food, hides and leather stack to **20** per slot; arrows, runes, arrowtips, arrow shafts, feathers, bait and thread stack to **999** per slot; coins stack without limit. Weapons, armour, tools, bones and potions don't stack. More than a stack's worth starts a new slot. Eating takes one item from a stack. The bank stacks everything without limit.
+- **Stacks** (changed in v0.17.0): logs, ores, bars, essence, raw and cooked food, burnt food, hides and leather stack to **20** per slot (every kind of log, ore and bar, matched by name; v0.51.6 fixed willow–elder logs, and partly filled stacks in the bag merge on load); arrows, runes, arrowtips, arrow shafts, feathers, bait and thread stack to **999** per slot; coins stack without limit. Weapons, armour, tools, bones and potions don't stack. More than a stack's worth starts a new slot. Eating takes one item from a stack. The bank stacks everything without limit.
 - Actions: Use, Equip/Wield, Eat/Drink, Drop, Examine. Drag to reorder.
 - Tapping (or left-clicking) an item does its main action: eat, drink, wield or wear. Long-press (or right-click) shows every option. A setting makes every tap open the menu instead.
 
