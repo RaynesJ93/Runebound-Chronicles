@@ -1,5 +1,6 @@
 import { TILE } from './pixel.js';
 import { buildGround } from './ground.js';
+import { GROUND } from '../world/area.js';
 import { buildingSprite } from './buildings.js';
 import * as S from './sprites.js';
 import { art } from './art.js';
@@ -75,7 +76,7 @@ function getLib() {
     graveMound: art('graveMound') || [S.graveMound(1), S.graveMound(2), S.graveMound(3)],
     memorial: art('memorial')?.[0] || S.memorial(),
     ruinTower: art('ruinTower')?.[0], ruinArch: art('ruinArch')?.[0], ruinLow: art('ruinLow'), fallenPillar: art('fallenPillar')?.[0],
-    fishingSpotVale: art('fishingSpotVale'), wallLamp: art('wallLamp')?.[0], grainSack: art('grainSack')?.[0], coinChest: art('coinChest')?.[0],
+    fishingSpotVale: Array.from({ length: 12 }, (_, k) => S.fishingRipples(k, '#dcfff2', '#4f7a74')), wallLamp: art('wallLamp')?.[0], grainSack: art('grainSack')?.[0], coinChest: art('coinChest')?.[0],
     bankBooth: art('bankBooth')?.[0], counterArt: [null, art('counter:1')?.[0], art('counter:2')?.[0], art('counter:3')?.[0]],
     stool: art('stool')?.[0], table: art('table')?.[0],
     deadTree: art('deadTree') || Array.from({ length: VARIANTS }, (_, i) => S.deadTree(i + 151)),
@@ -90,7 +91,8 @@ function getLib() {
     furnaceCold: art('furnaceCold')?.[0] || null,
     mineLamp: art('mineLamp')?.[0] || null,
     tanningRack: art('tanningRack')?.[0] || S.tanningRack(),
-    fishingSpot: art('fishingSpot') || [S.fishingSpot(0), S.fishingSpot(1)],
+    // v0.55.0: code-drawn ripples blend into any water better than the painted discs did
+    fishingSpot: Array.from({ length: 12 }, (_, k) => S.fishingRipples(k)),
     cookingPit: art('cookingPit') || [S.cookingPit(0), S.cookingPit(1)],
     anvil: art('anvil')?.[0] || S.anvil(),
     rubble: art('rubble') || [S.rubble(141), S.rubble(142), S.rubble(143)],
@@ -278,7 +280,23 @@ export function createWorldView(canvasEl, area) {
       case 'deadGrass': place(pick(lib.deadGrass, p), f.x + jit(p, 13), f.y + jit(p, 14) / 2, { sortY: (p.y + 1) * TILE + 1 }); break;
       case 'campChest': place(lib.campChest, f.x, f.y); break;
       // Ripples sit flat on the water, under anyone standing nearby.
-      case 'fishingSpot': { const fr = area.theme === 'vale' && lib.fishingSpotVale ? lib.fishingSpotVale : lib.fishingSpot; place(fr[0], f.x, f.y - 2, { frames: fr, rate: fr.length > 2 ? 3.2 : 1.6, sortY: p.y * TILE }); break; }
+      case 'fishingSpot': {
+        const fr0 = area.theme === 'vale' && lib.fishingSpotVale ? lib.fishingSpotVale : lib.fishingSpot;
+        // Clip the ripples to the water (kept 2 px in from the bank), so the
+        // rings never spill onto sand, grass or rock.
+        const ox = Math.round(f.x - fr0[0].ax), oy = Math.round(f.y - 2 - fr0[0].ay);
+        const wet = (x, y) => [[0, 0], [2, 0], [-2, 0], [0, 2], [0, -2]].every(([dx, dy]) => area.groundAt((x + dx) >> 4, (y + dy) >> 4) === GROUND.WATER);
+        const fr = fr0.map((s) => {
+          const c = document.createElement('canvas'); c.width = s.w; c.height = s.h;
+          const g2 = c.getContext('2d'); g2.drawImage(s.img, 0, 0);
+          const d = g2.getImageData(0, 0, s.w, s.h);
+          for (let y = 0; y < s.h; y++) for (let x = 0; x < s.w; x++) if (!wet(ox + x, oy + y)) d.data[(y * s.w + x) * 4 + 3] = 0;
+          g2.putImageData(d, 0, 0);
+          return { ...s, img: c };
+        });
+        place(fr[0], f.x, f.y - 2, { frames: fr, rate: 6, sortY: p.y * TILE });
+        break;
+      }
       case 'cookingPit': place(lib.cookingPit[0], f.x, f.y, { frames: lib.cookingPit }); break;
       case 'anvil': place(lib.anvil, f.x, f.y); break;
       case 'rubble': { const spr = pick(lib.rubble, p); decals.push({ img: spr.img, x: p.x * TILE, y: p.y * TILE }); break; }
