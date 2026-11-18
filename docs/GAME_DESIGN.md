@@ -399,6 +399,16 @@ Earth and fire runes are also sold in the magic shop.
 
 *v0.51.3, painted art* (the "Lumenhaven Images 01–07" sheets): Lumenhaven has its own ground (`theme: 'fae'`: fae grass, violet paths, moonstone market paving and a starlit pool); painted fae stalls, a well of starlight, fae lanterns, giant toadstools and crystal clusters, all glowing in the dark (decor props can have `light`); the fairy ring you arrive by (v0.51.4: moved up into the open, clear of the edge trees); and a straight bridge of glowing moonstone across the pool to the cosmic island (it replaces the wooden causeway). The eight new altars (two frames: the second glows brighter), the eight new rune icons (spells use them too) and the glimmerwisp, fae sentinel and hollow shade are all painted.
 
+### Softer joins between paths and paving (v0.54.0)
+
+Where ground types meet, the edges are built in `src/render/ground.js` (not painted), so this is all code:
+
+- **Paving meets a path:** the outer rows of cobbles break into irregular stone-sized chunks with dirt between them, a few chunks lie loose out in the dirt, and small pebbles are scattered around the entrance, thinning out with distance (`breakPaving`). The road also flares out a little as it reaches the square, like a worn entrance.
+- **Paving meets grass:** a lighter version, with grass creeping into the gaps.
+- **Path corners:** crossroads and bends get rounded corners instead of square notches (`roundEarth`, a blur of the path, like the paving rounding).
+- **Neat (built) squares** such as the Thornwood shrine keep their straight edges against grass, but paths still wear into them where they meet.
+- Works in every area and theme (the pebbles take the paving's own colour). Cost: building an area's ground takes about 25% longer (only the boxes around paving are processed).
+
 ### Old Bessie, the starter boss (v0.53.0)
 
 Old Bessie lives in her own pen at the east end of Brambleford's cow field (fenced off at x 53, gate in the middle; sign "OLD BESSIE'S PEN"). She's a big toffee-brown cow with horns, a nose ring and a brass bell (painted in v0.53.2, set `bessie` in tools/new_art.py; the cowbell worn facing down is hand-pixelled in tools/sprites).
