@@ -83,7 +83,7 @@ export function buildBrambleford() {
   // ---- The east end and the south road (added when the village grew) --------
   rect(39, 17, 59, 18, GROUND.PATH);   // main street, continued east
   rect(39, 25, 59, 25, GROUND.PATH);   // lower lane, continued east
-  rect(40, 26, 41, 48, GROUND.PATH);   // south road, over the river
+  rect(40, 26, 41, 53, GROUND.PATH);   // south road, over the river (v0.56.0: on to Greenmire Rainforest)
   rect(42, 38, 44, 38, GROUND.PATH);   // to the cow field gate
   rect(59, 18, 59, 25, GROUND.PATH);   // round the end of the lanes
 
@@ -267,6 +267,7 @@ export function buildBrambleford() {
     // Walking onto these tiles takes you to another area.
     exits: [
       { tiles: [{ x: 21, y: 0 }, { x: 22, y: 0 }], to: 'route1', at: { x: 55, y: 93 }, facing: Math.PI },
+      { tiles: [{ x: 40, y: 53 }, { x: 41, y: 53 }], to: 'rainforest', at: { x: 32, y: 2 }, facing: 0 },
       ...exits, // shop and bank doors
     ],
     spawns: [

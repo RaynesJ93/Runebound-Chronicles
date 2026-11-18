@@ -238,8 +238,7 @@ export function buildRoute1() {
   one('scarecrow', 98, 85, { interact: ['A scarecrow, slumped over. Its straw is chewed.'] });
   one('well', 86, 79, { interact: ['The farm well. The rope has been cut.'] });
 
-  // The body altar (v0.51.0), by the old graveyard: Runecrafting 20
-  prop('altar', [{ x: 35, y: 89 }, { x: 36, y: 89 }], { variant: 'body' });
+  // (The body altar was here until v0.56.0; it's in Greenmire Rainforest now.)
 
   // The stone shrine
   clearArea(92, 34, 108, 49);

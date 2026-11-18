@@ -88,8 +88,7 @@ export function buildForge() {
     else if (r < 0.06) one('bones', x, y, { blocks: false });
   }
 
-  // The fire altar (v0.51.0): Runecrafting 14
-  prop('altar', [{ x: 34, y: 24 }, { x: 35, y: 24 }], { variant: 'fire' });
+  // (The fire altar was here until v0.56.0; it's in Greenmire Rainforest now.)
 
   return {
     id: 'forge',

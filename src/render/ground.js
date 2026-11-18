@@ -65,7 +65,9 @@ const TEX = {};
 function textures(theme) {
   if (TEX[theme]) return TEX[theme];
   const t = (n) => texture(n);
-  TEX[theme] = theme === 'fae' // Lumenhaven (v0.51.3)
+  TEX[theme] = theme === 'jungle' // Greenmire Rainforest (v0.56.0): darker, lusher Brambleford ground
+    ? { flowers: flowerMasks([t('jungleFlowersA'), t('jungleFlowersB')]), wall: t('wall'), grass: t('jungleGrass'), path: t('junglePath'), plaza: t('junglePlaza'), sand: t('junglePath'), dirt: t('junglePath'), water: [t('jungleWater0'), t('jungleWater1')], bridge: t('bridge'), floor: t('floor'), cave: t('cave'), rockwall: t('rockwall') }
+    : theme === 'fae' // Lumenhaven (v0.51.3)
     ? { flowers: [], grass: t('faeGrass'), path: t('faePath'), plaza: t('faePlaza'), sand: t('faePath'), dirt: t('faePath'), water: [t('faeWater0'), t('faeWater1')], cave: t('cave'), rockwall: t('rockwall'), bridge: t('bridge'), floor: t('floor') }
     : theme === 'vale'
     ? { flowers: flowerMasks([t('valeBlue'), t('valePurple')]), grass: t('valeGrass'), path: t('valePath'), sand: t('valePath'), water: [t('valeWater0'), t('valeWater1')], cave: t('cave'), rockwall: t('rockwall'), bridge: t('bridge'), floor: t('floor') }
@@ -448,7 +450,7 @@ function drawBridges(area, g, frames) {
 
 export function buildGround(area) {
   P = area.theme === 'vale' || area.theme === 'fae' ? VALE : BASE;
-  const T = textures(area.theme === 'vale' || area.theme === 'fae' ? area.theme : 'base');
+  const T = textures(['vale', 'fae', 'jungle'].includes(area.theme) ? area.theme : 'base');
   const W = area.W * TILE;
   const H = area.H * TILE;
   const frames = [new Bitmap(W, H), new Bitmap(W, H)];
