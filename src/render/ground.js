@@ -95,6 +95,41 @@ const px = (tx, x, y) => { const i = (((y % tx.h) * tx.w) + (x % tx.w)) * 4; ret
 const BLEND = new Set([GROUND.GRASS, GROUND.PATH, GROUND.SAND, GROUND.DIRT, GROUND.PLAZA]);
 const EARTH = new Set([GROUND.PATH, GROUND.SAND, GROUND.DIRT]);
 
+// Paths get rounded corners where they meet grass (v0.54.0): the earth is
+// smoothed with a blur, so crossroads and bends get soft, curved corners
+// instead of square notches. Only earth and grass swap; neat squares stay put.
+function roundEarth(kinds, W, H, vn, isNeat) {
+  const R = 6;
+  const sum = new Float32Array((W + 1) * (H + 1));
+  for (let y = 0; y < H; y++) {
+    let row = 0;
+    for (let x = 0; x < W; x++) {
+      row += EARTH.has(kinds[y * W + x]) ? 1 : 0;
+      sum[(y + 1) * (W + 1) + x + 1] = sum[y * (W + 1) + x + 1] + row;
+    }
+  }
+  const out = kinds.slice();
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const k = kinds[y * W + x];
+      const earth = EARTH.has(k);
+      if ((!earth && k !== GROUND.GRASS) || isNeat(x, y)) continue;
+      const x0 = Math.max(0, x - R), y0 = Math.max(0, y - R), x1 = Math.min(W, x + R + 1), y1 = Math.min(H, y + R + 1);
+      const a = (sum[y1 * (W + 1) + x1] - sum[y0 * (W + 1) + x1] - sum[y1 * (W + 1) + x0] + sum[y0 * (W + 1) + x0]) / ((x1 - x0) * (y1 - y0));
+      if (a === 0 || a === 1) continue;
+      const want = a + (vn(x, y, 7, 161) - 0.5) * 0.25 > 0.5;
+      if (want && !earth) {
+        // take the earth kind from whichever side has it
+        for (const [dx, dy] of [[R, 0], [-R, 0], [0, R], [0, -R], [R, R], [-R, -R], [R, -R], [-R, R]]) {
+          const nx = x + dx, ny = y + dy;
+          if (nx >= 0 && ny >= 0 && nx < W && ny < H && EARTH.has(kinds[ny * W + nx])) { out[y * W + x] = kinds[ny * W + nx]; break; }
+        }
+      } else if (!want && earth) out[y * W + x] = GROUND.GRASS;
+    }
+  }
+  kinds.set(out);
+}
+
 function roundPaving(kinds, W, H, vn, isNeat) {
   const R = 10;
   const sum = new Float32Array((W + 1) * (H + 1)); // summed-area table of the paving
@@ -119,6 +154,129 @@ function roundPaving(kinds, W, H, vn, isNeat) {
       else if (!paved && k === GROUND.PLAZA) kinds[y * W + x] = GROUND.GRASS;
     }
   }
+}
+
+// Distance (in pixels, 8-way chamfer, capped) from every pixel to the nearest
+// pixel where `inSet` is true, and which kind that nearest pixel was.
+function nearest(kinds, W, H, inSet, cap) {
+  const d = new Float32Array(W * H).fill(cap);
+  const who = new Uint8Array(W * H);
+  for (let i = 0; i < W * H; i++) if (inSet(kinds[i])) { d[i] = 0; who[i] = kinds[i]; }
+  const pass = (y, x, dx, dy, c) => {
+    const nx = x + dx, ny = y + dy;
+    if (nx < 0 || ny < 0 || nx >= W || ny >= H) return;
+    const i = y * W + x, j = ny * W + nx;
+    if (d[j] + c < d[i]) { d[i] = d[j] + c; who[i] = who[j]; }
+  };
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { pass(y, x, -1, 0, 1); pass(y, x, 0, -1, 1); pass(y, x, -1, -1, 1.41); pass(y, x, 1, -1, 1.41); }
+  for (let y = H - 1; y >= 0; y--) for (let x = W - 1; x >= 0; x--) { pass(y, x, 1, 0, 1); pass(y, x, 0, 1, 1); pass(y, x, 1, 1, 1.41); pass(y, x, -1, 1, 1.41); }
+  return { d, who };
+}
+
+// Stone-sized chunks: each pixel takes the random value of the nearest of a
+// grid of jittered points (Voronoi cells about `size` pixels across).
+function cellValue(x, y, size, seed) {
+  const cx = Math.floor(x / size), cy = Math.floor(y / size);
+  let best = 1e9, v = 0;
+  for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) {
+    const gx = cx + i, gy = cy + j;
+    const px0 = (gx + 0.15 + rnd(gx, gy, seed) * 0.7) * size, py0 = (gy + 0.15 + rnd(gx, gy, seed + 1) * 0.7) * size;
+    const dd = (px0 - x) ** 2 * 0.8 + (py0 - y) ** 2;
+    if (dd < best) { best = dd; v = rnd(gx, gy, seed + 2); }
+  }
+  return v;
+}
+
+// Worn edges where paving meets earth or grass (v0.54.0): instead of a
+// straight cut, the outer rows of cobbles break up into irregular chunks with
+// earth between them, and a few chunks lie loose out in the dirt. Against
+// grass the effect is lighter, with grass creeping into the gaps.
+const BREAK_EARTH = 12, BREAK_GRASS = 6;
+function breakPaving(kinds, W, H, isNeat) {
+  const P = GROUND.PLAZA;
+  // Only the ground around paving changes, so work box by box: tiles holding
+  // paving, grown by 2 tiles, grouped into connected boxes. (A whole-map pass
+  // doubled the time to build big areas.)
+  const TW = Math.ceil(W / 16), TH = Math.ceil(H / 16);
+  const mark = new Uint8Array(TW * TH);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (kinds[y * W + x] === P) mark[(y >> 4) * TW + (x >> 4)] = 1;
+  const grow = new Uint8Array(TW * TH);
+  for (let ty = 0; ty < TH; ty++) for (let tx = 0; tx < TW; tx++) {
+    if (!mark[ty * TW + tx]) continue;
+    for (let j = -2; j <= 2; j++) for (let i = -2; i <= 2; i++) {
+      const x = tx + i, y = ty + j;
+      if (x >= 0 && y >= 0 && x < TW && y < TH) grow[y * TW + x] = 1;
+    }
+  }
+  const seen = new Uint8Array(TW * TH);
+  const boxes = [];
+  for (let t = 0; t < TW * TH; t++) {
+    if (!grow[t] || seen[t]) continue;
+    let x0 = TW, y0 = TH, x1 = 0, y1 = 0;
+    const stack = [t]; seen[t] = 1;
+    while (stack.length) {
+      const c = stack.pop(), cx = c % TW, cy = (c - cx) / TW;
+      x0 = Math.min(x0, cx); y0 = Math.min(y0, cy); x1 = Math.max(x1, cx); y1 = Math.max(y1, cy);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = cx + dx, ny = cy + dy, n = ny * TW + nx;
+        if (nx >= 0 && ny >= 0 && nx < TW && ny < TH && grow[n] && !seen[n]) { seen[n] = 1; stack.push(n); }
+      }
+    }
+    boxes.push([x0 * 16, y0 * 16, Math.min(W, (x1 + 1) * 16), Math.min(H, (y1 + 1) * 16)]);
+  }
+  if (!boxes.length) return null;
+  const paveDist = new Float32Array(W * H).fill(99);
+  for (const [bx0, by0, bx1, by1] of boxes) {
+    const w = bx1 - bx0, h = by1 - by0;
+    const sub = new Uint8Array(w * h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) sub[y * w + x] = kinds[(y + by0) * W + x + bx0];
+    breakBox(sub, w, h, bx0, by0, isNeat);
+    const d = nearest(sub, w, h, (k) => k === P, 16).d;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      kinds[(y + by0) * W + x + bx0] = sub[y * w + x];
+      paveDist[(y + by0) * W + x + bx0] = d[y * w + x];
+    }
+  }
+  return paveDist;
+}
+
+// One box of breakPaving; (ox, oy) is where the box sits on the map, so the
+// noise and the neat squares line up with the whole-map coordinates.
+function breakBox(kinds, W, H, ox, oy, isNeat) {
+  const P = GROUND.PLAZA;
+  const toSoft = nearest(kinds, W, H, (k) => EARTH.has(k) || k === GROUND.GRASS, BREAK_EARTH + 2);
+  const toPave = nearest(kinds, W, H, (k) => k === P, 16);
+  const toEarth = nearest(kinds, W, H, (k) => EARTH.has(k), 16);
+  const out = kinds.slice();
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const i = y * W + x, k = kinds[i], gx = x + ox, gy = y + oy;
+      // neat (built) squares keep crisp edges against grass, but paths still
+      // wear into them where they meet
+      const neat = isNeat(gx, gy);
+      if (neat && k === GROUND.GRASS) continue;
+      if (neat && k === P && !EARTH.has(toSoft.who[i])) continue;
+      if (k === GROUND.GRASS) {
+        // the road flares out where it meets the square, like a worn entrance
+        const dp = toPave.d[i], de = toEarth.d[i];
+        if (dp < 14 && de < 12 && de < (14 - dp) * 0.75 + (cellValue(gx, gy, 5, 317) - 0.5) * 5) out[i] = toEarth.who[i];
+      } else if (k === P) {
+        const soft = toSoft.who[i], earth = EARTH.has(soft);
+        const B = earth ? BREAK_EARTH : BREAK_GRASS;
+        const dd = toSoft.d[i];
+        if (dd > B) continue;
+        const v = cellValue(gx, gy, 7, 301);
+        const lose = (1 - dd / B) ** 1.1 * (earth ? 0.95 : 0.6);
+        if (v < lose) out[i] = soft;
+      } else if (EARTH.has(k)) {
+        const dd = toPave.d[i];
+        if (dd > BREAK_EARTH) continue;
+        const v = cellValue(gx, gy, 6, 307);
+        if (v > 1 - (1 - dd / BREAK_EARTH) ** 1.6 * 0.42) out[i] = P;
+      }
+    }
+  }
+  kinds.set(out);
 }
 
 // Ground a rock wall can round off into: cave floor, and outdoors grass, paths,
@@ -361,7 +519,9 @@ export function buildGround(area) {
   // Paved squares get rounded, uneven outlines instead of hard rectangles:
   // the paving is smoothed with a wide blur (which rounds the corners) and
   // its edge nudged by noise, and anything trimmed off becomes grass.
+  roundEarth(kinds, W, H, vn, isNeat);
   roundPaving(kinds, W, H, vn, isNeat);
+  const paveDist = breakPaving(kinds, W, H, isNeat);
 
   // Cave walls get rounded, rocky outlines instead of tile-sized steps (the
   // same trick as the ponds): blur the rock, nudge the edge with noise.
@@ -497,6 +657,34 @@ export function buildGround(area) {
       if (f === 1) continue;
       const i = (y * W + x) * 4;
       for (const fr of frames) for (let c = 0; c < 3; c++) fr.data[i + c] = Math.min(255, fr.data[i + c] * f);
+    }
+  }
+
+  // Loose pebbles in the earth around broken paving (v0.54.0): small stones,
+  // lit on top and shadowed below, thinning out away from the cobbles.
+  if (paveDist) {
+    const sh = (c, f) => c.map((v) => Math.round(Math.min(255, v * f)));
+    const base = T.plaza ? px(T.plaza, 5, 5) : P.stone[1];
+    for (let y = 2; y < H - 3; y += 3) {
+      for (let x = 2; x < W - 3; x += 3) {
+        const i = y * W + x;
+        if (!EARTH.has(kinds[i]) || paveDist[i] < 1.5 || paveDist[i] > 14) continue;
+        if (rnd(x, y, 311) > 0.3 * (1 - paveDist[i] / 15)) continue;
+        const ox = x + Math.floor(rnd(x, y, 312) * 3), oy = y + Math.floor(rnd(x, y, 313) * 3);
+        const big = rnd(x, y, 314) < 0.6;
+        const tone = 0.85 + rnd(x, y, 315) * 0.35;
+        const mid = sh(base, tone), hi = sh(base, tone * 1.25), lo = sh(base, tone * 0.62), shadow = 0.6;
+        for (const f of frames) {
+          const put = (a, b, c) => { if (EARTH.has(kinds[b * W + a])) f.set(a, b, c); };
+          const dark = (a, b) => { if (!EARTH.has(kinds[b * W + a])) return; const j = (b * W + a) * 4; for (let c = 0; c < 3; c++) f.data[j + c] = f.data[j + c] * shadow; };
+          if (big) {
+            put(ox, oy, hi); put(ox + 1, oy, mid); put(ox, oy + 1, mid); put(ox + 1, oy + 1, lo); put(ox + 2, oy + 1, lo);
+            dark(ox, oy + 2); dark(ox + 1, oy + 2); dark(ox + 2, oy + 2);
+          } else {
+            put(ox, oy, hi); put(ox + 1, oy, lo); dark(ox, oy + 1); dark(ox + 1, oy + 1);
+          }
+        }
+      }
     }
   }
 
