@@ -81,8 +81,7 @@ export function buildMine() {
     if (r < 0.06) one('rubble', x, y, { blocks: false });
   }
 
-  // The earth altar (v0.51.0): Runecrafting 9
-  prop('altar', [{ x: 9, y: 14 }, { x: 10, y: 14 }], { variant: 'earth' });
+  // (The earth altar was here until v0.56.0; it's in Greenmire Rainforest now.)
 
   return {
     id: 'mine',

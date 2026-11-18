@@ -611,7 +611,7 @@ export function createWorldView(canvasEl, area) {
     const vh = canvasEl.height / scale;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = area.indoors ? '#120c08' : area.theme === 'vale' ? '#0c1012' : '#2c5a2a';
+    ctx.fillStyle = area.indoors ? '#120c08' : area.theme === 'vale' ? '#0c1012' : area.theme === 'jungle' ? '#16341c' : '#2c5a2a';
     ctx.fillRect(0, 0, canvasEl.width, canvasEl.height);
     ctx.setTransform(scale, 0, 0, scale, -cam.x * scale, -cam.y * scale);
 

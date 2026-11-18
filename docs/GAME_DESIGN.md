@@ -352,9 +352,9 @@ The review found Runecrafting had only three runes and Magic only two spells. Ba
 
 | Rune | Runecrafting | XP | Extra rune at | Altar |
 | --- | --- | --- | --- | --- |
-| Earth | 9 | 6.5 | 26, 52, 78 | Copperdeep Mine |
-| Fire | 14 | 7 | 35, 70 | The Sunken Forge |
-| Body | 20 | 7.5 | 46, 92 | Thornwood, by the stone shrine |
+| Earth | 9 | 6.5 | 26, 52, 78 | Greenmire Rainforest, west clearing (Copperdeep Mine until v0.56.0) |
+| Fire | 14 | 7 | 35, 70 | Greenmire Rainforest, east vents (the Sunken Forge until v0.56.0) |
+| Body | 20 | 7.5 | 46, 92 | Greenmire Rainforest, the ruin over the stream (Thornwood until v0.56.0) |
 | Cosmic | 27 | 8 | 59 | Lumenhaven: an island in the starlit pool |
 | Chaos | 35 | 8.5 | 74 | Lumenhaven: the broken temple (west) |
 | Nature | 44 | 9 | 91 | Lumenhaven: the great tree glade (north-west) |
@@ -398,6 +398,15 @@ Teleports don't work mid-fight. Alchemy: cast it, then tap the item in your bag.
 Earth and fire runes are also sold in the magic shop.
 
 *v0.51.3, painted art* (the "Lumenhaven Images 01–07" sheets): Lumenhaven has its own ground (`theme: 'fae'`: fae grass, violet paths, moonstone market paving and a starlit pool); painted fae stalls, a well of starlight, fae lanterns, giant toadstools and crystal clusters, all glowing in the dark (decor props can have `light`); the fairy ring you arrive by (v0.51.4: moved up into the open, clear of the edge trees); and a straight bridge of glowing moonstone across the pool to the cosmic island (it replaces the wooden causeway). The eight new altars (two frames: the second glows brighter), the eight new rune icons (spells use them too) and the glimmerwisp, fae sentinel and hollow shade are all painted.
+
+### Greenmire Rainforest (v0.56.0)
+
+A new area south of Brambleford: carry on down the south road over the river bridge and through the tree line (exit at x 40–41, y 53). 64 × 56, `data/areas/rainforest.js`, theme `'jungle'`: Brambleford's painted ground recoloured darker and lusher (deep green grass, dark mud paths, mossy paving, green-teal water; `JUNGLE_TEX` in tools/derived.py).
+
+- **Layout:** you arrive in a clearing at the top (sign: GREENMIRE RAINFOREST). A path runs south to a crossroads. West is the **Earth altar** (Runecrafting 9) in a muddy clearing ringed by mossy boulders. East is the **Fire altar** (14) among steaming vents, a lava pool and obsidian. South, over a bridge across the winding stream, is the **Body altar** (20) in an overgrown stone ruin with mossy statues.
+- These three altars moved here from Copperdeep Mine, the Sunken Forge and Thornwood. The air, mind and water altars stay in the Vale, and the cosmic and higher ones in Lumenhaven.
+- Dense willow, old oak, yew and oak trees (choppable as usual), bushes, tall grass, mushrooms, flowers, mossy boulders and hanging vines. Reeds and lily pads along the stream.
+- No monsters yet. On the map as "Greenmire Rainforest" (tab "Rainforest") with the three altars labelled.
 
 ### Fishing spots as ripples (v0.55.0)
 

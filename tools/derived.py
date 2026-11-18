@@ -1103,6 +1103,25 @@ def canopy_to(colours, glow=None):
         return Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA')
     return fn
 
+# Greenmire Rainforest ground (v0.56.0, theme 'jungle'): the Brambleford
+# textures, recoloured darker and lusher. mul = per-channel multipliers.
+def tint(mul, add=(0, 0, 0)):
+    def fn(im, get=None):
+        a = np.array(im.convert('RGBA')).astype(np.float32)
+        for c in range(3): a[..., c] = a[..., c] * mul[c] + add[c]
+        return Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA')
+    return fn
+
+JUNGLE_TEX = [
+    ('tex:jungleGrass', 'tex:grass', tint((0.42, 0.66, 0.46), (0, 4, 6))),
+    ('tex:jungleFlowersA', 'tex:grassPink', tint((0.42, 0.66, 0.46), (0, 4, 6))),
+    ('tex:jungleFlowersB', 'tex:grassYellow', tint((0.42, 0.66, 0.46), (0, 4, 6))),
+    ('tex:junglePath', 'tex:path', tint((0.56, 0.5, 0.42))),
+    ('tex:junglePlaza', 'tex:plaza', tint((0.6, 0.72, 0.56))),
+    ('tex:jungleWater0', 'tex:water0', tint((0.4, 0.78, 0.62), (0, 10, 0))),
+    ('tex:jungleWater1', 'tex:water1', tint((0.4, 0.78, 0.62), (0, 10, 0))),
+]
+
 EXTRA = [
     ('ore:coal', 'ore:copper', coal),
     ('ore:silver', 'ore:copper', veins_to(J.METAL['silver'])),
@@ -1222,7 +1241,7 @@ def derive(get0):
                 if os.path.exists(os.path.join(SPRITE_DIR, f'gear__{new}__{d}.png')): continue  # painted
                 for k, im, ax, ay in get(f'gear:{gs}:{d}'):
                     emit((f'gear:{new}:{d}', k, f(im, get), ax, ay))
-    for new, src, fn in EXTRA:
+    for new, src, fn in EXTRA + JUNGLE_TEX:
         for k, im, ax, ay in get(src):
             r = fn(im, get)
             pad = 0
