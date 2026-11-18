@@ -401,7 +401,7 @@ Earth and fire runes are also sold in the magic shop.
 
 ### Greenmire Rainforest (v0.56.0)
 
-A new area south of Brambleford: carry on down the south road over the river bridge and through the tree line (exit at x 40–41, y 53). 64 × 56, `data/areas/rainforest.js`, theme `'jungle'`: Brambleford's painted ground recoloured darker and lusher (deep green grass, dark mud paths, mossy paving, green-teal water; `JUNGLE_TEX` in tools/derived.py).
+A new area south of Brambleford: carry on down the south road over the river bridge and through the tree line (exit at x 40–41, y 53; v0.56.1 cleared the trees there and added a GREENMIRE RAINFOREST signpost). 64 × 56, `data/areas/rainforest.js`, theme `'jungle'`: Brambleford's painted ground recoloured darker and lusher (deep green grass, dark mud paths, mossy paving, green-teal water; `JUNGLE_TEX` in tools/derived.py).
 
 - **Layout:** you arrive in a clearing at the top (sign: GREENMIRE RAINFOREST). A path runs south to a crossroads. West is the **Earth altar** (Runecrafting 9) in a muddy clearing ringed by mossy boulders. East is the **Fire altar** (14) among steaming vents, a lava pool and obsidian. South, over a bridge across the winding stream, is the **Body altar** (20) in an overgrown stone ruin with mossy statues.
 - These three altars moved here from Copperdeep Mine, the Sunken Forge and Thornwood. The air, mind and water altars stay in the Vale, and the cosmic and higher ones in Lumenhaven.

@@ -237,6 +237,7 @@ export function buildBrambleford() {
   one('toppledBarrel', 39, 43, { interact: ['A barrel, knocked over and split open.'] });
   one('smashedBarrel', 36, 43, { blocks: false, interact: ['What is left of a barrel: staves and a bent iron hoop.'] });
   one('sign', 39, 34, { interact: ['SOUTH ROAD', 'River and fishing ahead. Cows to the east.'] });
+  one('sign', 43, 50, { interact: ['GREENMIRE RAINFOREST', 'South, through the trees. The Earth, Fire and Body altars are there.'] });
 
   // ---- Decoration ---------------------------------------------------------
   for (const [x, y] of [[4, 9], [8, 6], [16, 6], [27, 6], [33, 5], [38, 7], [4, 21], [39, 22], [25, 22], [12, 22]]) {
@@ -249,6 +250,7 @@ export function buildBrambleford() {
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
     if (x >= 19 && x <= 24 && y <= 6) continue; // keep the north road clear
     if (x >= 16 && x <= 28 && y >= 32 && y <= 33) continue; // keep the chicken pen in view
+    if (x >= 36 && x <= 45 && y >= 49) continue; // keep the way into Greenmire Rainforest clear (v0.56.1)
     const d = Math.min(x, y, W - 1 - x, H - 1 - y);
     const chance = d <= 1 ? 1 : d === 2 ? 0.75 : d === 3 ? 0.35 : d === 4 ? 0.08 : 0;
     if (chance && rng() < chance) placeIfFree('tree', x, y, { variant: rng() < 0.6 ? 'pine' : 'oak' });
