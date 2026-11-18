@@ -1875,9 +1875,10 @@ function boot() {
   };
 }
 
-await loadArt(GAME_VERSION);
+const artLoaded = await loadArt(GAME_VERSION);
 try {
   boot();
+  if (!artLoaded) setTimeout(() => window.RBC?.hud?.message("The game's artwork couldn't download (weak signal?), so it's showing simple placeholder art. Reload the page to try again."), 1500);
 } catch (err) {
   console.error(err);
   fail(`Something went wrong while loading: ${err.message}`);

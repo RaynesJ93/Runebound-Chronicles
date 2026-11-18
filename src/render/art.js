@@ -11,20 +11,27 @@ const cache = new Map();
 let sheet = null;
 
 export async function loadArt(version = '', base = './assets/') {
-  const v = version ? `?v=${version}` : '';
-  try {
-    const [meta, img] = await Promise.all([
-      fetch(`${base}art.json${v}`).then((r) => (r.ok ? r.json() : null)),
-      new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `${base}art.png${v}`; }),
-    ]);
-    if (!meta) return false;
-    sheet = img;
-    META = meta;
-    return true;
-  } catch (err) {
-    console.warn('[art] using code-drawn art:', err);
-    return false;
+  // A phone on a weak signal (or a page opened mid-deploy) can fail to fetch
+  // the 2-3 MB atlas, which used to drop the whole game back to code-drawn art
+  // until a reload. Now it tries a few times, then reports the failure.
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const v = `?v=${version}${attempt ? `&retry=${attempt}` : ''}`;
+    try {
+      const [meta, img] = await Promise.all([
+        fetch(`${base}art.json${v}`, attempt ? { cache: 'reload' } : {}).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`art.json ${r.status}`)))),
+        new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('art.png failed to load')); i.src = `${base}art.png${v}`; }),
+      ]);
+      if (!meta || !img.width) throw new Error('art was empty');
+      sheet = img;
+      META = meta;
+      return true;
+    } catch (err) {
+      console.warn(`[art] attempt ${attempt + 1} failed:`, err);
+      await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
+    }
   }
+  console.warn('[art] using code-drawn art');
+  return false;
 }
 
 function cut(x, y, w, h) {

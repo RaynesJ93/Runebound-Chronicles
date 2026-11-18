@@ -399,6 +399,14 @@ Earth and fire runes are also sold in the magic shop.
 
 *v0.51.3, painted art* (the "Lumenhaven Images 01–07" sheets): Lumenhaven has its own ground (`theme: 'fae'`: fae grass, violet paths, moonstone market paving and a starlit pool); painted fae stalls, a well of starlight, fae lanterns, giant toadstools and crystal clusters, all glowing in the dark (decor props can have `light`); the fairy ring you arrive by (v0.51.4: moved up into the open, clear of the edge trees); and a straight bridge of glowing moonstone across the pool to the cosmic island (it replaces the wooden causeway). The eight new altars (two frames: the second glows brighter), the eight new rune icons (spells use them too) and the glimmerwisp, fae sentinel and hollow shade are all painted.
 
+### Fishing spots as ripples (v0.55.0)
+
+The painted fishing spots were solid discs with a dark outline, so they sat on the water like a blob. They are now drawn in code (`fishingRipples` in src/render/sprites.js): three rings of foam spread out and fade, bubbles rise at the centre, and a fish tail flicks up now and then (12 frames at 6 a second). No fill or outline, so the water shows through. Each spot is clipped to the water tiles (2 px in from the bank), so the rings never spill onto sand, grass or rock, even in the small slayer cave pool. The Vale gets a teal tint. The painted `fishingSpot` art is no longer used.
+
+### Art loading retries (v0.54.1)
+
+The painted art is one 2–3 MB atlas (`assets/art.png` + `art.json`). If it fails to download, the game falls back to code-drawn placeholder art. Before v0.54.1 one failed download (weak phone signal, or a page opened while an update was going live) meant placeholder art until a reload. Now `loadArt` tries 4 times (waiting 0.8 s, 1.6 s, 2.4 s, bypassing the cache on retries), and if all fail the game says so and asks the player to reload.
+
 ### Softer joins between paths and paving (v0.54.0)
 
 Where ground types meet, the edges are built in `src/render/ground.js` (not painted), so this is all code:

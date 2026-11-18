@@ -938,6 +938,42 @@ export function fishingSpot(frame) {
   return sprite(b, 8, 12);
 }
 
+// A fishing spot as moving water (v0.55.0): rings of foam spreading out and
+// fading, bubbles popping up, now and then a fish tail. No fill and no
+// outline, so the water shows through and the spot sits in it, not on it.
+// 12 frames, played at 6 a second.
+export function fishingRipples(frame, foamHex = '#eef8ff', fishHex = '#5f7f9c') {
+  const W = 26, H = 16, cx = 13, cy = 8, N = 12;
+  const b = new Bitmap(W, H);
+  const foam = hex(foamHex), fish = hex(fishHex);
+  for (let k = 0; k < 3; k++) {
+    const ph = ((frame / N) + k / 3) % 1;
+    const r = 1.5 + ph * 10;
+    const a = Math.round(255 * (1 - ph) ** 0.7);
+    if (a < 25) continue;
+    const steps = Math.max(12, Math.round(r * 5));
+    for (let i = 0; i < steps; i++) {
+      // gaps that drift round the ring, so it shimmers rather than outlines
+      if (((i + frame * 2 + k * 5) % 8) < 1) continue;
+      const t = (i / steps) * Math.PI * 2;
+      b.set(Math.round(cx + Math.cos(t) * r), Math.round(cy + Math.sin(t) * r * 0.5), foam, a);
+    }
+  }
+  // bubbles rising at the centre
+  const bub = [[0, -1, 0], [2, 1, 3], [-2, 0, 6], [1, -2, 9]];
+  for (const [dx, dy, at] of bub) {
+    const age = (frame - at + N) % N;
+    if (age < 3) b.set(cx + dx, cy + dy - age, foam, 255 - age * 70);
+  }
+  // a fish tail flicking up for a couple of frames
+  if (frame === 7 || frame === 8) {
+    const up = frame === 7 ? 0 : 1;
+    b.set(cx + 3, cy - 1 - up, fish); b.set(cx + 4, cy - 2 - up, fish); b.set(cx + 2, cy - 2 - up, fish);
+    b.set(cx + 3, cy - up, foam, 200);
+  }
+  return sprite(b, cx, cy + 4);
+}
+
 // A ring of stones around a low fire with a pot hanging over it.
 export function cookingPit(frame) {
   const b = new Bitmap(20, 24);

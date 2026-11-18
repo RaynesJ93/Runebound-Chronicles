@@ -17,6 +17,8 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 18 Nov 2026 | v0.55.0: Fishing spots are now animated ripples in the water (spreading foam rings, bubbles, a flicking fish tail) instead of solid discs sitting on top of it, clipped so they never spill onto the bank. Ships with v0.54.1. |
+| 18 Nov 2026 | v0.54.1: The game art now retries up to 4 times if it fails to download (weak signal, or opened mid-update) instead of falling straight back to code-drawn placeholder art; if it still fails, a message says to reload. |
 | 18 Nov 2026 | v0.54.0: Softer ground joins: where paths meet cobbled paving the stones break up into the dirt, with loose pebbles and a worn, wider entrance; crossroads and path bends get rounded corners. Every area. |
 | 17 Nov 2026 | v0.53.2: Painted art for Old Bessie (all four directions, walking) and Bessie's cowbell (icon and worn). |
 | 17 Nov 2026 | v0.53.1: Old Bessie respawns in 30 seconds instead of 2 minutes. |
