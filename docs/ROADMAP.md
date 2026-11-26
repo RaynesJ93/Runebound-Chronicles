@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 26 Nov 2026 | v0.57.0: Gear walks with you: armour, leg armour and boots bend to the walking frames (each boot steps with its own foot), helmets follow the head, and weapons, shields and capes move with the body, instead of staying frozen in the standing pose. |
 | 18 Nov 2026 | v0.56.1: The tree line south of Brambleford's river bridge is cleared so the road into Greenmire Rainforest shows, with a signpost. |
 | 18 Nov 2026 | v0.56.0: Greenmire Rainforest, a new dark-green rainforest area south of Brambleford over the river bridge. The Earth, Fire and Body altars moved there (from the mine, the forge and Thornwood). |
 | 18 Nov 2026 | v0.55.0: Fishing spots are now animated ripples in the water (spreading foam rings, bubbles, a flicking fish tail) instead of solid discs sitting on top of it, clipped so they never spill onto the bank. Ships with v0.54.1. |

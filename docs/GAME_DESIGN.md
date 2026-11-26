@@ -399,6 +399,19 @@ Earth and fire runes are also sold in the magic shop.
 
 *v0.51.3, painted art* (the "Lumenhaven Images 01–07" sheets): Lumenhaven has its own ground (`theme: 'fae'`: fae grass, violet paths, moonstone market paving and a starlit pool); painted fae stalls, a well of starlight, fae lanterns, giant toadstools and crystal clusters, all glowing in the dark (decor props can have `light`); the fairy ring you arrive by (v0.51.4: moved up into the open, clear of the edge trees); and a straight bridge of glowing moonstone across the pool to the cosmic island (it replaces the wooden causeway). The eight new altars (two frames: the second glows brighter), the eight new rune icons (spells use them too) and the glimmerwisp, fae sentinel and hollow shade are all painted.
 
+### Gear walks with you (v0.57.0)
+
+Painted gear is drawn once per facing, over the standing pose, but the painted player has two walking frames per facing (legs spread, arms swing, the body sways). So gear used to stay still while the body walked under it, with bare legs and arms poking out.
+
+`src/render/gearWalk.js` now bends each gear sprite to the walking frame the body is on, by comparing the body's outline in that frame with the standing one, row by row:
+
+- **Body armour** is stretched from where the body is when standing to where it is in the step.
+- **Legs and boots:** each half follows its own leg, so boots step apart instead of stretching into a bar.
+- Both are trimmed to the walking body's outline, so leg armour doesn't fill the gap between the legs.
+- **Helmets and amulets** move with the head; **weapons, shields and capes** move as one piece with the torso.
+
+Attack and hit poses use the gear as painted. Each bent piece is made once and cached. Tested in tests/gear_walk.test.mjs.
+
 ### Greenmire Rainforest (v0.56.0)
 
 A new area south of Brambleford: carry on down the south road over the river bridge and through the tree line (exit at x 40–41, y 53; v0.56.1 cleared the trees there and added a GREENMIRE RAINFOREST signpost). 64 × 56, `data/areas/rainforest.js`, theme `'jungle'`: Brambleford's painted ground recoloured darker and lusher (deep green grass, dark mud paths, mossy paving, green-teal water; `JUNGLE_TEX` in tools/derived.py).
