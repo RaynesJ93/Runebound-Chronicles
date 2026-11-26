@@ -399,6 +399,18 @@ Earth and fire runes are also sold in the magic shop.
 
 *v0.51.3, painted art* (the "Lumenhaven Images 01–07" sheets): Lumenhaven has its own ground (`theme: 'fae'`: fae grass, violet paths, moonstone market paving and a starlit pool); painted fae stalls, a well of starlight, fae lanterns, giant toadstools and crystal clusters, all glowing in the dark (decor props can have `light`); the fairy ring you arrive by (v0.51.4: moved up into the open, clear of the edge trees); and a straight bridge of glowing moonstone across the pool to the cosmic island (it replaces the wooden causeway). The eight new altars (two frames: the second glows brighter), the eight new rune icons (spells use them too) and the glimmerwisp, fae sentinel and hollow shade are all painted.
 
+### Tasks panel (v0.58.0)
+
+A new **Tasks** button (checklist icon) in the top-right row, between the bag and the map. A red dot shows when a task has been completed since you last looked. (On phones up to 420 px wide the five top buttons are slightly smaller so they clear the Guide button.) The panel has two tabs:
+
+- **Slayer:** your current task (how many to kill, how many left, a progress bar), where those monsters live (from the area data; tap to open the map there), Kesta's tip for the task, your tasks-in-a-row streak and Slayer points. With no task, it points you to Kesta.
+- **Achievements:** 36 goals in three tiers (`data/tasks.js`), ticked off as you play, each with a hint. Each task pays coins when completed (Easy 150, Medium 600, Hard 2,500) and finishing a whole tier pays a bonus (2,000 / 10,000 / 40,000). Coins go to the bag, or the bank if the bag is full.
+  - Easy: logs, a shrimp, copper ore, a bronze bar, cooked shrimps, leather, 5 cows, 10 goblins, air runes, visit the Vale, The Sleeping Stones, total level 75.
+  - Medium: willow logs, a lobster, mithril ore, a steel bar, a willow shortbow, Old Bessie, the Alpha Wolf, a Slayer task, cosmic runes, visit Greenmire, cut a ruby, The Overturned Cart.
+  - Hard: yew logs, a shark, runite ore, a rune bar, an ember wyrm, a vinegrasp horror, cut a dragonstone, death runes, wear a wyrmhide body, 10 Slayer tasks, The Runebound, combat level 80.
+
+**Tracking.** Saved in `state.tasks`: completed ids, tier bonuses paid, and counters for kills (`kill:<monster>`), items gathered or made (`get:<item>`, from every "+1 item" pop-up), areas visited (`visit:<area>`) and Slayer tasks finished (`slayer:done`). Counters start from v0.58.0, so earlier kills and gathering don't count; tasks about levels, quests and worn gear check your current state, so they complete straight away if you already qualify. Checked whenever a counter goes up and every 4 ticks.
+
 ### Animated scenery stays put (v0.57.2)
 
 Animated props (campfires, cooking pits, fishing spots...) used to draw every frame from the first frame's top-left corner. The painted campfire's frames differ in height (taller and shorter flames), so the whole fire hopped up and down. Each frame now lines up by its own anchor (the foot point), so the stones stay still and only the flames move.

@@ -708,3 +708,19 @@ img.mk-spot { width: 18px; height: 18px; filter: drop-shadow(0 0 1px #fff6dc) dr
 .map-legend .mk-npc, .map-legend .mk-enemy { width: 8px; height: 8px; border-radius: 50%; border: 1px solid #2b1d16; }
 .map-legend .mk-you { width: 9px; height: 9px; box-shadow: none; }
 .map-legend .mk-exit { color: var(--ink); text-shadow: none; }
+
+/* Tasks panel (v0.58.0) */
+#btn-tasks { position: relative; }
+#btn-tasks .dot { position: absolute; top: 4px; right: 4px; width: 12px; height: 12px; border-radius: 50%; background: #e8452c; border: 2px solid #2b1d16; }
+#btn-tasks .dot.hidden { display: none; }
+.task-bar { height: 10px; background: #2b1d16; border-radius: 5px; margin: 6px 0 4px; overflow: hidden; }
+.task-bar span { display: block; height: 100%; background: #4fd04a; }
+.task-list li { display: flex; gap: 6px; align-items: flex-start; margin: 6px 0; }
+.task-list li.task-done b { text-decoration: line-through; opacity: 0.7; }
+.task-tier { margin: 6px 0; }
+/* five buttons at the top right: a little smaller on narrow phones so they clear the Guide button */
+@media (max-width: 420px) {
+  .hud-top-right { gap: 5px; }
+  .hud-top-right .icon-btn { width: 47px; height: 47px; }
+  .hud-top-right .icon-btn img.px { width: 28px; height: 28px; }
+}

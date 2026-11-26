@@ -4,7 +4,8 @@ import { loadGame, saveGame, exportSave, importSave, wipeSave } from './core/sav
 import { Area, adjacentTo } from './world/area.js';
 import { findPath } from './world/pathfinding.js';
 import { AREAS, START_AREA } from '../data/areas/index.js';
-import { NPCS } from '../data/npcs.js';
+import { ACHIEVEMENTS, TASK_TIERS } from '../data/tasks.js';
+import { NPCS, SLAYER_TIPS } from '../data/npcs.js';
 import { Npc } from './entities/npc.js';
 import { mulberry32 } from './core/rng.js';
 import { createWorldView } from './render/world2d.js';
@@ -34,7 +35,7 @@ import { RECIPES, GROUP_OF } from '../data/fletching.js';
 import { ROCKS, PICKAXES, MINE_TICKS, gemChance, rollGem } from '../data/mining.js';
 import { STAR_SITES, DUST_PER_SIZE, FIRST_STAR, NEXT_STAR, STAR_LIFETIME, rollSize } from '../data/stars.js';
 import { MAP_NAME } from '../data/mapLabels.js';
-import { QUESTS, questStatus, QUEST_HOOKS, QUEST_DROPS } from '../data/quests.js';
+import { QUESTS, questStatus, questById, QUEST_HOOKS, QUEST_DROPS } from '../data/quests.js';
 import { LODESTONES, lodestoneOpen } from '../data/lodestones.js';
 import { TASKS, taskById, pickTask, pointsFor, SKIP_COST, BLOCK_COST, MAX_BLOCKS } from '../data/slayer.js';
 import { SMELTING, SMITHING, saveBarChance } from '../data/smithing.js';
@@ -68,6 +69,7 @@ function boot() {
   const rng = mulberry32((Date.now() & 0xffffff) ^ 0x5bd1e995);
 
   function loadWorld(id) {
+    state.tasks.c[`visit:${id}`] = 1; // achievements: places you've been (v0.58.0)
     if (worlds.has(id)) return worlds.get(id);
     const a = new Area(AREAS[id]());
     const v = createWorldView(canvas, a);
@@ -159,6 +161,7 @@ function boot() {
       enemyDied: (e) => {
         hud.message(`You defeated the ${e.name}!`);
         state.stats.kills = (state.stats.kills || 0) + 1;
+        taskCount(`kill:${e.def.id}`);
         slayerKill(e);
         if (e.summoned) return; // a boss's adds drop nothing
         // Story bosses set a flag when they fall (def.defeatFlag).
@@ -1171,11 +1174,85 @@ function boot() {
     sl().points += pts;
     sl().last = t.id;
     sl().task = null;
+    taskCount('slayer:done');
     hud.slayerFinished = true;
     hud.message(`You've finished your slayer task! ${st} in a row: +${pts} slayer points (you have ${sl().points}). Go back to Kesta for another.`);
     save();
   };
   hud.onSlayerChip = () => hud.showDialog([taskText()], null, 'Slayer task');
+
+  // ---- Tasks panel (v0.58.0): your Slayer task and the achievements ----
+  // Counters for achievements: kills, items you gather or make (everything that
+  // shows a "+1 item" pop-up), places visited, Slayer tasks finished.
+  function taskCount(key, n = 1) {
+    state.tasks.c[key] = (state.tasks.c[key] || 0) + n;
+    checkTasks();
+  }
+  const dropPopup = hud.itemDrop.bind(hud);
+  hud.itemDrop = (id, qty = 1) => { dropPopup(id, qty); taskCount(`get:${id}`, qty); };
+  const taskCtx = () => ({
+    count: (k) => state.tasks.c[k] || 0,
+    level: (sk) => book.level(sk),
+    get total() { return book.total(); },
+    get combat() { return combat.level; },
+    quest: (id) => state.flags[questById(id)?.flag] === 'done',
+    wearing: (id) => Object.values(equipment.slots).some((s) => s?.id === id),
+  });
+  const payCoins = (n) => {
+    if (inventory.add('coins', n)) return 'coins';
+    bank.put('coins', n);
+    return 'coins (sent to your bank: your bag was full)';
+  };
+  function checkTasks() {
+    const c = taskCtx(), T = state.tasks;
+    let changed = false;
+    for (const a of ACHIEVEMENTS) {
+      if (T.done.includes(a.id) || !a.check(c)) continue;
+      T.done.push(a.id);
+      const tier = TASK_TIERS.find((t) => t.id === a.tier);
+      hud.message(`Task complete: ${a.name}! +${tier.coins.toLocaleString()} ${payCoins(tier.coins)}.`);
+      changed = true;
+    }
+    for (const tier of TASK_TIERS) {
+      if (T.bonus.includes(tier.id)) continue;
+      if (!ACHIEVEMENTS.filter((a) => a.tier === tier.id).every((a) => T.done.includes(a.id))) continue;
+      T.bonus.push(tier.id);
+      hud.showDialog([`You've finished every ${tier.name.toLowerCase()} task! Here's a bonus of ${tier.bonus.toLocaleString()} ${payCoins(tier.bonus)}.`], null, 'Tasks');
+      changed = true;
+    }
+    if (changed) { T.unseen = true; hud.setTasksNew(true); refreshInventory(); save(); if (hud.tasksOpen) hud.onTasksOpen(); }
+  }
+  // Where each monster lives, from the area data (worked out once).
+  let homes = null;
+  const homesOf = (ids) => {
+    if (!homes) {
+      homes = new Map();
+      for (const [id, build] of Object.entries(AREAS)) {
+        const a = build();
+        for (const sp of a.spawns || []) { if (!homes.has(sp.enemy)) homes.set(sp.enemy, new Map()); homes.get(sp.enemy).set(id, a.name); }
+      }
+    }
+    const out = new Map();
+    for (const e of ids) for (const [area, name] of homes.get(e) || []) out.set(area, name);
+    return [...out].map(([area, name]) => ({ area, name }));
+  };
+  hud.onTasksOpen = () => {
+    checkTasks();
+    state.tasks.unseen = false;
+    hud.setTasksNew(false);
+    const t = sl().task, def = t && taskById(t.id);
+    const c = taskCtx();
+    hud.renderTasks({
+      slayer: { task: !!def, left: t?.left, total: t?.total, name: def?.name, where: def ? homesOf(def.monsters) : [], tip: def ? SLAYER_TIPS[def.id] : '', streak: sl().streak, points: sl().points },
+      tiers: TASK_TIERS.map((tier) => {
+        const list = ACHIEVEMENTS.filter((a) => a.tier === tier.id);
+        return { ...tier, total: list.length, done: list.filter((a) => state.tasks.done.includes(a.id)).length, claimedBonus: state.tasks.bonus.includes(tier.id),
+          tasks: list.map((a) => ({ name: a.name, hint: a.hint, done: state.tasks.done.includes(a.id), progress: a.progress?.(c) })) };
+      }),
+    });
+  };
+  hud.setTasksNew(state.tasks.unseen);
+
   // What Kesta's dialogue can do (her nodes in data/npcs.js).
   const slayerCtx = {
     get task() { const t = sl().task; return t && { ...t, name: taskById(t.id).name }; },
@@ -1280,6 +1357,8 @@ function boot() {
 
   // ---- Ticks ----------------------------------------------------------------
   const ticker = new Ticker();
+  // Achievements: levels, quests and gear change in lots of places, so look again every few ticks.
+  ticker.on((n) => { if (n % 4 === 0) checkTasks(); });
   ticker.on((n) => {
     if (!dying) combat.tick(time);
     // Potion boosts wear off by 1 level a minute.

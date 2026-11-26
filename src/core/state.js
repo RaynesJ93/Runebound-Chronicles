@@ -21,6 +21,7 @@ export function defaultState() {
     nextStarAt: 0, // play time (seconds) when the next star falls
     stats: { playTimeSec: 0, tilesWalked: 0, deaths: 0, kills: 0 },
     slayer: { task: null, streak: 0, points: 0, blocked: [], last: null }, // see data/slayer.js
+    tasks: { done: [], bonus: [], c: {}, unseen: false }, // achievements (data/tasks.js): done ids, tier bonuses paid, counters
     flags: { seenMoveHint: false },
     createdAt: Date.now(),
   };
