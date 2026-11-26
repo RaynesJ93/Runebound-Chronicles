@@ -119,9 +119,9 @@ function boot() {
       const name = SKILL_NAME[id];
       const oldCombat = combat.levelFrom(id, before);
       hud.levelUp(id, name, level);
-      hud.message(`Congratulations, your ${name} level is now ${level}.`);
       if (id === 'hitpoints') state.player.hp = Math.min(level, state.player.hp + (level - before));
-      if (combat.level > oldCombat) hud.message(`Your combat level is now ${combat.level}.`);
+      // combat level: its own banner, after the skill's level-up banner
+      if (combat.level > oldCombat) { const cl = combat.level; setTimeout(() => hud.levelUp('attack', 'Combat level', cl), 3700); }
       levelUpAt = time;
       refreshSkills();
       refreshQuests();
@@ -161,7 +161,6 @@ function boot() {
       cast: (id) => taskCount(`cast:${id}`), // combat spells, for achievements
       runeSaver: () => perk('runeSaver') && rng() < 0.1,
       enemyDied: (e) => {
-        hud.message(`You defeated the ${e.name}!`);
         state.stats.kills = (state.stats.kills || 0) + 1;
         taskCount(`kill:${e.def.id}`);
         slayerKill(e);
@@ -182,7 +181,7 @@ function boot() {
         }
         for (const drop of rollLoot(e.def.loot, rng, perk('keenEye') ? 1.1 : 1)) {
           ground.add(drop.item, drop.qty, e.tile.x, e.tile.y, time, { rare: drop.rare || !!ITEMS[drop.item]?.rare });
-          if (drop.rare) hud.message(`Rare drop: ${itemName(drop.item)}!`);
+          if (drop.rare) hud.popCard({ kind: 'rare', title: 'Rare drop!', name: `${itemName(drop.item)}${drop.qty > 1 ? ` × ${drop.qty}` : ''}`, reward: `From the ${e.name.toLowerCase()}`, icon: itemIcon(drop.item).url });
         }
       },
       playerDied: () => die(),
@@ -1136,7 +1135,7 @@ function boot() {
         },
         reward: (r) => {
           for (const [skill, xp] of Object.entries(r.xp || {})) book.add(skill, xp);
-          if (r.quest) { hud.message(`Quest complete: ${r.quest}!`); hud.toast?.(`Quest complete: ${r.quest}!`); }
+          if (r.quest) hud.popCard({ kind: 'quest', title: 'Quest complete!', name: r.quest, reward: 'Your rewards are in the Quests panel' });
           syncForge();
           save();
         },
@@ -1210,7 +1209,7 @@ function boot() {
     if (!t || !onTask(e) || t.left <= 0) return;
     t.left--;
     book.add('slayer', e.maxHp);
-    if (t.left > 0) { if (t.left % 5 === 0 || t.left <= 3) hud.message(`Slayer task: ${t.left} ${taskById(t.id).name} left.`); return; }
+    if (t.left > 0) return; // the slayer counter (top left) shows what's left
     const st = (sl().streak += 1);
     const pts = pointsFor(st, !!state.flags.huntersScroll);
     sl().points += pts;
@@ -1436,8 +1435,7 @@ function boot() {
           Object.assign(f, { lodeOn: true, lodeQuest: 'done' });
           book.add('runecrafting', 300);
           book.add('magic', 200);
-          hud.message('Quest complete: The Sleeping Stones!');
-          hud.toast?.('Quest complete: The Sleeping Stones!');
+          hud.popCard({ kind: 'quest', title: 'Quest complete!', name: 'The Sleeping Stones', reward: 'Every lodestone is awake' });
           hud.message('Every lodestone is awake. Touch any of them to travel to the others.');
           syncCaves();
           refreshQuests();

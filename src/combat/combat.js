@@ -159,7 +159,7 @@ export class Combat {
   resisted(e, dmg, kind) {
     const k = e.def.resist?.[kind];
     if (!dmg || k == null || k === 1) return dmg;
-    if (!e.resistTold) { e.resistTold = true; this.on.message?.(e.def.resistText || `The ${e.def.name.toLowerCase()} shrugs off some of the damage.`); }
+    if (!e.resistTold) { e.resistTold = true; this.on.note?.(e.def.resistText || `The ${e.def.name.toLowerCase()} shrugs off some of the damage.`); }
     return Math.max(1, Math.floor(dmg * k));
   }
 
@@ -232,13 +232,13 @@ export class Combat {
     if (b.phase === 1 && m.phase2At && frac <= m.phase2At) {
       b.phase = 2;
       b.slamIn = Math.min(b.slamIn, 3);
-      this.on.message?.(m.phase2Text || `The ${e.def.name} is enraged!`);
+      this.on.note?.(m.phase2Text || `The ${e.def.name} is enraged!`);
       this.on.bossEvent?.(e, 'phase2');
     }
     for (const thr of m.warCry || []) {
       if (b.cried.includes(thr) || frac > thr) continue;
       b.cried.push(thr);
-      this.on.message?.(m.warCryText || `The ${e.def.name} roars for help!`);
+      this.on.note?.(m.warCryText || `The ${e.def.name} roars for help!`);
       this.on.summon?.(e, m.adds, m.addCount || 2);
     }
     if (b.pinned > 0) { b.pinned--; return true; }
@@ -254,7 +254,7 @@ export class Combat {
       }
       const wind = m.slamWindup || 4;
       this.warnings.push({ by: e, tiles, at: this.ticks + wind, start: this.now, land: this.now + wind * 0.6, dmg: b.phase === 2 ? m.slamDmg2 || m.slamDmg : m.slamDmg });
-      this.on.message?.(m.slamText || `The ${e.def.name} raises its fists. Get off the red ground!`);
+      this.on.note?.(m.slamText || `The ${e.def.name} raises its fists. Get off the red ground!`);
       e.lungeAt = this.now;
       e.cooldown = Math.max(e.cooldown, wind);
       return true;
@@ -273,9 +273,9 @@ export class Combat {
       for (const t of w.tiles) this.impacts.push({ x: t.x, y: t.y, time: this.now });
       if (w.tiles.some((t) => t.x === pt.x && t.y === pt.y) && this.state.player.hp > 0) {
         const [lo, hi] = w.dmg;
-        this.on.message?.(w.by.def.mechanics?.hitText || 'The slam hits you!');
+        this.on.note?.(w.by.def.mechanics?.hitText || 'The slam hits you!');
         this.hurtPlayer(w.by, lo + Math.floor(this.rng() * (hi - lo + 1)));
-      } else this.on.message?.(w.by.def.mechanics?.clearText || 'You get clear of the slam!');
+      } else this.on.note?.(w.by.def.mechanics?.clearText || 'You get clear of the slam!');
     }
   }
 
@@ -338,6 +338,8 @@ export class Combat {
     return true;
   }
 
+  // (v0.59.2: combat chatter goes to on.note, which the game doesn't show; on.message
+  // is kept for things that stop you, like no arrows or not enough runes.)
   // Cast the chosen spell, using its runes. Returns false if you can't.
   cast(e) {
     const spell = this.spell;
@@ -463,7 +465,7 @@ export class Combat {
       if (def.aggressive && playerUp && near && this.level < def.level * 2 && this.canFight(e) && cheb(pt, e.spawn) <= def.leash) {
         e.state = 'fight';
         e.cooldown = Math.max(e.cooldown, 1);
-        this.on.message?.(`The ${def.name} attacks you!`);
+        this.on.note?.(`The ${def.name} attacks you!`);
       } else this.wander(e);
       return;
     }
@@ -477,7 +479,7 @@ export class Combat {
           const f = this.fightStats(e);
           // Fire breath (def.breath): every Nth attack, a bigger magic hit.
           const br = def.breath && (e.swings = (e.swings || 0) + 1) % def.breath.every === 0 ? def.breath : null;
-          if (br) this.on.message?.(br.text || `The ${def.name.toLowerCase()} breathes fire!`);
+          if (br) this.on.note?.(br.text || `The ${def.name.toLowerCase()} breathes fire!`);
           const dmg = resolveAttack(this.rng,
             { attack: f.attack, strength: f.strength, attackBonus: f.attackBonus, maxHit: br ? br.maxHit : f.maxHit },
             { defence: this.skills.defence, defenceBonus: this.defenceAgainst(br ? 'magic' : def.attackType || 'crush'), defenceStyle: this.defenceStyleBonus() });
@@ -488,7 +490,7 @@ export class Combat {
           // Rooting (def.root): every Nth attack holds you in place for a few ticks.
           if (def.root && (e.roots = (e.roots || 0) + 1) % def.root.every === 0) {
             this.rootUntil = this.now + def.root.ticks * 0.6;
-            this.on.message?.(def.root.text || `The ${def.name.toLowerCase()} roots you in place!`);
+            this.on.note?.(def.root.text || `The ${def.name.toLowerCase()} roots you in place!`);
           }
           // Drinking blood (def.drain): it heals by a share of what it hit.
           if (def.drain && dmg > 0 && e.hp < e.maxHp) e.hp = Math.min(e.maxHp, e.hp + Math.max(1, Math.floor(dmg * def.drain)));

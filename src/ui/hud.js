@@ -63,8 +63,8 @@ export class Hud {
         <div class="xp-drops" id="xp-drops" aria-hidden="true"></div>
       </div>
       <div class="taskdone hidden" id="taskdone" role="status">
-        <div class="taskdone-icon">${TASKS_SVG}</div>
-        <div><div class="taskdone-title">Task complete!</div><div class="taskdone-name" id="taskdone-name"></div><div class="taskdone-reward" id="taskdone-reward"></div></div>
+        <div class="taskdone-icon" id="taskdone-icon">${TASKS_SVG}</div>
+        <div><div class="taskdone-title" id="taskdone-title">Task complete!</div><div class="taskdone-name" id="taskdone-name"></div><div class="taskdone-reward" id="taskdone-reward"></div></div>
       </div>
       <div class="levelup hidden" id="levelup" role="status">
         <img class="px" id="levelup-icon" alt="">
@@ -961,17 +961,22 @@ export class Hud {
     setTimeout(() => d.remove(), 1900);
   }
 
-  // A task finished (v0.59.1): a card that pops up for a few seconds. Several
-  // at once queue up and show one after another.
-  taskDone(name, reward) {
-    (this.taskQueue ||= []).push({ name, reward });
+  // Pop-up cards (v0.59.1, v0.59.2): a task finished, a rare drop, a quest
+  // complete. Each shows for a few seconds; several queue up.
+  // kind: 'task' | 'rare' | 'quest'; icon: an image URL (or none for the checklist).
+  popCard({ kind = 'task', title, name, reward = '', icon = null }) {
+    (this.taskQueue ||= []).push({ kind, title, name, reward, icon });
     if (!this.taskShowing) this.nextTaskDone();
   }
+  taskDone(name, reward) { this.popCard({ kind: 'task', title: 'Task complete!', name, reward }); }
   nextTaskDone() {
     const el = this.$('taskdone');
     const t = this.taskQueue.shift();
     if (!t) { this.taskShowing = false; el.classList.add('hidden'); return; }
     this.taskShowing = true;
+    el.dataset.kind = t.kind;
+    this.$('taskdone-title').textContent = t.title;
+    this.$('taskdone-icon').innerHTML = t.icon ? `<img class="px" src="${t.icon}" alt="">` : t.kind === 'quest' ? SCROLL_SVG : TASKS_SVG;
     this.$('taskdone-name').textContent = t.name;
     this.$('taskdone-reward').textContent = t.reward;
     el.classList.remove('hidden', 'pop');
