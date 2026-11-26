@@ -748,3 +748,8 @@ img.mk-spot { width: 18px; height: 18px; filter: drop-shadow(0 0 1px #fff6dc) dr
   85% { opacity: 1; }
   100% { transform: translate(-50%, -8px); opacity: 0; }
 }
+.taskdone-icon img.px { width: 40px; height: 40px; display: block; }
+.taskdone[data-kind="rare"] { box-shadow: 0 0 0 3px #b03ad0, 0 6px 0 rgba(0,0,0,0.35); }
+.taskdone[data-kind="rare"] .taskdone-title { color: #8a2ab0; }
+.taskdone[data-kind="quest"] { box-shadow: 0 0 0 3px #e8b33c, 0 6px 0 rgba(0,0,0,0.35); }
+.taskdone[data-kind="quest"] .taskdone-title { color: #b8860b; }

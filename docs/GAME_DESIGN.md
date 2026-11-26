@@ -399,6 +399,15 @@ Earth and fire runes are also sold in the magic shop.
 
 *v0.51.3, painted art* (the "Lumenhaven Images 01–07" sheets): Lumenhaven has its own ground (`theme: 'fae'`: fae grass, violet paths, moonstone market paving and a starlit pool); painted fae stalls, a well of starlight, fae lanterns, giant toadstools and crystal clusters, all glowing in the dark (decor props can have `light`); the fairy ring you arrive by (v0.51.4: moved up into the open, clear of the edge trees); and a straight bridge of glowing moonstone across the pool to the cosmic island (it replaces the wooden causeway). The eight new altars (two frames: the second glows brighter), the eight new rune icons (spells use them too) and the glimmerwisp, fae sentinel and hollow shade are all painted.
 
+### Fewer messages, more pop-ups (v0.59.2)
+
+The message area on the left is now for things you need to know (what you can't do yet and why, examining things, story and world events, results of using items). Removed from it:
+
+- **Level ups:** the "Congratulations, your … level is now …" line (the level-up banner still shows). A new combat level gets its own banner ("Combat level is now 45") just after the skill's.
+- **Combat chatter:** "You defeated the …!", "The … attacks you!", resist, breath, root, enrage and war-cry lines, and boss slam/stomp warnings (the red ground shows those). In combat.js these go to `on.note`, which isn't shown. Messages that stop you (no arrows, not enough runes, Slayer level too low) stay.
+- **"Slayer task: X left":** the counter in the top left shows it.
+- **Rare drops** and **quest completions** are pop-up cards now, like task completions: a purple card with the item's icon ("Rare drop! Vine whip, from the vinegrasp horror") and a gold one with a scroll ("Quest complete! The Cold Forge"). `hud.popCard({ kind, title, name, reward, icon })`.
+
 ### Task pop-ups and icon item drops (v0.59.1)
 
 - **Task complete:** finishing an achievement task pops up a card in the upper middle of the screen for about 3 seconds ("Task complete!", the task's name, the points and coins), instead of a line in the message log. Several at once queue up. (Finishing a whole tier still opens a dialog.)
