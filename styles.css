@@ -443,7 +443,8 @@ summary.guide-sec:active { background: rgba(122, 90, 58, 0.12); }
   animation: xpfloat 1.6s ease-out forwards;
 }
 .xp-drop img.px { width: 20px; height: 20px; }
-.item-drop { color: #ffe9a8; top: 116px; font-size: 15px; } /* "+1 Iron ore": what you just gathered or made, just under its XP drop */
+.item-drop { color: #ffe9a8; top: 118px; } /* "+1" and the item's icon: what you just gathered or made, just under its XP drop */
+.item-drop img.px { width: 24px; height: 24px; }
 @keyframes xpfloat { 0% { opacity: 0; transform: translateY(10px); } 12% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-90px); } }
 
 .levelup {
@@ -727,3 +728,23 @@ img.mk-spot { width: 18px; height: 18px; filter: drop-shadow(0 0 1px #fff6dc) dr
 .task-points { background: #2b1d16; color: #f4e6c4; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
 .task-points b { color: #ffd34a; font-size: 1.2em; }
 .task-points .muted { color: #cdb894; }
+
+/* Task complete pop-up (v0.59.1) */
+.taskdone {
+  position: absolute; left: 50%; top: 27%; transform: translateX(-50%); z-index: 5; pointer-events: none;
+  display: flex; gap: 10px; align-items: center; padding: 10px 16px 10px 12px; min-width: 230px; max-width: calc(100vw - 32px);
+  background: #f4e6c4; border: 3px solid #2b1d16; border-radius: 12px; box-shadow: 0 0 0 3px #c89a3a, 0 6px 0 rgba(0,0,0,0.35);
+}
+.taskdone.hidden { display: none; }
+.taskdone-icon svg { width: 40px; height: 40px; display: block; }
+.taskdone-title { font-size: 17px; font-weight: 700; color: #2f7a34; }
+.taskdone-name { font-size: 15px; font-weight: 700; color: #2b1d16; }
+.taskdone-reward { font-size: 13px; color: #8a5a14; }
+.taskdone.pop { animation: taskpop 3.2s ease-out forwards; }
+@keyframes taskpop {
+  0% { transform: translate(-50%, 16px) scale(0.85); opacity: 0; }
+  10% { transform: translate(-50%, 0) scale(1.04); opacity: 1; }
+  16% { transform: translate(-50%, 0) scale(1); }
+  85% { opacity: 1; }
+  100% { transform: translate(-50%, -8px); opacity: 0; }
+}

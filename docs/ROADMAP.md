@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 26 Nov 2026 | v0.59.1: Finishing a task pops up a 'Task complete!' card instead of a message, and item drops show just '+1' and the item's icon, like an XP drop. |
 | 26 Nov 2026 | v0.59.0: Task points (easy 10, medium 30, hard 60, plus tier bonuses) and Tobin the Taskmaster in Brambleford: XP lamps, a coin pouch, six permanent perks (Light Feet: move 50% faster; Bountiful Harvest; Swift Hands; Keen Eye; Banker's Bond; Rune Saver), a bag of holding, the Taskmaster's ring and four task capes. |
 | 26 Nov 2026 | v0.58.3: 19 Fletching and Smithing achievement tasks (78 in all), from 150 arrow shafts and 5 bronze platebodies up to 250 steel arrows, 20 mithril platebodies, 500 rune arrows and a rune 2h sword. |
 | 26 Nov 2026 | v0.58.2: 23 more achievement tasks (59 in all), including 200 stardust, High Alchemy 50 times, the Molten Beast 5 times and level 99 in any skill. Spells cast now count. Tier bonuses up to 3,000 / 15,000 / 60,000. |

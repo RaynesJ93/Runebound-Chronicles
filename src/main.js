@@ -1245,7 +1245,7 @@ function boot() {
   const payCoins = (n) => {
     if (inventory.add('coins', n)) return 'coins';
     bank.put('coins', n);
-    return 'coins (sent to your bank: your bag was full)';
+    return 'coins (to your bank)';
   };
   function checkTasks() {
     const c = taskCtx(), T = state.tasks;
@@ -1254,7 +1254,8 @@ function boot() {
       if (T.done.includes(a.id) || !a.check(c)) continue;
       T.done.push(a.id);
       const tier = TASK_TIERS.find((t) => t.id === a.tier);
-      hud.message(`Task complete: ${a.name}! +${tier.points} task points and ${tier.coins.toLocaleString()} ${payCoins(tier.coins)}.`);
+      const where = payCoins(tier.coins);
+      hud.taskDone(a.name, `+${tier.points} task points · +${tier.coins.toLocaleString()} ${where}`);
       changed = true;
     }
     for (const tier of TASK_TIERS) {
