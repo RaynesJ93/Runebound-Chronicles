@@ -399,6 +399,18 @@ Earth and fire runes are also sold in the magic shop.
 
 *v0.51.3, painted art* (the "Lumenhaven Images 01–07" sheets): Lumenhaven has its own ground (`theme: 'fae'`: fae grass, violet paths, moonstone market paving and a starlit pool); painted fae stalls, a well of starlight, fae lanterns, giant toadstools and crystal clusters, all glowing in the dark (decor props can have `light`); the fairy ring you arrive by (v0.51.4: moved up into the open, clear of the edge trees); and a straight bridge of glowing moonstone across the pool to the cosmic island (it replaces the wooden causeway). The eight new altars (two frames: the second glows brighter), the eight new rune icons (spells use them too) and the glimmerwisp, fae sentinel and hollow shade are all painted.
 
+### RuneScape-style menus (v0.60.0)
+
+The whole interface uses a painted UI kit (from ChatGPT sheets, cut by `tools/ui_kit.py` into `assets/ui/`, about 630 KB; run it again with a new zip to replace any piece). Frames are CSS 9-slice `border-image`s, so the corners stay as drawn and the edges stretch to any size:
+
+- **Panels** (bag, bank, shops, map, skills, quests, guide, tasks, settings): parchment with a wood-and-stone frame and iron corners (`frameParch`), with an ornamental divider under the title.
+- **The bag's item grid:** a dark frame (`frameDark`) with recessed stone slots (`slot`).
+- **Speech, menus, the area name, hints, toasts and the target box:** the dialog frame (`frameDialog`); a boss's target box and the pop-up cards use the gold-studded card frame (`frameCard`); the level-up banner is a scroll (`scroll`).
+- **Buttons:** stone square buttons at the top and for hitpoints (`btnSquare`, pressed `btnSquareDown`), dark wood text buttons for Guide, Quests, the Slayer counter and panel buttons (`btnWide`), tabs (`tab`, `tabOn`, `tabDown`), the stone close X (`close`), parchment answer strips with a bronze bullet (`choice`, `choiceOn`) and small stone chips for quantities and settings (`qty`, `qtyOn`). Text on dark buttons is gold with a dark outline.
+- **Icons:** bag, tasks, map, combat, settings, guide, quests and the heart, plus the pop-up cards' tick (task), gem (rare drop, when the item has no icon) and sealed scroll (quest).
+
+The CSS is the block headed "RuneScape-style UI kit" at the end of styles.css.
+
 ### Fewer messages, more pop-ups (v0.59.2)
 
 The message area on the left is now for things you need to know (what you can't do yet and why, examining things, story and world events, results of using items). Removed from it:
