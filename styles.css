@@ -860,3 +860,7 @@ img.mk-spot { width: 18px; height: 18px; filter: drop-shadow(0 0 1px #fff6dc) dr
 .ui-ic { object-fit: contain; image-rendering: auto; }
 .guide-btn { height: 46px; padding: 0 6px 0 2px; }
 .guide-btn .ui-ic { width: 24px; height: 24px; }
+/* v0.60.1: the selected tab's old cream background showed through the kit's transparent corners */
+.tab.on, .tab:hover, .tab:focus-visible { background: none; border-color: transparent; }
+/* "17 / 28": on the same line as the tab labels */
+.inv-free { align-self: flex-end; height: 40px; line-height: 40px; margin-bottom: 0; color: #5a3a1a; font-size: 18px; }
