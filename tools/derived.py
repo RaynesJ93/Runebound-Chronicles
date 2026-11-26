@@ -1080,6 +1080,8 @@ for _k, _c in (('perkLightFeet', ['#0c2a2a', '#1a6a6a', '#3ab0b0', '#c0f8f0']), 
                ('perkSwiftHands', ['#2a1408', '#6a3414', '#c06a30', '#f8c890']), ('perkKeenEye', ['#1a0a2a', '#4a1a6a', '#8a4ab0', '#e0c0f8']),
                ('perkBankersBond', ['#2a2008', '#6a5414', '#c0a030', '#f8eca0']), ('perkRuneSaver', ['#081a2a', '#14446a', '#3a8ac0', '#b0e0f8'])):
     DERIVED[_k] = dict(icon=('huntersScroll', ramp_to(_c)))
+_PACK = ramp_to(['#1a1006', '#4a3014', '#7a5a2a', '#c8a868'])
+DERIVED['rangersBackpack'] = dict(icon=('bag', _PACK), small=('bag', _PACK), gear=('wolfCloak', ramp_to(['#141006', '#3a2a14', '#5e4a24', '#a08a58'])))
 STALKER = ramp_to(['#0c0814', '#241a38', '#45386a', '#8a7cb8'])
 WYRMHIDE = ramp_to(['#200604', '#5e140a', '#a83018', '#f0884a'])
 DERIVED['uncutDragonstone'] = dict(icon=('uncutRuby', red_to_violet))

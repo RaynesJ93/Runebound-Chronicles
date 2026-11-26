@@ -881,6 +881,12 @@ export const ITEMS = {
     name: 'Wyrmscale boots', value: 16000, rare: true, examine: 'Boots of ember wyrm scale. Still warm.',
     equip: { slot: 'feet', req: { defence: 60 }, def: { stab: 13, slash: 13, crush: 13, ranged: 10, magic: 2 }, str: 2 },
   },
+  // v0.60.4: from Kesta's slayer shop. ammoSave: chance an arrow, bolt, dart,
+  // knife or javelin isn't used up when you shoot (combat.js shoot()).
+  rangersBackpack: {
+    name: "Ranger's backpack", value: 0, examine: "Kesta's quiver-pack. +8 Ranged attack, and a 75% chance to save each arrow, bolt, dart or javelin you shoot. Needs Ranged 50.",
+    equip: { slot: 'cape', req: { ranged: 50 }, att: { ranged: 8 }, def: { stab: 1, slash: 1, crush: 1, ranged: 4, magic: 1 }, rangedStr: 2, ammoSave: 0.75, look: {} },
+  },
   huntersGauntlets: {
     name: "Hunter's gauntlets", value: 0, examine: "Kesta's own design: hard leather and steel, made for gripping a blade and finishing the hunt.",
     equip: { slot: 'hands', req: { attack: 60, defence: 60 }, att: { stab: 9, slash: 9, crush: 9 }, def: { stab: 8, slash: 8, crush: 8, ranged: 6 }, str: 7 },
