@@ -876,3 +876,7 @@ img.mk-spot { width: 18px; height: 18px; filter: drop-shadow(0 0 1px #fff6dc) dr
   .hud-top-right .icon-btn img.ui-ic, .hud-top-right .icon-btn img.px { width: 26px; height: 26px; }
   .guide-btn { font-size: 16px; }
 }
+/* Shop and bank item info (v0.60.3): long-press or right-click */
+.menu-title .menu-sub { display: block; font-weight: 400; font-size: 13px; color: #5a3a1a; margin-top: 3px; max-width: 260px; white-space: normal; }
+.menu-title .menu-price { display: block; font-weight: 700; font-size: 13px; color: #8a5a14; margin-top: 3px; }
+.trade-grid .slot { -webkit-touch-callout: none; }

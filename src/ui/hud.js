@@ -336,9 +336,31 @@ export class Hud {
         return;
       }
       const t = e.target.closest('[data-take]');
+      // a long-press just opened this item's info menu: don't buy it as well
+      if (t && this.tradeHeld) { this.tradeHeld = false; return; }
       if (t) { this.onTradeTake?.(t.dataset.take); return; }
       const g = e.target.closest('[data-give]');
       if (g) { this.onTradeGive?.(Number(g.dataset.give)); return; }
+    });
+    // Long-press (or right-click) a shop or bank item: what it is, its price,
+    // and buy/withdraw options (v0.60.3). A tap still buys or withdraws.
+    let hold = null;
+    this.el.trade.addEventListener('pointerdown', (e) => {
+      const t = e.target.closest('[data-take]');
+      if (!t || e.pointerType === 'mouse') return;
+      const id = t.dataset.take, x = e.clientX, y = e.clientY;
+      hold = { x, y, timer: setTimeout(() => { hold = null; this.tradeHeld = true; navigator.vibrate?.(12); this.onTradeInfo?.(id, x, y); }, 450) };
+    });
+    this.el.trade.addEventListener('pointermove', (e) => { if (hold && Math.hypot(e.clientX - hold.x, e.clientY - hold.y) > 10) { clearTimeout(hold.timer); hold = null; } });
+    const letGo = () => { if (hold) { clearTimeout(hold.timer); hold = null; } };
+    this.el.trade.addEventListener('pointerup', letGo);
+    this.el.trade.addEventListener('pointercancel', letGo);
+    this.el.trade.addEventListener('contextmenu', (e) => {
+      const t = e.target.closest('[data-take]');
+      if (!t) return;
+      e.preventDefault();
+      if (this.tradeHeld) return; // the long-press already did it
+      this.onTradeInfo?.(t.dataset.take, e.clientX, e.clientY);
     });
     $('bank-dep-inv').addEventListener('click', () => this.onDepositBag?.());
     $('bank-dep-gear').addEventListener('click', () => this.onDepositGear?.());

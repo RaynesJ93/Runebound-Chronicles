@@ -399,6 +399,10 @@ Earth and fire runes are also sold in the magic shop.
 
 *v0.51.3, painted art* (the "Lumenhaven Images 01–07" sheets): Lumenhaven has its own ground (`theme: 'fae'`: fae grass, violet paths, moonstone market paving and a starlit pool); painted fae stalls, a well of starlight, fae lanterns, giant toadstools and crystal clusters, all glowing in the dark (decor props can have `light`); the fairy ring you arrive by (v0.51.4: moved up into the open, clear of the edge trees); and a straight bridge of glowing moonstone across the pool to the cosmic island (it replaces the wooden causeway). The eight new altars (two frames: the second glows brighter), the eight new rune icons (spells use them too) and the glimmerwisp, fae sentinel and hollow shade are all painted.
 
+### What's this reward? (v0.60.3)
+
+In any shop (Tobin, Kesta, Lyra, Pell...) and the bank, **long-press an item** (or right-click it on a computer) to see its name, what it does and its price, with Buy 1 / 5 / 10 (Withdraw 1 / 5 / all in the bank). One-off rewards (perks, capes, rings, bags, upgrades) only offer Buy 1, and Tobin's capes and perks say what they need. A tap still buys or withdraws straight away; a long-press never buys by accident. The reward shops' intro text says to hold a reward to see what it is.
+
 ### RuneScape-style menus (v0.60.0)
 
 The whole interface uses a painted UI kit (from ChatGPT sheets, cut by `tools/ui_kit.py` into `assets/ui/`, about 630 KB; run it again with a new zip to replace any piece). Frames are CSS 9-slice `border-image`s, so the corners stay as drawn and the edges stretch to any size:
