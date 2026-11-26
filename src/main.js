@@ -16,7 +16,7 @@ import { Hud } from './ui/hud.js';
 import { Enemy } from './entities/enemy.js';
 import { ENEMIES } from '../data/enemies.js';
 import { Combat } from './combat/combat.js';
-import { SkillBook, SKILL_NAME, MELEE_STYLES, RANGED_STYLES } from './skills/skills.js';
+import { SkillBook, SKILL_NAME, MELEE_STYLES, RANGED_STYLES, SKILLS } from './skills/skills.js';
 import { SPELLS, UTILITY } from '../data/spells.js';
 import { maxHit, effectiveLevel } from './combat/formulas.js';
 import { Inventory } from './items/inventory.js';
@@ -158,6 +158,7 @@ function boot() {
         const here = ground.at(x, y).find((g) => g.item === id && !g.rare);
         if (here) { here.qty++; here.expires = time + 120; } else ground.add(id, 1, x, y, time);
       },
+      cast: (id) => taskCount(`cast:${id}`), // combat spells, for achievements
       enemyDied: (e) => {
         hud.message(`You defeated the ${e.name}!`);
         state.stats.kills = (state.stats.kills || 0) + 1;
@@ -385,6 +386,7 @@ function boot() {
     if (s.qty > 1) inventory.remove(s.id, 1); else inventory.removeSlot(i);
     inventory.add('coins', coins);
     book.add('magic', sp.xp);
+    taskCount(`cast:${sp.id}`);
     hud.message(`The ${def.name.toLowerCase()} melts into ${coins} coins.`);
     refreshInventory();
     save();
@@ -1197,6 +1199,8 @@ function boot() {
     get combat() { return combat.level; },
     quest: (id) => state.flags[questById(id)?.flag] === 'done',
     wearing: (id) => Object.values(equipment.slots).some((s) => s?.id === id),
+    have: (id) => haveAnywhere(id) || Object.values(equipment.slots).some((s) => s?.id === id),
+    get best() { return Math.max(...SKILLS.map((sk) => book.level(sk.id))); },
   });
   const payCoins = (n) => {
     if (inventory.add('coins', n)) return 'coins';

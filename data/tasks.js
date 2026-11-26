@@ -8,7 +8,8 @@
 //     gathered or made, areas you've been to, Slayer tasks finished);
 //   c.level(skill), c.total (total level), c.combat (combat level);
 //   c.quest(id) true once that quest is complete;
-//   c.wearing(id) true if you have that item equipped.
+//   c.wearing(id) true if you have that item equipped;
+//   c.have(id) true if it's in your bag, bank or worn; c.best = your highest skill level.
 // `progress(c)` (optional) returns [have, need] for a progress count.
 //
 // Each task pays coins when you complete it, and finishing a whole tier pays
@@ -17,9 +18,9 @@
 // amounts went up, so they count again from where your counter is).
 
 export const TASK_TIERS = [
-  { id: 'easy', name: 'Easy', coins: 150, bonus: 2000 },
-  { id: 'medium', name: 'Medium', coins: 600, bonus: 10000 },
-  { id: 'hard', name: 'Hard', coins: 2500, bonus: 40000 },
+  { id: 'easy', name: 'Easy', coins: 150, bonus: 3000 },
+  { id: 'medium', name: 'Medium', coins: 600, bonus: 15000 },
+  { id: 'hard', name: 'Hard', coins: 2500, bonus: 60000 },
 ];
 
 const get = (id, n = 1) => ({ check: (c) => c.count(`get:${id}`) >= n, progress: (c) => [Math.min(n, c.count(`get:${id}`)), n] });
@@ -27,6 +28,7 @@ const kill = (id, n = 1) => ({ check: (c) => c.count(`kill:${id}`) >= n, progres
 const visit = (id) => ({ check: (c) => c.count(`visit:${id}`) >= 1 });
 const level = (sk, n) => ({ check: (c) => c.level(sk) >= n, progress: (c) => [Math.min(n, c.level(sk)), n] });
 const quest = (id) => ({ check: (c) => c.quest(id) });
+const cast = (id, n) => ({ check: (c) => c.count(`cast:${id}`) >= n, progress: (c) => [Math.min(n, c.count(`cast:${id}`)), n] });
 
 export const ACHIEVEMENTS = [
   // ---- Easy ----
@@ -41,6 +43,15 @@ export const ACHIEVEMENTS = [
   { id: 'e_air100', tier: 'easy', name: 'Craft 100 air runes', hint: 'Rune essence at the air altar, north-east of the Whispering Vale.', ...get('airRune', 100) },
   { id: 'e_vale', tier: 'easy', name: 'Visit the Whispering Vale', hint: 'Off the east edge of Thornwood.', ...visit('vale') },
   { id: 'e_lodestones', tier: 'easy', name: 'Finish The Sleeping Stones', hint: 'The lodestone quest.', ...quest('lodestones') },
+  // (v0.58.2)
+  { id: 'e_anchovies20', tier: 'easy', name: 'Catch 20 anchovies', hint: "Small net on Brambleford's river (Fishing 15).", ...get('rawAnchovies', 20) },
+  { id: 'e_tin25', tier: 'easy', name: 'Mine 25 tin ore', hint: 'Copperdeep Mine, the west gallery.', ...get('tinOre', 25) },
+  { id: 'e_shortbow15', tier: 'easy', name: 'Fletch 15 shortbows', hint: 'A knife on normal logs (Fletching 5).', ...get('shortbow', 15) },
+  { id: 'e_chickens15', tier: 'easy', name: 'Kill 15 chickens', hint: "The chicken pen in Brambleford.", ...kill('chicken', 15) },
+  { id: 'e_spiders10', tier: 'easy', name: 'Kill 10 giant spiders', hint: 'They lurk in Thornwood.', ...kill('giantSpider', 10) },
+  { id: 'e_water100', tier: 'easy', name: 'Craft 100 water runes', hint: 'The water altar, south-west of the Whispering Vale (Runecrafting 5).', ...get('waterRune', 100) },
+  { id: 'e_mine', tier: 'easy', name: 'Visit Copperdeep Mine', hint: 'North of Thornwood.', ...visit('mine') },
+  { id: 'e_wind25', tier: 'easy', name: 'Cast Wind Strike 25 times', hint: 'Your first combat spell: an air and a mind rune each.', ...cast('windStrike', 25) },
   { id: 'e_total', tier: 'easy', name: 'Reach total level 75', hint: 'Every level in every skill counts.', check: (c) => c.total >= 75, progress: (c) => [Math.min(75, c.total), 75] },
 
   // ---- Medium ----
@@ -55,6 +66,14 @@ export const ACHIEVEMENTS = [
   { id: 'm_cosmic200', tier: 'medium', name: 'Craft 200 cosmic runes', hint: 'The island altar in Lumenhaven (Runecrafting 27).', ...get('cosmicRune', 200) },
   { id: 'm_greenmire', tier: 'medium', name: 'Visit Greenmire Rainforest', hint: "South of Brambleford, over the river bridge.", ...visit('rainforest') },
   { id: 'm_ruby10', tier: 'medium', name: 'Cut 10 rubies', hint: 'A chisel on an uncut ruby (Crafting 34).', ...get('ruby', 10) },
+  // (v0.58.2)
+  { id: 'm_salmon50', tier: 'medium', name: 'Catch 50 salmon', hint: 'A fly rod at a lure spot (Fishing 30).', ...get('rawSalmon', 50) },
+  { id: 'm_gold25', tier: 'medium', name: 'Smelt 25 gold bars', hint: 'Gold ore at a furnace (Smithing 40).', ...get('goldBar', 25) },
+  { id: 'm_stardust200', tier: 'medium', name: 'Mine 200 stardust', hint: 'From the shooting stars that fall around the world. Lyra trades for it.', ...get('stardust', 200) },
+  { id: 'm_chief', tier: 'medium', name: 'Defeat the Goblin Chief', hint: "The goblin camp in west Thornwood.", ...kill('goblinChief') },
+  { id: 'm_bloodbats30', tier: 'medium', name: 'Kill 30 bloodbats', hint: 'The Slayer Caverns or Copperdeep Hollow (Slayer 25).', ...kill('bloodbat', 30) },
+  { id: 'm_war', tier: 'medium', name: 'Finish Echoes of the War', hint: 'A quest.', ...quest('war') },
+  { id: 'm_alch50', tier: 'medium', name: 'Cast High Alchemy 50 times', hint: 'Turns an item into coins: 1 nature and 5 fire runes (Magic 55).', ...cast('highAlch', 50) },
   { id: 'm_cart', tier: 'medium', name: 'Finish The Overturned Cart', hint: 'A quest.', ...quest('cart') },
 
   // ---- Hard ----
@@ -69,6 +88,15 @@ export const ACHIEVEMENTS = [
   { id: 'h_wyrmhide', tier: 'hard', name: 'Wear a wyrmhide body', hint: 'Sewn from ember wyrm hides (Crafting 72, Ranged 50).', check: (c) => c.wearing('wyrmhideBody') },
   { id: 'h_slayer25', tier: 'hard', name: 'Finish 25 Slayer tasks', hint: 'Any tasks from Kesta.', check: (c) => c.count('slayer:done') >= 25, progress: (c) => [Math.min(25, c.count('slayer:done')), 25] },
   { id: 'h_story', tier: 'hard', name: 'Finish The Runebound', hint: 'The end of the story.', ...quest('final') },
+  // (v0.58.2)
+  { id: 'h_magic50', tier: 'hard', name: 'Chop 50 magic logs', hint: 'Magic trees glow all over Lumenhaven (Woodcutting 75).', ...get('magicLogs', 50) },
+  { id: 'h_adamant100', tier: 'hard', name: 'Mine 100 adamantite ore', hint: 'The west gallery of the Sunken Forge (Mining 70).', ...get('adamantiteOre', 100) },
+  { id: 'h_runePlate', tier: 'hard', name: 'Smith a rune platebody', hint: 'Five rune bars at an anvil (Smithing 99).', ...get('runePlatebody') },
+  { id: 'h_molten5', tier: 'hard', name: 'Defeat the Molten Beast 5 times', hint: 'The far hall of the Sunken Forge.', ...kill('moltenBeast', 5) },
+  { id: 'h_whip', tier: 'hard', name: 'Get a vine whip', hint: 'A rare drop from vinegrasp horrors (Slayer 70).', check: (c) => c.have('vineWhip') },
+  { id: 'h_superior', tier: 'hard', name: 'Wear a superior slayer helmet', hint: "From Kesta's Slayer shop (Defence 60).", check: (c) => c.wearing('superiorSlayerHelmet') },
+  { id: 'h_coldForge', tier: 'hard', name: 'Finish The Cold Forge', hint: 'A quest.', ...quest('coldForge') },
+  { id: 'h_99', tier: 'hard', name: 'Reach level 99 in any skill', hint: 'The top of any skill.', check: (c) => c.best >= 99, progress: (c) => [Math.min(99, c.best), 99] },
   { id: 'h_combat', tier: 'hard', name: 'Reach combat level 80', hint: 'Attack, Strength, Defence, Hitpoints, Ranged and Magic all count.', check: (c) => c.combat >= 80, progress: (c) => [Math.min(80, c.combat), 80] },
 ];
 

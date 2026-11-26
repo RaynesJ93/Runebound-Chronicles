@@ -354,6 +354,7 @@ export class Combat {
       return false;
     }
     for (const [id, n] of Object.entries(spell.runes)) this.inv.remove(id, n);
+    this.on.cast?.(spell.id); // counted for achievements (v0.58.2)
     const b = this.gear.bonuses();
     const dmg = resolveAttack(this.rng,
       { attack: s.magic, attackBonus: b.att.magic, maxHit: spell.maxHit, boost: this.on.taskBoost?.(e) },
