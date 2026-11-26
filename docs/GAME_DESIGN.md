@@ -423,7 +423,7 @@ Finishing (Fletching), and how they compare with metal:
 | Cursed bone dart | 55 | Ranged 20, +14 / +14 | mithril 12, adamant 16 |
 | Wyrm bone dart | 70 | Ranged 30, +18 / +18 | adamant 16, rune 20 |
 
-Tap bones (or the knife) to open the carving menu; tap the tips to fletch them. Recipes in `data/fletching.js` (carving ones have `skill: 'crafting'`). Stand-in art: recoloured bones and bronze ammo (tools/derived.py). Old saved bones stay plain Bones.
+Tap bones (or the knife) to open the carving menu; tap the tips to fletch them. Recipes in `data/fletching.js` (carving ones have `skill: 'crafting'`). Painted icons (26 Nov 2026, tools/new_art.py set `bones`; the plain bones icon was repainted too). Old saved bones stay plain Bones.
 
 ### Ranger's backpack (v0.60.4)
 
