@@ -1193,13 +1193,13 @@ for (const [skill, name, value] of [['attack', 'Attack', 60], ['strength', 'Stre
 
 // ---- Stacks ------------------------------------------------------------------
 // How many fit in one bag slot:
-// - skilling materials, food, hides and leather: 20
+// - skilling materials, food, hides, leather and bones: 20
 // - arrows, runes and other small things that already stack: 999
 // - coins: no limit
 // - weapons, armour, tools and potions: 1 (they don't stack)
 // The bank stacks everything without limit.
 // (by name pattern, so new logs, ores and bars stack too: v0.51.6 fixed willow to elder logs)
-const STACK_20 = /^(logs|[a-z]+Logs|[a-z]+Ore|coal|[a-z]+Bar|uncut[A-Z]\w*|sapphire|emerald|ruby|diamond|dragonstone|runeEssence|cowhide|wolfPelt|[a-z]+Hide|leather|hardLeather|[a-z]+Leather|raw[A-Z]\w*|burnt[A-Z]\w*)$/;
+const STACK_20 = /^(logs|[a-z]+Logs|[a-z]+Ore|coal|[a-z]+Bar|uncut[A-Z]\w*|sapphire|emerald|ruby|diamond|dragonstone|runeEssence|cowhide|wolfPelt|[a-z]+Hide|leather|hardLeather|[a-z]+Leather|raw[A-Z]\w*|burnt[A-Z]\w*|bones|[a-z]+Bones)$/;
 for (const [id, it] of Object.entries(ITEMS)) {
   if (STACK_20.test(id) || it.food) { it.stackable = true; it.stack = 20; }
   else if (it.stackable) it.stack = id === 'coins' ? Infinity : 999;
