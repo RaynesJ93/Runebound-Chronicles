@@ -29,6 +29,30 @@ export const SHOPS = {
       { id: 'slayerGem', price: 1 },
     ],
   },
+  // Tobin the Taskmaster (v0.59.0): paid in task points. perk: sets that perk
+  // for good (never goes in your bag). needsTier: you must have finished that
+  // tier's tasks ('all' = every task).
+  taskShop: {
+    name: "Tobin's task rewards", currency: 'taskPoints', buyOnly: true, unlimited: true,
+    stock: [
+      { id: 'smallLamp', price: 25 },
+      { id: 'mediumLamp', price: 75 },
+      { id: 'largeLamp', price: 200 },
+      { id: 'coinPouch', price: 50 },
+      { id: 'perkLightFeet', price: 50, perk: true },
+      { id: 'perkBountiful', price: 150, perk: true },
+      { id: 'perkSwiftHands', price: 150, perk: true },
+      { id: 'perkKeenEye', price: 250, perk: true },
+      { id: 'perkBankersBond', price: 300, perk: true },
+      { id: 'perkRuneSaver', price: 400, perk: true },
+      { id: 'bagOfHolding', price: 200 },
+      { id: 'taskmasterRing', price: 400 },
+      { id: 'easyTaskCape', price: 100, needsTier: 'easy' },
+      { id: 'mediumTaskCape', price: 300, needsTier: 'medium' },
+      { id: 'hardTaskCape', price: 800, needsTier: 'hard' },
+      { id: 'taskMasterCape', price: 1500, needsTier: 'all' },
+    ],
+  },
   generalStore: {
     name: "Pell's General Store",
     stock: [

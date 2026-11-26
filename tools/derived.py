@@ -1065,6 +1065,21 @@ def red_to_violet(im, get=None):
 
 BRASS = ramp_to(['#2a1a06', '#6a4a14', '#b08a30', '#f0dc8a'])
 DERIVED['bessiesCowbell'] = dict(icon=('goldAmulet', BRASS), gear=('goldAmulet', BRASS))
+# Task points rewards (v0.59.0): stand-ins until painted.
+_GOLD = ramp_to(['#3a2408', '#8a5a14', '#d8a030', '#fff0a0'])
+for _k, _r in (('smallLamp', ramp_to(['#2a1a08', '#7a4a18', '#c08030', '#f0c870'])), ('mediumLamp', _GOLD), ('largeLamp', ramp_to(['#3a2a08', '#a87a10', '#f0c830', '#fffbd8']))):
+    DERIVED[_k] = dict(icon=('vial', _r))
+DERIVED['coinPouch'] = dict(icon=('bag', ramp_to(['#2a1606', '#6a3e14', '#b07a30', '#f0d080'])))
+DERIVED['bagOfHolding'] = dict(icon=('bag', ramp_to(['#140a24', '#3a2266', '#6a48b0', '#c8b0f0'])))
+DERIVED['taskmasterRing'] = dict(icon=('goldEmeraldRing', ramp_to(['#1a2408', '#3a6a1a', '#6ab03a', '#e0f0a0'], light_only=True)))
+for _k, _c in (('easyTaskCape', ['#0c2410', '#1e5a26', '#3a9a44', '#a8e8a0']), ('mediumTaskCape', ['#0c1430', '#1e3a7a', '#3a6ad0', '#b0c8f8']),
+               ('hardTaskCape', ['#24081a', '#6a1a3e', '#b03a6a', '#f0b0c8']), ('taskMasterCape', ['#3a2408', '#8a5a14', '#e0a828', '#fff4b0'])):
+    _r = ramp_to(_c)
+    DERIVED[_k] = dict(icon=('wolfCloak', _r), small=('wolfCloak', _r), gear=('wolfCloak', _r))
+for _k, _c in (('perkLightFeet', ['#0c2a2a', '#1a6a6a', '#3ab0b0', '#c0f8f0']), ('perkBountiful', ['#1a2a08', '#3a6a14', '#7ab030', '#e0f8a0']),
+               ('perkSwiftHands', ['#2a1408', '#6a3414', '#c06a30', '#f8c890']), ('perkKeenEye', ['#1a0a2a', '#4a1a6a', '#8a4ab0', '#e0c0f8']),
+               ('perkBankersBond', ['#2a2008', '#6a5414', '#c0a030', '#f8eca0']), ('perkRuneSaver', ['#081a2a', '#14446a', '#3a8ac0', '#b0e0f8'])):
+    DERIVED[_k] = dict(icon=('huntersScroll', ramp_to(_c)))
 STALKER = ramp_to(['#0c0814', '#241a38', '#45386a', '#8a7cb8'])
 WYRMHIDE = ramp_to(['#200604', '#5e140a', '#a83018', '#f0884a'])
 DERIVED['uncutDragonstone'] = dict(icon=('uncutRuby', red_to_violet))

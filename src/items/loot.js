@@ -2,7 +2,8 @@
 
 const qtyOf = (e, rng) => (e.qty ?? (e.min + Math.floor(rng() * (e.max - e.min + 1))));
 
-export function rollLoot(loot, rng) {
+// rareBoost: Keen Eye (task perk, v0.59.0) makes rare drops a little more likely.
+export function rollLoot(loot, rng, rareBoost = 1) {
   if (!loot) return [];
   const out = [];
   for (const e of loot.always || []) out.push({ item: e.item, qty: qtyOf(e, rng), rare: false });
@@ -14,8 +15,8 @@ export function rollLoot(loot, rng) {
     }
   }
   // each: every entry rolls on its own, so a kill can give several (or none).
-  for (const e of loot.each || []) if (rng() < e.chance) out.push({ item: e.item, qty: qtyOf(e, rng), rare: !!e.rare });
-  if (loot.rare && rng() < loot.rare.chance) {
+  for (const e of loot.each || []) if (rng() < e.chance * (e.rare ? rareBoost : 1)) out.push({ item: e.item, qty: qtyOf(e, rng), rare: !!e.rare });
+  if (loot.rare && rng() < loot.rare.chance * rareBoost) {
     const t = loot.rare.table;
     const e = t[Math.floor(rng() * t.length)];
     out.push({ item: e.item, qty: qtyOf(e, rng), rare: true });

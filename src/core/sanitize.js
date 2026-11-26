@@ -10,7 +10,7 @@ import { ITEMS, maxStack } from '../../data/items.js';
 const LEGACY_NOTES = { runeEssenceNoted: 'runeEssence' };
 const unNote = (s) => (s && typeof s === 'object' && LEGACY_NOTES[s.id] ? { ...s, id: LEGACY_NOTES[s.id] } : s);
 import { AREAS, START_AREA } from '../../data/areas/index.js';
-import { achievementById, TASK_TIERS } from '../../data/tasks.js';
+import { achievementById, TASK_TIERS, holdable, HOLD_MAX, RING_CHARGES } from '../../data/tasks.js';
 import { SPELLS } from '../../data/spells.js';
 import { SLOTS } from '../items/equipment.js';
 import { SKILLS } from '../skills/skills.js';
@@ -162,7 +162,14 @@ export function sanitize(state) {
     bonus: Array.isArray(tk.bonus) ? [...new Set(tk.bonus.filter((id) => TASK_TIERS.some((t) => t.id === id)))] : [],
     c: counters,
     unseen: !!tk.unseen,
+    spent: Math.floor(num(tk.spent, 0, 0, 1e7)),
+    bankAt: num(tk.bankAt, 0, 0),
+    ring: tk.ring && typeof tk.ring === 'object' && typeof tk.ring.day === 'string' ? { day: tk.ring.day.slice(0, 10), used: Math.floor(num(tk.ring.used, 0, 0, RING_CHARGES)) } : null,
   };
+  // The bag of holding (v0.59.0): only things it can hold, up to HOLD_MAX each.
+  const hold = {};
+  if (state.holding && typeof state.holding === 'object') for (const [id, n] of Object.entries(state.holding)) if (holdable(id) && ITEMS[id]) { const k = Math.floor(num(n, 0, 0, HOLD_MAX)); if (k) hold[id] = k; }
+  state.holding = hold;
 
   return state;
 }

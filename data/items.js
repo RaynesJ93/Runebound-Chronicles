@@ -1048,6 +1048,37 @@ export const ITEMS = {
     name: "Bessie's cowbell", value: 500, rare: true, examine: "Old Bessie's brass cowbell, dented from a hundred stomps. It still rings loud and clear.",
     equip: { slot: 'neck', req: {}, def: { stab: 3, slash: 3, crush: 3, ranged: 3, magic: 3 }, str: 1 },
   },
+  // ---- Task points rewards (v0.59.0): Tobin the Taskmaster's shop ----
+  taskPoints: { name: 'Task points', value: 0, examine: 'Points from achievement tasks. Spend them with Tobin the Taskmaster.' }, // a currency, never in your bag
+  smallLamp: { name: 'Small XP lamp', value: 0, examine: 'Rub it and pick a skill for some XP in it: the higher your level, the more you get.' },
+  mediumLamp: { name: 'Medium XP lamp', value: 0, examine: 'Rub it and pick a skill for a good chunk of XP in it: the higher your level, the more you get.' },
+  largeLamp: { name: 'Large XP lamp', value: 0, examine: 'Rub it and pick a skill for a big pile of XP in it: the higher your level, the more you get.' },
+  coinPouch: { name: 'Coin pouch', value: 0, examine: 'A fat little pouch. Open it for 5,000 coins.' },
+  bagOfHolding: { name: 'Bag of holding', value: 0, examine: 'Bigger on the inside. While it is in your bag, logs, ores and raw fish you gather go into it first: up to 100 of each. Tap it to take them out; deposit your bag at a bank to empty it.' },
+  taskmasterRing: { name: "Taskmaster's ring", value: 0, examine: 'Tap it to teleport to Brambleford, Thornwood or Lumenhaven. 3 charges a day.' },
+  easyTaskCape: {
+    name: 'Easy task cape', value: 0, examine: 'For finishing every easy task. Green and proud.',
+    equip: { slot: 'cape', req: {}, att: { stab: 1, slash: 1, crush: 1, ranged: 1, magic: 1 }, def: { stab: 2, slash: 2, crush: 2, ranged: 2, magic: 2 }, str: 1, look: {} },
+  },
+  mediumTaskCape: {
+    name: 'Medium task cape', value: 0, examine: 'For finishing every medium task.',
+    equip: { slot: 'cape', req: {}, att: { stab: 2, slash: 2, crush: 2, ranged: 2, magic: 2 }, def: { stab: 3, slash: 3, crush: 3, ranged: 3, magic: 3 }, str: 2, look: {} },
+  },
+  hardTaskCape: {
+    name: 'Hard task cape', value: 0, examine: 'For finishing every hard task. Not many wear this.',
+    equip: { slot: 'cape', req: {}, att: { stab: 3, slash: 3, crush: 3, ranged: 3, magic: 3 }, def: { stab: 4, slash: 4, crush: 4, ranged: 4, magic: 4 }, str: 3, look: {} },
+  },
+  taskMasterCape: {
+    name: 'Task Master cape', value: 0, rare: true, examine: 'For finishing every task there is. Tap it in your bag to teleport to Tobin.',
+    equip: { slot: 'cape', req: {}, att: { stab: 4, slash: 4, crush: 4, ranged: 4, magic: 4 }, def: { stab: 6, slash: 6, crush: 6, ranged: 6, magic: 6 }, str: 4, look: {} },
+  },
+  // Perks: bought once from Tobin, always on (never in your bag; data/tasks.js PERKS)
+  perkLightFeet: { name: 'Light Feet', value: 0, examine: 'Perk: walk and run 50% faster. Skilling stays the same speed.' },
+  perkBountiful: { name: 'Bountiful Harvest', value: 0, examine: 'Perk: a 10% chance of a second log, ore or fish.' },
+  perkSwiftHands: { name: 'Swift Hands', value: 0, examine: 'Perk: Smithing, Fletching, Crafting and Cooking 20% faster.' },
+  perkKeenEye: { name: 'Keen Eye', value: 0, examine: 'Perk: rare drops come 10% more often.' },
+  perkBankersBond: { name: "Banker's Bond", value: 0, examine: 'Perk: open your bank from anywhere, once every 10 minutes (Tasks panel).' },
+  perkRuneSaver: { name: 'Rune Saver', value: 0, examine: 'Perk: a 10% chance that a spell costs no runes.' },
   // ---- Skill review batch 3 (v0.52.0): dragonstone and two tiers of ranged hide armour ----
   uncutDragonstone: { name: 'Uncut dragonstone', value: 2500, examine: 'A rough violet gem, warm from a wyrm\'s hoard. Cut it with a chisel (Crafting 55).' },
   dragonstone: { name: 'Dragonstone', value: 3750, examine: 'A cut dragonstone. Set it in a ring or amulet at a furnace (Crafting 70+).' },
