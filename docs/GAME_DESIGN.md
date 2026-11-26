@@ -399,6 +399,11 @@ Earth and fire runes are also sold in the magic shop.
 
 *v0.51.3, painted art* (the "Lumenhaven Images 01–07" sheets): Lumenhaven has its own ground (`theme: 'fae'`: fae grass, violet paths, moonstone market paving and a starlit pool); painted fae stalls, a well of starlight, fae lanterns, giant toadstools and crystal clusters, all glowing in the dark (decor props can have `light`); the fairy ring you arrive by (v0.51.4: moved up into the open, clear of the edge trees); and a straight bridge of glowing moonstone across the pool to the cosmic island (it replaces the wooden causeway). The eight new altars (two frames: the second glows brighter), the eight new rune icons (spells use them too) and the glimmerwisp, fae sentinel and hollow shade are all painted.
 
+### Task pop-ups and icon item drops (v0.59.1)
+
+- **Task complete:** finishing an achievement task pops up a card in the upper middle of the screen for about 3 seconds ("Task complete!", the task's name, the points and coins), instead of a line in the message log. Several at once queue up. (Finishing a whole tier still opens a dialog.)
+- **Item drops** show just "+1" (or "+25") and the item's icon, styled like the XP drop just above them, instead of "+1 Willow logs".
+
 ### Task points and Tobin the Taskmaster (v0.59.0)
 
 Every achievement task now earns **task points** as well as coins: easy 10, medium 30, hard 60, plus a bonus for a whole tier (100 / 250 / 500). Coins per task dropped to 100 / 400 / 1,500 (tier coin bonuses unchanged). Points are worked out from the tasks you've done (`pointsEarned` in data/tasks.js), so tasks finished before points existed count; `state.tasks.spent` is what you've spent. The Tasks panel shows your balance, your perks and the Banker's Bond button. A full game is 2,630 points (with every tier bonus, 3,480).
@@ -973,7 +978,7 @@ A cave system behind Kesta's camp in south-west Thornwood: the mouth is in a roc
 - The caverns are on the map ("Slayer Caverns" tab). The monsters' old spots (Depths, Hollow, Warrens, Forge) stay too.
 - Kesta's tips for these tasks mention the caverns.
 
-### Item pop-ups (v0.51.2)
+### Item pop-ups (v0.51.2; since v0.59.1 just "+1" and the icon)
 
 Gathering and making no longer print a line each time ("You swing your pickaxe at the rock.", "You manage to mine some iron.", "You smelt the ore into a bar."): the animation already shows what you're doing. Instead, what you get pops up as "+1 Iron ore" with its icon, just under its XP drop, top right (`hud.itemDrop`). It covers mining (and gems), woodcutting, fishing, runecrafting ("+20 Cosmic rune"), smelting, smithing (and saved bars), cooking (a burn shows as "+1 Burnt fish"), fletching and crafting. Messages you need to read stay: a full bag, a level or tool you're missing, a rock or tree running out. Hidden with the XP drops if you turn those off.
 

@@ -62,6 +62,10 @@ export class Hud {
         <button class="icon-btn ui" id="btn-settings" aria-label="Settings">${uiIcon('settings', GEAR_SVG, 32)}</button>
         <div class="xp-drops" id="xp-drops" aria-hidden="true"></div>
       </div>
+      <div class="taskdone hidden" id="taskdone" role="status">
+        <div class="taskdone-icon">${TASKS_SVG}</div>
+        <div><div class="taskdone-title">Task complete!</div><div class="taskdone-name" id="taskdone-name"></div><div class="taskdone-reward" id="taskdone-reward"></div></div>
+      </div>
       <div class="levelup hidden" id="levelup" role="status">
         <img class="px" id="levelup-icon" alt="">
         <span class="levelup-title">Level up!</span><span class="levelup-text" id="levelup-text"></span>
@@ -949,10 +953,31 @@ export class Hud {
     const box = this.$('xp-drops');
     const d = document.createElement('div');
     d.className = 'xp-drop item-drop';
-    d.innerHTML = `<span class="xp-part"><img class="px" src="${itemIcon(id).url}" alt=""><span>+${qty.toLocaleString('en-GB')} ${ITEMS[id]?.name || id}</span></span>`;
+    // v0.59.1: just "+1" and the item's icon, like an XP drop (the name is in the title, for screen readers)
+    d.title = ITEMS[id]?.name || id;
+    d.innerHTML = `<span class="xp-part"><img class="px" src="${itemIcon(id).url}" alt=""><span>+${qty.toLocaleString('en-GB')}</span></span>`;
     box.appendChild(d);
     while (box.children.length > 4) box.firstChild.remove();
     setTimeout(() => d.remove(), 1900);
+  }
+
+  // A task finished (v0.59.1): a card that pops up for a few seconds. Several
+  // at once queue up and show one after another.
+  taskDone(name, reward) {
+    (this.taskQueue ||= []).push({ name, reward });
+    if (!this.taskShowing) this.nextTaskDone();
+  }
+  nextTaskDone() {
+    const el = this.$('taskdone');
+    const t = this.taskQueue.shift();
+    if (!t) { this.taskShowing = false; el.classList.add('hidden'); return; }
+    this.taskShowing = true;
+    this.$('taskdone-name').textContent = t.name;
+    this.$('taskdone-reward').textContent = t.reward;
+    el.classList.remove('hidden', 'pop');
+    void el.offsetWidth;
+    el.classList.add('pop');
+    setTimeout(() => this.nextTaskDone(), 3300);
   }
 
   levelUp(skillId, skillName, level) {
