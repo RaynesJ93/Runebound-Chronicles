@@ -441,7 +441,7 @@ Every achievement task now earns **task points** as well as coins: easy 10, medi
 
 | Reward | Points | What it does |
 | --- | --- | --- |
-| Small / medium / large XP lamp | 25 / 75 / 200 | Rub, pick a skill: level × 10 / 35 / 100 XP, with the game's XP rate on top (so ×12) |
+| Small / medium / large XP lamp | 25 / 75 / 200 | Rub, pick a skill: level × 10 / 35 / 100 XP, with the game's XP rate on top (so ×24) |
 | Coin pouch | 50 | 5,000 coins |
 | Light Feet (perk) | 50 | Walk and run 50% faster (`player.speedMul`); skilling speed is unchanged |
 | Bountiful Harvest (perk) | 150 | 10% chance of a second log, ore or fish |
