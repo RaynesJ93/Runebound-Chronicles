@@ -52,6 +52,13 @@ export const ACHIEVEMENTS = [
   { id: 'e_water100', tier: 'easy', name: 'Craft 100 water runes', hint: 'The water altar, south-west of the Whispering Vale (Runecrafting 5).', ...get('waterRune', 100) },
   { id: 'e_mine', tier: 'easy', name: 'Visit Copperdeep Mine', hint: 'North of Thornwood.', ...visit('mine') },
   { id: 'e_wind25', tier: 'easy', name: 'Cast Wind Strike 25 times', hint: 'Your first combat spell: an air and a mind rune each.', ...cast('windStrike', 25) },
+  // Fletching and Smithing (v0.58.3)
+  { id: 'e_shafts150', tier: 'easy', name: 'Fletch 150 arrow shafts', hint: 'A knife on normal logs: 15 shafts a log.', ...get('arrowShaft', 150) },
+  { id: 'e_bronzeArrows100', tier: 'easy', name: 'Fletch 100 bronze arrows', hint: 'Headless arrows and bronze arrowtips.', ...get('bronzeArrow', 100) },
+  { id: 'e_bronzeDarts50', tier: 'easy', name: 'Fletch 50 bronze darts', hint: 'Bronze dart tips and feathers (Fletching 10).', ...get('bronzeDart', 50) },
+  { id: 'e_bronzePlate5', tier: 'easy', name: 'Smith 5 bronze platebodies', hint: '5 bronze bars each, at an anvil (Smithing 18).', ...get('bronzePlatebody', 5) },
+  { id: 'e_ironScim10', tier: 'easy', name: 'Smith 10 iron scimitars', hint: '2 iron bars each (Smithing 20).', ...get('ironScimitar', 10) },
+  { id: 'e_ironTips150', tier: 'easy', name: 'Smith 150 iron arrowtips', hint: '15 from each iron bar (Smithing 20).', ...get('ironArrowtips', 150) },
   { id: 'e_total', tier: 'easy', name: 'Reach total level 75', hint: 'Every level in every skill counts.', check: (c) => c.total >= 75, progress: (c) => [Math.min(75, c.total), 75] },
 
   // ---- Medium ----
@@ -74,6 +81,13 @@ export const ACHIEVEMENTS = [
   { id: 'm_bloodbats30', tier: 'medium', name: 'Kill 30 bloodbats', hint: 'The Slayer Caverns or Copperdeep Hollow (Slayer 25).', ...kill('bloodbat', 30) },
   { id: 'm_war', tier: 'medium', name: 'Finish Echoes of the War', hint: 'A quest.', ...quest('war') },
   { id: 'm_alch50', tier: 'medium', name: 'Cast High Alchemy 50 times', hint: 'Turns an item into coins: 1 nature and 5 fire runes (Magic 55).', ...cast('highAlch', 50) },
+  // Fletching and Smithing (v0.58.3)
+  { id: 'm_steelArrows250', tier: 'medium', name: 'Fletch 250 steel arrows', hint: 'Headless arrows and steel arrowtips (Fletching 30).', ...get('steelArrow', 250) },
+  { id: 'm_mapleLong25', tier: 'medium', name: 'Fletch 25 maple longbows', hint: 'A knife on maple logs (Fletching 55).', ...get('mapleLongbow', 25) },
+  { id: 'm_mithDarts100', tier: 'medium', name: 'Fletch 100 mithril darts', hint: 'Mithril dart tips and feathers (Fletching 52).', ...get('mithrilDart', 100) },
+  { id: 'm_mithPlate20', tier: 'medium', name: 'Smith 20 mithril platebodies', hint: '5 mithril bars each (Smithing 68).', ...get('mithrilPlatebody', 20) },
+  { id: 'm_steelKite10', tier: 'medium', name: 'Smith 10 steel kiteshields', hint: '3 steel bars each (Smithing 42).', ...get('steelKiteshield', 10) },
+  { id: 'm_studs100', tier: 'medium', name: 'Smith 100 steel studs', hint: '5 from each steel bar, for studded armour (Smithing 36).', ...get('steelStuds', 100) },
   { id: 'm_cart', tier: 'medium', name: 'Finish The Overturned Cart', hint: 'A quest.', ...quest('cart') },
 
   // ---- Hard ----
@@ -97,6 +111,14 @@ export const ACHIEVEMENTS = [
   { id: 'h_superior', tier: 'hard', name: 'Wear a superior slayer helmet', hint: "From Kesta's Slayer shop (Defence 60).", check: (c) => c.wearing('superiorSlayerHelmet') },
   { id: 'h_coldForge', tier: 'hard', name: 'Finish The Cold Forge', hint: 'A quest.', ...quest('coldForge') },
   { id: 'h_99', tier: 'hard', name: 'Reach level 99 in any skill', hint: 'The top of any skill.', check: (c) => c.best >= 99, progress: (c) => [Math.min(99, c.best), 99] },
+  // Fletching and Smithing (v0.58.3)
+  { id: 'h_runeArrows500', tier: 'hard', name: 'Fletch 500 rune arrows', hint: 'Headless arrows and rune arrowtips (Fletching 75).', ...get('runeArrow', 500) },
+  { id: 'h_magicLong50', tier: 'hard', name: 'Fletch 50 magic longbows', hint: 'A knife on magic logs (Fletching 85).', ...get('magicLongbow', 50) },
+  { id: 'h_elderShort10', tier: 'hard', name: 'Fletch 10 elder shortbows', hint: 'A knife on elder logs (Fletching 92).', ...get('elderShortbow', 10) },
+  { id: 'h_runeJav100', tier: 'hard', name: 'Fletch 100 rune javelins', hint: 'Rune javelin heads and arrow shafts (Fletching 77).', ...get('runeJavelin', 100) },
+  { id: 'h_addyPlate10', tier: 'hard', name: 'Smith 10 adamant platebodies', hint: '5 adamant bars each (Smithing 88).', ...get('adamantPlatebody', 10) },
+  { id: 'h_runeScim10', tier: 'hard', name: 'Smith 10 rune scimitars', hint: '2 rune bars each (Smithing 90).', ...get('runeScimitar', 10) },
+  { id: 'h_rune2h', tier: 'hard', name: 'Smith a rune 2h sword', hint: '3 rune bars (Smithing 99).', ...get('rune2hSword') },
   { id: 'h_combat', tier: 'hard', name: 'Reach combat level 80', hint: 'Attack, Strength, Defence, Hitpoints, Ranged and Magic all count.', check: (c) => c.combat >= 80, progress: (c) => [Math.min(80, c.combat), 80] },
 ];
 
