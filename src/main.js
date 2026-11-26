@@ -31,7 +31,7 @@ import { Shop } from './items/shop.js';
 import { SHOPS } from '../data/shops.js';
 import { splitOnDeath, graveFee, reclaim, GRAVE_SECONDS, FREE_SECONDS } from './items/death.js';
 import { TREES, AXES, SWING_TICKS } from '../data/woodcutting.js';
-import { RECIPES, GROUP_OF } from '../data/fletching.js';
+import { RECIPES, GROUP_OF, BONES } from '../data/fletching.js';
 import { ROCKS, PICKAXES, MINE_TICKS, gemChance, rollGem } from '../data/mining.js';
 import { STAR_SITES, DUST_PER_SIZE, FIRST_STAR, NEXT_STAR, STAR_LIFETIME, rollSize } from '../data/stars.js';
 import { MAP_NAME } from '../data/mapLabels.js';
@@ -495,7 +495,7 @@ function boot() {
     if (id === 'slayerRing') return () => hud.showMenu(x, y, 'Slayer ring', [{ label: 'Wear', fn: () => wear(i) }, ...ringOptions(), { label: 'Cancel', fn: () => {} }]);
     if (/Mould$/.test(id)) return () => hud.message('Use a mould at a furnace, with a silver or gold bar, to cast jewellery.');
     if (id === 'silverBar' || id === 'goldBar') return () => hud.message('Cast it into rings and amulets at a furnace, with a ring or amulet mould.');
-    if (id === 'knife') return () => fletchMenu(inventory.count('logs') ? 'logs' : inventory.count('oakLogs') ? 'oakLogs' : null, x, y);
+    if (id === 'knife') return () => fletchMenu(inventory.count('logs') ? 'logs' : inventory.count('oakLogs') ? 'oakLogs' : BONES.find((b) => inventory.count(b)) || null, x, y);
     if (def.food || def.potion) return () => eat(i);
     if (def.equip) return () => wear(i);
     return null;
@@ -511,7 +511,7 @@ function boot() {
     if (!s) return;
     const def = ITEMS[s.id];
     const options = [];
-    if (GROUP_OF[s.id]) options.push({ label: 'Fletch', fn: () => fletchMenu(GROUP_OF[s.id], x, y) });
+    if (GROUP_OF[s.id]) options.push({ label: BONES.includes(s.id) ? 'Carve' : 'Fletch', fn: () => fletchMenu(GROUP_OF[s.id], x, y) });
     if (CRAFT_GROUP[s.id]) options.push({ label: 'Sew', fn: () => sewMenu(CRAFT_GROUP[s.id], x, y) });
     if (CUT_FROM[s.id] || s.id === 'chisel') options.push({ label: 'Cut', fn: () => cutMenu(x, y) });
     if (s.id === 'steelStuds') options.push({ label: 'Stud leather', fn: () => studMenu(x, y) });
@@ -1798,7 +1798,6 @@ function boot() {
   };
 
   // ---- Fletching -----------------------------------------------------------------
-  const flLevel = () => book.level('fletching');
   const skillOf = (r) => r.skill || 'fletching';
   const amountLabel = (r) => {
     const [id, q] = Object.entries(r.gives)[0];
@@ -1813,11 +1812,12 @@ function boot() {
   const fletchMenu = (group, x, y) => {
     if (!group) { hud.message('Tap some logs to carve them with your knife.'); return; }
     const list = RECIPES.filter((r) => r.group === group);
-    if (list.some((r) => r.tool) && !inventory.count('knife')) { hud.message('You need a knife to carve logs. Pell sells them.'); return; }
-    hud.showMenu(x, y, 'Fletching', [
+    const carving = BONES.includes(group); // v0.61.0: bones are carved with Crafting
+    if (list.some((r) => r.tool) && !inventory.count('knife')) { hud.message(`You need a knife to carve ${carving ? 'bones' : 'logs'}. Pell sells them.`); return; }
+    hud.showMenu(x, y, carving ? `Carve ${itemName(group).toLowerCase()}` : 'Fletching', [
       ...list.map((r) => {
         const out = Object.keys(r.gives)[0];
-        const locked = flLevel() < r.level;
+        const locked = book.level(skillOf(r)) < r.level;
         return { label: `${amountLabel(r)}${locked ? ` — needs level ${r.level}` : ''}`, icon: itemIcon(out).url, fn: () => startMake(r) };
       }),
       { label: 'Cancel', fn: () => {} },
