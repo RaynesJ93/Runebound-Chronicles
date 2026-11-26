@@ -753,3 +753,110 @@ img.mk-spot { width: 18px; height: 18px; filter: drop-shadow(0 0 1px #fff6dc) dr
 .taskdone[data-kind="rare"] .taskdone-title { color: #8a2ab0; }
 .taskdone[data-kind="quest"] { box-shadow: 0 0 0 3px #e8b33c, 0 6px 0 rgba(0,0,0,0.35); }
 .taskdone[data-kind="quest"] .taskdone-title { color: #b8860b; }
+
+/* ==========================================================================
+   RuneScape-style UI kit (v0.60.0): frames and buttons from assets/ui/
+   (cut from the ChatGPT sheets by tools/ui_kit.py). Each frame is a 9-slice
+   border-image: the corners stay as drawn, the edges stretch.
+   ========================================================================== */
+:root { --gold-text: #ffd86a; --gold-shadow: 1px 1px 0 #1a0f06, -1px -1px 0 #1a0f06, 1px -1px 0 #1a0f06, -1px 1px 0 #1a0f06; }
+
+/* Big panels: bag, bank, shops, map, skills, quests, guide, tasks, settings */
+.panel {
+  border-style: solid; border-width: 19px; border-radius: 0;
+  border-image: url(assets/ui/frameParch.png) 56 fill / 19px stretch;
+  background: none; box-shadow: none; filter: drop-shadow(0 4px 0 rgba(20, 12, 4, 0.55));
+  padding: 0;
+}
+.panel-head { padding: 2px 0 6px 4px; border-bottom: 0; position: relative; }
+.panel-head::after { /* ornamental divider under every panel's title */
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 10px;
+  background: url(assets/ui/divider.png) center / 100% 100% no-repeat; pointer-events: none;
+}
+.panel-head h2 { color: #3a2410; }
+.panel-body { padding: 8px 4px 4px; }
+
+/* Speech, menus, the area name, hints, toasts, the target box */
+.dialog, .menu, .area-banner, .hint, .toast, .target {
+  border-style: solid; border-radius: 0; background: none;
+  border-width: 10px; border-image: url(assets/ui/frameDialog.png) 24 fill / 10px stretch;
+  box-shadow: none; filter: drop-shadow(0 3px 0 rgba(20, 12, 4, 0.5));
+}
+.dialog { padding: 12px 40px 12px 16px; }
+.menu { padding: 2px; }
+.target.boss { border-image: url(assets/ui/frameCard.png) 20 fill / 9px stretch; box-shadow: none; }
+.dialog-name {
+  border-style: solid; border-width: 8px 12px; border-radius: 0; padding: 0 2px;
+  border-image: url(assets/ui/btnWide.png) 10 26 fill / 8px 12px stretch;
+  background: none; box-shadow: none; color: var(--gold-text); text-shadow: var(--gold-shadow);
+}
+
+/* Pop-up cards and the level-up scroll */
+.taskdone { border: 9px solid; border-radius: 0; border-image: url(assets/ui/frameCard.png) 20 fill / 9px stretch; background: none; box-shadow: none; filter: drop-shadow(0 4px 0 rgba(20, 12, 4, 0.5)); }
+.taskdone[data-kind="rare"], .taskdone[data-kind="quest"] { box-shadow: none; }
+.levelup {
+  border-style: solid; border-width: 8px 22px; border-radius: 0; background: none; box-shadow: none;
+  border-image: url(assets/ui/scroll.png) 14 36 fill / 8px 22px stretch; padding: 2px 6px;
+  filter: drop-shadow(0 3px 0 rgba(20, 12, 4, 0.5));
+}
+
+/* Square buttons at the top, and the hitpoints box */
+.icon-btn, .hp-orb {
+  border-style: solid; border-width: 12px; border-radius: 0; background: none; box-shadow: none;
+  border-image: url(assets/ui/btnSquare.png) 22 fill / 12px stretch;
+  filter: drop-shadow(0 3px 0 rgba(20, 12, 4, 0.5));
+}
+.icon-btn:active { transform: none; border-image-source: url(assets/ui/btnSquareDown.png); }
+.icon-btn img.px, .icon-btn img.ui-ic { width: 30px; height: 30px; }
+.hp-orb { color: #ff5a4a; }
+.hp-orb .run-val, .hp-orb b, .hp-orb span { color: #f4e6c4; text-shadow: var(--gold-shadow); }
+.hp-orb.low { animation: none; filter: drop-shadow(0 0 8px rgba(224, 87, 74, 0.9)); }
+
+/* Wide text buttons: Guide, Quests, the Slayer counter, panel buttons */
+.guide-btn, .slayer-chip, .btn {
+  border-style: solid; border-width: 6px 14px; border-radius: 0; background: none; box-shadow: none;
+  border-image: url(assets/ui/btnWide.png) 10 26 fill / 6px 14px stretch;
+  color: var(--gold-text); text-shadow: var(--gold-shadow);
+  filter: drop-shadow(0 3px 0 rgba(20, 12, 4, 0.5));
+}
+.guide-btn:active, .btn:active { transform: none; border-image-source: url(assets/ui/btnWideDown.png); box-shadow: none; }
+.slayer-chip small, .slayer-chip b { color: var(--gold-text); }
+.btn.primary { border-image-source: url(assets/ui/btnWide.png); background: none; box-shadow: none; color: #9cf07a; }
+.btn.danger { border-image-source: url(assets/ui/btnWide.png); background: none; box-shadow: none; color: #ff8a7a; }
+
+/* Tabs */
+.tab {
+  border-style: solid; border-width: 9px 10px 0; border-radius: 0; background: none;
+  border-image: url(assets/ui/tab.png) 13 13 0 fill / 9px 10px 0 stretch;
+  color: #e8d2a0; text-shadow: var(--gold-shadow); height: 40px; padding: 0 6px;
+}
+.tab.on { border-image-source: url(assets/ui/tabOn.png); color: var(--gold-text); }
+.tab:active { border-image-source: url(assets/ui/tabDown.png); }
+
+/* The close button: the stone X */
+.close-btn { width: 40px; height: 40px; font-size: 0; color: transparent; background: url(assets/ui/close.png) center / 32px 32px no-repeat; }
+.close-btn:active { background-image: url(assets/ui/closeDown.png); }
+
+/* Dialogue answers */
+.choice {
+  border-style: solid; border-radius: 0; background: none;
+  border-width: 7px 8px 7px 30px; border-image: url(assets/ui/choice.png) 10 10 10 44 fill / 7px 8px 7px 30px stretch;
+  padding: 4px 8px 4px 2px; color: #2b1d16;
+}
+.choice::before { content: none; }
+.choice:hover, .choice:focus-visible { background: none; border-image-source: url(assets/ui/choiceOn.png); }
+
+/* Quantity and other small chips */
+.chip, .qty-pick .chip {
+  border-style: solid; border-width: 7px; border-radius: 0; background: none; box-shadow: none;
+  border-image: url(assets/ui/qty.png) 12 fill / 7px stretch;
+  color: #f4e6c4; text-shadow: var(--gold-shadow);
+}
+.chip.on, .qty-pick .chip.on { border-image-source: url(assets/ui/qtyOn.png); background: none; box-shadow: none; color: var(--gold-text); }
+
+/* The bag: a dark frame, stone slots */
+.inv-grid { border: 14px solid; border-radius: 0; background: none; border-image: url(assets/ui/frameDark.png) 56 fill / 14px stretch; padding: 2px; }
+.slot { border-radius: 0; box-shadow: none; background: url(assets/ui/slot.png) center / 100% 100% no-repeat; }
+.ui-ic { object-fit: contain; image-rendering: auto; }
+.guide-btn { height: 46px; padding: 0 6px 0 2px; }
+.guide-btn .ui-ic { width: 24px; height: 24px; }

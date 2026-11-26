@@ -4,6 +4,8 @@
 import { iconUrl, paintedIconUrl } from '../render/icons.js';
 
 // A painted interface icon, or the drawn SVG if there isn't one.
+// v0.60.0: the painted UI kit icons (assets/ui/ic*.png, tools/ui_kit.py)
+const kitIcon = (file, size, cls = '') => `<img class="px ui-ic ${cls}" src="assets/ui/${file}.png" alt="" width="${size}" height="${size}">`;
 const uiIcon = (name, svg, size) => { const u = paintedIconUrl(name); return u ? `<img class="px ui-ic" src="${u}" alt="" width="${size}" height="${size}" id="ic-${name}">` : svg; };
 import { itemIcon, stackLabel } from '../render/items.js';
 import { ITEMS } from '../../data/items.js';
@@ -43,8 +45,8 @@ export class Hud {
     this.root = root;
     root.innerHTML = `
       <div class="hud-top-left">
-        <button class="guide-btn ui" id="btn-guide" aria-label="Guide: how to play and where to get your first tools">${BOOK_SVG}<span>Guide</span></button>
-        <button class="guide-btn ui" id="btn-quests" aria-label="Quests">${SCROLL_SVG}<span>Quests</span></button>
+        <button class="guide-btn ui" id="btn-guide" aria-label="Guide: how to play and where to get your first tools">${kitIcon('icGuide', 24)}<span>Guide</span></button>
+        <button class="guide-btn ui" id="btn-quests" aria-label="Quests">${kitIcon('icQuests', 24)}<span>Quests</span></button>
         <button class="slayer-chip ui hidden" id="slayer-chip" aria-label="Slayer task"><img class="px" src="${itemIcon('slayerGem').url}" alt=""><b id="slayer-left"></b><small id="slayer-name"></small></button>
         <div class="target hidden" id="target" aria-live="polite">
           <div class="target-name" id="target-name"></div>
@@ -55,15 +57,15 @@ export class Hud {
         <div class="messages" id="messages" aria-live="polite"></div>
       </div>
       <div class="hud-top-right">
-        <button class="icon-btn ui" id="btn-inv" aria-label="Inventory"><img class="px" src="${itemIcon('bag').url}" alt=""></button>
-        <button class="icon-btn ui" id="btn-tasks" aria-label="Tasks">${uiIcon('tasks', TASKS_SVG, 32)}<span class="dot hidden" id="tasks-dot"></span></button>
-        <button class="icon-btn ui" id="btn-map" aria-label="Map">${uiIcon('map', MAP_SVG, 32)}</button>
-        <button class="icon-btn ui" id="btn-skills" aria-label="Skills"><img class="px" src="${paintedIconUrl('equipment') || iconUrl('attack')}" alt=""></button>
-        <button class="icon-btn ui" id="btn-settings" aria-label="Settings">${uiIcon('settings', GEAR_SVG, 32)}</button>
+        <button class="icon-btn ui" id="btn-inv" aria-label="Inventory">${kitIcon('icBag', 30)}</button>
+        <button class="icon-btn ui" id="btn-tasks" aria-label="Tasks">${kitIcon('icTasks', 30)}<span class="dot hidden" id="tasks-dot"></span></button>
+        <button class="icon-btn ui" id="btn-map" aria-label="Map">${kitIcon('icMap', 30)}</button>
+        <button class="icon-btn ui" id="btn-skills" aria-label="Skills">${kitIcon('icCombat', 30)}</button>
+        <button class="icon-btn ui" id="btn-settings" aria-label="Settings">${kitIcon('icSettings', 30)}</button>
         <div class="xp-drops" id="xp-drops" aria-hidden="true"></div>
       </div>
       <div class="taskdone hidden" id="taskdone" role="status">
-        <div class="taskdone-icon" id="taskdone-icon">${TASKS_SVG}</div>
+        <div class="taskdone-icon" id="taskdone-icon">${kitIcon('icTick', 40)}</div>
         <div><div class="taskdone-title" id="taskdone-title">Task complete!</div><div class="taskdone-name" id="taskdone-name"></div><div class="taskdone-reward" id="taskdone-reward"></div></div>
       </div>
       <div class="levelup hidden" id="levelup" role="status">
@@ -191,7 +193,7 @@ export class Hud {
       </div>
       <div class="hud-bottom-right">
         <div class="hp-orb" id="hp-orb" aria-label="Hitpoints">
-          <span class="hp-icon">${uiIcon('heart', HEART_SVG, 26)}</span>
+          <span class="hp-icon">${kitIcon('icHeart', 24)}</span>
           <span class="run-bar"><span class="hp-fill" id="hp-fill"></span></span>
           <span class="run-val" id="hp-val">10</span>
         </div>
@@ -976,7 +978,7 @@ export class Hud {
     this.taskShowing = true;
     el.dataset.kind = t.kind;
     this.$('taskdone-title').textContent = t.title;
-    this.$('taskdone-icon').innerHTML = t.icon ? `<img class="px" src="${t.icon}" alt="">` : t.kind === 'quest' ? SCROLL_SVG : TASKS_SVG;
+    this.$('taskdone-icon').innerHTML = t.icon ? `<img class="px" src="${t.icon}" alt="">` : kitIcon(t.kind === 'quest' ? 'icQuestDone' : t.kind === 'rare' ? 'icGem' : 'icTick', 40);
     this.$('taskdone-name').textContent = t.name;
     this.$('taskdone-reward').textContent = t.reward;
     el.classList.remove('hidden', 'pop');
