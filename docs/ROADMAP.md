@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 26 Nov 2026 | v0.57.1: Hair and sleeves no longer show through gear: with a helmet, armour, leg armour or boots on, whatever of the character pokes out round them is hidden (skin like faces and hands stays). |
 | 26 Nov 2026 | v0.57.0: Gear walks with you: armour, leg armour and boots bend to the walking frames (each boot steps with its own foot), helmets follow the head, and weapons, shields and capes move with the body, instead of staying frozen in the standing pose. |
 | 18 Nov 2026 | v0.56.1: The tree line south of Brambleford's river bridge is cleared so the road into Greenmire Rainforest shows, with a signpost. |
 | 18 Nov 2026 | v0.56.0: Greenmire Rainforest, a new dark-green rainforest area south of Brambleford over the river bridge. The Earth, Fire and Body altars moved there (from the mine, the forge and Thornwood). |

@@ -96,6 +96,56 @@ export function bendGear(gear, slot, stand, step) {
   return out;
 }
 
+// ---- Hiding what the gear covers (v0.57.1) ----
+// The painted helmets and armour don't quite cover the painted player: spiky
+// hair pokes out round a helmet and the tunic's sleeves show at the sides of
+// a platebody. So with a helmet, body armour, leg armour or boots on, the
+// body's pixels on the rows that piece covers, but outside its outline, are
+// hidden. Bare skin (face, hands) stays, and so do eyes and other small
+// details set in skin.
+const COVERS = { head: 0, body: 1, legs: 1, feet: 1 }; // slot -> outline margin in px
+const isSkin = (d, i) => d[i] >= 210 && d[i + 1] >= 150 && d[i + 2] >= 95;
+
+export function coverBody(body, worn) {
+  const out = { ...body, data: new Uint8ClampedArray(body.data) };
+  const hide = new Uint8Array(body.w * body.h);
+  for (const { slot, im } of worn) {
+    if (!(slot in COVERS)) continue;
+    const m = COVERS[slot];
+    // the gear's outline in body coordinates (rows and columns from the feet)
+    const on = new Set();
+    let top = Infinity, bot = -Infinity;
+    for (let y = 0; y < im.h; y++) for (let x = 0; x < im.w; x++) {
+      if (alphaAt(im, x, y) === 0) continue;
+      const bx = x - im.ax, r = y - im.ay;
+      top = Math.min(top, r); bot = Math.max(bot, r);
+      for (let dy = -m; dy <= m; dy++) for (let dx = -m; dx <= m; dx++) on.add(`${bx + dx},${r + dy}`);
+    }
+    if (top === Infinity) continue;
+    // a helmet also covers the hair above it
+    const from = slot === 'head' ? -body.ay : top;
+    for (let r = from; r <= bot; r++) {
+      const y = r + body.ay;
+      if (y < 0 || y >= body.h) continue;
+      for (let x = 0; x < body.w; x++) if (!on.has(`${x - body.ax},${r}`)) hide[y * body.w + x] = 1;
+    }
+  }
+  const d = body.data;
+  for (let y = 0; y < body.h; y++) for (let x = 0; x < body.w; x++) {
+    const k = y * body.w + x, i = k * 4;
+    if (!hide[k] || d[i + 3] === 0 || isSkin(d, i)) continue;
+    // keep eyes and the like: pixels with skin on two or more sides
+    let skin = 0;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nx = x + dx, ny = y + dy;
+      if (nx >= 0 && ny >= 0 && nx < body.w && ny < body.h && d[(ny * body.w + nx) * 4 + 3] && isSkin(d, (ny * body.w + nx) * 4)) skin++;
+    }
+    if (skin >= 2) continue;
+    out.data[i + 3] = 0;
+  }
+  return out;
+}
+
 // ---- Browser side: canvases in, canvases out, cached ----
 const pixels = new WeakMap();
 function imageOf(spr) {
@@ -122,4 +172,23 @@ export function walkingGear(gearSpr, slot, body, frame) {
     byFrame.set(key, { img: c, w: im.w, h: im.h, ax: im.ax, ay: im.ay });
   }
   return byFrame.get(key);
+}
+
+// The body sprite with whatever the worn gear covers hidden; `worn` is
+// [{ slot, spr }] of the (already bent) gear sprites. Cached per combination.
+const covered = new WeakMap();
+export function coveredBody(bodySpr, worn) {
+  const parts = worn.filter((w) => w.slot in COVERS);
+  if (!bodySpr || !parts.length) return bodySpr;
+  let bySet = covered.get(bodySpr);
+  if (!bySet) covered.set(bodySpr, (bySet = new Map()));
+  const key = parts.map((w) => `${w.slot}:${w.key}`).join('|');
+  if (!bySet.has(key)) {
+    const im = coverBody(imageOf(bodySpr), parts.map((w) => ({ slot: w.slot, im: imageOf(w.spr) })));
+    const c = document.createElement('canvas');
+    c.width = im.w; c.height = im.h;
+    c.getContext('2d').putImageData(new ImageData(im.data, im.w, im.h), 0, 0);
+    bySet.set(key, { ...bodySpr, img: c });
+  }
+  return bySet.get(key);
 }

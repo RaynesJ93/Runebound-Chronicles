@@ -412,6 +412,8 @@ Painted gear is drawn once per facing, over the standing pose, but the painted p
 
 Attack and hit poses use the gear as painted. Each bent piece is made once and cached. Tested in tests/gear_walk.test.mjs.
 
+**Covering what's underneath (v0.57.1).** The painted gear doesn't quite cover the painted player (spiky hair poked out round helmets, tunic sleeves showed beside platebodies). With a helmet, body armour, leg armour or boots on, the body's pixels on the rows that piece covers but outside its outline are hidden (a helmet also hides the hair above it). Bare skin (face, hands) and small details set in skin (eyes) stay. `coverBody` in gearWalk.js, cached per body frame and gear combination.
+
 ### Greenmire Rainforest (v0.56.0)
 
 A new area south of Brambleford: carry on down the south road over the river bridge and through the tree line (exit at x 40–41, y 53; v0.56.1 cleared the trees there and added a GREENMIRE RAINFOREST signpost). 64 × 56, `data/areas/rainforest.js`, theme `'jungle'`: Brambleford's painted ground recoloured darker and lusher (deep green grass, dark mud paths, mossy paving, green-teal water; `JUNGLE_TEX` in tools/derived.py).
