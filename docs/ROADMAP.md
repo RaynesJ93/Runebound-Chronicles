@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 26 Nov 2026 | v0.60.4: Ranger's backpack in Kesta's slayer shop (1,000 points, Ranged 50, cape slot): +8 Ranged attack, +2 ranged strength, and a 75% chance to save each arrow, bolt, dart or javelin. |
 | 26 Nov 2026 | v0.60.3: Long-press (or right-click) anything in a shop or the bank to see what it is, what it does and its price, with buy or withdraw options. |
 | 26 Nov 2026 | v0.60.2: Top buttons tidied: icons sit fully inside their stone frames and centred, and the Guide button no longer runs into the bag button on phones. |
 | 26 Nov 2026 | v0.60.1: Fixed white corners on the selected tab (an old background colour showed through), and the bag's '17 / 28' count now lines up with the tab labels. |

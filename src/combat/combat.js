@@ -317,7 +317,10 @@ export class Combat {
       this.target = null;
       return false;
     }
-    ammo.qty--;
+    // Something worn that saves ammo (the ranger's backpack, v0.60.4): this one isn't used up
+    const saveChance = Math.max(0, ...Object.values(this.gear.slots).map((s) => (s && ITEMS[s.id]?.equip?.ammoSave) || 0));
+    const saved = this.rng() < saveChance;
+    if (!saved) ammo.qty--;
     if (ammo.qty <= 0) {
       if (thrown) { this.gear.slots.weapon = null; this.on.message?.(`That was your last ${ITEMS[ammo.id].name.toLowerCase()}!`); this.target = null; }
       else { this.gear.slots.ammo = null; this.on.message?.("That was your last arrow!"); }
@@ -333,7 +336,7 @@ export class Combat {
     this.playerLungeAt = this.now;
     this.playerAttackKind = thrown ? 'slash' : 'bow';
     // Like OSRS, most arrows can be picked up again where they land.
-    this.pending.push({ target: e, dmg, at: this.ticks + ticks, mode: 'ranged', arrow: ammo.id, keepArrow: this.rng() < 0.6 });
+    this.pending.push({ target: e, dmg, at: this.ticks + ticks, mode: 'ranged', arrow: ammo.id, keepArrow: !saved && this.rng() < 0.6 });
     this.on.inventoryChanged?.();
     return true;
   }
