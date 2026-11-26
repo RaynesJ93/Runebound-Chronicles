@@ -1,6 +1,7 @@
 import { TILE } from './pixel.js';
 import { buildGround } from './ground.js';
 import { GROUND } from '../world/area.js';
+import { walkingGear } from './gearWalk.js';
 import { buildingSprite } from './buildings.js';
 import * as S from './sprites.js';
 import { art } from './art.js';
@@ -466,14 +467,14 @@ export function createWorldView(canvasEl, area) {
   // ---- Drawing ---------------------------------------------------------------------
   const DIRS = ['down', 'right', 'up', 'left'];
 
+  // Which walking frame someone is on: 0 standing, 1 and 2 the two steps.
+  const stepFrame = (who, steps) => (who.moving && who.t < 0.5 ? (steps % 2 ? 1 : 2) : 0);
   function frameOf(frames, who, steps) {
     const a = who.facing;
     const dx = Math.sin(a);
     const dy = Math.cos(a);
     const dir = Math.abs(dx) > Math.abs(dy) + 0.01 ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
-    let frame = 0;
-    if (who.moving) frame = who.t < 0.5 ? (steps % 2 ? 1 : 2) : 0;
-    return frames[dir][frame] || frames.down[0];
+    return frames[dir][stepFrame(who, steps)] || frames.down[0];
   }
 
   // A drawable for anyone walking around: the player or a villager.
@@ -593,10 +594,12 @@ export function createWorldView(canvasEl, area) {
     // behind you (except from behind); from behind, so do weapons and shields.
     if (lib.paintedPlayer && playerGear) {
       const d = dirOf(player.facing);
+      // v0.57.0: bent to the walking frame the body is on, so gear walks too
+      const frame = pPose ? 0 : stepFrame(player, steps);
       const behind = [], front = [];
       for (const slot of ['cape', 'legs', 'feet', 'body', 'neck', 'head', 'shield', 'weapon']) {
         const id = playerGear[slot]?.id;
-        const spr = id && art(`gear:${id}:${d}`)?.[0];
+        const spr = id && walkingGear(art(`gear:${id}:${d}`)?.[0], slot, lib.paintedPlayer[d], frame);
         if (!spr) continue;
         const back = (slot === 'cape' && d !== 'up') || (d === 'up' && (slot === 'weapon' || slot === 'shield')) || (slot === 'shield' && (d === 'left' || d === 'right'));
         (back ? behind : front).push(spr);
