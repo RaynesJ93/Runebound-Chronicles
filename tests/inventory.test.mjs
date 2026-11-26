@@ -12,10 +12,10 @@ const tests = [];
 const test = (name, fn) => tests.push({ name, fn });
 
 test('stack sizes', () => {
-  for (const id of ['logs', 'oakLogs', 'copperOre', 'ironBar', 'runeEssence', 'rawShrimps', 'shrimps', 'bread', 'cookedTrout', 'cowhide', 'leather', 'burntFish']) assert.equal(maxStack(id), 20, id);
+  for (const id of ['logs', 'oakLogs', 'copperOre', 'ironBar', 'runeEssence', 'rawShrimps', 'shrimps', 'bread', 'cookedTrout', 'cowhide', 'leather', 'burntFish', 'bones', 'bigBones', 'cursedBones', 'wyrmBones']) assert.equal(maxStack(id), 20, id);
   for (const id of ['bronzeArrow', 'ironArrow', 'airRune', 'mindRune', 'waterRune', 'feather', 'fishingBait', 'thread', 'arrowShaft']) assert.equal(maxStack(id), 999, id);
   assert.equal(maxStack('coins'), Infinity);
-  for (const id of ['bronzeSword', 'leatherBody', 'bronzeAxe', 'attackPotion4', 'bones']) assert.equal(maxStack(id), 1, id);
+  for (const id of ['bronzeSword', 'leatherBody', 'bronzeAxe', 'attackPotion4']) assert.equal(maxStack(id), 1, id);
 });
 
 test('25 logs fill one slot of 20 and start another', () => {
