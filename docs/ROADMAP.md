@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 26 Nov 2026 | v0.60.2: Top buttons tidied: icons sit fully inside their stone frames and centred, and the Guide button no longer runs into the bag button on phones. |
 | 26 Nov 2026 | v0.60.1: Fixed white corners on the selected tab (an old background colour showed through), and the bag's '17 / 28' count now lines up with the tab labels. |
 | 26 Nov 2026 | v0.60.0: RuneScape-style menus: every panel, dialogue box, menu, button, tab and pop-up uses the painted UI kit (wood-and-stone frames with iron corners, parchment, stone buttons, scroll level-up banner, gold-studded pop-up cards) and new icons. |
 | 26 Nov 2026 | v0.59.2: Fewer messages on the left: level-up and combat lines are gone (the level-up banner stays, and a new combat level gets its own banner), the Slayer counter replaces 'X left' lines, and rare drops and quest completions pop up as cards. |

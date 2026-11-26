@@ -864,3 +864,15 @@ img.mk-spot { width: 18px; height: 18px; filter: drop-shadow(0 0 1px #fff6dc) dr
 .tab.on, .tab:hover, .tab:focus-visible { background: none; border-color: transparent; }
 /* "17 / 28": on the same line as the tab labels */
 .inv-free { align-self: flex-end; height: 40px; line-height: 40px; margin-bottom: 0; color: #5a3a1a; font-size: 18px; }
+/* v0.60.2: top buttons. The icon fits inside the stone border (not over it),
+   and Guide/Quests are compact enough to clear the row of icon buttons. */
+.icon-btn { border-width: 9px; border-image-width: 9px; }
+.icon-btn img.ui-ic, .icon-btn img.px { width: 30px; height: 30px; }
+.guide-btn { border-width: 6px 10px; border-image-width: 6px 10px; height: 44px; gap: 4px; padding: 0 2px; font-size: 17px; }
+.guide-btn .ui-ic { width: 20px; height: 20px; }
+@media (max-width: 420px) {
+  .hud-top-right { gap: 4px; }
+  .hud-top-right .icon-btn { width: 44px; height: 44px; border-width: 8px; border-image-width: 8px; }
+  .hud-top-right .icon-btn img.ui-ic, .hud-top-right .icon-btn img.px { width: 26px; height: 26px; }
+  .guide-btn { font-size: 16px; }
+}
