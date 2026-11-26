@@ -965,9 +965,9 @@ function boot() {
     if (name === 'smelt' || name === 'smith' || name === 'cook' || name === 'tan') { stationMenu(name); return; }
     if (name === 'bank') hud.openTrade('bank', lastStation?.type === 'campChest' ? lastStation.title || 'Supply chest' : 'Bank of Brambleford');
     else if (name === 'shop') { shop = shops.generalStore; hud.openTrade('shop', shop.name); }
-    else if (name === 'starShop') { shop = shops.starShop; hud.openTrade('shop', shop.name, 'Tap a reward to buy it with stardust. Lyra doesn\'t buy anything.'); }
-    else if (name === 'taskShop') { shop = shops.taskShop; hud.openTrade('shop', shop.name, `Tap a reward to buy it with task points. You have ${taskPointsLeft()}. Perks are for good and never take a bag slot; capes need their whole tier done.`); }
-    else if (name === 'slayerShop') { shop = shops.slayerShop; hud.openTrade('shop', shop.name, `Tap a reward to buy it with slayer points. You have ${state.slayer.points}. The superior helmet is an upgrade: bring your slayer helmet in your bag.`); }
+    else if (name === 'starShop') { shop = shops.starShop; hud.openTrade('shop', shop.name, 'Tap a reward to buy it with stardust; hold it to see what it is. Lyra doesn\'t buy anything.'); }
+    else if (name === 'taskShop') { shop = shops.taskShop; hud.openTrade('shop', shop.name, `Tap a reward to buy it with task points. You have ${taskPointsLeft()}. Hold a reward (or right-click it) to see what it is.`); }
+    else if (name === 'slayerShop') { shop = shops.slayerShop; hud.openTrade('shop', shop.name, `Tap a reward to buy it with slayer points, or hold it to see what it is. You have ${state.slayer.points}. The superior helmet is an upgrade: bring your slayer helmet in your bag.`); }
     refreshTrade();
   };
   hud.onTradeClose = () => { refreshInventory(); save(); };
@@ -1018,6 +1018,33 @@ function boot() {
       else hud.tradeStatus(`Bought ${itemName(id)} × ${r.n} for ${r.cost} ${cur}.`);
     }
     refreshTrade();
+  };
+  // Long-press or right-click a shop or bank item (v0.60.3): what it is and what it costs.
+  hud.onTradeInfo = (id, x, y) => {
+    const def = ITEMS[id];
+    if (!def) return;
+    const withQty = (n, fn) => () => { const old = hud.tradeQty; hud.tradeQty = n; fn(); hud.tradeQty = old; };
+    const info = `${def.name}<small class="menu-sub">${def.examine || ''}</small>`;
+    if (hud.tradeMode === 'bank') {
+      hud.showMenu(x, y, info, [
+        { label: 'Withdraw 1', fn: withQty(1, () => hud.onTradeTake(id)) },
+        { label: 'Withdraw 5', fn: withQty(5, () => hud.onTradeTake(id)) },
+        { label: 'Withdraw all', fn: withQty(Infinity, () => hud.onTradeTake(id)) },
+        { label: 'Cancel', fn: () => {} },
+      ]);
+      return;
+    }
+    const entry = shopEntry(id);
+    const cur = itemName(shop.currency).toLowerCase();
+    const price = shop.buyPrice(id);
+    // one-offs (perks, capes, rings, bags, upgrades) only come in ones
+    const single = entry?.perk || entry?.needsTier || entry?.needs || entry?.hideFlag || def.equip || ['bagOfHolding', 'taskmasterRing'].includes(id);
+    const need = entry?.needsTier ? (entry.needsTier === 'all' ? 'Needs every task done.' : `Needs every ${entry.needsTier} task done.`) : entry?.perk ? 'A perk: yours for good, no bag slot.' : '';
+    hud.showMenu(x, y, `${info}<small class="menu-price">${price.toLocaleString()} ${cur}${need ? ` · ${need}` : ''}</small>`, [
+      { label: `Buy 1 (${price.toLocaleString()} ${cur})`, fn: withQty(1, () => hud.onTradeTake(id)) },
+      ...(single ? [] : [{ label: 'Buy 5', fn: withQty(5, () => hud.onTradeTake(id)) }, { label: 'Buy 10', fn: withQty(10, () => hud.onTradeTake(id)) }]),
+      { label: 'Cancel', fn: () => {} },
+    ]);
   };
   hud.onTradeGive = (i) => {
     const slot = inventory.slots[i];
