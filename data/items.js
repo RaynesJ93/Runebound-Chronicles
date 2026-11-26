@@ -19,7 +19,51 @@
 
 export const ITEMS = {
   coins: { name: 'Coins', stackable: true, value: 1, examine: 'Lovely money!' },
-  bones: { name: 'Bones', value: 1, examine: 'Bones are for burying. (Prayer arrives in a later update.)' },
+  // Bones (v0.61.0): four kinds, carved into arrowtips and dart tips (Crafting)
+  bones: { name: 'Bones', value: 1, examine: "Plain bones. Carve them with a knife into arrowtips or dart tips (Crafting 5)." },
+  boneArrowtips: { name: 'Bone arrowtips', stackable: true, value: 2, examine: 'Carved from bones. Put them on headless arrows to make bone arrows.' },
+  boneDartTip: { name: 'Bone dart tip', stackable: true, value: 2, examine: 'Carved from bones. Fletch it with a feather to make a dart.' },
+  boneArrow: {
+    name: 'Bone arrow', stackable: true, value: 3, examine: 'Arrows tipped with carved bones.',
+    equip: { slot: 'ammo', req: {}, rangedStr: 9, ammo: 'arrow' },
+  },
+  boneDart: {
+    name: 'Bone dart', stackable: true, value: 5, examine: 'A dart with a carved bone tip. Throw it from your weapon slot.',
+    equip: { slot: 'weapon', req: { ranged: 1 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 5 }, rangedStr: 5, look: {} },
+  },
+  bigBones: { name: 'Big bones', value: 8, examine: "Big, heavy bones. Carve them with a knife into big bone arrowtips or dart tips (Crafting 25)." },
+  bigBoneArrowtips: { name: 'Big bone arrowtips', stackable: true, value: 5, examine: 'Carved from big bones. Put them on headless arrows to make big bone arrows.' },
+  bigBoneDartTip: { name: 'Big bone dart tip', stackable: true, value: 5, examine: 'Carved from big bones. Fletch it with a feather to make a dart.' },
+  bigBoneArrow: {
+    name: 'Big bone arrow', stackable: true, value: 8, examine: 'Arrows tipped with carved big bones.',
+    equip: { slot: 'ammo', req: {}, rangedStr: 18, ammo: 'arrow' },
+  },
+  bigBoneDart: {
+    name: 'Big bone dart', stackable: true, value: 14, examine: 'A dart with a carved big bone tip. Throw it from your weapon slot.',
+    equip: { slot: 'weapon', req: { ranged: 10 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 10 }, rangedStr: 10, look: {} },
+  },
+  cursedBones: { name: 'Cursed bones', value: 25, examine: "Grey bones that feel cold to the touch. Carve them with a knife into cursed arrowtips or dart tips (Crafting 45)." },
+  cursedBoneArrowtips: { name: 'Cursed bone arrowtips', stackable: true, value: 12, examine: 'Carved from cursed bones. Put them on headless arrows to make cursed bone arrows.' },
+  cursedBoneDartTip: { name: 'Cursed bone dart tip', stackable: true, value: 12, examine: 'Carved from cursed bones. Fletch it with a feather to make a dart.' },
+  cursedBoneArrow: {
+    name: 'Cursed bone arrow', stackable: true, value: 20, examine: 'Arrows tipped with carved cursed bones.',
+    equip: { slot: 'ammo', req: {}, rangedStr: 27, ammo: 'arrow' },
+  },
+  cursedBoneDart: {
+    name: 'Cursed bone dart', stackable: true, value: 34, examine: 'A dart with a carved cursed bone tip. Throw it from your weapon slot.',
+    equip: { slot: 'weapon', req: { ranged: 20 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 14 }, rangedStr: 14, look: {} },
+  },
+  wyrmBones: { name: 'Wyrm bones', value: 70, examine: "Hot, red bones from something with wings. Carve them with a knife into wyrm bone arrowtips or dart tips (Crafting 65)." },
+  wyrmBoneArrowtips: { name: 'Wyrm bone arrowtips', stackable: true, value: 30, examine: 'Carved from wyrm bones. Put them on headless arrows to make wyrm bone arrows.' },
+  wyrmBoneDartTip: { name: 'Wyrm bone dart tip', stackable: true, value: 30, examine: 'Carved from wyrm bones. Fletch it with a feather to make a dart.' },
+  wyrmBoneArrow: {
+    name: 'Wyrm bone arrow', stackable: true, value: 50, examine: 'Arrows tipped with carved wyrm bones.',
+    equip: { slot: 'ammo', req: {}, rangedStr: 40, ammo: 'arrow' },
+  },
+  wyrmBoneDart: {
+    name: 'Wyrm bone dart', stackable: true, value: 80, examine: 'A dart with a carved wyrm bone tip. Throw it from your weapon slot.',
+    equip: { slot: 'weapon', req: { ranged: 30 }, style: 'ranged', thrown: true, range: 4, type: 'ranged', speed: 3, att: { ranged: 18 }, rangedStr: 18, look: {} },
+  },
   bread: { name: 'Bread', value: 12, examine: 'Nice crusty bread.', food: { heal: 4 } },
   cookedTrout: { name: 'Trout', value: 30, examine: 'Some nicely cooked trout.', food: { heal: 7 } },
   // ---- Fishing and Cooking -----------------------------------------------------------

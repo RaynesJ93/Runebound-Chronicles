@@ -57,7 +57,7 @@ export const ENEMIES = {
       hitText: 'Old Bessie stomps on you!', clearText: 'You dodge out of the way of her hooves!',
     },
     loot: {
-      always: [{ item: 'bones', qty: 1 }, { item: 'cowhide', min: 2, max: 5 }, { item: 'rawBeef', min: 2, max: 3 }],
+      always: [{ item: 'bigBones', qty: 1 }, { item: 'cowhide', min: 2, max: 5 }, { item: 'rawBeef', min: 2, max: 3 }],
       main: [
         { item: 'coins', min: 80, max: 250, chance: 1 / 5 },
         { item: 'steelBar', min: 2, max: 4, chance: 1 / 8 },
@@ -119,7 +119,7 @@ export const ENEMIES = {
     look: { skin: '#6a9a3e', hair: '#2a1e12', tunic: '#7a2f2a', pants: '#4a3a2a', belt: '#2a1e12', ears: true, eyes: '#ffcf3a', hat: 'helmet', hatColor: '#6e6257' },
     examine: 'A big goblin in a dented helmet. It looks like it wants a fight.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }],
+      always: [{ item: 'bigBones', qty: 1 }],
       main: [
         { item: 'coins', min: 5, max: 30, chance: 1 / 2 },
         { item: 'bread', qty: 1, chance: 1 / 8 },
@@ -159,7 +159,7 @@ export const ENEMIES = {
     look: { fur: '#8a8f94', dark: '#5e6368', light: '#c4c8cc', eyes: '#f2c23a' },
     examine: 'A hungry grey wolf. Its eyes never leave you.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }],
+      always: [{ item: 'bigBones', qty: 1 }],
       main: [
         { item: 'wolfPelt', qty: 1, chance: 1 / 4 },
         { item: 'coins', min: 3, max: 20, chance: 1 / 4 },
@@ -176,7 +176,7 @@ export const ENEMIES = {
     look: { skin: '#5a8a34', hair: '#2a1e12', tunic: '#6a1e1a', pants: '#3a2a1a', belt: '#c8a030', ears: true, eyes: '#ff3a1a', hat: 'helmet', hatColor: '#c8a030' },
     examine: 'The biggest goblin you have ever seen, in a crown of bent iron. He does not look pleased to be awake.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }, { item: 'coins', min: 60, max: 150 }],
+      always: [{ item: 'bigBones', qty: 1 }, { item: 'coins', min: 60, max: 150 }],
       main: [
         { item: 'ironSword', qty: 1, chance: 1 / 4 },
         { item: 'goblinMail', qty: 1, chance: 1 / 4 },
@@ -196,7 +196,7 @@ export const ENEMIES = {
     look: { skin: '#8a9a80', hair: '#1a1a14', tunic: '#5a2a24', pants: '#3a3028', belt: '#1a1a14', ears: true, eyes: '#e8e0a0', hat: 'helmet', hatColor: '#5a5650' },
     examine: 'A pale goblin with huge eyes. It has never seen the sun, and it does not want to.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }],
+      always: [{ item: 'bigBones', qty: 1 }],
       main: [
         { item: 'coins', min: 20, max: 80, chance: 1 / 2 },
         { item: 'coal', qty: 1, chance: 1 / 6 },
@@ -218,7 +218,7 @@ export const ENEMIES = {
     look: { skin: '#8a9a80', hair: '#1a1a14', tunic: '#6a4a2a', pants: '#3a2a1a', belt: '#c8a030', ears: true, eyes: '#ffe080', hat: 'helmet', hatColor: '#c8a030' },
     examine: 'The goblin in charge of the dig. He carries a huge pick and a scroll of orders.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }, { item: 'coins', min: 100, max: 250 }],
+      always: [{ item: 'bigBones', qty: 1 }, { item: 'coins', min: 100, max: 250 }],
       main: [
         { item: 'steelChainbody', qty: 1, chance: 1 / 6 },
         { item: 'mithrilOre', min: 2, max: 4, chance: 1 / 4 },
@@ -254,7 +254,7 @@ export const ENEMIES = {
       phase2: { maxHit: 8, speed: 4 },
       phase2Text: 'With a scream of iron, one of the chains SNAPS! Grubnak is enraged!',
     },
-    loot: { always: [{ item: 'bones', qty: 1 }], main: [] },
+    loot: { always: [{ item: 'wyrmBones', qty: 1 }], main: [] },
   },
   // ---- New monsters (v0.46.0): filling the gaps between the old levels ----
   giantSpider: {
@@ -288,7 +288,7 @@ export const ENEMIES = {
     look: { skin: '#c99a72', hair: '#2a1a10', tunic: '#2e4a2a', pants: '#4a3a28', hat: 'hood', hatColor: '#2e4a2a' },
     examine: 'A highway robber in a green hood. He looks at your purse, not your face.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }],
+      always: [{ item: 'bigBones', qty: 1 }],
       main: [{ item: 'coins', min: 10, max: 50, chance: 1 / 2 }, { item: 'bronzeDagger', qty: 1, chance: 1 / 12 }, { item: 'ironDagger', qty: 1, chance: 1 / 20 }, { item: 'hardLeather', qty: 1, chance: 1 / 10 }, { item: 'meatPie', qty: 1, chance: 1 / 8 }, { item: 'ironScimitar', qty: 1, chance: 1 / 40 }],
       rare: { chance: 1 / 96, table: [{ item: 'warCharm', qty: 1 }, { item: 'uncutEmerald', qty: 1 }] },
     },
@@ -300,7 +300,7 @@ export const ENEMIES = {
     look: { skin: '#e8dcb8', hair: '#e8dcb8', tunic: '#8a5a32', pants: '#e8dcb8', hat: 'helmet', hatColor: '#8a5a32', eyes: '#60e060' },
     examine: 'An old soldier of the Goblin War, still wearing his helmet. He never got the message that it ended.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }],
+      always: [{ item: 'cursedBones', qty: 1 }],
       main: [{ item: 'coins', min: 8, max: 40, chance: 1 / 3 }, { item: 'ironArrow', min: 5, max: 15, chance: 1 / 8 }, { item: 'ironSqShield', qty: 1, chance: 1 / 20 }, { item: 'ironSword', qty: 1, chance: 1 / 24 }, { item: 'steelArrowtips', min: 5, max: 10, chance: 1 / 16 }, { item: 'uncutSapphire', qty: 1, chance: 1 / 40 }],
       rare: { chance: 1 / 96, table: [{ item: 'warCharm', qty: 1 }] },
     },
@@ -352,7 +352,7 @@ export const ENEMIES = {
     look: { skin: '#6a7a3a', hair: '#3a4a1a', tunic: '#6a7a3a', pants: '#6a7a3a', eyes: '#f0e040' },
     examine: 'A many-legged cave thing with a shell like wet slate. Its wounds close as you watch.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }],
+      always: [{ item: 'bigBones', qty: 1 }],
       main: [
         { item: 'coins', min: 20, max: 90, chance: 1 / 3 },
         { item: 'coal', min: 2, max: 4, chance: 1 / 4 },
@@ -375,7 +375,7 @@ export const ENEMIES = {
     look: { skin: '#5a1a22', hair: '#2a0a10', tunic: '#5a1a22', pants: '#5a1a22', eyes: '#ff3030' },
     examine: 'A bat with a wingspan wider than you are tall. It drinks from whatever it bites.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }],
+      always: [{ item: 'cursedBones', qty: 1 }],
       main: [
         { item: 'coins', min: 50, max: 180, chance: 1 / 3 },
         { item: 'mithrilOre', min: 1, max: 2, chance: 1 / 6 },
@@ -397,7 +397,7 @@ export const ENEMIES = {
     look: { skin: '#8a8a90', hair: '#4a4a52', tunic: '#6a6a72', pants: '#4a4a52', eyes: '#80f0ff' },
     examine: 'A ghost that took a body of rock. Blades skitter off it; it fears the hammer.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }],
+      always: [{ item: 'cursedBones', qty: 1 }],
       main: [
         { item: 'coins', min: 80, max: 260, chance: 1 / 3 },
         { item: 'mindRune', min: 20, max: 50, chance: 1 / 5 },
@@ -420,7 +420,7 @@ export const ENEMIES = {
     look: { skin: '#a83a1a', hair: '#5a1a0a', tunic: '#a83a1a', pants: '#5a1a0a', eyes: '#ffd040' },
     examine: 'A wingless dragon, long as a cart, with coals for scales. The forge never cooled because of it.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }, { item: 'wyrmHide', qty: 1 }],
+      always: [{ item: 'wyrmBones', qty: 1 }, { item: 'wyrmHide', qty: 1 }],
       main: [
         { item: 'coins', min: 150, max: 450, chance: 1 / 3 },
         { item: 'coal', min: 5, max: 10, chance: 1 / 4 },
@@ -445,7 +445,7 @@ export const ENEMIES = {
     look: { skin: '#2a5a1a', hair: '#123a0a', tunic: '#2a5a1a', pants: '#123a0a', eyes: '#f0dc50' },
     examine: 'A knot of thorny vines around a hungry maw. The roots under your feet move when it does.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }],
+      always: [{ item: 'wyrmBones', qty: 1 }],
       main: [
         { item: 'coins', min: 200, max: 600, chance: 1 / 3 },
         { item: 'coal', min: 6, max: 12, chance: 1 / 5 },
@@ -487,7 +487,7 @@ export const ENEMIES = {
     look: { skin: '#d8f0d0', hair: '#e8d878', tunic: '#3a7a5a', pants: '#2a4a3a', eyes: '#a8ffd0' },
     examine: 'A fae knight in leaf-green armour, guarding the altars of the hidden city.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }],
+      always: [{ item: 'cursedBones', qty: 1 }],
       main: [
         { item: 'runeEssence', min: 3, max: 5, chance: 1 / 3 },
         { item: 'natureRune', min: 3, max: 8, chance: 1 / 5 },
@@ -527,7 +527,7 @@ export const ENEMIES = {
     look: { fur: '#4e5358', dark: '#2e3236', light: '#e8e8e4', eyes: '#ff6a3a', big: true },
     examine: 'The leader of the pack: huge, scarred and very angry.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }, { item: 'wolfPelt', qty: 2 }, { item: 'coins', min: 40, max: 120 }],
+      always: [{ item: 'bigBones', qty: 1 }, { item: 'wolfPelt', qty: 2 }, { item: 'coins', min: 40, max: 120 }],
       main: [
         { item: 'ironDagger', qty: 1, chance: 1 / 3 },
         { item: 'mindRune', min: 15, max: 30, chance: 1 / 3 },
@@ -544,7 +544,7 @@ export const ENEMIES = {
     look: { fur: '#5e3b2e', dark: '#3a2418', light: '#a8786a', eyes: '#ffcf3a', big: true },
     examine: 'A huge, shaggy beast that lives in the dark. It does not like visitors.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }],
+      always: [{ item: 'bigBones', qty: 1 }],
       main: [
         { item: 'coins', min: 20, max: 80, chance: 1 / 3 },
         { item: 'coal', min: 1, max: 3, chance: 1 / 4 },
@@ -558,7 +558,8 @@ export const ENEMIES = {
       ],
       rare: { chance: 1 / 128, table: [{ item: 'warCharm', qty: 1 }, { item: 'uncutRuby', qty: 1 }, { item: 'uncutDiamond', qty: 1 }] },
     },
-  },  forgeGolem: {
+  },
+  forgeGolem: {
     id: 'forgeGolem', name: 'Forge golem', level: 48, hp: 70, sprite: 'golem', glow: '#ff8a3a',
     attack: 40, strength: 44, defence: 40,
     attackBonus: 15, strengthBonus: 15, defenceBonus: 40, maxHit: 8,
@@ -566,7 +567,7 @@ export const ENEMIES = {
     look: {},
     examine: 'Iron and slag, still hot from the forge. The dwarves built it to guard their work.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }],
+      always: [{ item: 'wyrmBones', qty: 1 }],
       main: [
         { item: 'coins', min: 60, max: 220, chance: 1 / 3 },
         { item: 'coal', min: 3, max: 6, chance: 1 / 4 },
@@ -588,7 +589,7 @@ export const ENEMIES = {
     look: { fur: '#2a1a14', dark: '#120a08', light: '#ff8a3a', eyes: '#ffd23a', big: true },
     examine: 'A great beast with a hide like cooling lava. The heat coming off it is unbearable.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }, { item: 'coins', min: 400, max: 1200 }, { item: 'coal', min: 8, max: 16 }],
+      always: [{ item: 'wyrmBones', qty: 1 }, { item: 'coins', min: 400, max: 1200 }, { item: 'coal', min: 8, max: 16 }],
       main: [
         { item: 'runiteOre', min: 1, max: 3, chance: 1 / 3 },
         { item: 'adamantBar', min: 2, max: 4, chance: 1 / 3 },
@@ -610,7 +611,7 @@ export const ENEMIES = {
     look: { skin: '#3a2a5a', hair: '#1a1028', tunic: '#2a1e40', pants: '#1a1028', belt: '#1a1028', eyes: '#5ff0ff' },
     examine: 'A thing made of shadow, with eyes like cold fire. It moves too quickly.',
     loot: {
-      always: [{ item: 'bones', qty: 1 }, { item: 'stalkerHide', qty: 1 }],
+      always: [{ item: 'cursedBones', qty: 1 }, { item: 'stalkerHide', qty: 1 }],
       main: [
         { item: 'coins', min: 40, max: 150, chance: 1 / 3 },
         { item: 'coal', min: 2, max: 4, chance: 1 / 4 },

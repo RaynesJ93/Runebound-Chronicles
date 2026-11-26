@@ -1082,6 +1082,17 @@ for _k, _c in (('perkLightFeet', ['#0c2a2a', '#1a6a6a', '#3ab0b0', '#c0f8f0']), 
     DERIVED[_k] = dict(icon=('huntersScroll', ramp_to(_c)))
 _PACK = ramp_to(['#1a1006', '#4a3014', '#7a5a2a', '#c8a868'])
 DERIVED['rangersBackpack'] = dict(icon=('bag', _PACK), small=('bag', _PACK), gear=('wolfCloak', ramp_to(['#141006', '#3a2a14', '#5e4a24', '#a08a58'])))
+# v0.61.0 bones and bone ammo: recoloured from the bones and bronze ammo
+_BONE = {'bone': ['#2e2a22', '#7a7262', '#d2cab2', '#f8f4e6'], 'bigBone': ['#2a2014', '#6e5a3a', '#c8b48a', '#f4ead0'],
+         'cursedBone': ['#120c18', '#3a2e48', '#8a7aa0', '#e2daf0'], 'wyrmBone': ['#260804', '#7a2410', '#d4703a', '#ffe0b4']}
+for _p, _ramp in _BONE.items():
+    _f = ramp_to(_ramp); _tip = ramp_to(_ramp, light_only=True)
+    if _p != 'bone':
+        DERIVED[_p + 's'] = dict(icon=('bones', _f), small=('bones', _f))
+    DERIVED[f'{_p}Arrowtips'] = dict(icon=('bronzeArrowtips', _f), small=('bronzeArrowtips', _f))
+    DERIVED[f'{_p}DartTip'] = dict(icon=('bronzeDartTip', _f), small=('bronzeDartTip', _f))
+    DERIVED[f'{_p}Arrow'] = dict(icon=('bronzeArrow', _tip), small=('bronzeArrow', _tip))
+    DERIVED[f'{_p}Dart'] = dict(icon=('bronzeDart', _tip), small=('bronzeDart', _tip))
 STALKER = ramp_to(['#0c0814', '#241a38', '#45386a', '#8a7cb8'])
 WYRMHIDE = ramp_to(['#200604', '#5e140a', '#a83018', '#f0884a'])
 DERIVED['uncutDragonstone'] = dict(icon=('uncutRuby', red_to_violet))

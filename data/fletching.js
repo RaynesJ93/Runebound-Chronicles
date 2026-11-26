@@ -45,6 +45,15 @@ export const RECIPES = [
   { id: 'runeArrows', name: 'Rune arrows', level: 75, xp: 12.5, uses: { headlessArrow: 1, runeArrowtips: 1 }, gives: { runeArrow: 1 }, batch: 15, ticks: 2, group: 'arrows' },
   { id: 'runeDarts', name: 'Rune darts', level: 81, xp: 18.8, uses: { runeDartTip: 1, feather: 1 }, gives: { runeDart: 1 }, batch: 10, ticks: 2, group: 'thrown' },
   { id: 'runeJavelins', name: 'Rune javelins', level: 77, xp: 12.4, uses: { runeJavelinHeads: 1, arrowShaft: 1 }, gives: { runeJavelin: 1 }, batch: 5, ticks: 2, group: 'thrown' },
+  // v0.61.0: carving bones (Crafting, with a knife), then finishing the arrows and darts (Fletching)
+  ...[['bones', 'bone', 'Bone', 5, 10, 5, 1.8, 12, 2.5], ['bigBones', 'bigBone', 'Big bone', 25, 25, 33, 5.5, 40, 8],
+    ['cursedBones', 'cursedBone', 'Cursed bone', 45, 45, 50, 8.5, 55, 12], ['wyrmBones', 'wyrmBone', 'Wyrm bone', 65, 80, 68, 11, 70, 16]]
+    .flatMap(([bone, pre, Name, lv, xp, arLv, arXp, dLv, dXp]) => [
+      { id: `${pre}Tips`, name: `${Name} arrowtips`, level: lv, xp, uses: { [bone]: 1 }, gives: { [`${pre}Arrowtips`]: 8 }, tool: 'knife', ticks: 3, group: bone, skill: 'crafting' },
+      { id: `${pre}DartTips`, name: `${Name} dart tips`, level: lv, xp, uses: { [bone]: 1 }, gives: { [`${pre}DartTip`]: 6 }, tool: 'knife', ticks: 3, group: bone, skill: 'crafting' },
+      { id: `${pre}Arrows`, name: `${Name} arrows`, level: arLv, xp: arXp, uses: { headlessArrow: 1, [`${pre}Arrowtips`]: 1 }, gives: { [`${pre}Arrow`]: 1 }, batch: 15, ticks: 2, group: 'arrows' },
+      { id: `${pre}Darts`, name: `${Name} darts`, level: dLv, xp: dXp, uses: { [`${pre}DartTip`]: 1, feather: 1 }, gives: { [`${pre}Dart`]: 1 }, batch: 10, ticks: 2, group: 'thrown' },
+    ]),
 ];
 
 // Which recipe group an item belongs to when you tap it.
@@ -53,4 +62,8 @@ export const GROUP_OF = {
   arrowShaft: 'arrows', feather: 'arrows', headlessArrow: 'arrows', bronzeArrowtips: 'arrows', ironArrowtips: 'arrows', steelArrowtips: 'arrows', mithrilArrowtips: 'arrows',
   adamantArrowtips: 'arrows', runeArrowtips: 'arrows', adamantDartTip: 'thrown', adamantJavelinHeads: 'thrown', runeDartTip: 'thrown', runeJavelinHeads: 'thrown',
   bronzeDartTip: 'thrown', bronzeJavelinHeads: 'thrown', ironDartTip: 'thrown', ironJavelinHeads: 'thrown', steelDartTip: 'thrown', steelJavelinHeads: 'thrown', mithrilDartTip: 'thrown', mithrilJavelinHeads: 'thrown',
+  bones: 'bones', bigBones: 'bigBones', cursedBones: 'cursedBones', wyrmBones: 'wyrmBones',
+  boneArrowtips: 'arrows', bigBoneArrowtips: 'arrows', cursedBoneArrowtips: 'arrows', wyrmBoneArrowtips: 'arrows',
+  boneDartTip: 'thrown', bigBoneDartTip: 'thrown', cursedBoneDartTip: 'thrown', wyrmBoneDartTip: 'thrown',
 };
+export const BONES = ['bones', 'bigBones', 'cursedBones', 'wyrmBones'];

@@ -399,6 +399,32 @@ Earth and fire runes are also sold in the magic shop.
 
 *v0.51.3, painted art* (the "Lumenhaven Images 01–07" sheets): Lumenhaven has its own ground (`theme: 'fae'`: fae grass, violet paths, moonstone market paving and a starlit pool); painted fae stalls, a well of starlight, fae lanterns, giant toadstools and crystal clusters, all glowing in the dark (decor props can have `light`); the fairy ring you arrive by (v0.51.4: moved up into the open, clear of the edge trees); and a straight bridge of glowing moonstone across the pool to the cosmic island (it replaces the wooden causeway). The eight new altars (two frames: the second glows brighter), the eight new rune icons (spells use them too) and the glimmerwisp, fae sentinel and hollow shade are all painted.
 
+### Bones and bone ammo (v0.61.0)
+
+Bones are no longer waiting for Prayer: they're **carved with a knife (Crafting)** into arrowtips or dart tips, then finished with Fletching like metal ammo. The better the bone, the better the ammo. Each bone-dropping monster drops one bone of its kind:
+
+| Bone | Dropped by | Crafting | Base XP per bone | One bone makes |
+|---|---|---|---|---|
+| Bones | chickens, cows, goblins, tunnel goblins | 5 | 10 | 8 arrowtips or 6 dart tips |
+| Big bones | Old Bessie, goblin brutes, wolves, alpha wolves, warren goblins, goblin chief, the Digmaster, bandits, cave beasts, cave crawlers | 25 | 25 | 8 / 6 |
+| Cursed bones | skeletons, bloodbats, night stalkers, stone wraiths, fae sentinels | 45 | 45 | 8 / 6 |
+| Wyrm bones | ember wyrms, molten beasts, forge golems, vinegrasp horrors, Grubnak | 65 | 80 | 8 / 6 |
+
+Finishing (Fletching), and how they compare with metal:
+
+| Ammo | Fletching | Stats | Metal either side |
+|---|---|---|---|
+| Bone arrow | 5 | ranged str 9 | bronze 7, iron 10 |
+| Big bone arrow | 33 | 18 | steel 16, mithril 22 |
+| Cursed bone arrow | 50 | 27 | mithril 22, adamant 31 |
+| Wyrm bone arrow | 68 | 40 | adamant 31, rune 49 |
+| Bone dart | 12 | Ranged 1, +5 / +5 | bronze 4, iron 6 |
+| Big bone dart | 40 | Ranged 10, +10 / +10 | steel 9, mithril 12 |
+| Cursed bone dart | 55 | Ranged 20, +14 / +14 | mithril 12, adamant 16 |
+| Wyrm bone dart | 70 | Ranged 30, +18 / +18 | adamant 16, rune 20 |
+
+Tap bones (or the knife) to open the carving menu; tap the tips to fletch them. Recipes in `data/fletching.js` (carving ones have `skill: 'crafting'`). Stand-in art: recoloured bones and bronze ammo (tools/derived.py). Old saved bones stay plain Bones.
+
 ### Ranger's backpack (v0.60.4)
 
 A new reward in Kesta's slayer shop for **100 slayer points** (was 1,000 at first): the Ranger's backpack, worn in the **cape slot**, needs **Ranged 50**. +8 Ranged attack, +2 ranged strength, small defences (+4 ranged), and a **75% chance that each arrow, bolt, dart, knife or javelin you shoot isn't used up** (`equip.ammoSave` on any worn item; `shoot()` in combat.js). Saved shots don't drop an arrow on the ground. Tested: 400 shots used 105 arrows with it, 400 without. Stand-in art (the bag icon in leather browns, a brown cloak when worn) until painted.
