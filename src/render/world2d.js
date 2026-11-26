@@ -158,7 +158,7 @@ export function createWorldView(canvasEl, area) {
     return { x: ((Math.min(...xs) + Math.max(...xs) + 1) / 2) * TILE, y: (Math.max(...ys) + 1) * TILE - 2 };
   };
   const place = (spr, fx, fy, extra = {}) => {
-    objects.push({ img: spr.img, x: Math.round(fx - spr.ax), y: Math.round(fy - spr.ay), w: spr.w, h: spr.h, sortY: fy, ...extra });
+    objects.push({ img: spr.img, x: Math.round(fx - spr.ax), y: Math.round(fy - spr.ay), w: spr.w, h: spr.h, sortY: fy, ax: spr.ax, ay: spr.ay, ...extra });
   };
   const isFence = new Set(area.props.filter((p) => p.type === 'fence').map((p) => `${p.x},${p.y}`));
 
@@ -702,7 +702,14 @@ export function createWorldView(canvasEl, area) {
         ctx.drawImage(st.img, Math.round(o.fx - st.ax), Math.round(o.fy - st.ay));
         continue;
       }
-      if (o.frames) o.img = o.frames[Math.floor(time * (o.rate || 6)) % o.frames.length].img;
+      if (o.frames) {
+        // Each frame lines up by its own anchor (v0.57.2): frames can differ in
+        // size (taller flames), and drawing them all from the first frame's
+        // corner made campfires hop up and down.
+        const fr = o.frames[Math.floor(time * (o.rate || 6)) % o.frames.length];
+        o.img = fr.img;
+        if (fr.ay !== undefined && o.ay !== undefined) { o.x += o.ax - fr.ax; o.y += o.ay - fr.ay; o.ax = fr.ax; o.ay = fr.ay; o.w = fr.w; o.h = fr.h; }
+      }
       const behind = o.fade && o.sortY > pObj.sortY &&
         pObj.x + 12 > o.x + 6 && pObj.x + 4 < o.x + o.w - 6 && pObj.y + 4 < o.y + o.h - 10 && pObj.y + pObj.h > o.y;
       if (behind) ctx.globalAlpha = 0.5;

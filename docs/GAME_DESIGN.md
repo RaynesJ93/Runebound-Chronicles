@@ -399,6 +399,10 @@ Earth and fire runes are also sold in the magic shop.
 
 *v0.51.3, painted art* (the "Lumenhaven Images 01–07" sheets): Lumenhaven has its own ground (`theme: 'fae'`: fae grass, violet paths, moonstone market paving and a starlit pool); painted fae stalls, a well of starlight, fae lanterns, giant toadstools and crystal clusters, all glowing in the dark (decor props can have `light`); the fairy ring you arrive by (v0.51.4: moved up into the open, clear of the edge trees); and a straight bridge of glowing moonstone across the pool to the cosmic island (it replaces the wooden causeway). The eight new altars (two frames: the second glows brighter), the eight new rune icons (spells use them too) and the glimmerwisp, fae sentinel and hollow shade are all painted.
 
+### Animated scenery stays put (v0.57.2)
+
+Animated props (campfires, cooking pits, fishing spots...) used to draw every frame from the first frame's top-left corner. The painted campfire's frames differ in height (taller and shorter flames), so the whole fire hopped up and down. Each frame now lines up by its own anchor (the foot point), so the stones stay still and only the flames move.
+
 ### Gear walks with you (v0.57.0)
 
 Painted gear is drawn once per facing, over the standing pose, but the painted player has two walking frames per facing (legs spread, arms swing, the body sways). So gear used to stay still while the body walked under it, with bare legs and arms poking out.
