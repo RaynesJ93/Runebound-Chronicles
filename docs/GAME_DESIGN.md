@@ -401,7 +401,7 @@ Earth and fire runes are also sold in the magic shop.
 
 ### Ranger's backpack (v0.60.4)
 
-A new reward in Kesta's slayer shop for **1,000 slayer points**: the Ranger's backpack, worn in the **cape slot**, needs **Ranged 50**. +8 Ranged attack, +2 ranged strength, small defences (+4 ranged), and a **75% chance that each arrow, bolt, dart, knife or javelin you shoot isn't used up** (`equip.ammoSave` on any worn item; `shoot()` in combat.js). Saved shots don't drop an arrow on the ground. Tested: 400 shots used 105 arrows with it, 400 without. Stand-in art (the bag icon in leather browns, a brown cloak when worn) until painted.
+A new reward in Kesta's slayer shop for **100 slayer points** (was 1,000 at first): the Ranger's backpack, worn in the **cape slot**, needs **Ranged 50**. +8 Ranged attack, +2 ranged strength, small defences (+4 ranged), and a **75% chance that each arrow, bolt, dart, knife or javelin you shoot isn't used up** (`equip.ammoSave` on any worn item; `shoot()` in combat.js). Saved shots don't drop an arrow on the ground. Tested: 400 shots used 105 arrows with it, 400 without. Stand-in art (the bag icon in leather browns, a brown cloak when worn) until painted.
 
 ### What's this reward? (v0.60.3)
 
