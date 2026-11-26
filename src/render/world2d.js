@@ -1,7 +1,7 @@
 import { TILE } from './pixel.js';
 import { buildGround } from './ground.js';
 import { GROUND } from '../world/area.js';
-import { walkingGear } from './gearWalk.js';
+import { walkingGear, coveredBody } from './gearWalk.js';
 import { buildingSprite } from './buildings.js';
 import * as S from './sprites.js';
 import { art } from './art.js';
@@ -596,15 +596,21 @@ export function createWorldView(canvasEl, area) {
       const d = dirOf(player.facing);
       // v0.57.0: bent to the walking frame the body is on, so gear walks too
       const frame = pPose ? 0 : stepFrame(player, steps);
-      const behind = [], front = [];
+      const behind = [], front = [], worn = [];
       for (const slot of ['cape', 'legs', 'feet', 'body', 'neck', 'head', 'shield', 'weapon']) {
         const id = playerGear[slot]?.id;
         const spr = id && walkingGear(art(`gear:${id}:${d}`)?.[0], slot, lib.paintedPlayer[d], frame);
         if (!spr) continue;
+        worn.push({ slot, spr, key: `${id}:${d}:${frame}` });
         const back = (slot === 'cape' && d !== 'up') || (d === 'up' && (slot === 'weapon' || slot === 'shield')) || (slot === 'shield' && (d === 'left' || d === 'right'));
         (back ? behind : front).push(spr);
       }
       if (behind.length || front.length) pObj.gear = { behind, front };
+      // v0.57.1: hide the hair and sleeves the helmet and armour should cover
+      if (!pPose) {
+        const body = lib.paintedPlayer[d][frame] || lib.paintedPlayer[d][0];
+        pObj.img = coveredBody(body, worn).img;
+      }
     }
     const footX = pObj.fx;
     const footY = pObj.fy;
