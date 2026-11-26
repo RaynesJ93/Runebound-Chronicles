@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 26 Nov 2026 | v0.58.1: Achievement tasks ask for real amounts, growing each tier (e.g. chop 25 logs, then 100 willow logs, then 250 yew logs; kill 20 goblins, then Old Bessie 10 times, then 50 ember wyrms). |
 | 26 Nov 2026 | v0.58.0: Tasks button at the top right. One panel with your Slayer task (progress, where to find them, Kesta's tip, streak and points) and 36 achievements in Easy, Medium and Hard tiers that pay coins, plus a bonus for finishing a tier. |
 | 26 Nov 2026 | v0.57.2: Campfires no longer hop up and down: animated scenery lines each frame up by its own base, so the stones stay still and only the flames flicker. |
 | 26 Nov 2026 | v0.57.1: Hair and sleeves no longer show through gear: with a helmet, armour, leg armour or boots on, whatever of the character pokes out round them is hidden (skin like faces and hands stays). |

@@ -405,9 +405,10 @@ A new **Tasks** button (checklist icon) in the top-right row, between the bag an
 
 - **Slayer:** your current task (how many to kill, how many left, a progress bar), where those monsters live (from the area data; tap to open the map there), Kesta's tip for the task, your tasks-in-a-row streak and Slayer points. With no task, it points you to Kesta.
 - **Achievements:** 36 goals in three tiers (`data/tasks.js`), ticked off as you play, each with a hint. Each task pays coins when completed (Easy 150, Medium 600, Hard 2,500) and finishing a whole tier pays a bonus (2,000 / 10,000 / 40,000). Coins go to the bag, or the bank if the bag is full.
-  - Easy: logs, a shrimp, copper ore, a bronze bar, cooked shrimps, leather, 5 cows, 10 goblins, air runes, visit the Vale, The Sleeping Stones, total level 75.
-  - Medium: willow logs, a lobster, mithril ore, a steel bar, a willow shortbow, Old Bessie, the Alpha Wolf, a Slayer task, cosmic runes, visit Greenmire, cut a ruby, The Overturned Cart.
-  - Hard: yew logs, a shark, runite ore, a rune bar, an ember wyrm, a vinegrasp horror, cut a dragonstone, death runes, wear a wyrmhide body, 10 Slayer tasks, The Runebound, combat level 80.
+  - Easy: chop 25 logs, catch 20 shrimps, mine 25 copper ore, smelt 10 bronze bars, cook 20 shrimps, tan 10 cowhides, kill 10 cows, kill 20 goblins, craft 100 air runes, visit the Vale, The Sleeping Stones, total level 75.
+  - Medium: chop 100 willow logs, catch 50 lobsters, mine 50 mithril ore, smelt 50 steel bars, fletch 25 willow shortbows, defeat Old Bessie 10 times, the Alpha Wolf 5 times, finish 5 Slayer tasks, craft 200 cosmic runes, visit Greenmire, cut 10 rubies, The Overturned Cart.
+  - Hard: chop 250 yew logs, catch 100 sharks, mine 25 runite ore, smelt 25 rune bars, slay 50 ember wyrms and 50 vinegrasp horrors, cut 5 dragonstones, craft 500 death runes, wear a wyrmhide body, finish 25 Slayer tasks, The Runebound, combat level 80.
+  - (v0.58.1 raised these from single items to real amounts. The counted tasks got new ids, so a task already ticked off at one log counts again, from the counter's current total; coins already paid stay paid.)
 
 **Tracking.** Saved in `state.tasks`: completed ids, tier bonuses paid, and counters for kills (`kill:<monster>`), items gathered or made (`get:<item>`, from every "+1 item" pop-up), areas visited (`visit:<area>`) and Slayer tasks finished (`slayer:done`). Counters start from v0.58.0, so earlier kills and gathering don't count; tasks about levels, quests and worn gear check your current state, so they complete straight away if you already qualify. Checked whenever a counter goes up and every 4 ticks.
 
