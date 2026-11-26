@@ -34,6 +34,7 @@ const TIPS = {
   vinegrasp: 'Vinegrasp horrors, in the Overgrowth, past the Wyrm\'s Hearth. Every few lashes they root you to the floor, so never fight one when you\'re low. Eat first.',
 };
 
+export { TIPS as SLAYER_TIPS }; // for the Tasks panel (v0.58.0)
 export const NPCS = [
   // ---- Brambleford -------------------------------------------------------------
   {

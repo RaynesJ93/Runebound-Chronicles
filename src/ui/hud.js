@@ -35,6 +35,7 @@ const GEAR_SVG = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="t
 const HEART_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 21 3.5 12.6A5.2 5.2 0 0 1 12 6.2a5.2 5.2 0 0 1 8.5 6.4z"/></svg>';
 const BOOK_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="#8a3a2a" stroke="#2b1d16" stroke-width="1.5" stroke-linejoin="round" d="M4 4.5C4 3.7 4.7 3 5.5 3H19v15H6a2 2 0 0 0-2 2z"/><path fill="#f4e6c4" stroke="#2b1d16" stroke-width="1.5" stroke-linejoin="round" d="M4 20a2 2 0 0 1 2-2h13v3H6a2 2 0 0 1-2-1z"/><path stroke="#e8b33c" stroke-width="1.6" d="M8 7.5h7M8 10.5h5"/></svg>';
 const SCROLL_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="#f4e6c4" stroke="#2b1d16" stroke-width="1.5" stroke-linejoin="round" d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7"/><path fill="#d8c49a" stroke="#2b1d16" stroke-width="1.5" stroke-linejoin="round" d="M4 6a2 2 0 1 1 4 0v12a2 2 0 1 1-4 0z"/><path stroke="#8a3a2a" stroke-width="1.6" d="M11 9h5M11 12h5M11 15h3"/></svg>';
+const TASKS_SVG = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><rect x="4" y="3" width="16" height="19" rx="2" fill="#f4e6c4" stroke="#2b1d16" stroke-width="1.6"/><rect x="8.5" y="1.5" width="7" height="3.5" rx="1" fill="#8a5a2a" stroke="#2b1d16" stroke-width="1.4"/><path fill="none" stroke="#3a8a3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m7 10 1.6 1.6L11 9M7 16l1.6 1.6L11 15"/><path stroke="#2b1d16" stroke-width="1.6" stroke-linecap="round" d="M13 10.5h4M13 16.5h4"/></svg>';
 const MAP_SVG = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="#e8d8b0" stroke="#2b1d16" stroke-width="1.6" stroke-linejoin="round" d="M2.5 5.5 8.5 3l7 2.5 6-2.5v15l-6 2.5-7-2.5-6 2.5z"/><path stroke="#2b1d16" stroke-width="1.4" d="M8.5 3v15M15.5 5.5v15"/><path fill="none" stroke="#b0483a" stroke-width="1.6" stroke-dasharray="2 1.6" d="M4.5 15c2-3 4-1 5.5-4s3.5-2 5-4"/><path fill="#b0483a" d="m17 6.2 2.4.3-1.2 2.3z"/></svg>';
 
 export class Hud {
@@ -55,6 +56,7 @@ export class Hud {
       </div>
       <div class="hud-top-right">
         <button class="icon-btn ui" id="btn-inv" aria-label="Inventory"><img class="px" src="${itemIcon('bag').url}" alt=""></button>
+        <button class="icon-btn ui" id="btn-tasks" aria-label="Tasks">${uiIcon('tasks', TASKS_SVG, 32)}<span class="dot hidden" id="tasks-dot"></span></button>
         <button class="icon-btn ui" id="btn-map" aria-label="Map">${uiIcon('map', MAP_SVG, 32)}</button>
         <button class="icon-btn ui" id="btn-skills" aria-label="Skills"><img class="px" src="${paintedIconUrl('equipment') || iconUrl('attack')}" alt=""></button>
         <button class="icon-btn ui" id="btn-settings" aria-label="Settings">${uiIcon('settings', GEAR_SVG, 32)}</button>
@@ -125,6 +127,15 @@ export class Hud {
             <button class="close-btn" data-close aria-label="Close">✕</button>
           </div>
           <div class="panel-body" id="quests-body"></div>
+        </div>
+      </div>
+      <div class="panel-backdrop ui hidden" id="tasks">
+        <div class="panel guide-panel" role="dialog" aria-label="Tasks">
+          <div class="panel-head">
+            <div class="tabs"><button class="tab on" data-ttab="slayer">Slayer</button><button class="tab" data-ttab="ach">Achievements</button></div>
+            <button class="close-btn" data-close aria-label="Close">✕</button>
+          </div>
+          <div class="panel-body" id="tasks-body"></div>
         </div>
       </div>
       <div class="panel-backdrop ui hidden" id="map">
@@ -254,6 +265,19 @@ export class Hud {
     $('btn-guide').addEventListener('click', () => this.openGuidePanel());
     $('btn-quests').addEventListener('click', () => this.openQuests());
     $('slayer-chip').addEventListener('click', () => this.onSlayerChip?.());
+    // Tasks (v0.58.0): your Slayer task and the achievement list
+    $('btn-tasks').addEventListener('click', () => this.openTasks());
+    this.el.tasks = $('tasks');
+    this.tasksTab = 'slayer';
+    this.el.tasks.addEventListener('click', (e) => {
+      if (e.target === this.el.tasks || e.target.closest('[data-close]')) { this.el.tasks.classList.add('hidden'); return; }
+      const tab = e.target.closest('[data-ttab]');
+      if (tab) { this.tasksTab = tab.dataset.ttab; this.onTasksOpen?.(); return; }
+      const tier = e.target.closest('[data-tier]');
+      if (tier) { this.tierOpen = { ...(this.tierOpen || {}), [tier.dataset.tier]: !tier.parentElement.open }; return; }
+      const row = e.target.closest('[data-gmap]');
+      if (row) { this.el.tasks.classList.add('hidden'); this.openMapAt(row.dataset.gmap); }
+    });
     this.el.quests = $('quests');
     this.el.quests.addEventListener('click', (e) => {
       if (e.target === this.el.quests || e.target.closest('[data-close]')) { this.closeQuests(); return; }
@@ -582,6 +606,41 @@ export class Hud {
 
   // ---- Quest journal (top left) -----------------------------------------------------
   // c: { flags, level(skill), count(item) } from the game.
+  openTasks() { this.el.tasks.classList.remove('hidden'); this.onTasksOpen?.(); }
+  get tasksOpen() { return !this.el.tasks.classList.contains('hidden'); }
+  setTasksNew(on) { this.$('tasks-dot').classList.toggle('hidden', !on); }
+
+  // v: { slayer: { task, left, total, name, where, tip, streak, points } | null-ish,
+  //      tiers: [{ id, name, coins, bonus, done, total, claimedBonus, tasks: [{ name, hint, done, progress }] }] }
+  renderTasks(v) {
+    for (const b of this.el.tasks.querySelectorAll('[data-ttab]')) b.classList.toggle('on', b.dataset.ttab === this.tasksTab);
+    const body = this.$('tasks-body');
+    if (this.tasksTab === 'slayer') {
+      const s = v.slayer;
+      body.innerHTML = s.task
+        ? `<div class="quest-card q-started">
+            <div class="quest-top"><b>Kill ${s.total} ${s.name}</b><span class="q-status">${s.left} left</span></div>
+            <div class="task-bar"><span style="width:${Math.round(((s.total - s.left) / s.total) * 100)}%"></span></div>
+            ${s.where.length ? `<h4>Where to find them</h4>${s.where.map((w) => `<button class="quest-giver" data-gmap="${w.area}">${w.name} <span class="guide-pin">📍</span></button>`).join('')}` : ''}
+            ${s.tip ? `<h4>Kesta says</h4><p class="quest-about">${s.tip}</p>` : ''}
+          </div>`
+        : `<div class="quest-card"><div class="quest-top"><b>No Slayer task</b></div>
+            <p class="quest-about">Kesta the Huntress gives out Slayer tasks at the Hunters' camp in Thornwood.</p>
+            <button class="quest-giver" data-gmap="route1">Kesta, the Hunters' camp <span class="guide-pin">📍</span></button></div>`;
+      body.innerHTML += `<p class="muted small">Tasks in a row: <b>${s.streak}</b> · Slayer points: <b>${s.points}</b></p>`;
+      return;
+    }
+    const all = v.tiers.reduce((n, t) => n + t.done, 0), of = v.tiers.reduce((n, t) => n + t.total, 0);
+    this.tierOpen ||= {};
+    body.innerHTML = `<p class="muted small">${all} of ${of} done. Each task pays coins when you finish it, and finishing a whole tier pays a bonus.</p>`
+      + v.tiers.map((t) => {
+        const open = this.tierOpen[t.id] ?? (t.done < t.total && !v.tiers.slice(0, v.tiers.indexOf(t)).some((u) => u.done < u.total));
+        return `<details class="task-tier"${open ? ' open' : ''}><summary class="guide-sec" data-tier="${t.id}">${t.name} <span class="muted small">${t.done}/${t.total} · ${t.coins.toLocaleString()} coins each, ${t.bonus.toLocaleString()} for the lot${t.claimedBonus ? ' ✔' : ''}</span></summary>
+          <ul class="q-list task-list">${t.tasks.map((a) => `<li class="${a.done ? 'task-done' : ''}"><span class="q-tick ${a.done ? 'ok' : ''}">${a.done ? '✔' : '✘'}</span> <span><b>${a.name}</b>${a.progress && !a.done ? ` <span class="muted small">(${a.progress[0]}/${a.progress[1]})</span>` : ''}<br><span class="muted small">${a.hint}</span></span></li>`).join('')}</ul>
+        </details>`;
+      }).join('');
+  }
+
   get questsOpen() { return !this.el.quests.classList.contains('hidden'); }
 
   // The button glows while a quest you could start hasn't been looked at yet.

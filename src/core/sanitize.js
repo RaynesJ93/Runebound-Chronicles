@@ -10,6 +10,7 @@ import { ITEMS, maxStack } from '../../data/items.js';
 const LEGACY_NOTES = { runeEssenceNoted: 'runeEssence' };
 const unNote = (s) => (s && typeof s === 'object' && LEGACY_NOTES[s.id] ? { ...s, id: LEGACY_NOTES[s.id] } : s);
 import { AREAS, START_AREA } from '../../data/areas/index.js';
+import { achievementById, TASK_TIERS } from '../../data/tasks.js';
 import { SPELLS } from '../../data/spells.js';
 import { SLOTS } from '../items/equipment.js';
 import { SKILLS } from '../skills/skills.js';
@@ -151,6 +152,16 @@ export function sanitize(state) {
     points: Math.floor(num(sl.points, 0, 0, 1_000_000)),
     blocked: Array.isArray(sl.blocked) ? [...new Set(sl.blocked.filter((id) => taskById(id)))].slice(0, MAX_BLOCKS) : [],
     last: taskById(sl.last) ? sl.last : null,
+  };
+  // Achievements (v0.58.0): known task ids, tier bonuses, whole-number counters.
+  const tk = state.tasks && typeof state.tasks === 'object' ? state.tasks : def.tasks;
+  const counters = {};
+  if (tk.c && typeof tk.c === 'object') for (const [k, v] of Object.entries(tk.c)) if (/^[a-z]+:[A-Za-z0-9]+$/.test(k)) counters[k] = Math.floor(num(v, 0, 0, 1e9));
+  state.tasks = {
+    done: Array.isArray(tk.done) ? [...new Set(tk.done.filter((id) => achievementById(id)))] : [],
+    bonus: Array.isArray(tk.bonus) ? [...new Set(tk.bonus.filter((id) => TASK_TIERS.some((t) => t.id === id)))] : [],
+    c: counters,
+    unseen: !!tk.unseen,
   };
 
   return state;
