@@ -399,6 +399,29 @@ Earth and fire runes are also sold in the magic shop.
 
 *v0.51.3, painted art* (the "Lumenhaven Images 01–07" sheets): Lumenhaven has its own ground (`theme: 'fae'`: fae grass, violet paths, moonstone market paving and a starlit pool); painted fae stalls, a well of starlight, fae lanterns, giant toadstools and crystal clusters, all glowing in the dark (decor props can have `light`); the fairy ring you arrive by (v0.51.4: moved up into the open, clear of the edge trees); and a straight bridge of glowing moonstone across the pool to the cosmic island (it replaces the wooden causeway). The eight new altars (two frames: the second glows brighter), the eight new rune icons (spells use them too) and the glimmerwisp, fae sentinel and hollow shade are all painted.
 
+### Task points and Tobin the Taskmaster (v0.59.0)
+
+Every achievement task now earns **task points** as well as coins: easy 10, medium 30, hard 60, plus a bonus for a whole tier (100 / 250 / 500). Coins per task dropped to 100 / 400 / 1,500 (tier coin bonuses unchanged). Points are worked out from the tasks you've done (`pointsEarned` in data/tasks.js), so tasks finished before points existed count; `state.tasks.spent` is what you've spent. The Tasks panel shows your balance, your perks and the Banker's Bond button. A full game is 2,630 points (with every tier bonus, 3,480).
+
+**Tobin the Taskmaster** stands on Brambleford's main street (28, 20) and sells rewards for task points (`taskShop` in data/shops.js):
+
+| Reward | Points | What it does |
+| --- | --- | --- |
+| Small / medium / large XP lamp | 25 / 75 / 200 | Rub, pick a skill: level × 10 / 35 / 100 XP, with the game's XP rate on top (so ×12) |
+| Coin pouch | 50 | 5,000 coins |
+| Light Feet (perk) | 50 | Walk and run 50% faster (`player.speedMul`); skilling speed is unchanged |
+| Bountiful Harvest (perk) | 150 | 10% chance of a second log, ore or fish |
+| Swift Hands (perk) | 150 | Smithing, Fletching, Crafting and Cooking 20% faster |
+| Keen Eye (perk) | 250 | Rare drops (rare table and `rare` entries) 10% more likely |
+| Banker's Bond (perk) | 300 | Open your bank from the Tasks panel, anywhere, once every 10 minutes |
+| Rune Saver (perk) | 400 | 10% chance a spell (combat, teleport or alchemy) uses no runes |
+| Bag of holding | 200 | While in your bag, gathered logs, ores, raw fish and essence go into it first, up to 100 each (`state.holding`); tap it to take things out; "Deposit bag" at a bank empties it |
+| Taskmaster's ring | 400 | Teleport to Brambleford, Thornwood crossroads or Lumenhaven; 3 charges a day (real days) |
+| Easy / medium / hard task cape | 100 / 300 / 800 | Needs that whole tier done. Small bonuses (+1/+2/+3 attack, +2/+3/+4 defence, +1/+2/+3 Strength) |
+| Task Master cape | 1,500 | Needs every task done. The best cape (+4 attack, +6 defence, +4 Strength); tap in the bag to teleport to Tobin |
+
+Perks are bought once, set a flag (`perk_<name>`) and never take a bag slot; they disappear from the shop once owned. Art is recoloured stand-ins for now.
+
 ### Tasks panel (v0.58.0)
 
 A new **Tasks** button (checklist icon) in the top-right row, between the bag and the map. A red dot shows when a task has been completed since you last looked. (On phones up to 420 px wide the five top buttons are slightly smaller so they clear the Guide button.) The panel has two tabs:

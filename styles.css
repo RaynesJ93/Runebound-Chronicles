@@ -724,3 +724,6 @@ img.mk-spot { width: 18px; height: 18px; filter: drop-shadow(0 0 1px #fff6dc) dr
   .hud-top-right .icon-btn { width: 47px; height: 47px; }
   .hud-top-right .icon-btn img.px { width: 28px; height: 28px; }
 }
+.task-points { background: #2b1d16; color: #f4e6c4; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
+.task-points b { color: #ffd34a; font-size: 1.2em; }
+.task-points .muted { color: #cdb894; }

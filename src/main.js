@@ -4,7 +4,7 @@ import { loadGame, saveGame, exportSave, importSave, wipeSave } from './core/sav
 import { Area, adjacentTo } from './world/area.js';
 import { findPath } from './world/pathfinding.js';
 import { AREAS, START_AREA } from '../data/areas/index.js';
-import { ACHIEVEMENTS, TASK_TIERS } from '../data/tasks.js';
+import { ACHIEVEMENTS, TASK_TIERS, pointsEarned, tierDone, PERKS, perkOn, LAMPS, HOLD_MAX, holdable, RING_SPOTS, RING_CHARGES, TOBIN_SPOT } from '../data/tasks.js';
 import { NPCS, SLAYER_TIPS } from '../data/npcs.js';
 import { Npc } from './entities/npc.js';
 import { mulberry32 } from './core/rng.js';
@@ -16,7 +16,7 @@ import { Hud } from './ui/hud.js';
 import { Enemy } from './entities/enemy.js';
 import { ENEMIES } from '../data/enemies.js';
 import { Combat } from './combat/combat.js';
-import { SkillBook, SKILL_NAME, MELEE_STYLES, RANGED_STYLES, SKILLS } from './skills/skills.js';
+import { SkillBook, SKILL_NAME, MELEE_STYLES, RANGED_STYLES, SKILLS, XP_RATE } from './skills/skills.js';
 import { SPELLS, UTILITY } from '../data/spells.js';
 import { maxHit, effectiveLevel } from './combat/formulas.js';
 import { Inventory } from './items/inventory.js';
@@ -159,6 +159,7 @@ function boot() {
         if (here) { here.qty++; here.expires = time + 120; } else ground.add(id, 1, x, y, time);
       },
       cast: (id) => taskCount(`cast:${id}`), // combat spells, for achievements
+      runeSaver: () => perk('runeSaver') && rng() < 0.1,
       enemyDied: (e) => {
         hud.message(`You defeated the ${e.name}!`);
         state.stats.kills = (state.stats.kills || 0) + 1;
@@ -179,7 +180,7 @@ function boot() {
           ground.add(qd.item, 1, e.tile.x, e.tile.y, time, { rare: true });
           hud.message(qd.say);
         }
-        for (const drop of rollLoot(e.def.loot, rng)) {
+        for (const drop of rollLoot(e.def.loot, rng, perk('keenEye') ? 1.1 : 1)) {
           ground.add(drop.item, drop.qty, e.tile.x, e.tile.y, time, { rare: drop.rare || !!ITEMS[drop.item]?.rare });
           if (drop.rare) hud.message(`Rare drop: ${itemName(drop.item)}!`);
         }
@@ -360,7 +361,7 @@ function boot() {
     if (!sp || !payRunes(sp)) return;
     if (sp.teleport) {
       if (combat.target || enemies.some((e) => !e.dead && e.state === 'fight')) { hud.message("You can't teleport while you're fighting."); return; }
-      for (const [rid, n] of Object.entries(sp.runes)) inventory.remove(rid, n);
+      if (!(perk('runeSaver') && rng() < 0.1)) for (const [rid, n] of Object.entries(sp.runes)) inventory.remove(rid, n);
       book.add('magic', sp.xp);
       hud.closeSkills();
       hud.message(`You cast ${sp.name}.`);
@@ -381,7 +382,7 @@ function boot() {
     if (s.id === 'coins') { hud.message("You can't turn coins into coins."); return; }
     if (!def.value) { hud.message(`The ${def.name.toLowerCase()} has no value. Alchemy can't touch it.`); return; }
     if (!payRunes(sp)) return;
-    for (const [rid, n] of Object.entries(sp.runes)) inventory.remove(rid, n);
+    if (!(perk('runeSaver') && rng() < 0.1)) for (const [rid, n] of Object.entries(sp.runes)) inventory.remove(rid, n);
     const coins = Math.max(1, Math.floor(def.value * sp.alch));
     if (s.qty > 1) inventory.remove(s.id, 1); else inventory.removeSlot(i);
     inventory.add('coins', coins);
@@ -484,6 +485,11 @@ function boot() {
     if (CUT_FROM[id] || id === 'chisel') return () => cutMenu(x, y);
     if (id === 'steelStuds') return () => studMenu(x, y);
     if (id === 'coalBag' || id === 'gemBag') return () => openBag(i);
+    if (LAMPS[id]) return () => rubLamp(i, x, y);
+    if (id === 'coinPouch') return () => openPouch(i);
+    if (id === 'bagOfHolding') return () => holdingMenu(x, y);
+    if (id === 'taskmasterRing') return () => taskRingMenu(x, y);
+    if (id === 'taskMasterCape') return () => hud.showMenu(x, y, 'Task Master cape', [{ label: 'Wear', fn: () => wear(i) }, { label: 'Teleport to Tobin', fn: capeToTobin }, { label: 'Cancel', fn: () => {} }]);
     if (def.read) return () => readItem(id);
     if (id === 'slayerGem') return () => hud.showDialog([taskText()], null, 'Slayer gem');
     if (id === 'huntersScroll') return () => readScroll(i);
@@ -511,6 +517,11 @@ function boot() {
     if (CUT_FROM[s.id] || s.id === 'chisel') options.push({ label: 'Cut', fn: () => cutMenu(x, y) });
     if (s.id === 'steelStuds') options.push({ label: 'Stud leather', fn: () => studMenu(x, y) });
     if (s.id === 'coalBag' || s.id === 'gemBag') options.push({ label: 'Open', fn: () => openBag(i) });
+    if (LAMPS[s.id]) options.push({ label: 'Rub', fn: () => rubLamp(i, x, y) });
+    if (s.id === 'coinPouch') options.push({ label: 'Open', fn: () => openPouch(i) });
+    if (s.id === 'bagOfHolding') options.push({ label: 'Take out', fn: () => holdingMenu(x, y) });
+    if (s.id === 'taskmasterRing') options.push({ label: 'Teleport', fn: () => taskRingMenu(x, y) });
+    if (s.id === 'taskMasterCape') options.push({ label: 'Teleport to Tobin', fn: capeToTobin });
     if (def.read) options.push({ label: 'Read', fn: () => readItem(s.id) });
     if (s.id === 'huntersScroll') options.push({ label: 'Read', fn: () => readScroll(i) });
     if (s.id === 'slayerGem') options.push({ label: 'Check task', fn: () => hud.showDialog([taskText()], null, 'Slayer gem') });
@@ -937,8 +948,8 @@ function boot() {
   // that looks like the bag for everything else.
   const pointsWallet = new Proxy(inventory, {
     get(inv, k) {
-      if (k === 'count') return (id) => (id === 'slayerPoints' ? state.slayer.points : inv.count(id));
-      if (k === 'remove') return (id, n) => { if (id === 'slayerPoints') state.slayer.points -= n; else inv.remove(id, n); };
+      if (k === 'count') return (id) => (id === 'slayerPoints' ? state.slayer.points : id === 'taskPoints' ? taskPointsLeft() : inv.count(id));
+      if (k === 'remove') return (id, n) => { if (id === 'slayerPoints') state.slayer.points -= n; else if (id === 'taskPoints') state.tasks.spent += n; else inv.remove(id, n); };
       const v = inv[k];
       return typeof v === 'function' ? v.bind(inv) : v;
     },
@@ -948,7 +959,7 @@ function boot() {
   const refreshTrade = () => {
     if (!hud.tradeOpen) return;
     if (hud.tradeMode === 'bank') hud.renderTrade(bank.items, inventory.slots);
-    else hud.renderTrade(shop.stock.filter((x) => (x.base > 0 || x.qty > 0) && !(shopEntry(x.id)?.hideFlag && state.flags[shopEntry(x.id).hideFlag])).map((x) => ({ id: x.id, qty: shop.unlimited ? null : x.qty, price: shop.buyPrice(x.id), currency: itemName(shop.currency).toLowerCase() })), inventory.slots, (id) => shop.sellPrice(id));
+    else hud.renderTrade(shop.stock.filter((x) => (x.base > 0 || x.qty > 0) && !(shopEntry(x.id)?.hideFlag && state.flags[shopEntry(x.id).hideFlag]) && !(shopEntry(x.id)?.perk && perkOn(state.flags, PERKS[x.id]))).map((x) => ({ id: x.id, qty: shop.unlimited ? null : x.qty, price: shop.buyPrice(x.id), currency: itemName(shop.currency).toLowerCase() })), inventory.slots, (id) => shop.sellPrice(id));
   };
   const runAction = (name) => {
     combat.stop();
@@ -956,6 +967,7 @@ function boot() {
     if (name === 'bank') hud.openTrade('bank', lastStation?.type === 'campChest' ? lastStation.title || 'Supply chest' : 'Bank of Brambleford');
     else if (name === 'shop') { shop = shops.generalStore; hud.openTrade('shop', shop.name); }
     else if (name === 'starShop') { shop = shops.starShop; hud.openTrade('shop', shop.name, 'Tap a reward to buy it with stardust. Lyra doesn\'t buy anything.'); }
+    else if (name === 'taskShop') { shop = shops.taskShop; hud.openTrade('shop', shop.name, `Tap a reward to buy it with task points. You have ${taskPointsLeft()}. Perks are for good and never take a bag slot; capes need their whole tier done.`); }
     else if (name === 'slayerShop') { shop = shops.slayerShop; hud.openTrade('shop', shop.name, `Tap a reward to buy it with slayer points. You have ${state.slayer.points}. The superior helmet is an upgrade: bring your slayer helmet in your bag.`); }
     refreshTrade();
   };
@@ -968,6 +980,26 @@ function boot() {
       if (!n) hud.tradeStatus('Your bag is full.');
       else hud.tradeStatus(`Withdrew ${itemName(id)} × ${n}.`);
     } else {
+      // Tobin's shop (v0.59.0): perks are set for good, capes need their tier done.
+      const entry = shopEntry(id);
+      if (entry?.needsTier && !(entry.needsTier === 'all' ? TASK_TIERS.every((t) => tierDone(state.tasks.done, t.id)) : tierDone(state.tasks.done, entry.needsTier))) {
+        hud.tradeStatus(entry.needsTier === 'all' ? 'Tobin only gives that to someone who has finished every task.' : `Finish every ${entry.needsTier} task first.`);
+        refreshTrade();
+        return;
+      }
+      if (entry?.perk) {
+        if (taskPointsLeft() < entry.price) hud.tradeStatus("You don't have enough task points.");
+        else {
+          state.tasks.spent += entry.price;
+          state.flags[`perk_${PERKS[id]}`] = true;
+          applyPerks();
+          const what = ITEMS[id].examine.replace(/^Perk: /, '');
+          hud.tradeStatus(`${itemName(id)} is yours, for good: ${what[0].toLowerCase()}${what.slice(1)}`);
+          save();
+        }
+        refreshTrade();
+        return;
+      }
       // Part exchange (a stock entry's `needs`): the old item must be in your bag, and goes.
       const needs = shopEntry(id)?.needs;
       if (shopEntry(id)?.hideFlag && (state.flags[shopEntry(id).hideFlag] || inventory.count(id))) {
@@ -980,7 +1012,7 @@ function boot() {
         refreshTrade();
         return;
       }
-      const r = shop.buy(id, needs ? 1 : q === Infinity ? 1000 : q, shop.currency === 'slayerPoints' ? pointsWallet : inventory);
+      const r = shop.buy(id, needs ? 1 : q === Infinity ? 1000 : q, shop.currency === 'slayerPoints' || shop.currency === 'taskPoints' ? pointsWallet : inventory);
       if (needs && r.n) inventory.remove(needs, 1);
       const cur = itemName(shop.currency).toLowerCase();
       if (!r.n) hud.tradeStatus(r.why === 'coins' ? `You don't have enough ${cur}.` : r.why === 'space' ? 'Your bag is full.' : "That's out of stock.");
@@ -1004,7 +1036,15 @@ function boot() {
     }
     refreshTrade();
   };
-  hud.onDepositBag = () => { bank.depositAll(inventory); hud.tradeStatus('Deposited everything in your bag.'); refreshTrade(); };
+  hud.onDepositBag = () => {
+    // the bag of holding empties into the bank too
+    const held = inventory.count('bagOfHolding') ? Object.entries(state.holding).filter(([, n]) => n > 0) : [];
+    for (const [id, n] of held) bank.put(id, n);
+    if (held.length) state.holding = {};
+    bank.depositAll(inventory);
+    hud.tradeStatus(held.length ? 'Deposited everything in your bag, and emptied your bag of holding.' : 'Deposited everything in your bag.');
+    refreshTrade();
+  };
   hud.onDepositGear = () => { bank.depositGear(equipment); hud.tradeStatus('Deposited everything you were wearing.'); refreshTrade(); };
 
   // ---- Food and potions -------------------------------------------------------
@@ -1083,7 +1123,7 @@ function boot() {
       talkTarget = null;
       npc.busy = true;
       hud.startConversation({ name: npc.name, ...npc.def.talk }, {
-        flags: state.flags, give: giveItems(npc), action: runAction, starNews, slayer: slayerCtx,
+        flags: state.flags, give: giveItems(npc), action: runAction, starNews, slayer: slayerCtx, taskPoints: () => taskPointsLeft(),
         level: (skill) => book.level(skill),
         count: (id) => inventory.count(id),
         have: (id) => haveAnywhere(id),
@@ -1214,14 +1254,14 @@ function boot() {
       if (T.done.includes(a.id) || !a.check(c)) continue;
       T.done.push(a.id);
       const tier = TASK_TIERS.find((t) => t.id === a.tier);
-      hud.message(`Task complete: ${a.name}! +${tier.coins.toLocaleString()} ${payCoins(tier.coins)}.`);
+      hud.message(`Task complete: ${a.name}! +${tier.points} task points and ${tier.coins.toLocaleString()} ${payCoins(tier.coins)}.`);
       changed = true;
     }
     for (const tier of TASK_TIERS) {
       if (T.bonus.includes(tier.id)) continue;
       if (!ACHIEVEMENTS.filter((a) => a.tier === tier.id).every((a) => T.done.includes(a.id))) continue;
       T.bonus.push(tier.id);
-      hud.showDialog([`You've finished every ${tier.name.toLowerCase()} task! Here's a bonus of ${tier.bonus.toLocaleString()} ${payCoins(tier.bonus)}.`], null, 'Tasks');
+      hud.showDialog([`You've finished every ${tier.name.toLowerCase()} task! Bonus: ${tier.bonusPoints} task points and ${tier.bonus.toLocaleString()} ${payCoins(tier.bonus)}.`, `Tobin the Taskmaster, in Brambleford, will give you the ${tier.name.toLowerCase()} task cape for it.`], null, 'Tasks');
       changed = true;
     }
     if (changed) { T.unseen = true; hud.setTasksNew(true); refreshInventory(); save(); if (hud.tasksOpen) hud.onTasksOpen(); }
@@ -1246,7 +1286,11 @@ function boot() {
     hud.setTasksNew(false);
     const t = sl().task, def = t && taskById(t.id);
     const c = taskCtx();
+    const bondWait = Math.max(0, (state.tasks.bankAt || 0) + BOND_COOLDOWN - Date.now());
     hud.renderTasks({
+      points: taskPointsLeft(),
+      perks: Object.entries(PERKS).filter(([, f]) => perk(f)).map(([id]) => itemName(id)),
+      bond: perk('bankersBond') ? (bondWait ? `ready in ${Math.ceil(bondWait / 60000)} min` : 'ready') : null,
       slayer: { task: !!def, left: t?.left, total: t?.total, name: def?.name, where: def ? homesOf(def.monsters) : [], tip: def ? SLAYER_TIPS[def.id] : '', streak: sl().streak, points: sl().points },
       tiers: TASK_TIERS.map((tier) => {
         const list = ACHIEVEMENTS.filter((a) => a.tier === tier.id);
@@ -1256,6 +1300,100 @@ function boot() {
     });
   };
   hud.setTasksNew(state.tasks.unseen);
+  queueMicrotask(() => applyPerks()); // once everything below is set up
+
+  // ---- Task points and Tobin's rewards (v0.59.0) ----
+  function taskPointsLeft() { return Math.max(0, pointsEarned(state.tasks.done, state.tasks.bonus) - state.tasks.spent); }
+  const perk = (id) => perkOn(state.flags, id);
+  // Perks that change how things run all the time.
+  function applyPerks() {
+    player.speedMul = perk('lightFeet') ? 1.5 : 1;
+  }
+  const fightingNow = () => combat.target || enemies.some((e) => !e.dead && e.state === 'fight');
+  // XP lamps: pick a skill, get (level x lamp) XP in it.
+  const rubLamp = (i, x, y) => {
+    const s = inventory.slots[i];
+    if (!s || !LAMPS[s.id]) return;
+    const k = LAMPS[s.id];
+    hud.showMenu(x, y, `${itemName(s.id)}: pick a skill`, [
+      ...SKILLS.map((sk) => ({ label: `${sk.name} (+${(book.level(sk.id) * k * XP_RATE).toLocaleString()} XP)`, icon: iconUrl(sk.id), fn: () => {
+        if (inventory.slots[i]?.id !== s.id) return;
+        inventory.remove(s.id, 1);
+        book.add(sk.id, book.level(sk.id) * k); // the game's XP rate applies, as for all XP
+        hud.message(`The lamp glows. You gain ${(book.level(sk.id) * k * XP_RATE).toLocaleString()} ${sk.name} XP.`);
+        refreshInventory(); save();
+      } })),
+      { label: 'Cancel', fn: () => {} },
+    ]);
+  };
+  const openPouch = (i) => {
+    if (inventory.slots[i]?.id !== 'coinPouch') return;
+    inventory.removeSlot(i);
+    const put = inventory.add('coins', 5000);
+    if (put < 5000) bank.put('coins', 5000 - put);
+    hud.message(put < 5000 ? 'You open the pouch: 5,000 coins (some went to your bank).' : 'You open the pouch: 5,000 coins!');
+    refreshInventory(); save();
+  };
+  // The bag of holding: gathered logs, ores and raw fish go in first, up to HOLD_MAX each.
+  const holding = () => state.holding;
+  const stash = (id, n = 1) => {
+    if (!inventory.count('bagOfHolding') || !holdable(id)) return 0;
+    const room = HOLD_MAX - (holding()[id] || 0);
+    const k = Math.max(0, Math.min(n, room));
+    if (k) holding()[id] = (holding()[id] || 0) + k;
+    return k;
+  };
+  const roomFor = (id) => inventory.room(id, 1) > 0 || (inventory.count('bagOfHolding') && holdable(id) && (holding()[id] || 0) < HOLD_MAX);
+  // Gathered items: into the bag of holding if it has room, else the bag.
+  const gain = (id, n = 1) => { const k = stash(id, n); return k + (n - k > 0 ? inventory.add(id, n - k) : 0); };
+  const holdingMenu = (x, y) => {
+    const inside = Object.entries(holding()).filter(([, n]) => n > 0);
+    if (!inside.length) { hud.message("Your bag of holding is empty. Logs, ores and raw fish you gather go in it first, while it's in your bag."); return; }
+    hud.showMenu(x, y, 'Bag of holding: take out', [
+      ...inside.map(([id, n]) => ({ label: `${itemName(id)} (${n})`, icon: itemIcon(id).url, fn: () => {
+        const got = inventory.add(id, holding()[id]);
+        holding()[id] -= got;
+        if (!holding()[id]) delete holding()[id];
+        hud.message(got ? `You take out ${got} ${itemName(id).toLowerCase()}.` : 'Your bag is full.');
+        refreshInventory(); save();
+      } })),
+      { label: 'Cancel', fn: () => {} },
+    ]);
+  };
+  // The Taskmaster's ring: 3 teleports a day (resets each real day).
+  const ringDay = () => new Date().toISOString().slice(0, 10);
+  const ringLeft = () => (state.tasks.ring?.day === ringDay() ? RING_CHARGES - state.tasks.ring.used : RING_CHARGES);
+  const taskRingMenu = (x, y) => {
+    const left = ringLeft();
+    hud.showMenu(x, y, `Taskmaster's ring (${left} of ${RING_CHARGES} left today)`, [
+      ...RING_SPOTS.map((sp) => ({ label: `Teleport: ${sp.name}`, fn: () => {
+        if (ringLeft() <= 0) { hud.message('The ring is out of charges. They come back tomorrow.'); return; }
+        if (fightingNow()) { hud.message("You can't teleport while you're fighting."); return; }
+        state.tasks.ring = { day: ringDay(), used: RING_CHARGES - ringLeft() + 1 };
+        hud.message(`The ring hums, and you're pulled away to ${sp.name}. (${ringLeft()} left today)`);
+        save();
+        travel({ to: sp.to, at: { x: sp.x, y: sp.y }, offset: 0, facing: 0 });
+      } })),
+      { label: 'Cancel', fn: () => {} },
+    ]);
+  };
+  const capeToTobin = () => {
+    if (fightingNow()) { hud.message("You can't teleport while you're fighting."); return; }
+    hud.message('The cape billows, and you land beside Tobin.');
+    travel({ to: TOBIN_SPOT.to, at: { x: TOBIN_SPOT.x, y: TOBIN_SPOT.y + 1 }, offset: 0, facing: Math.PI });
+  };
+  // Banker's Bond: the bank from anywhere, once every 10 minutes (from the Tasks panel).
+  const BOND_COOLDOWN = 10 * 60 * 1000;
+  hud.onBondBank = () => {
+    if (!perk('bankersBond')) return;
+    const wait = (state.tasks.bankAt || 0) + BOND_COOLDOWN - Date.now();
+    if (wait > 0) { hud.message(`Banker's Bond is ready again in ${Math.ceil(wait / 60000)} minute${wait > 60000 ? 's' : ''}.`); return; }
+    if (fightingNow()) { hud.message("You can't bank while you're fighting."); return; }
+    state.tasks.bankAt = Date.now();
+    hud.el.tasks.classList.add('hidden');
+    hud.openTrade('bank', "Bank (Banker's Bond)");
+    refreshTrade();
+  };
 
   // What Kesta's dialogue can do (her nodes in data/npcs.js).
   const slayerCtx = {
@@ -1535,7 +1673,7 @@ function boot() {
       hud.message(g.tools.some((t) => hasItem(t.id)) ? `You need a higher ${SKILL_NAME[g.skill]} level to use your ${g.tool}.` : g.noTool);
       return;
     }
-    if (!inventory.room(g.item(d), 1)) { hud.message(fullBag(g)); return; }
+    if (!roomFor(g.item(d))) { hud.message(fullBag(g)); return; }
     combat.stop();
     player.faceTowards(trunk(prop).x, trunk(prop).y);
     activity = { kind: 'gather', prop, g, d, next: ticker.count + 2, since: time };
@@ -1552,8 +1690,10 @@ function boot() {
     const chance = Math.min(0.9, d.chance + (book.level(g.skill) - d.level) * 0.012 + tool.bonus);
     if (rng() >= chance) return;
     const item = d.gems ? rollGem(rng) : g.item(d);
-    if (!inventory.add(item, 1)) { hud.message(fullBag(g)); stopActivity(); return; }
+    if (!gain(item, 1)) { hud.message(fullBag(g)); stopActivity(); return; }
     hud.itemDrop(item, 1);
+    // Bountiful Harvest (task perk): sometimes a second one
+    if (perk('bountiful') && !prop.star && rng() < 0.1 && gain(item, 1)) hud.itemDrop(item, 1);
     book.add(g.skill, d.xp);
     if (prop.star) { refreshInventory(); starMined(a); return; }
     // Mining sometimes turns up a gem too.
@@ -1578,7 +1718,7 @@ function boot() {
       const msg = g.fell(d);
       if (msg) hud.message(msg);
       stopActivity();
-    } else if (!inventory.room(item, 1)) {
+    } else if (!roomFor(item)) {
       hud.message(fullBag(g));
       stopActivity();
     }
@@ -1589,15 +1729,16 @@ function boot() {
     if (d.bait && !inventory.count(d.bait)) { hud.message(`You have run out of ${d.bait === 'feather' ? 'feathers' : 'bait'}.`); stopActivity(); return; }
     const c = rollCatch(d);
     if (!c) return;
-    if (!inventory.room(c.item, 1)) { hud.message(fullBag(a.g)); stopActivity(); return; }
+    if (!roomFor(c.item)) { hud.message(fullBag(a.g)); stopActivity(); return; }
     if (d.bait) inventory.remove(d.bait, 1);
-    inventory.add(c.item, 1);
+    gain(c.item, 1);
     hud.itemDrop(c.item, 1);
+    if (perk('bountiful') && rng() < 0.1 && gain(c.item, 1)) hud.itemDrop(c.item, 1);
     book.add('fishing', c.xp);
     refreshInventory();
     // stop once none of the fish you can catch here would fit
     const lvl = book.level('fishing');
-    if (!d.catches.some((x) => lvl >= x.level && inventory.room(x.item, 1))) { hud.message(fullBag(a.g)); stopActivity(); }
+    if (!d.catches.some((x) => lvl >= x.level && roomFor(x.item))) { hud.message(fullBag(a.g)); stopActivity(); }
   };
 
   // ---- Runecrafting -----------------------------------------------------------------
@@ -1798,7 +1939,11 @@ function boot() {
     const outs = Object.entries(r.success ? { ...r.gives, ...(r.failGives || {}) } : r.gives);
     if (outs.some(([id, q]) => trial.room(id, q * k) < q * k)) { hud.message("You don't have enough inventory space."); stopActivity(); return; }
     for (const [id, q] of Object.entries(r.uses)) inventory.remove(id, q * k);
-    a.next = ticker.count + r.ticks;
+    // Swift Hands (task perk): Smithing, Fletching, Crafting and Cooking 20% faster
+    const fast = perk('swiftHands') && ['smithing', 'fletching', 'crafting', 'cooking'].includes(skillOf(r));
+    const t = r.ticks * (fast ? 0.8 : 1) + (a.carry || 0);
+    a.next = ticker.count + Math.max(1, Math.floor(t));
+    a.carry = t - Math.max(1, Math.floor(t));
     // Some makes can fail (burnt food): the materials are used up anyway.
     if (r.success && rng() >= r.success(book.level(skillOf(r)))) {
       for (const [id, q] of Object.entries(r.failGives || {})) inventory.add(id, q * k);

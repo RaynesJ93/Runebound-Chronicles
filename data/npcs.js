@@ -419,6 +419,33 @@ export const NPCS = [
       },
     },
   },
+  {
+    // v0.59.0: spends your task points (achievements in the Tasks panel)
+    id: 'tobin', name: 'Tobin the Taskmaster', short: 'Tobin', area: 'brambleford', x: 28, y: 20, radius: 1, wander: 0.1,
+    look: { hair: '#5a3a1a', tunic: '#2f6b3a', pants: '#3a2a1a', belt: '#e8c050', beard: '#5a3a1a' },
+    talk: {
+      start: (c) => (c.flags.metTobin ? 'again' : 'intro'),
+      nodes: {
+        intro: {
+          say: ['Tobin, Taskmaster. I keep the ledger: every task anyone in these parts has ever finished.', 'Check your tasks with the checklist button up top. Each one you finish earns task points, and I pay well for them.'],
+          set: { metTobin: true },
+          next: 'menu',
+        },
+        again: { say: (c) => `Back again? You've got ${c.taskPoints?.() ?? 0} task points to spend.`, next: 'menu' },
+        menu: { say: [], choices: [
+          { text: "Let's see your rewards.", action: 'taskShop' },
+          { text: 'How do task points work?', next: 'how' },
+          { text: 'Bye, Tobin.', next: 'bye' },
+        ] },
+        how: {
+          say: ['Easy tasks are worth 10 points, medium 30, hard 60. Finish a whole tier and I add a bonus: 100, 250 or 500.',
+            'Spend them on XP lamps, perks that last for good, a bag of holding, my ring, or a cape to show off. The capes need a whole tier done.'],
+          next: 'menu',
+        },
+        bye: { say: 'Keep ticking them off!' },
+      },
+    },
+  },
 
   // ---- Thornwood -----------------------------------------------------------------
   {

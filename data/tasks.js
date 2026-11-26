@@ -18,9 +18,10 @@
 // amounts went up, so they count again from where your counter is).
 
 export const TASK_TIERS = [
-  { id: 'easy', name: 'Easy', coins: 150, bonus: 3000 },
-  { id: 'medium', name: 'Medium', coins: 600, bonus: 15000 },
-  { id: 'hard', name: 'Hard', coins: 2500, bonus: 60000 },
+  // points: task points per task (spent with Tobin the Taskmaster); bonusPoints for a whole tier (v0.59.0)
+  { id: 'easy', name: 'Easy', coins: 100, bonus: 3000, points: 10, bonusPoints: 100 },
+  { id: 'medium', name: 'Medium', coins: 400, bonus: 15000, points: 30, bonusPoints: 250 },
+  { id: 'hard', name: 'Hard', coins: 1500, bonus: 60000, points: 60, bonusPoints: 500 },
 ];
 
 const get = (id, n = 1) => ({ check: (c) => c.count(`get:${id}`) >= n, progress: (c) => [Math.min(n, c.count(`get:${id}`)), n] });
@@ -123,3 +124,39 @@ export const ACHIEVEMENTS = [
 ];
 
 export const achievementById = (id) => ACHIEVEMENTS.find((a) => a.id === id);
+
+// Task points earned so far: every completed task, plus each tier bonus paid.
+// Worked out from what's done, so tasks finished before points existed count.
+export function pointsEarned(done, bonus) {
+  let n = 0;
+  for (const id of done) { const a = achievementById(id); const t = a && TASK_TIERS.find((x) => x.id === a.tier); if (t) n += t.points; }
+  for (const id of bonus) { const t = TASK_TIERS.find((x) => x.id === id); if (t) n += t.bonusPoints; }
+  return n;
+}
+export const tierDone = (done, tier) => ACHIEVEMENTS.filter((a) => a.tier === tier).every((a) => done.includes(a.id));
+
+// Permanent perks bought from Tobin (v0.59.0): the flag each sets.
+export const PERKS = {
+  perkLightFeet: 'lightFeet',      // walk and run 50% faster
+  perkBountiful: 'bountiful',      // 10% chance of a second log, ore or fish
+  perkSwiftHands: 'swiftHands',    // Smithing, Fletching, Crafting and Cooking 20% faster
+  perkKeenEye: 'keenEye',          // rare drops 10% more often
+  perkBankersBond: 'bankersBond',  // bank from anywhere, once every 10 minutes
+  perkRuneSaver: 'runeSaver',      // 10% chance a spell costs no runes
+};
+export const perkOn = (flags, perk) => !!flags[`perk_${perk}`];
+
+// XP lamps: XP = your level in the chosen skill x this.
+export const LAMPS = { smallLamp: 10, mediumLamp: 35, largeLamp: 100 };
+// What the bag of holding takes: logs, ores and raw fish (and essence), up to HOLD_MAX each.
+export const HOLD_MAX = 100;
+export const holdable = (id) => /^(logs|[a-z]+Logs|[a-z]+Ore|coal|runeEssence|raw[A-Z][A-Za-z]*)$/.test(id) && id !== 'rawBeef' && id !== 'rawChicken';
+// The Taskmaster's ring: where it takes you, and charges a day.
+export const RING_SPOTS = [
+  { id: 'brambleford', name: 'Brambleford', to: 'brambleford', x: 24, y: 11 },
+  { id: 'thornwood', name: 'Thornwood crossroads', to: 'route1', x: 62, y: 43 },
+  { id: 'lumenhaven', name: 'Lumenhaven', to: 'lumenhaven', x: 36, y: 46 },
+];
+export const RING_CHARGES = 3;
+// Tobin's spot, for the Task Master cape's teleport.
+export const TOBIN_SPOT = { to: 'brambleford', x: 28, y: 20 };

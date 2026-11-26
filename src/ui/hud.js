@@ -273,6 +273,7 @@ export class Hud {
       if (e.target === this.el.tasks || e.target.closest('[data-close]')) { this.el.tasks.classList.add('hidden'); return; }
       const tab = e.target.closest('[data-ttab]');
       if (tab) { this.tasksTab = tab.dataset.ttab; this.onTasksOpen?.(); return; }
+      if (e.target.closest('[data-bond]')) { this.onBondBank?.(); return; }
       const tier = e.target.closest('[data-tier]');
       if (tier) { this.tierOpen = { ...(this.tierOpen || {}), [tier.dataset.tier]: !tier.parentElement.open }; return; }
       const row = e.target.closest('[data-gmap]');
@@ -632,10 +633,13 @@ export class Hud {
     }
     const all = v.tiers.reduce((n, t) => n + t.done, 0), of = v.tiers.reduce((n, t) => n + t.total, 0);
     this.tierOpen ||= {};
-    body.innerHTML = `<p class="muted small">${all} of ${of} done. Each task pays coins when you finish it, and finishing a whole tier pays a bonus.</p>`
+    body.innerHTML = `<div class="task-points"><b>${v.points.toLocaleString()}</b> task points <span class="muted small">to spend with Tobin the Taskmaster, by Brambleford's main street</span></div>`
+      + (v.perks.length ? `<p class="small">Your perks: ${v.perks.join(', ')}</p>` : '')
+      + (v.bond ? `<button class="quest-giver" data-bond>Banker's Bond: open your bank (${v.bond})</button>` : '')
+      + `<p class="muted small">${all} of ${of} done. Each task pays task points and coins (easy 10 points, medium 30, hard 60), and finishing a whole tier pays a bonus.</p>`
       + v.tiers.map((t) => {
         const open = this.tierOpen[t.id] ?? (t.done < t.total && !v.tiers.slice(0, v.tiers.indexOf(t)).some((u) => u.done < u.total));
-        return `<details class="task-tier"${open ? ' open' : ''}><summary class="guide-sec" data-tier="${t.id}">${t.name} <span class="muted small">${t.done}/${t.total} · ${t.coins.toLocaleString()} coins each, ${t.bonus.toLocaleString()} for the lot${t.claimedBonus ? ' ✔' : ''}</span></summary>
+        return `<details class="task-tier"${open ? ' open' : ''}><summary class="guide-sec" data-tier="${t.id}">${t.name} <span class="muted small">${t.done}/${t.total} · ${t.points} points each, +${t.bonusPoints} for the lot${t.claimedBonus ? ' ✔' : ''}</span></summary>
           <ul class="q-list task-list">${t.tasks.map((a) => `<li class="${a.done ? 'task-done' : ''}"><span class="q-tick ${a.done ? 'ok' : ''}">${a.done ? '✔' : '✘'}</span> <span><b>${a.name}</b>${a.progress && !a.done ? ` <span class="muted small">(${a.progress[0]}/${a.progress[1]})</span>` : ''}<br><span class="muted small">${a.hint}</span></span></li>`).join('')}</ul>
         </details>`;
       }).join('');

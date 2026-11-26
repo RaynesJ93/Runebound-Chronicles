@@ -131,7 +131,8 @@ export class PlayerController {
     this.moving = true;
     this.t = 0;
     this.stepRunning = this.canRun;
-    this.stepDur = this.stepRunning ? RUN_STEP : WALK_STEP;
+    // speedMul: Light Feet (task perk, v0.59.0) is 1.5
+    this.stepDur = (this.stepRunning ? RUN_STEP : WALK_STEP) / (this.speedMul || 1);
     this.targetFacing = Math.atan2(n.x - this.tile.x, n.y - this.tile.y);
   }
 
