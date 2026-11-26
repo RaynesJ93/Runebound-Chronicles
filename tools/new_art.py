@@ -37,6 +37,9 @@ Sets:
                 stalkerhide and wyrmhide armour) and worn views (2_, 5 x 4:
                 the two bodies and chaps facing down/up/left/right, then the
                 gold and silver dragonstone amulets facing down and up).
+  bones         (26 Nov 2026) Bones and bone ammo: one 5 x 4 sheet, a row per
+                bone (bones, big, cursed, wyrm); columns: bones, arrowtips,
+                dart tips, arrows, darts.
   slayercaves   (15 Nov 2026) The Slayer Caverns' four sections: for each,
                 a sheet of floor + wall textures (1A, 2A...) and a 3 x 2
                 sheet of decorations (1B, 2B...).
@@ -496,6 +499,21 @@ elif SET == 'images01-09':
     old = json.load(open(path)) if os.path.exists(path) else {}
     old.update(anchors)
     json.dump(old, open(path, 'w'), indent=1, sort_keys=True)
+elif SET == 'bones':
+    sheet = glob.glob(os.path.join(SRC, '*.png'))[0]
+    grid = grid_cells(sheet, rows=4, cols=5, grow=14)
+
+    def boxed(im, size, fit):
+        sm = scaled(im, min(fit / im.width, fit / im.height))
+        c = Image.new('RGBA', (size, size))
+        c.alpha_composite(sm, ((size - sm.width) // 2, (size - sm.height) // 2))
+        return c
+
+    for row, (bone, pre) in zip(grid, (('bones', 'bone'), ('bigBones', 'bigBone'), ('cursedBones', 'cursedBone'), ('wyrmBones', 'wyrmBone'))):
+        for im, item in zip(row, (bone, f'{pre}Arrowtips', f'{pre}DartTip', f'{pre}Arrow', f'{pre}Dart')):
+            boxed(im, 32, 28).save(os.path.join(OUT, f'icon__{item}.png'))
+            boxed(im, 16, 15).save(os.path.join(OUT, f'iconS__{item}.png'))
+
 else:
-    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, overgrowth, slayergear, vinegrasp-art, batch1, lumenhaven, batch3 or bessie')
+    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, overgrowth, slayergear, vinegrasp-art, batch1, lumenhaven, batch3, bessie or bones')
 print('done')

@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 26 Nov 2026 | v0.61.1: Painted icons for the four bones and all the bone arrowtips, dart tips, arrows and darts (replacing the recoloured stand-ins). |
 | 26 Nov 2026 | v0.61.0: Bones get a use: four kinds (bones, big, cursed, wyrm) dropped by tougher monsters, carved with a knife (Crafting 5/25/45/65) into arrowtips and dart tips, then fletched into bone arrows and darts that sit between the metal tiers. |
 | 26 Nov 2026 | v0.60.6: XP rates doubled: every bit of XP (combat, Hitpoints, every skill, lamps) is now 24× the base rate, up from 12×. |
 | 26 Nov 2026 | v0.60.5: Ranger's backpack now costs 100 slayer points (was 1,000). |
