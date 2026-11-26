@@ -205,7 +205,7 @@ This is the OSRS curve: level 2 needs 83 XP, level 50 needs about 101,000, level
 
 ### XP rate: 12×
 
-*Changed 4 Nov 2026 (was 5× from 2 Nov):* all XP in the game is multiplied by **12** (`XP_RATE` in `src/skills/skills.js`). The XP figures in this document and in the data files are the base rates before the multiplier; for example a pine log gives 25 × 12 = 300 Woodcutting XP, and each point of melee damage gives 4 × 12 = 48 XP. The skill guides show XP with the multiplier applied.
+*Changed 26 Nov 2026 (v0.60.6; was 12× from 4 Nov, 5× from 2 Nov):* all XP in the game is multiplied by **24** (`XP_RATE` in `src/skills/skills.js`). The XP figures in this document and in the data files are the base rates before the multiplier; for example a pine log gives 25 × 24 = 600 Woodcutting XP, and each point of melee damage gives 4 × 24 = 96 XP. Lamps scale with it too. The skill guides show XP with the multiplier applied.
 
 ### Combat XP rates
 
@@ -917,7 +917,7 @@ The map shows the ground, trees, water and buildings drawn small, and on top: pl
 
 A new skill, **Slayer** (1–99), trained only by killing monsters on a task.
 
-**The slayer master: Kesta the Huntress**, at the Hunters' camp by the lake in south-west Thornwood. Ask her for a task and she picks one that suits your combat level (and, later, your Slayer level): "Kill 23 wolves". She also gives you a **slayer gem** the first time, which tells you your task anywhere (tap it in your bag). Kills of the task's monsters count down; each kill gives Slayer XP equal to the monster's hitpoints (base, x12 like all XP). When the task is done you get **slayer points**: 10 per task, 50 for every 10th in a row, 150 for every 50th. Then go back to Kesta for a new one.
+**The slayer master: Kesta the Huntress**, at the Hunters' camp by the lake in south-west Thornwood. Ask her for a task and she picks one that suits your combat level (and, later, your Slayer level): "Kill 23 wolves". She also gives you a **slayer gem** the first time, which tells you your task anywhere (tap it in your bag). Kills of the task's monsters count down; each kill gives Slayer XP equal to the monster's hitpoints (base, x24 like all XP). When the task is done you get **slayer points**: 10 per task, 50 for every 10th in a row, 150 for every 50th. Then go back to Kesta for a new one.
 
 | Task | Monsters | Needs Slayer | Needs combat | Kills |
 | --- | --- | --- | --- | --- |
@@ -1146,7 +1146,7 @@ Part 1 ends with Grubnak down and Tobin at your side; part 2 adds the ending sce
 | --- | --- |
 | Holt's sword (weapon, Attack 35) | Slash 28, stab 10, crush 2; strength 26; speed 4. Between adamant and rune. |
 | Runebound cape (cape, Defence 30) | +3 to every attack, +5 to every defence (magic +4), strength 3. A blue cloak with a glowing rune. |
-| From Maren | 5,000 coins; 800 base XP (9,600 at x12) each in Attack, Strength, Defence and Hitpoints. |
+| From Maren | 5,000 coins; 800 base XP (19,200 at x24) each in Attack, Strength, Defence and Hitpoints. |
 
 Afterwards, both Tobins (at the hut and in the chamber) and Maren have new lines, and the statue can still be looked at.
 
