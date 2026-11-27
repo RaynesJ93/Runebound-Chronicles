@@ -1082,6 +1082,9 @@ for _k, _c in (('perkLightFeet', ['#0c2a2a', '#1a6a6a', '#3ab0b0', '#c0f8f0']), 
     DERIVED[_k] = dict(icon=('huntersScroll', ramp_to(_c)))
 _PACK = ramp_to(['#1a1006', '#4a3014', '#7a5a2a', '#c8a868'])
 DERIVED['rangersBackpack'] = dict(icon=('bag', _PACK), small=('bag', _PACK), gear=('wolfCloak', ramp_to(['#141006', '#3a2a14', '#5e4a24', '#a08a58'])))
+# v0.62.0 spell pouch: the coin pouch in deep violet (stand-in until painted)
+_SPOUCH = ramp_to(['#140a24', '#3a2066', '#7a4ac0', '#d8b8ff'])
+DERIVED['spellPouch'] = dict(icon=('coinPouch', _SPOUCH), small=('coinPouch', _SPOUCH))
 # v0.61.0 bones and bone ammo: recoloured from the bones and bronze ammo
 _BONE = {'bone': ['#2e2a22', '#7a7262', '#d2cab2', '#f8f4e6'], 'bigBone': ['#2a2014', '#6e5a3a', '#c8b48a', '#f4ead0'],
          'cursedBone': ['#120c18', '#3a2e48', '#8a7aa0', '#e2daf0'], 'wyrmBone': ['#260804', '#7a2410', '#d4703a', '#ffe0b4']}

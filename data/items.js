@@ -1104,6 +1104,7 @@ export const ITEMS = {
   mediumLamp: { name: 'Medium XP lamp', value: 0, examine: 'Rub it and pick a skill for a good chunk of XP in it: the higher your level, the more you get.' },
   largeLamp: { name: 'Large XP lamp', value: 0, examine: 'Rub it and pick a skill for a big pile of XP in it: the higher your level, the more you get.' },
   coinPouch: { name: 'Coin pouch', value: 0, examine: 'A fat little pouch. Open it for 5,000 coins.' },
+  spellPouch: { name: 'Spell pouch', value: 0, examine: 'A pouch for runes, any number of each. While it is in your bag your spells use the runes in it, each cast has a 60% chance to use no runes at all, and runes you craft go straight in. Tap it to put runes in or take them out.' },
   bagOfHolding: { name: 'Bag of holding', value: 0, examine: 'Bigger on the inside. While it is in your bag, logs, ores and raw fish you gather go into it first: up to 100 of each. Tap it to take them out; deposit your bag at a bank to empty it.' },
   taskmasterRing: { name: "Taskmaster's ring", value: 0, examine: 'Tap it to teleport to Brambleford, Thornwood or Lumenhaven. 3 charges a day.' },
   easyTaskCape: {
