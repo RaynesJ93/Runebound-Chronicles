@@ -37,6 +37,9 @@ Sets:
                 stalkerhide and wyrmhide armour) and worn views (2_, 5 x 4:
                 the two bodies and chaps facing down/up/left/right, then the
                 gold and silver dragonstone amulets facing down and up).
+  gems          (27 Nov 2026) Gems: one 5 x 2 sheet, uncut on top, cut below;
+                sapphire, emerald, ruby, diamond, dragonstone. Keyed strictly
+                (ruby and dragonstone sit close to magenta).
   bones         (26 Nov 2026) Bones and bone ammo: one 5 x 4 sheet, a row per
                 bone (bones, big, cursed, wyrm); columns: bones, arrowtips,
                 dart tips, arrows, darts.
@@ -514,6 +517,41 @@ elif SET == 'bones':
             boxed(im, 32, 28).save(os.path.join(OUT, f'icon__{item}.png'))
             boxed(im, 16, 15).save(os.path.join(OUT, f'iconS__{item}.png'))
 
+elif SET == 'gems':
+    from scipy import ndimage
+    sheet = glob.glob(os.path.join(SRC, '*.png'))[0]
+    rgb = np.array(Image.open(sheet).convert('RGB'))
+    r, g, b = [rgb[..., k].astype(np.int32) for k in range(3)]
+    m = np.minimum(r, b) - g - np.abs(r - b) // 2
+    bg = m > 170                     # only near-pure magenta is background
+    edge = ndimage.binary_dilation(bg, iterations=1) & ~bg & (m > 40)
+    rgb[..., 0][edge] = np.minimum(r[edge], g[edge] + 40)
+    rgb[..., 2][edge] = np.minimum(b[edge], g[edge] + 40)
+    on = ~bg
+    lab, n = ndimage.label(ndimage.binary_dilation(on, iterations=24))  # joins each gem's sparkle on
+    boxes = ndimage.find_objects(lab)
+    sizes = ndimage.sum(on, lab, range(1, n + 1))
+    blobs = []
+    for i in sorted(range(n), key=lambda i: -sizes[i])[:10]:
+        sy, sx = boxes[i]
+        a = np.where((lab[sy, sx] == i + 1) & on[sy, sx], 255, 0)
+        im = Image.fromarray(np.dstack([rgb[sy, sx], a]).astype(np.uint8), 'RGBA')
+        blobs.append(((sy.start + sy.stop) / 2, (sx.start + sx.stop) / 2, im.crop(im.getbbox())))
+    blobs.sort(key=lambda t: t[0])
+    rows = [sorted(blobs[k * 5:(k + 1) * 5], key=lambda t: t[1]) for k in range(2)]
+
+    def boxed(im, size, fit):
+        sm = scaled(im, min(fit / im.width, fit / im.height))
+        c = Image.new('RGBA', (size, size))
+        c.alpha_composite(sm, ((size - sm.width) // 2, (size - sm.height) // 2))
+        return c
+
+    GEMS = ['sapphire', 'emerald', 'ruby', 'diamond', 'dragonstone']
+    for row, ids in zip(rows, ([f'uncut{g[0].upper()}{g[1:]}' for g in GEMS], GEMS)):
+        for (_, _, im), item in zip(row, ids):
+            boxed(im, 32, 26).save(os.path.join(OUT, f'icon__{item}.png'))
+            boxed(im, 16, 14).save(os.path.join(OUT, f'iconS__{item}.png'))
+
 else:
-    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, overgrowth, slayergear, vinegrasp-art, batch1, lumenhaven, batch3, bessie or bones')
+    sys.exit(f'Unknown set {SET!r}: images01-09, monsters01-12, slayercaves, overgrowth, slayergear, vinegrasp-art, batch1, lumenhaven, batch3, bessie, bones or gems')
 print('done')

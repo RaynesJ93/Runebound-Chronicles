@@ -399,6 +399,10 @@ Earth and fire runes are also sold in the magic shop.
 
 *v0.51.3, painted art* (the "Lumenhaven Images 01–07" sheets): Lumenhaven has its own ground (`theme: 'fae'`: fae grass, violet paths, moonstone market paving and a starlit pool); painted fae stalls, a well of starlight, fae lanterns, giant toadstools and crystal clusters, all glowing in the dark (decor props can have `light`); the fairy ring you arrive by (v0.51.4: moved up into the open, clear of the edge trees); and a straight bridge of glowing moonstone across the pool to the cosmic island (it replaces the wooden causeway). The eight new altars (two frames: the second glows brighter), the eight new rune icons (spells use them too) and the glimmerwisp, fae sentinel and hollow shade are all painted.
 
+### New gem icons (v0.62.1)
+
+The uncut and cut gems were repainted so they no longer look like ore: uncut gems are raw crystal points and clusters (no rock), cut gems are polished jewels with a sparkle (sapphire oval, emerald step cut, ruby heart, diamond round brilliant, dragonstone marquise). Set `gems` in tools/new_art.py (keyed strictly, as ruby and dragonstone sit close to the magenta background).
+
 ### Spell pouch (v0.62.0)
 
 A new reward in Kesta's slayer shop for **100 slayer points**. The spell pouch sits in your bag (one slot) and **holds any number of every rune**. Tap it to put all the runes in your bag into it, or take one kind out.
