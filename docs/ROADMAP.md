@@ -17,6 +17,7 @@ Released 2 November 2026 as game version 0.10.0 (the version numbers in Settings
 
 | Batch | Name | What's in it | Done when |
 | --- | --- | --- | --- |
+| 27 Nov 2026 | v0.62.1: New painted icons for the uncut and cut gems (sapphire, emerald, ruby, diamond, dragonstone), so they no longer look like ores. |
 | 27 Nov 2026 | v0.62.0: Spell pouch in Kesta's slayer shop (100 points): holds any number of every rune in one bag slot, spells use the runes in it, each cast has a 60% chance to use no runes, and crafted runes go straight in. |
 | 26 Nov 2026 | v0.61.2: Bones (all four kinds) stack 20 to a bag slot, like logs and ores. |
 | 26 Nov 2026 | v0.61.1: Painted icons for the four bones and all the bone arrowtips, dart tips, arrows and darts (replacing the recoloured stand-ins). |
