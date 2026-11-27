@@ -23,6 +23,7 @@ export function defaultState() {
     slayer: { task: null, streak: 0, points: 0, blocked: [], last: null }, // see data/slayer.js
     tasks: { done: [], bonus: [], c: {}, unseen: false, spent: 0, bankAt: 0, ring: null }, // achievements (data/tasks.js): done ids, tier bonuses paid, counters, task points spent, Banker's Bond and ring use
     holding: {}, // the bag of holding's contents (v0.59.0)
+    pouch: {}, // the spell pouch's runes (v0.62.0)
     flags: { seenMoveHint: false },
     createdAt: Date.now(),
   };

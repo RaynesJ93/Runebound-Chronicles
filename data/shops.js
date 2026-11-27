@@ -24,6 +24,7 @@ export const SHOPS = {
       { id: 'slayerRing', price: 150 },
       { id: 'bloodbatGloves', price: 400 },
       { id: 'rangersBackpack', price: 100 },
+      { id: 'spellPouch', price: 100 },
       { id: 'huntersGauntlets', price: 1500 },
       // hideFlag: gone from the shop once this flag is set (you've read it)
       { id: 'huntersScroll', price: 150, hideFlag: 'huntersScroll' },

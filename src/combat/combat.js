@@ -352,14 +352,16 @@ export class Combat {
       this.target = null;
       return false;
     }
-    const missing = Object.entries(spell.runes).find(([id, n]) => this.inv.count(id) < n);
+    const have = (id) => this.on.runeCount?.(id) ?? this.inv.count(id); // the spell pouch counts too (v0.62.0)
+    const missing = Object.entries(spell.runes).find(([id, n]) => have(id) < n);
     if (missing) {
       this.on.message?.(`You don't have enough ${ITEMS[missing[0]].name.toLowerCase()}s to cast ${spell.name}.`);
       this.target = null;
       return false;
     }
-    // Rune Saver (task perk, v0.59.0): sometimes the runes aren't used up
-    if (!this.on.runeSaver?.()) for (const [id, n] of Object.entries(spell.runes)) this.inv.remove(id, n);
+    // Rune Saver (task perk, v0.59.0) and the spell pouch (v0.62.0): sometimes the runes aren't used up
+    if (this.on.useRunes) this.on.useRunes(spell.runes);
+    else if (!this.on.runeSaver?.()) for (const [id, n] of Object.entries(spell.runes)) this.inv.remove(id, n);
     this.on.cast?.(spell.id); // counted for achievements (v0.58.2)
     const b = this.gear.bonuses();
     const dmg = resolveAttack(this.rng,

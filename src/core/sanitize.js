@@ -170,6 +170,10 @@ export function sanitize(state) {
   const hold = {};
   if (state.holding && typeof state.holding === 'object') for (const [id, n] of Object.entries(state.holding)) if (holdable(id) && ITEMS[id]) { const k = Math.floor(num(n, 0, 0, HOLD_MAX)); if (k) hold[id] = k; }
   state.holding = hold;
+  // The spell pouch (v0.62.0): runes only, any number of each.
+  const pouch = {};
+  if (state.pouch && typeof state.pouch === 'object') for (const [id, n] of Object.entries(state.pouch)) if (/Rune$/.test(id) && ITEMS[id]?.stackable) { const k = Math.floor(num(n, 0, 0, 1e9)); if (k) pouch[id] = k; }
+  state.pouch = pouch;
 
   return state;
 }

@@ -160,6 +160,8 @@ function boot() {
       },
       cast: (id) => taskCount(`cast:${id}`), // combat spells, for achievements
       runeSaver: () => perk('runeSaver') && rng() < 0.1,
+      runeCount: (id) => runeCount(id),
+      useRunes: (runes) => useRunes(runes),
       enemyDied: (e) => {
         state.stats.kills = (state.stats.kills || 0) + 1;
         taskCount(`kill:${e.def.id}`);
@@ -351,7 +353,7 @@ function boot() {
   let pendingAlch = null;
   const payRunes = (sp) => {
     if (combat.skills.magic < sp.level) { hud.message(`You need a Magic level of ${sp.level} to cast ${sp.name}.`); return false; }
-    const missing = Object.entries(sp.runes).find(([id, n]) => inventory.count(id) < n);
+    const missing = Object.entries(sp.runes).find(([id, n]) => runeCount(id) < n);
     if (missing) { hud.message(`You don't have enough ${ITEMS[missing[0]].name.toLowerCase()}s to cast ${sp.name}.`); return false; }
     return true;
   };
@@ -360,7 +362,7 @@ function boot() {
     if (!sp || !payRunes(sp)) return;
     if (sp.teleport) {
       if (combat.target || enemies.some((e) => !e.dead && e.state === 'fight')) { hud.message("You can't teleport while you're fighting."); return; }
-      if (!(perk('runeSaver') && rng() < 0.1)) for (const [rid, n] of Object.entries(sp.runes)) inventory.remove(rid, n);
+      useRunes(sp.runes);
       book.add('magic', sp.xp);
       hud.closeSkills();
       hud.message(`You cast ${sp.name}.`);
@@ -381,7 +383,7 @@ function boot() {
     if (s.id === 'coins') { hud.message("You can't turn coins into coins."); return; }
     if (!def.value) { hud.message(`The ${def.name.toLowerCase()} has no value. Alchemy can't touch it.`); return; }
     if (!payRunes(sp)) return;
-    if (!(perk('runeSaver') && rng() < 0.1)) for (const [rid, n] of Object.entries(sp.runes)) inventory.remove(rid, n);
+    useRunes(sp.runes);
     const coins = Math.max(1, Math.floor(def.value * sp.alch));
     if (s.qty > 1) inventory.remove(s.id, 1); else inventory.removeSlot(i);
     inventory.add('coins', coins);
@@ -487,6 +489,7 @@ function boot() {
     if (LAMPS[id]) return () => rubLamp(i, x, y);
     if (id === 'coinPouch') return () => openPouch(i);
     if (id === 'bagOfHolding') return () => holdingMenu(x, y);
+    if (id === 'spellPouch') return () => pouchMenu(x, y);
     if (id === 'taskmasterRing') return () => taskRingMenu(x, y);
     if (id === 'taskMasterCape') return () => hud.showMenu(x, y, 'Task Master cape', [{ label: 'Wear', fn: () => wear(i) }, { label: 'Teleport to Tobin', fn: capeToTobin }, { label: 'Cancel', fn: () => {} }]);
     if (def.read) return () => readItem(id);
@@ -519,6 +522,7 @@ function boot() {
     if (LAMPS[s.id]) options.push({ label: 'Rub', fn: () => rubLamp(i, x, y) });
     if (s.id === 'coinPouch') options.push({ label: 'Open', fn: () => openPouch(i) });
     if (s.id === 'bagOfHolding') options.push({ label: 'Take out', fn: () => holdingMenu(x, y) });
+    if (s.id === 'spellPouch') options.push({ label: 'Open', fn: () => pouchMenu(x, y) });
     if (s.id === 'taskmasterRing') options.push({ label: 'Teleport', fn: () => taskRingMenu(x, y) });
     if (s.id === 'taskMasterCape') options.push({ label: 'Teleport to Tobin', fn: capeToTobin });
     if (def.read) options.push({ label: 'Read', fn: () => readItem(s.id) });
@@ -1038,7 +1042,7 @@ function boot() {
     const cur = itemName(shop.currency).toLowerCase();
     const price = shop.buyPrice(id);
     // one-offs (perks, capes, rings, bags, upgrades) only come in ones
-    const single = entry?.perk || entry?.needsTier || entry?.needs || entry?.hideFlag || def.equip || ['bagOfHolding', 'taskmasterRing'].includes(id);
+    const single = entry?.perk || entry?.needsTier || entry?.needs || entry?.hideFlag || def.equip || ['bagOfHolding', 'taskmasterRing', 'spellPouch'].includes(id);
     const need = entry?.needsTier ? (entry.needsTier === 'all' ? 'Needs every task done.' : `Needs every ${entry.needsTier} task done.`) : entry?.perk ? 'A perk: yours for good, no bag slot.' : '';
     hud.showMenu(x, y, `${info}<small class="menu-price">${price.toLocaleString()} ${cur}${need ? ` · ${need}` : ''}</small>`, [
       { label: `Buy 1 (${price.toLocaleString()} ${cur})`, fn: withQty(1, () => hud.onTradeTake(id)) },
@@ -1387,6 +1391,46 @@ function boot() {
       { label: 'Cancel', fn: () => {} },
     ]);
   };
+  // The spell pouch (v0.62.0): holds any number of runes. While it's in your
+  // bag, spells use the runes in it (and in your bag), each cast has a 60%
+  // chance to use no runes, and runes you craft go straight into it.
+  const pouch = () => state.pouch;
+  const isRune = (id) => /Rune$/.test(id) && !!ITEMS[id]?.stackable;
+  const hasPouch = () => inventory.count('spellPouch') > 0;
+  const runeCount = (id) => inventory.count(id) + (hasPouch() ? pouch()[id] || 0 : 0);
+  const takeRunes = (runes) => {
+    for (const [id, n] of Object.entries(runes)) {
+      const fromPouch = hasPouch() ? Math.min(n, pouch()[id] || 0) : 0;
+      if (fromPouch) { pouch()[id] -= fromPouch; if (!pouch()[id]) delete pouch()[id]; }
+      if (n - fromPouch > 0) inventory.remove(id, n - fromPouch);
+    }
+    refreshInventory();
+  };
+  const useRunes = (runes) => {
+    const saved = (hasPouch() && rng() < 0.6) || (perk('runeSaver') && rng() < 0.1);
+    if (!saved) takeRunes(runes);
+    return saved;
+  };
+  const pouchMenu = (x, y) => {
+    const loose = inventory.slots.filter((s) => s && isRune(s.id));
+    const inside = Object.entries(pouch()).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]);
+    hud.showMenu(x, y, inside.length ? 'Spell pouch' : 'Spell pouch (empty)', [
+      ...(loose.length ? [{ label: 'Put your runes in', icon: itemIcon('spellPouch').url, fn: () => {
+        let n = 0;
+        for (const s of inventory.slots.filter((t) => t && isRune(t.id))) { pouch()[s.id] = (pouch()[s.id] || 0) + s.qty; n += s.qty; inventory.remove(s.id, s.qty); }
+        hud.message(`You put ${n.toLocaleString()} runes in your spell pouch.`);
+        refreshInventory(); save();
+      } }] : []),
+      ...inside.map(([id, n]) => ({ label: `Take out ${itemName(id).toLowerCase()}s (${n.toLocaleString()})`, icon: itemIcon(id).url, fn: () => {
+        const got = inventory.add(id, pouch()[id]);
+        pouch()[id] -= got;
+        if (!pouch()[id]) delete pouch()[id];
+        hud.message(got ? `You take out ${got.toLocaleString()} ${itemName(id).toLowerCase()}s.` : 'Your bag is full.');
+        refreshInventory(); save();
+      } })),
+      { label: 'Cancel', fn: () => {} },
+    ]);
+  };
   // The Taskmaster's ring: 3 teleports a day (resets each real day).
   const ringDay = () => new Date().toISOString().slice(0, 10);
   const ringLeft = () => (state.tasks.ring?.day === ringDay() ? RING_CHARGES - state.tasks.ring.used : RING_CHARGES);
@@ -1495,8 +1539,8 @@ function boot() {
     if (p.snapped) { hud.showDialog(['The pillar is dark. Its chain has snapped.']); return; }
     if (!boss) { hud.showDialog(p.interact || ['A rune pillar.']); return; }
     if (p.used) { hud.message('This pillar has nothing left to give.'); return; }
-    if (inventory.count('mindRune') < PILLAR_RUNES) { hud.message(`You need ${PILLAR_RUNES} mind runes to feed the pillar.`); return; }
-    inventory.remove('mindRune', PILLAR_RUNES);
+    if (runeCount('mindRune') < PILLAR_RUNES) { hud.message(`You need ${PILLAR_RUNES} mind runes to feed the pillar.`); return; }
+    takeRunes({ mindRune: PILLAR_RUNES });
     refreshInventory();
     p.used = true;
     p.flashAt = time;
@@ -1789,7 +1833,8 @@ function boot() {
     if (!n) return;
     const per = runesPerEssence(a.alt, book.level('runecrafting'));
     inventory.remove('runeEssence', n);
-    inventory.add(a.alt.rune, n * per);
+    if (hasPouch()) pouch()[a.alt.rune] = (pouch()[a.alt.rune] || 0) + n * per; // straight into the spell pouch
+    else inventory.add(a.alt.rune, n * per);
     const total = n * per;
     hud.itemDrop(a.alt.rune, total);
     book.add('runecrafting', a.alt.xp * n);
